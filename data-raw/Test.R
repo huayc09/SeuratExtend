@@ -9,8 +9,8 @@ library(rlist)
 library(purrr)
 library(roxygen2)
 library(sinew)
+options(max.print = 50, spe = "mouse", nCores = 12)
 
-options(max.print = 50)
 seu <- seuratObj
 matr <- as.matrix(GetAssayData(seuratObj))[1:20,]
 meta <- seuratObj@meta.data
@@ -34,7 +34,7 @@ only.end.terms = T
 slot = "counts"
 assay = "RNA"
 nCores = 4
-makeOxygen(ClusterDistrBar)
+makeOxygen(RunBasicUmap)
 roxygenize()
 CalcScoreGeneral_v3(Seu, features, group.by, "zscore")
 

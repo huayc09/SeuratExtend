@@ -23,7 +23,8 @@
 #' @export
 GeneSetAnalysisGO<-function(seu = NULL, dataset = "BP", root = "BP", spe = "mouse",
                             ratio = 0.4, n.min = 1, n.max = Inf, only.end.terms = F,
-                            slot = "counts", assay = "RNA", nCores = 2){
+                            slot = "counts", assay = "RNA", nCores = getOption("nCores")){
+  check_spe(spe)
   DatabaseList<-list("BP"=c("BP" = "GO:0008150",
                             "immune_system_process" = "GO:0002376",
                             "response_to_stimulus" = "GO:0050896",
@@ -35,6 +36,7 @@ GeneSetAnalysisGO<-function(seu = NULL, dataset = "BP", root = "BP", spe = "mous
                      "CC"=c("CC" = "GO:0005575"))
   library(Seurat)
   library(dplyr)
+  library(rlang)
 
   if(is.null(seu)){
     return(DatabaseList)
@@ -51,17 +53,18 @@ GeneSetAnalysisGO<-function(seu = NULL, dataset = "BP", root = "BP", spe = "mous
     }
   }
   Time1 <- Sys.time()
-  filter <- lapply(GO_Data[[spe]]$GO2Gene[GenesetNames],
+  filter <- sapply(GO_Data[[spe]]$GO2Gene[GenesetNames],
                    function(x){
                      length(x) >= n.min &
                        length(x) <= n.max &
                        sum(rownames(seu) %in% x)/length(x) > (1 - ratio)
                    })
-  GenesetNames <- GenesetNames[unlist(filter)]
+  GenesetNames <- GenesetNames[filter]
   if(only.end.terms) GenesetNames <- GetEndTermsGO(GenesetNames, spe)
   GenesetList <- GO_Data[[spe]]$GO2Gene[GenesetNames]
+  nCores <- nCores %||% parallel::detectCores()
   if(is.null(seu@misc$AUCell[["cells_rankings"]])){
-    seu <- BuildAUCRank(seu, slot = slot, assay = assay)
+    seu <- BuildAUCRank(seu, slot = slot, assay = assay, nCores = nCores)
   }
   seu@misc[["AUCell"]][["GO"]][[dataset]] <-
     AUCell_calcAUC(GenesetList, seu@misc$AUCell[["cells_rankings"]], nCores = nCores) %>%

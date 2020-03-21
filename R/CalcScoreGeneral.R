@@ -18,6 +18,7 @@ CalcScoreGeneral<-function(matr, f, method = "zscore"){
   library(rlist)
   library(mosaic)
   library(purrr)
+  library(tidyr)
   f <- factor(f)
   scores <-
     matr %>%
@@ -63,6 +64,7 @@ CalcScoreGeneral<-function(matr, f, method = "zscore"){
       as.data.frame() %>%
       setNames(., levels(f))
   }
+  scores <- drop_na(scores)
   return(scores)
 }
 

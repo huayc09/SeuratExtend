@@ -122,102 +122,6 @@ GetGeneSet<-function(genelist_list,char,n=0){
   if(hits==1) return(genelist_list[[names(genelist_list)[grep(char,names(genelist_list))]]])
   if(hits>1&n>0) return(genelist_list[[names(genelist_list)[grep(char,names(genelist_list))][n]]])
 }
-ScoreAndOrderDown<-function(matr, meta, group, score, order_method="none", n=0){
-  tmp<-as.matrix(CalcScoreGeneral(matr, meta, group, score))
-  if(order_method=="none") return(tmp)
-  tmp_min<-vector()
-  for (i in rownames(tmp)) {
-    tmp_min[i]<-colnames(tmp)[tmp[i,]==min(tmp[i,])]
-  }
-  tmp_cluster<-colnames(tmp) %>% .[. %in% tmp_min]
-  if(order_method=="value"){
-    tmp2<-list()
-    for (i in tmp_cluster) {
-      tmp2[[i]]<-tmp[tmp_min==i,] %>% .[order(.[,i]),]
-    }
-  }
-  if(order_method=="sd"){
-    tmp2<-list()
-    for (i in tmp_cluster) {
-      tmp2[[i]]<-tmp[tmp_min==i,]
-      tmp_sd<-apply(tmp2[[i]],1,sd)
-      tmp2[[i]]<-tmp2[[i]] %>% .[order(tmp_sd),]
-    }
-  }
-  if(order_method=="p"){
-    tmp2<-list()
-    tmp_p<-CalcScoreGeneral(matr, meta, group, "p")
-    for (i in tmp_cluster) {
-      tmp2[[i]]<-as.data.frame(tmp)[tmp_min==i,]
-      tmp_p_i<-tmp_p[rownames(tmp2[[i]]),i]
-      tmp2[[i]]<-tmp2[[i]] %>% .[order(tmp_p_i),]
-    }
-  }
-  if(n==0){
-    tmp3<-tmp2[[names(tmp2)[1]]]
-    for (i in names(tmp2)[2:length(tmp2)]) {
-      tmp3<-rbind(tmp3, tmp2[[i]])
-    }
-  }else{
-    tmp3<-head(tmp2[[names(tmp2)[1]]],n)
-    for (i in names(tmp2)[2:length(tmp2)]) {
-      tmp3<-rbind(tmp3, head(tmp2[[i]],n))
-    }
-  }
-  return(tmp3)
-}
-EnsemblToGenesymbol<-function(genelist_list){
-  GeneListEnsembl<-unique(unlist(genelist_list))
-  require("biomaRt")
-  mart <- useDataset("mmusculus_gene_ensembl", useMart("ensembl"))
-  EnsemblGenes<-getBM(attributes = c("mgi_symbol", "ensembl_gene_id"),
-                      filters = "ensembl_gene_id",
-                      values = GeneListEnsembl,
-                      mart = mart)
-  GeneListGenesymbol<-list()
-  for (i in names(genelist_list)) {
-    GeneListGenesymbol[[i]]<-unique(EnsemblGenes$mgi_symbol[EnsemblGenes$ensembl_gene_id %in% genelist_list[[i]]])
-    if (length(GeneListGenesymbol[[i]])==0){
-      GeneListGenesymbol[[i]] <- NULL
-    }
-  }
-  return(GeneListGenesymbol)
-}
-GetChild<-function(MMU,relation){
-  child<-unique(as.vector(relation$V2)[relation$V1 %in% MMU])
-  return(child)
-}
-GetAllChild<-function(MMU,relation){
-  tmp<-MMU
-  child<-GetChild(MMU,relation)
-  tmp<-unique(c(tmp,child))
-  if(length(tmp)>length(MMU)){
-    return(GetAllChild(tmp,relation))
-  }else{
-    return(tmp)
-  }
-}
-ChangeName<-function(char, ref, from, to){
-  tmp<-char
-  for (i in 1:length(char)) {
-    tmp[i]<-as.character(ref[ref[,from]==char[i],to][1])
-  }
-  return(tmp)
-}
-GetParent<-function(MMU,relation){
-  parent<-unique(as.vector(relation$V1)[relation$V2 %in% MMU])
-  return(parent)
-}
-GetAllParent<-function(MMU,relation){
-  tmp<-MMU
-  parent<-GetParent(MMU,relation)
-  tmp<-unique(c(tmp,parent))
-  if(length(tmp)>length(MMU)){
-    return(GetAllParent(tmp,relation))
-  }else{
-    return(tmp)
-  }
-}
 GenesetOfGenes<-function(geneset_list, genes, type="onlygene"){
   tmp_list<-list()
   if(type=="all"){
@@ -649,5 +553,105 @@ AddMetaData<-function(Df, MetadataDf, ID, col){
   }
   return(Df)
 }
+check_spe <- function(spe){
+  if(is.null(spe)) stop("species undefined: options(spe = c(\"mouse\", \"human\"))")
 }
-
+}
+{
+  # ScoreAndOrderDown<-function(matr, meta, group, score, order_method="none", n=0){
+  #   tmp<-as.matrix(CalcScoreGeneral(matr, meta, group, score))
+  #   if(order_method=="none") return(tmp)
+  #   tmp_min<-vector()
+  #   for (i in rownames(tmp)) {
+  #     tmp_min[i]<-colnames(tmp)[tmp[i,]==min(tmp[i,])]
+  #   }
+  #   tmp_cluster<-colnames(tmp) %>% .[. %in% tmp_min]
+  #   if(order_method=="value"){
+  #     tmp2<-list()
+  #     for (i in tmp_cluster) {
+  #       tmp2[[i]]<-tmp[tmp_min==i,] %>% .[order(.[,i]),]
+  #     }
+  #   }
+  #   if(order_method=="sd"){
+  #     tmp2<-list()
+  #     for (i in tmp_cluster) {
+  #       tmp2[[i]]<-tmp[tmp_min==i,]
+  #       tmp_sd<-apply(tmp2[[i]],1,sd)
+  #       tmp2[[i]]<-tmp2[[i]] %>% .[order(tmp_sd),]
+  #     }
+  #   }
+  #   if(order_method=="p"){
+  #     tmp2<-list()
+  #     tmp_p<-CalcScoreGeneral(matr, meta, group, "p")
+  #     for (i in tmp_cluster) {
+  #       tmp2[[i]]<-as.data.frame(tmp)[tmp_min==i,]
+  #       tmp_p_i<-tmp_p[rownames(tmp2[[i]]),i]
+  #       tmp2[[i]]<-tmp2[[i]] %>% .[order(tmp_p_i),]
+  #     }
+  #   }
+  #   if(n==0){
+  #     tmp3<-tmp2[[names(tmp2)[1]]]
+  #     for (i in names(tmp2)[2:length(tmp2)]) {
+  #       tmp3<-rbind(tmp3, tmp2[[i]])
+  #     }
+  #   }else{
+  #     tmp3<-head(tmp2[[names(tmp2)[1]]],n)
+  #     for (i in names(tmp2)[2:length(tmp2)]) {
+  #       tmp3<-rbind(tmp3, head(tmp2[[i]],n))
+  #     }
+  #   }
+  #   return(tmp3)
+  # }
+  # EnsemblToGenesymbol<-function(genelist_list){
+  #   GeneListEnsembl<-unique(unlist(genelist_list))
+  #   require("biomaRt")
+  #   mart <- useDataset("mmusculus_gene_ensembl", useMart("ensembl"))
+  #   EnsemblGenes<-getBM(attributes = c("mgi_symbol", "ensembl_gene_id"),
+  #                       filters = "ensembl_gene_id",
+  #                       values = GeneListEnsembl,
+  #                       mart = mart)
+  #   GeneListGenesymbol<-list()
+  #   for (i in names(genelist_list)) {
+  #     GeneListGenesymbol[[i]]<-unique(EnsemblGenes$mgi_symbol[EnsemblGenes$ensembl_gene_id %in% genelist_list[[i]]])
+  #     if (length(GeneListGenesymbol[[i]])==0){
+  #       GeneListGenesymbol[[i]] <- NULL
+  #     }
+  #   }
+  #   return(GeneListGenesymbol)
+  # }
+  # GetChild<-function(MMU,relation){
+  #   child<-unique(as.vector(relation$V2)[relation$V1 %in% MMU])
+  #   return(child)
+  # }
+  # GetAllChild<-function(MMU,relation){
+  #   tmp<-MMU
+  #   child<-GetChild(MMU,relation)
+  #   tmp<-unique(c(tmp,child))
+  #   if(length(tmp)>length(MMU)){
+  #     return(GetAllChild(tmp,relation))
+  #   }else{
+  #     return(tmp)
+  #   }
+  # }
+  # ChangeName<-function(char, ref, from, to){
+  #   tmp<-char
+  #   for (i in 1:length(char)) {
+  #     tmp[i]<-as.character(ref[ref[,from]==char[i],to][1])
+  #   }
+  #   return(tmp)
+  # }
+  # GetParent<-function(MMU,relation){
+  #   parent<-unique(as.vector(relation$V1)[relation$V2 %in% MMU])
+  #   return(parent)
+  # }
+  # GetAllParent<-function(MMU,relation){
+  #   tmp<-MMU
+  #   parent<-GetParent(MMU,relation)
+  #   tmp<-unique(c(tmp,parent))
+  #   if(length(tmp)>length(MMU)){
+  #     return(GetAllParent(tmp,relation))
+  #   }else{
+  #     return(tmp)
+  #   }
+  # }
+}

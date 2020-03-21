@@ -4,7 +4,7 @@
 \alias{BuildAUCRank}
 \title{FUNCTION_TITLE}
 \usage{
-BuildAUCRank(seu, slot = "counts", assay = "RNA")
+BuildAUCRank(seu, slot = "counts", assay = "RNA", nCores = getOption("nCores"))
 }
 \arguments{
 \item{seu}{PARAM_DESCRIPTION}
@@ -12,6 +12,8 @@ BuildAUCRank(seu, slot = "counts", assay = "RNA")
 \item{slot}{PARAM_DESCRIPTION, Default: 'counts'}
 
 \item{assay}{PARAM_DESCRIPTION, Default: 'RNA'}
+
+\item{nCores}{PARAM_DESCRIPTION, Default: getOption("nCores")}
 }
 \value{
 OUTPUT_DESCRIPTION

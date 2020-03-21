@@ -4,7 +4,7 @@
 \alias{GetEndTermsGO}
 \title{FUNCTION_TITLE}
 \usage{
-GetEndTermsGO(term, spe)
+GetEndTermsGO(term, spe = getOption("spe"))
 }
 \arguments{
 \item{term}{PARAM_DESCRIPTION}

@@ -10,15 +10,5 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.0.2
 Imports: 
-    Seurat,
-    dplyr,
-    rlist,
-    mosaic,
-    ggplot2,
-    reshape2,
-    purrr,
-    rgl,
-    slingshot,
-    destiny,
-    magrittr,
-    AUCell
+    Seurat, dplyr, rlist, mosaic, ggplot2, reshape2, purrr, rgl, slingshot, destiny, magrittr, AUCell, tidyr,
+    biomaRt, ontologyIndex, doParallel, doRNG, mgsa

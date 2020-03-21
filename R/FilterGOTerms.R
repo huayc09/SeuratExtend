@@ -18,8 +18,9 @@
 #' @rdname FilterGOTerms
 #' @export
 
-FilterGOTerms <- function(term, spe = "mouse", n.min = 1, n.max = Inf,
+FilterGOTerms <- function(term, spe = getOption("spe"), n.min = 1, n.max = Inf,
                           only.end.terms = T, change.name = F, parent = NULL){
+  check_spe(spe)
   if(is.vector(term)){
     filter <-
       GO_Data[[spe]]$GO2Gene[term] %>%

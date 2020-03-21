@@ -6,7 +6,7 @@
 \usage{
 FilterGOTerms(
   term,
-  spe = "mouse",
+  spe = getOption("spe"),
   n.min = 1,
   n.max = Inf,
   only.end.terms = T,

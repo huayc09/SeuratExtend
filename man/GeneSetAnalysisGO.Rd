@@ -15,7 +15,7 @@ GeneSetAnalysisGO(
   only.end.terms = F,
   slot = "counts",
   assay = "RNA",
-  nCores = 2
+  nCores = getOption("nCores")
 )
 }
 \arguments{

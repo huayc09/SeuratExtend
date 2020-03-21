@@ -12,7 +12,8 @@
 #' }
 #' @rdname GetEndTermsGO
 #' @export
-GetEndTermsGO <- function(term, spe){
+GetEndTermsGO <- function(term, spe = getOption("spe")){
+  check_spe(spe)
   anc <- GO_Data[[spe]]$GO_ontology$ancestors[term] %>%
     lapply(function(x) x[-length(x)]) %>%
     unlist() %>% unique()

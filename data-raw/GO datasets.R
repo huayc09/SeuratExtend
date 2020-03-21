@@ -4,6 +4,7 @@ library(ontologyIndex)
 library(dplyr)
 library(openxlsx)
 library(readxl)
+# original databases are moved to "SeuratExtend_databases"
 GO_Annot_Mgi <- readGAF("data-raw/mgi.gaf")
 GO_Annot_human <- readGAF("data-raw/goa_human.gaf")
 GO_ontology <- get_OBO("data-raw/go-basic.obo")
