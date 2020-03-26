@@ -76,7 +76,7 @@ GeneSetAnalysisGO<-function(seu = NULL, dataset = "BP", root = "BP", spe = getOp
     seu <- BuildAUCRank(seu, slot = slot, assay = assay, nCores = nCores)
   }
   message(paste(Sys.time(), "Calculating", length(GenesetList), "gene set(s)"))
-  n.items.part <- 2e6 / ncol(seu) * nCores
+  n.items.part <- 1e6 / ncol(seu) * nCores
   splited_terms <- split(GenesetList, ceiling((1:length(GenesetList))/n.items.part))
   message(paste(Sys.time(), "Split gene set(s) into", length(splited_terms), "part(s)"))
   AUC_matrix <-
