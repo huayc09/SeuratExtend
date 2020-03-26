@@ -24,6 +24,7 @@ SearchDatabase <-
            spe = getOption("spe"), export.to.data.frame = F,
            n.min = 1, n.max = Inf, only.end.terms = T){
     check_spe(spe)
+    library(dplyr)
     library(rlist)
     ID_GO <- c()
     ID_Rct <- c()

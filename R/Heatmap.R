@@ -5,6 +5,7 @@
 #' @param lab_fill PARAM_DESCRIPTION, Default: 'score'
 #' @param angle PARAM_DESCRIPTION, Default: 45
 #' @param hjust PARAM_DESCRIPTION, Default: 1
+#' @param vjust PARAM_DESCRIPTION, Default: 1
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -15,8 +16,9 @@
 #' }
 #' @rdname Heatmap
 #' @export
+
 Heatmap<-function(score, color_scheme="2", lab_fill = "score",
-                  angle = 45, hjust = 1){
+                  angle = 45, hjust = 1, vjust = 1){
   library(ggplot2)
   library(reshape2)
   library(viridis)
@@ -31,7 +33,7 @@ Heatmap<-function(score, color_scheme="2", lab_fill = "score",
     labs(x = "", y = "", fill = lab_fill)+
     scale_y_discrete(position = "right")+
     scale_x_discrete(labels = colnames(score))+
-    theme(axis.text.x=element_text(angle = angle, hjust = hjust))
+    theme(axis.text.x=element_text(angle = angle, hjust = hjust, vjust = vjust))
   if(color_scheme == "2"){
     p <- p + scale_fill_gradient2(low = muted("blue"), high = muted("red"))
   }else if(color_scheme %in% c("A","B","C","D","E")){
@@ -39,4 +41,7 @@ Heatmap<-function(score, color_scheme="2", lab_fill = "score",
   }
   return(p)
 }
+# matr <- as.matrix(GetAssayData(seu))[1:20,]
+# f <- seu@meta.data$cluster
 # matr %>% CalcScoreGeneral(f, "zscore") %>% Heatmap()
+# matr %>% CalcScoreGeneral(f, "zscore") %>% Heatmap(angle = -90, hjust = 0, vjust = 0.5)

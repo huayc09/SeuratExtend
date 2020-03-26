@@ -1,22 +1,4 @@
 {
-stacked_violin<-function(matr, meta, group, genelist){
-  require(ggplot2)
-  tmp_meta<-meta
-  for (i in genelist) {
-    tmp_meta[,i]<-matr[i,]
-  }
-  tmp<-reshape2::melt(tmp_meta[,c(group,genelist)])
-  p<-ggplot(tmp, aes(x=tmp[,group],y=value, fill=tmp[,group]))+
-    geom_violin(scale = "width")+
-    facet_wrap( ~variable, ncol = 1, strip.position="left")+
-    ylab(NULL) +
-    xlab(NULL) +
-    theme(strip.background = element_blank(),
-          strip.placement = "outside",
-          legend.position = "none",
-          axis.text.x=element_text(angle = 45,hjust = 1))
-  return(p)
-}
 run_GSVA <- function(Obj, Gmtfilename){
   require("biomaRt")
   human = useMart("ensembl", dataset = "hsapiens_gene_ensembl")
@@ -38,39 +20,6 @@ run_GSVA <- function(Obj, Gmtfilename){
   require("GSVA")
   es <- gsva(new_matrix, Gmtfile, min.sz=10, max.sz=500, verbose=TRUE, parallel.sz=1)
   return(es)
-}
-AUC_violin<-function(Obj, genelist_list){
-  tmp_meta<-Obj@meta.data
-  tmp_data<-Obj@data
-  require(AUCell)
-  cells_rankings <- AUCell_buildRankings(tmp_data, plotStats=TRUE)
-  for (i in names(genelist_list)){
-    AUC <- getAUC(AUCell_calcAUC(genelist_list[[i]], cells_rankings))
-    tmp_meta[,i]<-AUC[1,]
-  }
-  tmp<-reshape2::melt(tmp_meta[,c("cluster",names(genelist_list))])
-  p<-ggplot(tmp, aes(x=tmp[,"cluster"],y=value, fill=cluster))+
-    geom_violin(scale = "width")+
-    facet_wrap( ~variable, ncol = 1, strip.position="left")+
-    ylab(NULL) +
-    xlab(NULL) +
-    theme(strip.background = element_blank(),
-          strip.placement = "outside",
-          legend.position = "none",
-          axis.text.x=element_text(angle = 45,hjust = 1))
-  return(p)
-}
-AUC_matrix<-function(matr, genelist_list, ratio=0.2){
-  require(AUCell)
-  cells_rankings <- AUCell_buildRankings(matr, plotStats=TRUE)
-  tmp<-genelist_list
-  for (i in names(tmp)){
-    if(sum(tmp[[i]] %in% rownames(matr))/length(tmp[[i]]) < (1-ratio)){
-      tmp[[i]]<-NULL
-    }
-  }
-  AUC <- getAUC(AUCell_calcAUC(tmp, cells_rankings, nCores = 2))
-  return(AUC)
 }
 MouseToHumanGeneExpression<-function(Matr){
   require("biomaRt")
@@ -517,31 +466,6 @@ HeatmapGeneSet_v3<-function(seu = NULL, group = NULL, order_by_group = T,
   p<-heatmap_marker(ToPlot, color_scheme) + labs(fill=score)
   return(p)
 }
-stacked_violin_v3<-function(Seu, group = "seurat_clusters", genelist, cell = NULL, ncol = 1){
-  require(ggplot2)
-  require(rlang)
-  require(dplyr)
-  cell <- cell %||% colnames(Seu)
-  genelist <- genelist %>% .[. %in% rownames(Seu)]
-  matr <- GetAssayData(Seu)[genelist, cell]
-  tmp_meta<-Seu@meta.data[cell,]
-  for (i in genelist) {
-    tmp_meta[,i]<-matr[i,]
-  }
-  tmp<-reshape2::melt(tmp_meta[,c(group,genelist)])
-  p<-ggplot(tmp, aes(x=tmp[,group],y=value, fill=tmp[,group]))+
-    geom_violin(scale = "width")+
-    facet_wrap( ~variable, ncol = ncol, strip.position="left")+
-    ylab(NULL) +
-    xlab(NULL) +
-    theme(strip.background = element_blank(),
-          strip.placement = "outside",
-          legend.position = "none",
-          axis.text.x=element_text(angle = 45,hjust = 1)) +
-    theme_classic() +
-    labs(fill=group)
-  return(p)
-}
 AddMetaData<-function(Df, MetadataDf, ID, col){
   MetaIDs<-as.data.frame(MetadataDf)[,ID]
   for (i in rownames(Df)) {
@@ -654,4 +578,81 @@ check_spe <- function(spe){
   #     return(tmp)
   #   }
   # }
+  # stacked_violin<-function(matr, meta, group, genelist){
+  #   require(ggplot2)
+  #   tmp_meta<-meta
+  #   for (i in genelist) {
+  #     tmp_meta[,i]<-matr[i,]
+  #   }
+  #   tmp<-reshape2::melt(tmp_meta[,c(group,genelist)])
+  #   p<-ggplot(tmp, aes(x=tmp[,group],y=value, fill=tmp[,group]))+
+  #     geom_violin(scale = "width")+
+  #     facet_wrap( ~variable, ncol = 1, strip.position="left")+
+  #     ylab(NULL) +
+  #     xlab(NULL) +
+  #     theme(strip.background = element_blank(),
+  #           strip.placement = "outside",
+  #           legend.position = "none",
+  #           axis.text.x=element_text(angle = 45,hjust = 1))
+  #   return(p)
+  # }
+  # AUC_violin<-function(Obj, genelist_list){
+  #   tmp_meta<-Obj@meta.data
+  #   tmp_data<-Obj@data
+  #   require(AUCell)
+  #   cells_rankings <- AUCell_buildRankings(tmp_data, plotStats=TRUE)
+  #   for (i in names(genelist_list)){
+  #     AUC <- getAUC(AUCell_calcAUC(genelist_list[[i]], cells_rankings))
+  #     tmp_meta[,i]<-AUC[1,]
+  #   }
+  #   tmp<-reshape2::melt(tmp_meta[,c("cluster",names(genelist_list))])
+  #   p<-ggplot(tmp, aes(x=tmp[,"cluster"],y=value, fill=cluster))+
+  #     geom_violin(scale = "width")+
+  #     facet_wrap( ~variable, ncol = 1, strip.position="left")+
+  #     ylab(NULL) +
+  #     xlab(NULL) +
+  #     theme(strip.background = element_blank(),
+  #           strip.placement = "outside",
+  #           legend.position = "none",
+  #           axis.text.x=element_text(angle = 45,hjust = 1))
+  #   return(p)
+  # }
+  # AUC_matrix<-function(matr, genelist_list, ratio=0.2){
+  #   require(AUCell)
+  #   cells_rankings <- AUCell_buildRankings(matr, plotStats=TRUE)
+  #   tmp<-genelist_list
+  #   for (i in names(tmp)){
+  #     if(sum(tmp[[i]] %in% rownames(matr))/length(tmp[[i]]) < (1-ratio)){
+  #       tmp[[i]]<-NULL
+  #     }
+  #   }
+  #   AUC <- getAUC(AUCell_calcAUC(tmp, cells_rankings, nCores = 2))
+  #   return(AUC)
+  # }
+  # stacked_violin_v3<-function(Seu, group = "seurat_clusters", genelist, cell = NULL, ncol = 1){
+  #   require(ggplot2)
+  #   require(rlang)
+  #   require(dplyr)
+  #   cell <- cell %||% colnames(Seu)
+  #   genelist <- genelist %>% .[. %in% rownames(Seu)]
+  #   matr <- GetAssayData(Seu)[genelist, cell]
+  #   tmp_meta<-Seu@meta.data[cell,]
+  #   for (i in genelist) {
+  #     tmp_meta[,i]<-matr[i,]
+  #   }
+  #   tmp<-reshape2::melt(tmp_meta[,c(group,genelist)])
+  #   p<-ggplot(tmp, aes(x=tmp[,group],y=value, fill=tmp[,group]))+
+  #     geom_violin(scale = "width")+
+  #     facet_wrap( ~variable, ncol = ncol, strip.position="left")+
+  #     ylab(NULL) +
+  #     xlab(NULL) +
+  #     theme(strip.background = element_blank(),
+  #           strip.placement = "outside",
+  #           legend.position = "none",
+  #           axis.text.x=element_text(angle = 45,hjust = 1)) +
+  #     theme_classic() +
+  #     labs(fill=group)
+  #   return(p)
+  # }
+
 }

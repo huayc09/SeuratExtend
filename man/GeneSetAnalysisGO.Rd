@@ -8,14 +8,15 @@ GeneSetAnalysisGO(
   seu = NULL,
   dataset = "BP",
   root = "BP",
-  spe = "mouse",
+  spe = getOption("spe"),
   ratio = 0.4,
   n.min = 1,
   n.max = Inf,
   only.end.terms = F,
   slot = "counts",
   assay = "RNA",
-  nCores = getOption("nCores")
+  nCores = getOption("nCores"),
+  export_to_matrix = F
 )
 }
 \arguments{
@@ -25,7 +26,7 @@ GeneSetAnalysisGO(
 
 \item{root}{PARAM_DESCRIPTION, Default: 'BP'}
 
-\item{spe}{PARAM_DESCRIPTION, Default: 'mouse'}
+\item{spe}{PARAM_DESCRIPTION, Default: getOption("spe")}
 
 \item{ratio}{PARAM_DESCRIPTION, Default: 0.4}
 
@@ -39,7 +40,9 @@ GeneSetAnalysisGO(
 
 \item{assay}{PARAM_DESCRIPTION, Default: 'RNA'}
 
-\item{nCores}{PARAM_DESCRIPTION, Default: 2}
+\item{nCores}{PARAM_DESCRIPTION, Default: getOption("nCores")}
+
+\item{export_to_matrix}{PARAM_DESCRIPTION, Default: F}
 }
 \value{
 OUTPUT_DESCRIPTION
@@ -56,4 +59,7 @@ if(interactive()){
  #EXAMPLE1
  }
 }
+}
+\seealso{
+\code{\link[parallel]{detectCores}}
 }

@@ -6,10 +6,11 @@ GetChilrenReactome <- function(term, spe = getOption("spe")){
 
 GetAllChilrenReactome <- function(term, spe = getOption("spe")){
   Child <- GetChilrenReactome(term, spe)
-  if(length(Child) > length(term)) return(GetChilrenReactome(Child, spe)) else return(term)
+  if(length(Child) > length(term)) return(GetAllChilrenReactome(Child, spe)) else return(term)
 }
 
 # options(spe = "mouse")
 # term <- c("R-MMU-1430728", "R-MMU-162582")
 # GetChilrenReactome(term)
 # GetAllChilrenReactome(term)
+

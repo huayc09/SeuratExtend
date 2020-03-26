@@ -4,7 +4,14 @@
 \alias{Heatmap}
 \title{FUNCTION_TITLE}
 \usage{
-Heatmap(score, color_scheme = "2", lab_fill = "score", angle = 45, hjust = 1)
+Heatmap(
+  score,
+  color_scheme = "2",
+  lab_fill = "score",
+  angle = 45,
+  hjust = 1,
+  vjust = 1
+)
 }
 \arguments{
 \item{score}{PARAM_DESCRIPTION}
@@ -16,6 +23,8 @@ Heatmap(score, color_scheme = "2", lab_fill = "score", angle = 45, hjust = 1)
 \item{angle}{PARAM_DESCRIPTION, Default: 45}
 
 \item{hjust}{PARAM_DESCRIPTION, Default: 1}
+
+\item{vjust}{PARAM_DESCRIPTION, Default: 1}
 }
 \value{
 OUTPUT_DESCRIPTION

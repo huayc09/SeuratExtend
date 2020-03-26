@@ -10,6 +10,7 @@
 #' @param slot PARAM_DESCRIPTION, Default: 'counts'
 #' @param assay PARAM_DESCRIPTION, Default: 'RNA'
 #' @param nCores PARAM_DESCRIPTION, Default: getOption("nCores")
+#' @param export_to_matrix PARAM_DESCRIPTION, Default: F
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -27,12 +28,15 @@
 GeneSetAnalysisReactome <-
   function(seu = NULL, parent = "All", spe = getOption("spe"),
            ratio = 0.4, n.min = 1, n.max = Inf, only.end.terms = F,
-           slot = "counts", assay = "RNA", nCores = getOption("nCores")){
+           slot = "counts", assay = "RNA", nCores = getOption("nCores"),
+           export_to_matrix = F){
     check_spe(spe)
     DatabaseList <- Reactome_Data[[spe]]$Roots
     library(Seurat)
     library(dplyr)
     library(rlang)
+    library(AUCell)
+    library(rlist)
 
     if(is.null(seu)){
       return(DatabaseList)
@@ -41,13 +45,13 @@ GeneSetAnalysisReactome <-
       GenesetNames <- names(Reactome_Data[[spe]]$Path2Gene)
     }else if(all(parent %in% DatabaseList)){
       GenesetNames <- GetAllChilrenReactome(names(DatabaseList)[DatabaseList %in% parent], spe = spe)
-    }else if(all(parent %in% names(DatabaseList))){
+    }else if(all(parent %in% names(Reactome_Data[[spe]]$Path2Gene))){
       GenesetNames <- GetAllChilrenReactome(parent, spe = spe)
     }else{
       print(DatabaseList)
       return(seu)
     }
-    Time1 <- Sys.time()
+    message(paste(Sys.time(), "Start filtering gene sets"))
     filter <- sapply(Reactome_Data[[spe]]$Path2Gene[GenesetNames],
                      function(x){
                        length(x) >= n.min &
@@ -59,20 +63,25 @@ GeneSetAnalysisReactome <-
     GenesetList <- Reactome_Data[[spe]]$Path2Gene[GenesetNames]
     nCores <- nCores %||% parallel::detectCores()
     if(is.null(seu@misc$AUCell[["cells_rankings"]])){
+      message(paste(Sys.time(), "Build AUC Rank"))
       seu <- BuildAUCRank(seu, slot = slot, assay = assay, nCores = nCores)
     }
-    seu@misc[["AUCell"]][["Reactome"]][[parent]] <-
-      AUCell_calcAUC(GenesetList, seu@misc$AUCell[["cells_rankings"]], nCores = nCores) %>%
-      getAUC() %>%
+    message(paste(Sys.time(), "Calculating", length(GenesetList), "gene set(s)"))
+    n.items.part <- 2e6 / ncol(seu) * nCores
+    splited_terms <- split(GenesetList, ceiling((1:length(GenesetList))/n.items.part))
+    message(paste(Sys.time(), "Split gene set(s) into", length(splited_terms), "part(s)"))
+    AUC_matrix <-
+      splited_terms %>%
+      lapply(function(x) AUCell_calcAUC(x, seu@misc$AUCell[["cells_rankings"]], nCores = nCores) %>% getAUC()) %>%
+      list.rbind() %>%
       .[apply(., 1, sum)>0, ]
-    Time2 <- Sys.time()
-    message <- paste0("\nTime usage: ", round(difftime(Time2, Time1, units='mins'), digits = 2), " mins")
-    message(message)
+    message(paste0("\n", Sys.time(), " Done"))
+    if(export_to_matrix) return(AUC_matrix)
+    seu@misc[["AUCell"]][["Reactome"]][[parent]] <- AUC_matrix
     return(seu)
   }
 
 # options(spe = "mouse", nCores = 12)
-# spe = "mouse"
 # parent = "All"
 # ratio = 0.4
 # n.min = 1
@@ -82,4 +91,4 @@ GeneSetAnalysisReactome <-
 # assay = "RNA"
 # nCores = 12
 # seu <- readRDS("~/R documents/2020-2-10 EC PyMT and E0771/rds/PyMTEC_old.rds")
-# GeneSetAnalysisReactome(seu)
+# seu <- GeneSetAnalysisReactome(seu)

@@ -3,14 +3,15 @@
 #' @param seu PARAM_DESCRIPTION, Default: NULL
 #' @param dataset PARAM_DESCRIPTION, Default: 'BP'
 #' @param root PARAM_DESCRIPTION, Default: 'BP'
-#' @param spe PARAM_DESCRIPTION, Default: 'mouse'
+#' @param spe PARAM_DESCRIPTION, Default: getOption("spe")
 #' @param ratio PARAM_DESCRIPTION, Default: 0.4
 #' @param n.min PARAM_DESCRIPTION, Default: 1
 #' @param n.max PARAM_DESCRIPTION, Default: Inf
 #' @param only.end.terms PARAM_DESCRIPTION, Default: F
 #' @param slot PARAM_DESCRIPTION, Default: 'counts'
 #' @param assay PARAM_DESCRIPTION, Default: 'RNA'
-#' @param nCores PARAM_DESCRIPTION, Default: 2
+#' @param nCores PARAM_DESCRIPTION, Default: getOption("nCores")
+#' @param export_to_matrix PARAM_DESCRIPTION, Default: F
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -19,11 +20,16 @@
 #'  #EXAMPLE1
 #'  }
 #' }
+#' @seealso
+#'  \code{\link[parallel]{detectCores}}
 #' @rdname GeneSetAnalysisGO
 #' @export
-GeneSetAnalysisGO<-function(seu = NULL, dataset = "BP", root = "BP", spe = "mouse",
+#' @importFrom parallel detectCores
+
+GeneSetAnalysisGO<-function(seu = NULL, dataset = "BP", root = "BP", spe = getOption("spe"),
                             ratio = 0.4, n.min = 1, n.max = Inf, only.end.terms = F,
-                            slot = "counts", assay = "RNA", nCores = getOption("nCores")){
+                            slot = "counts", assay = "RNA", nCores = getOption("nCores"),
+                            export_to_matrix = F){
   check_spe(spe)
   DatabaseList<-list("BP"=c("BP" = "GO:0008150",
                             "immune_system_process" = "GO:0002376",
@@ -37,6 +43,8 @@ GeneSetAnalysisGO<-function(seu = NULL, dataset = "BP", root = "BP", spe = "mous
   library(Seurat)
   library(dplyr)
   library(rlang)
+  library(AUCell)
+  library(rlist)
 
   if(is.null(seu)){
     return(DatabaseList)
@@ -44,7 +52,7 @@ GeneSetAnalysisGO<-function(seu = NULL, dataset = "BP", root = "BP", spe = "mous
   if(all(dataset %in% names(DatabaseList[[root]]))){
     GenesetNames <- GetAllChilrenGO(DatabaseList[[root]][dataset], spe = spe)
   }else{
-    AllGeneset <- GetAllChilrenGO(DatabaseList[[root]]["All"], spe = spe)
+    AllGeneset <- GetAllChilrenGO(DatabaseList[[root]][dataset], spe = spe)
     if(all(dataset %in% AllGeneset)){
       GenesetNames <- GetAllChilrenGO(dataset, spe = spe)
     }else{
@@ -52,7 +60,7 @@ GeneSetAnalysisGO<-function(seu = NULL, dataset = "BP", root = "BP", spe = "mous
       return(seu)
     }
   }
-  Time1 <- Sys.time()
+  message(paste(Sys.time(), "Start filtering gene sets"))
   filter <- sapply(GO_Data[[spe]]$GO2Gene[GenesetNames],
                    function(x){
                      length(x) >= n.min &
@@ -64,20 +72,34 @@ GeneSetAnalysisGO<-function(seu = NULL, dataset = "BP", root = "BP", spe = "mous
   GenesetList <- GO_Data[[spe]]$GO2Gene[GenesetNames]
   nCores <- nCores %||% parallel::detectCores()
   if(is.null(seu@misc$AUCell[["cells_rankings"]])){
+    message(paste(Sys.time(), "Build AUC Rank"))
     seu <- BuildAUCRank(seu, slot = slot, assay = assay, nCores = nCores)
   }
-  seu@misc[["AUCell"]][["GO"]][[dataset]] <-
-    AUCell_calcAUC(GenesetList, seu@misc$AUCell[["cells_rankings"]], nCores = nCores) %>%
-    getAUC() %>%
+  message(paste(Sys.time(), "Calculating", length(GenesetList), "gene set(s)"))
+  n.items.part <- 2e6 / ncol(seu) * nCores
+  splited_terms <- split(GenesetList, ceiling((1:length(GenesetList))/n.items.part))
+  message(paste(Sys.time(), "Split gene set(s) into", length(splited_terms), "part(s)"))
+  AUC_matrix <-
+    splited_terms %>%
+    lapply(function(x) AUCell_calcAUC(x, seu@misc$AUCell[["cells_rankings"]], nCores = nCores) %>% getAUC()) %>%
+    list.rbind() %>%
     .[apply(., 1, sum)>0, ]
-  Time2 <- Sys.time()
-  message <- paste0("\nTime usage: ", round(difftime(Time2, Time1, units='mins'), digits = 2), " mins")
-  message(message)
+  message(paste0("\n", Sys.time(), " Done"))
+  if(export_to_matrix) return(AUC_matrix)
+  seu@misc[["AUCell"]][["GO"]][[dataset]] <- AUC_matrix
   return(seu)
 }
 
-# library(magrittr)
+# dataset = "BP"
+# root = "BP"
+# spe = getOption("spe")
+# ratio = 0.4
+# n.min = 1
+# n.max = Inf
+# only.end.terms = F
+# slot = "counts"
+# assay = "RNA"
+# nCores = getOption("nCores")
+# export_to_matrix = F
 # seu <- GeneSetAnalysisGO(seu)
-# ScoreAndOrder(seu@misc[["AUCell"]][["GO"]][["All"]], f, n = 7) %>%
-#   set_rownames(RenameGO(rownames(.))) %>%
-#   Heatmap()
+

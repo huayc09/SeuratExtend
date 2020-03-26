@@ -14,7 +14,8 @@ GeneSetAnalysisReactome(
   only.end.terms = F,
   slot = "counts",
   assay = "RNA",
-  nCores = getOption("nCores")
+  nCores = getOption("nCores"),
+  export_to_matrix = F
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ GeneSetAnalysisReactome(
 \item{assay}{PARAM_DESCRIPTION, Default: 'RNA'}
 
 \item{nCores}{PARAM_DESCRIPTION, Default: getOption("nCores")}
+
+\item{export_to_matrix}{PARAM_DESCRIPTION, Default: F}
 }
 \value{
 OUTPUT_DESCRIPTION

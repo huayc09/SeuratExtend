@@ -4,10 +4,16 @@
 \alias{RenameGO}
 \title{FUNCTION_TITLE}
 \usage{
-RenameGO(term)
+RenameGO(term, add_id = T, add_n_gene = T, spe = getOption("spe"))
 }
 \arguments{
 \item{term}{PARAM_DESCRIPTION}
+
+\item{add_id}{PARAM_DESCRIPTION, Default: T}
+
+\item{add_n_gene}{PARAM_DESCRIPTION, Default: T}
+
+\item{spe}{PARAM_DESCRIPTION, Default: getOption("spe")}
 }
 \value{
 OUTPUT_DESCRIPTION

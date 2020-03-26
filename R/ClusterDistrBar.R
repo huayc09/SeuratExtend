@@ -17,6 +17,7 @@
 #' }
 #' @rdname ClusterDistrBar
 #' @export
+
 ClusterDistrBar <- function(origin, cluster, rev = F, normalize = rev, percent = T,
                             plot = T, flip = T){
   library(dplyr)
@@ -42,6 +43,7 @@ ClusterDistrBar <- function(origin, cluster, rev = F, normalize = rev, percent =
   y.label <- ifelse(normalize, "Normalized cell counts", "Cell counts")
   y.label <- ifelse(percent, paste("Percentage of", tolower(y.label)), y.label)
 
+  if(flip) ToPlot$Var2 <- ToPlot$Var2 %>% factor(levels = rev(levels(.)))
   p <-
     ggplot(ToPlot, aes(x = Var2, y = value, fill = Var1)) +
     geom_bar(stat="identity", position = position_stack(reverse = TRUE)) +
@@ -51,14 +53,31 @@ ClusterDistrBar <- function(origin, cluster, rev = F, normalize = rev, percent =
   return(p)
 }
 
+#' @title FUNCTION_TITLE
+#' @description FUNCTION_DESCRIPTION
+#' @param meta PARAM_DESCRIPTION
+#' @param cluster PARAM_DESCRIPTION
+#' @param origin PARAM_DESCRIPTION
+#' @param method PARAM_DESCRIPTION, Default: 'value'
+#' @param do.heatmap PARAM_DESCRIPTION, Default: T
+#' @return OUTPUT_DESCRIPTION
+#' @details DETAILS
+#' @examples
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @rdname BarOfCluster
+#' @export
+
 BarOfCluster <- function(meta,cluster,origin,method="value",do.heatmap=T){
   warning("BarOfCluster() is deprecated. Please use ClusterDistrBar() instead.")
   ClusterDistrBar(origin = meta[,origin], cluster = meta[,cluster], percent = method=="percent", plot = do.heatmap)
 }
 
-# seuratObj <- readRDS("~/Documents/scRNA/HEV-seurat3/Robjects/seuratObj.rds")
-# meta <- seuratObj@meta.data
+# meta <- seu@meta.data
 # origin <- meta$orig.ident
 # cluster <- meta$cluster
-# ClusterDistrBar(origin, cluster, plot = F)
+# ClusterDistrBar(origin, cluster, rev = T)
 # BarOfCluster(meta, "cluster", "orig.ident", method = "percent", do.heatmap = T)
