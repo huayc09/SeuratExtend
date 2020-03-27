@@ -38,11 +38,11 @@ WaterfallPlot <-
   }
 
 
-matr <- GetAssayData(seu)[1:10,]
-f <- seu$seurat_clusters
-ident.1 <- "0"
-ident.2 <- NULL
-length = "tscore"
-color = "tscore"
-threshold = 0.5
-flip = F
+# matr <- GetAssayData(seu)[1:10,]
+# f <- seu$seurat_clusters
+# ident.1 <- "0"
+# ident.2 <- NULL
+# length = "tscore"
+# color = "tscore"
+# threshold = 0.5
+# flip = F
