@@ -9,7 +9,7 @@ library(rlist)
 library(purrr)
 library(roxygen2)
 library(sinew)
-options(max.print = 50, spe = "human", nCores = 12)
+options(max.print = 50, spe = "mouse", nCores = 12)
 seu <- readRDS("~/R documents/2020-2-10 EC PyMT and E0771/rds/PyMTEC_old.rds")
 
 seu <- seuratObj
@@ -35,7 +35,7 @@ only.end.terms = T
 slot = "counts"
 assay = "RNA"
 nCores = 4
-makeOxygen(BarOfCluster)
+makeOxygen(Dimplot3d)
 roxygenize()
 CalcScoreGeneral_v3(Seu, features, group.by, "zscore")
 

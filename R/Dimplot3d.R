@@ -5,6 +5,7 @@
 #' @param assay PARAM_DESCRIPTION, Default: NULL
 #' @param reduction PARAM_DESCRIPTION, Default: 'pca'
 #' @param dims PARAM_DESCRIPTION, Default: NULL
+#' @param text PARAM_DESCRIPTION, Default: T
 #' @param text_shift PARAM_DESCRIPTION, Default: 0.1
 #' @param size PARAM_DESCRIPTION, Default: 16
 #' @param width PARAM_DESCRIPTION, Default: 640
@@ -22,8 +23,9 @@
 #' }
 #' @rdname Dimplot3d
 #' @export
+
 Dimplot3d <- function(Seu, group.by = "seurat_clusters", assay = NULL, reduction = "pca",
-                      dims = NULL, text_shift = 0.1, size = 16, width = 640,
+                      dims = NULL, text = T, text_shift = 0.1, size = 16, width = 640,
                       legend3d = T, writeWebGL = F, filename = NULL, slingPseudotime = NULL){
   library(rgl)
   library(rlang)
@@ -45,9 +47,11 @@ Dimplot3d <- function(Seu, group.by = "seurat_clusters", assay = NULL, reduction
     Embeddings(Seu, reduction = "umap"),
     col = cols[f], type = 'p', alpha = 0.2)
   points3d(Textdf, size = size, alpha = 1, col = cols)
-  text3d(Textdf + text_shift,
-         texts = rownames(Textdf),
-         adj = 0)
+  if(text){
+    text3d(Textdf + text_shift,
+           texts = rownames(Textdf),
+           adj = 0)
+  }
   check.slingPseudotime <-
     identical(Seu@meta.data[,group.by], Seu@misc[["slingshot"]][[toupper(reduction)]]$f)
   if(slingPseudotime %||% check.slingPseudotime){
