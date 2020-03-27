@@ -10,6 +10,7 @@ Dimplot3d(
   assay = NULL,
   reduction = "pca",
   dims = NULL,
+  text = T,
   text_shift = 0.1,
   size = 16,
   width = 640,
@@ -29,6 +30,8 @@ Dimplot3d(
 \item{reduction}{PARAM_DESCRIPTION, Default: 'pca'}
 
 \item{dims}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{text}{PARAM_DESCRIPTION, Default: T}
 
 \item{text_shift}{PARAM_DESCRIPTION, Default: 0.1}
 

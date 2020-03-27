@@ -4,7 +4,7 @@
 \alias{CalcScoreGeneral}
 \title{FUNCTION_TITLE}
 \usage{
-CalcScoreGeneral(matr, f, method = "zscore")
+CalcScoreGeneral(matr, f, method = "zscore", exp.transform = F)
 }
 \arguments{
 \item{matr}{PARAM_DESCRIPTION}
@@ -12,6 +12,8 @@ CalcScoreGeneral(matr, f, method = "zscore")
 \item{f}{PARAM_DESCRIPTION}
 
 \item{method}{PARAM_DESCRIPTION, Default: 'zscore'}
+
+\item{exp.transform}{PARAM_DESCRIPTION, Default: F}
 }
 \value{
 OUTPUT_DESCRIPTION
