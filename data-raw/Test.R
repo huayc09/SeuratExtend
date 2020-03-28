@@ -35,7 +35,7 @@ only.end.terms = T
 slot = "counts"
 assay = "RNA"
 nCores = 4
-makeOxygen(WaterfallPlot_v3)
+makeOxygen(HumanToMouseGenesymbol)
 roxygenize()
 CalcScoreGeneral_v3(Seu, features, group.by, "zscore")
 

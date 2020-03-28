@@ -15,6 +15,7 @@
 #' @export
 
 EnsemblToGenesymbol<-function(Ensembl, spe = getOption("spe"), mirror = NULL){
+  check_spe(spe)
   library("biomaRt")
   par <- list(mouse = c(Dataset = "mmusculus_gene_ensembl", symbol = "mgi_symbol"),
               human = c(Dataset = "hsapiens_gene_ensembl", symbol = "hgnc_symbol"))

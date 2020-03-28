@@ -39,31 +39,7 @@ MouseToHumanGeneExpression<-function(Matr){
   }
   return(new_matrix)
 }
-HumanToMouseGeneList<-function(genelist_list){
-  GeneListHuman<-unique(unlist(genelist_list))
-  require("biomaRt")
-  human = useMart("ensembl", dataset = "hsapiens_gene_ensembl")
-  mouse = useMart("ensembl", dataset = "mmusculus_gene_ensembl")
-  genelists = getLDS(attributes = c("hgnc_symbol"), filters = "hgnc_symbol", values = GeneListHuman , mart = human,
-                     attributesL = c("mgi_symbol"), martL = mouse, uniqueRows=T)
-  GeneListMouse<-list()
-  for (i in names(genelist_list)) {
-    GeneListMouse[[i]]<-unique(genelists$MGI.symbol[genelists$HGNC.symbol %in% genelist_list[[i]]])
-    if (length(GeneListMouse[[i]])==0){
-      GeneListMouse[[i]] <- NULL
-    }
-  }
-  return(GeneListMouse)
-}
-GmtGeneList<-function(Gmtfilename){
-  require("GSEABase")
-  Gmtfile<-getGmt(Gmtfilename)
-  gmt_gene_list<-list()
-  for (i in names(Gmtfile)){
-    gmt_gene_list[[i]]<-geneIds(Gmtfile[[i]])
-  }
-  return(gmt_gene_list)
-}
+
 GetGeneSet<-function(genelist_list,char,n=0){
   hits<-sum(grepl(char,names(genelist_list)))
   if(hits==0) return("no hits")
@@ -654,5 +630,20 @@ check_spe <- function(spe){
   #     labs(fill=group)
   #   return(p)
   # }
-
+  # HumanToMouseGeneList<-function(genelist_list){
+  #   GeneListHuman<-unique(unlist(genelist_list))
+  #   require("biomaRt")
+  #   human = useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+  #   mouse = useMart("ensembl", dataset = "mmusculus_gene_ensembl")
+  #   genelists = getLDS(attributes = c("hgnc_symbol"), filters = "hgnc_symbol", values = GeneListHuman , mart = human,
+  #                      attributesL = c("mgi_symbol"), martL = mouse, uniqueRows=T)
+  #   GeneListMouse<-list()
+  #   for (i in names(genelist_list)) {
+  #     GeneListMouse[[i]]<-unique(genelists$MGI.symbol[genelists$HGNC.symbol %in% genelist_list[[i]]])
+  #     if (length(GeneListMouse[[i]])==0){
+  #       GeneListMouse[[i]] <- NULL
+  #     }
+  #   }
+  #   return(GeneListMouse)
+  # }
 }
