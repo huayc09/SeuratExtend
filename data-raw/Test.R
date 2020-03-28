@@ -35,7 +35,7 @@ only.end.terms = T
 slot = "counts"
 assay = "RNA"
 nCores = 4
-makeOxygen(HumanToMouseGenesymbol)
+makeOxygen(MouseToHumanGenesymbol)
 roxygenize()
 CalcScoreGeneral_v3(Seu, features, group.by, "zscore")
 

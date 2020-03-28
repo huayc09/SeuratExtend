@@ -21,45 +21,6 @@ run_GSVA <- function(Obj, Gmtfilename){
   es <- gsva(new_matrix, Gmtfile, min.sz=10, max.sz=500, verbose=TRUE, parallel.sz=1)
   return(es)
 }
-MouseToHumanGeneExpression<-function(Matr){
-  require("biomaRt")
-  human = useMart("ensembl", dataset = "hsapiens_gene_ensembl")
-  mouse = useMart("ensembl", dataset = "mmusculus_gene_ensembl")
-  genelists = getLDS(attributes = c("mgi_symbol"), filters = "mgi_symbol", values = rownames(Matr) , mart = mouse,
-                     attributesL = c("hgnc_symbol"), martL = human, uniqueRows=T)
-  genes<-genelists$HGNC.symbol %>% .[!duplicated(.)]
-  cells<-colnames(Matr)
-  new_matrix<-matrix(nrow = length(genes), ncol = length(cells))
-  rownames(new_matrix)<-genes
-  colnames(new_matrix)<-cells
-  mouse_matrix<-as.matrix(Matr)
-  for (i in genes){
-    gene_mouse<-genelists$MGI.symbol[genelists$HGNC.symbol==i][1]
-    new_matrix[i,]<-mouse_matrix[gene_mouse,]
-  }
-  return(new_matrix)
-}
-
-GetGeneSet<-function(genelist_list,char,n=0){
-  hits<-sum(grepl(char,names(genelist_list)))
-  if(hits==0) return("no hits")
-  if(hits>1&n==0) return(names(genelist_list)[grep(char,names(genelist_list))])
-  if(hits==1) return(genelist_list[[names(genelist_list)[grep(char,names(genelist_list))]]])
-  if(hits>1&n>0) return(genelist_list[[names(genelist_list)[grep(char,names(genelist_list))][n]]])
-}
-GenesetOfGenes<-function(geneset_list, genes, type="onlygene"){
-  tmp_list<-list()
-  if(type=="all"){
-    for (i in names(geneset_list)) {
-      if(sum(geneset_list[[i]] %in% genes)>0) tmp_list[[i]]<-geneset_list[[i]]
-    }
-  }else{
-    for (i in names(geneset_list)) {
-      if(sum(geneset_list[[i]] %in% genes)>0) tmp_list[[i]]<-geneset_list[[i]] %>% .[. %in% genes]
-    }
-  }
-  return(tmp_list)
-}
 RelationPlot<-function(nodes, relation){
   require(Rgraphviz)
   rEG <- new("graphNEL", nodes=nodes, edgemode="directed")
@@ -646,4 +607,43 @@ check_spe <- function(spe){
   #   }
   #   return(GeneListMouse)
   # }
+  # MouseToHumanGeneExpression<-function(Matr){
+  #   require("biomaRt")
+  #   human = useMart("ensembl", dataset = "hsapiens_gene_ensembl")
+  #   mouse = useMart("ensembl", dataset = "mmusculus_gene_ensembl")
+  #   genelists = getLDS(attributes = c("mgi_symbol"), filters = "mgi_symbol", values = rownames(Matr) , mart = mouse,
+  #                      attributesL = c("hgnc_symbol"), martL = human, uniqueRows=T)
+  #   genes<-genelists$HGNC.symbol %>% .[!duplicated(.)]
+  #   cells<-colnames(Matr)
+  #   new_matrix<-matrix(nrow = length(genes), ncol = length(cells))
+  #   rownames(new_matrix)<-genes
+  #   colnames(new_matrix)<-cells
+  #   mouse_matrix<-as.matrix(Matr)
+  #   for (i in genes){
+  #     gene_mouse<-genelists$MGI.symbol[genelists$HGNC.symbol==i][1]
+  #     new_matrix[i,]<-mouse_matrix[gene_mouse,]
+  #   }
+  #   return(new_matrix)
+  # }
+  # GetGeneSet<-function(genelist_list,char,n=0){
+  #   hits<-sum(grepl(char,names(genelist_list)))
+  #   if(hits==0) return("no hits")
+  #   if(hits>1&n==0) return(names(genelist_list)[grep(char,names(genelist_list))])
+  #   if(hits==1) return(genelist_list[[names(genelist_list)[grep(char,names(genelist_list))]]])
+  #   if(hits>1&n>0) return(genelist_list[[names(genelist_list)[grep(char,names(genelist_list))][n]]])
+  # }
+  # GenesetOfGenes<-function(geneset_list, genes, type="onlygene"){
+  #   tmp_list<-list()
+  #   if(type=="all"){
+  #     for (i in names(geneset_list)) {
+  #       if(sum(geneset_list[[i]] %in% genes)>0) tmp_list[[i]]<-geneset_list[[i]]
+  #     }
+  #   }else{
+  #     for (i in names(geneset_list)) {
+  #       if(sum(geneset_list[[i]] %in% genes)>0) tmp_list[[i]]<-geneset_list[[i]] %>% .[. %in% genes]
+  #     }
+  #   }
+  #   return(tmp_list)
+  # }
+  #
 }

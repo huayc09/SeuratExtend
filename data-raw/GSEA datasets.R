@@ -18,6 +18,7 @@ names(gmtlist) <-
 
 library(GSEABase)
 library(dplyr)
+library(readxl)
 Gmt2list <- function(Gmt){
   GenesetList <- Gmt %>%
     lapply(geneIds) %>%
@@ -43,4 +44,15 @@ Genesets[["mouse"]][["GSEA_mouse_gene_transformed"]] <-
         unique()
     })
   })
+
+HEV_markers_Girards <- readRDS("~/R documents/SeuratExtend_databases/Other gene sets/HEV_markers_Girards.rds")
+Genesets[["mouse"]][["HEV_markers_Girards"]] <- HEV_markers_Girards %>% lapply(rownames)
+Genesets[["mouse"]][["HEV_markers_Girards_top30"]] <- HEV_markers_Girards %>% lapply(function(x) rownames(x)[1:30])
+
+EC_3T_markers <- read_excel("~/R documents/SeuratExtend_databases/Other gene sets/EC_3T_markers.xlsx")
+EC_markers_Junbin <- as.list(EC_3T_markers)
+Genesets[["human"]][["EC_markers_Junbin"]] <- EC_markers_Junbin
+
 usethis::use_data(Genesets, overwrite = TRUE)
+
+
