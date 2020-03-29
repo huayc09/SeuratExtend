@@ -53,7 +53,7 @@ WaterfallPlot <-
       scores[["p"]] <-
         matr %>%
         apply(1, function(x){
-          t.test(x[cell.1], x[cell.2])[["p.value"]] * ifelse(mean(x[cell.1]) > mean(x[cell.2]), 1, -1)
+          -log10(t.test(x[cell.1], x[cell.2])[["p.value"]]) * ifelse(mean(x[cell.1]) > mean(x[cell.2]), 1, -1)
           }) %>%
         unlist()
     }
@@ -65,6 +65,7 @@ WaterfallPlot <-
     }
     scores <- scores %>%
       list.cbind() %>%
+      as.data.frame() %>%
       drop_na() %>%
       .[abs(.[,length]) > len.threshold, ,drop = FALSE] %>%
       .[abs(.[,color]) > col.threshold, ,drop = FALSE] %>%
@@ -82,10 +83,11 @@ WaterfallPlot <-
       hjust <- hjust %||% 0
       vjust <- vjust %||% 0.5
     }
+    if(color == "p") lab_fill <- "-log10(p)" else lab_fill <- color
     p <- ggplot(scores, aes(x = rank, y = length, fill = color)) +
       geom_bar(stat = "identity") +
       theme_classic() +
-      labs(fill = color, x = element_blank(), y = y.label) +
+      labs(fill = lab_fill, x = element_blank(), y = y.label) +
       scale_fill_gradient2(low = muted("blue"), high = muted("red")) +
       theme(axis.text.x=element_text(angle = angle, hjust = hjust, vjust = vjust))
     if(flip) p <- p + coord_flip() + scale_x_discrete(position = "top")
@@ -148,5 +150,5 @@ WaterfallPlot_v3 <-
 # exp.transform = T
 # WaterfallPlot(matr, seu$seurat_clusters,
 #               length = "logFC", color = "p", exp.transform = T, flip = F)
-# WaterfallPlot_v3(seu, group.by = "seurat_clusters", features = rownames(seu)[1:10])
+# WaterfallPlot_v3(seu, group.by = "seurat_clusters", features = c("Selp","Sele","Vwf","Fut7","Chst4","Glycam1"))
 
