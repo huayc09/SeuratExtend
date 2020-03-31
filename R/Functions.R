@@ -403,17 +403,7 @@ HeatmapGeneSet_v3<-function(seu = NULL, group = NULL, order_by_group = T,
   p<-heatmap_marker(ToPlot, color_scheme) + labs(fill=score)
   return(p)
 }
-AddMetaData<-function(Df, MetadataDf, ID, col){
-  MetaIDs<-as.data.frame(MetadataDf)[,ID]
-  for (i in rownames(Df)) {
-    if(Df[i,ID] %in% MetaIDs){
-      for (j in col) {
-        Df[i,j]<-MetadataDf[MetadataDf[,ID]==Df[i,ID],j][1]
-      }
-    }
-  }
-  return(Df)
-}
+
 check_spe <- function(spe){
   if(is.null(spe)) stop("species undefined: options(spe = c(\"mouse\", \"human\"))")
 }
@@ -646,4 +636,15 @@ check_spe <- function(spe){
   #   return(tmp_list)
   # }
   #
+  # AddMetaData<-function(Df, MetadataDf, ID, col){
+  #   MetaIDs<-as.data.frame(MetadataDf)[,ID]
+  #   for (i in rownames(Df)) {
+  #     if(Df[i,ID] %in% MetaIDs){
+  #       for (j in col) {
+  #         Df[i,j]<-MetadataDf[MetadataDf[,ID]==Df[i,ID],j][1]
+  #       }
+  #     }
+  #   }
+  #   return(Df)
+  # }
 }

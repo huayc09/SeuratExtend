@@ -53,6 +53,7 @@ EC_3T_markers <- read_excel("~/R documents/SeuratExtend_databases/Other gene set
 EC_markers_Junbin <- as.list(EC_3T_markers)
 Genesets[["human"]][["EC_markers_Junbin"]] <- EC_markers_Junbin
 
-usethis::use_data(Genesets, overwrite = TRUE)
+Genesets_data <- Genesets
+usethis::use_data(Genesets_data, overwrite = TRUE)
 
 
