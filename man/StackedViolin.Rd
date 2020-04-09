@@ -4,12 +4,21 @@
 \alias{StackedViolin}
 \title{FUNCTION_TITLE}
 \usage{
-StackedViolin(matr, f, features = NULL, ncol = 1, lab_fill = "group")
+StackedViolin(
+  matr,
+  f,
+  f2 = NULL,
+  features = NULL,
+  ncol = 1,
+  lab_fill = "group"
+)
 }
 \arguments{
 \item{matr}{PARAM_DESCRIPTION}
 
 \item{f}{PARAM_DESCRIPTION}
+
+\item{f2}{PARAM_DESCRIPTION, Default: NULL}
 
 \item{features}{PARAM_DESCRIPTION, Default: NULL}
 

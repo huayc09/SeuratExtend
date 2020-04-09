@@ -8,6 +8,7 @@ StackedViolin_v3(
   seu,
   features,
   group.by = "seurat_clusters",
+  split.by = NULL,
   cell = NULL,
   ncol = 1
 )
@@ -18,6 +19,8 @@ StackedViolin_v3(
 \item{features}{PARAM_DESCRIPTION}
 
 \item{group.by}{PARAM_DESCRIPTION, Default: 'seurat_clusters'}
+
+\item{split.by}{PARAM_DESCRIPTION, Default: NULL}
 
 \item{cell}{PARAM_DESCRIPTION, Default: NULL}
 
