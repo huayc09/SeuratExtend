@@ -11,6 +11,6 @@ LazyData: true
 RoxygenNote: 7.1.0
 Imports: 
     Seurat, dplyr, rlist, mosaic, ggplot2, reshape2, purrr, slingshot, destiny, magrittr, AUCell, tidyr,
-    biomaRt, ontologyIndex, doParallel, doRNG, mgsa, scales
+    biomaRt, ontologyIndex, doParallel, doRNG, mgsa, scales, GSEABase
 Suggests:
-    rgl
+    rgl, GSVA, GSVAdata

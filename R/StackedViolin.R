@@ -55,7 +55,8 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
             strip.placement = "outside",
             legend.position = "none",
             axis.text.x=element_text(angle = 45,hjust = 1)) +
-      theme_classic()
+      theme_classic() +
+      labs(fill = lab_fill)
   }
 
   return(p)
