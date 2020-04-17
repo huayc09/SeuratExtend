@@ -13,6 +13,7 @@
 #' @rdname RunDiffusionMap
 #' @export
 RunDiffusionMap <- function(Seu, assay = NULL){
+  library(Seurat)
   library(rlang)
   library(destiny)
   library(magrittr)

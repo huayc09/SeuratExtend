@@ -25,7 +25,7 @@ RenameGO <- function(term, add_id = T, add_n_gene = T, spe = getOption("spe")){
   }else{
     library(magrittr)
     library(dplyr)
-    term <- term %>% set_rownames(RenameGO(rownames(.)))
+    term <- term %>% set_rownames(RenameGO(rownames(.), add_id = add_id, add_n_gene = add_n_gene))
     return(term)
   }
 }
