@@ -34,7 +34,8 @@ only.end.terms = T
 slot = "counts"
 assay = "RNA"
 nCores = 4
-makeOxygen(CellphoneDB_GenerateCustomDB)
+makeOxygen(RunCellphoneDB)
+setwd("~/R documents/SeuratExtend")
 roxygenize()
 CalcScoreGeneral_v3(Seu, features, group.by, "zscore")
 
