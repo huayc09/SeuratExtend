@@ -14,7 +14,7 @@
 #' @rdname EnsemblToGenesymbol
 #' @export
 
-EnsemblToGenesymbol<-function(Ensembl, spe = getOption("spe"), mirror = NULL){
+EnsemblToGenesymbol <- function(Ensembl, spe = getOption("spe"), mirror = NULL){
   check_spe(spe)
   library("biomaRt")
   par <- list(mouse = c(Dataset = "mmusculus_gene_ensembl", symbol = "mgi_symbol"),
@@ -27,6 +27,37 @@ EnsemblToGenesymbol<-function(Ensembl, spe = getOption("spe"), mirror = NULL){
                         mart = mart)
   return(EnsemblGenes)
 }
+
+#' @title FUNCTION_TITLE
+#' @description FUNCTION_DESCRIPTION
+#' @param Genesymbol PARAM_DESCRIPTION
+#' @param spe PARAM_DESCRIPTION, Default: getOption("spe")
+#' @param mirror PARAM_DESCRIPTION, Default: NULL
+#' @return OUTPUT_DESCRIPTION
+#' @details DETAILS
+#' @examples
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @rdname GenesymbolToEnsembl
+#' @export
+
+GenesymbolToEnsembl <- function(Genesymbol, spe = getOption("spe"), mirror = NULL){
+  check_spe(spe)
+  library("biomaRt")
+  par <- list(mouse = c(Dataset = "mmusculus_gene_ensembl", symbol = "mgi_symbol"),
+              human = c(Dataset = "hsapiens_gene_ensembl", symbol = "hgnc_symbol"))
+  message("Posible mirrors: 'www', 'uswest', 'useast', 'asia'.")
+  mart <- useDataset(par[[spe]]["Dataset"], useEnsembl(biomart = "ensembl", mirror = mirror))
+  EnsemblGenes <- getBM(attributes = c(par[[spe]]["symbol"], "ensembl_gene_id"),
+                        filters = par[[spe]]["symbol"],
+                        values = Genesymbol,
+                        mart = mart)
+  return(EnsemblGenes)
+}
+
 
 # options(spe = "human")
 # par <- list(mouse = c(name = "Mus musculus", title = "MMU"),

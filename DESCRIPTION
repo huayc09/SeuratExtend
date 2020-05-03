@@ -14,3 +14,5 @@ Imports:
     biomaRt, ontologyIndex, doParallel, doRNG, mgsa, scales, GSEABase
 Suggests:
     rgl, GSVA, GSVAdata
+Depends: 
+    R (>= 2.10)
