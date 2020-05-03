@@ -74,13 +74,16 @@ Reactome_interactions_filtered <-
   apply(2, function(x) x %in% filtered_genes) %>%
   apply(1, any) %>%
   Reactome_interactions[["mouse"]][.,] %>%
-  drop_na()
-Reactome_interactions_filtered$pairs <-
-  Reactome_interactions_filtered[,c("Genesymbol.1","Genesymbol.2")] %>%
-  apply(1, function(x) paste(sort(x), collapse = "_"))
-
-Reactome_interactions_filtered$pairs %>%
-  .[!duplicated(.)]
+  drop_na() %>%
+  mutate("pairs" = .[,c("Genesymbol.1","Genesymbol.2")] %>%
+           apply(1, function(x) paste(sort(x), collapse = "_"))) %>%
+  .[!duplicated(.$pairs),] %>%
+  .[.$Interaction.type == "physical association", ] %>%
+  mutate("Uniprot.1" = sub("uniprotkb:","", .$"X..Interactor.1.uniprot.id"),
+         "Uniprot.2" = sub("uniprotkb:","", .$"Interactor.2.uniprot.id"),
+         "pairs" = paste(.$Genesymbol.1, .$Genesymbol.2, sep = "_"))
+setwd("~/R documents/SeuratExtend")
+usethis::use_data(Reactome_interactions_filtered, overwrite = TRUE)
 
 # setwd("~/R documents/cellphonedb test")
 # saveRDS(Reactome_interactions_filtered, "Reactome_interactions_filtered.rds")

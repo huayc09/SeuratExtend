@@ -34,7 +34,7 @@ only.end.terms = T
 slot = "counts"
 assay = "RNA"
 nCores = 4
-makeOxygen(GenesymbolToEnsembl)
+makeOxygen(CellphoneDB_GenerateCustomDB)
 roxygenize()
 CalcScoreGeneral_v3(Seu, features, group.by, "zscore")
 
