@@ -98,38 +98,38 @@ RunCellphoneDB <- function(seu, group.by, database = "cellphonedb_mouse_cytokine
   return(seu)
 }
 
-sender <- levels(seu$cluster)
-receiver <- levels(seu$cluster)
-library(dplyr)
-library(SeuratExtend)
-library(Seurat)
-significant_means_trimmed <-
-  significant_means %>%
-  `rownames<-`(.$interacting_pair) %>%
-  .[, lapply(sender, function(x) paste(x, receiver, sep = "|")) %>% unlist] %>%
-  as.matrix()
-significant_means_trimmed[is.na(significant_means_trimmed)] <- 0
-Heatmap(significant_means_trimmed, color_scheme = "D")
-
-lr_cluster <- data.frame()
-for (i in sender) {
-  for (j in receiver) {
-    lr_cluster[i,j] <- sum(significant_means_trimmed[,c(paste(i,j,sep = "|"), paste(j,i,sep = "|"))]>0)
-  }
-}
-Heatmap(lr_cluster)
-
-ligands <- unique(significant_means[apply(significant_means_trimmed, 1, function(x) sum(x)>0),"gene_a"])
-receptors <- unique(significant_means[apply(significant_means_trimmed, 1, function(x) sum(x)>0),"gene_b"])
-lr_gene <- data.frame()
-for (i in ligands) {
-  for (j in receptors) {
-    lr_gene[i,j] <- ifelse(paste(i,j,sep = "_") %in% significant_means$interacting_pair, 1, 0)
-  }
-}
-Heatmap(lr_gene)
-
-DotPlot(seu, features = ligands, group.by = "cluster")
+# sender <- levels(seu$cluster)
+# receiver <- levels(seu$cluster)
+# library(dplyr)
+# library(SeuratExtend)
+# library(Seurat)
+# significant_means_trimmed <-
+#   significant_means %>%
+#   `rownames<-`(.$interacting_pair) %>%
+#   .[, lapply(sender, function(x) paste(x, receiver, sep = "|")) %>% unlist] %>%
+#   as.matrix()
+# significant_means_trimmed[is.na(significant_means_trimmed)] <- 0
+# Heatmap(significant_means_trimmed, color_scheme = "D")
+#
+# lr_cluster <- data.frame()
+# for (i in sender) {
+#   for (j in receiver) {
+#     lr_cluster[i,j] <- sum(significant_means_trimmed[,c(paste(i,j,sep = "|"), paste(j,i,sep = "|"))]>0)
+#   }
+# }
+# Heatmap(lr_cluster)
+#
+# ligands <- unique(significant_means[apply(significant_means_trimmed, 1, function(x) sum(x)>0),"gene_a"])
+# receptors <- unique(significant_means[apply(significant_means_trimmed, 1, function(x) sum(x)>0),"gene_b"])
+# lr_gene <- data.frame()
+# for (i in ligands) {
+#   for (j in receptors) {
+#     lr_gene[i,j] <- ifelse(paste(i,j,sep = "_") %in% significant_means$interacting_pair, 1, 0)
+#   }
+# }
+# Heatmap(lr_gene)
+#
+# DotPlot(seu, features = ligands, group.by = "cluster")
 
 # library(Seurat)
 # library(SeuratExtend)
