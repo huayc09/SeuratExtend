@@ -83,16 +83,62 @@ RunCellphoneDB <- function(seu, group.by, database = "cellphonedb_mouse_cytokine
   meta_export <- data.frame("Cell" = rownames(meta), "cell_type" = meta[,group.by])
   write.table(meta_export, file = "input/meta_data.txt", row.names = F, sep = "\t", quote = F)
   write.table(data_export, file = "input/counts.txt", row.names = F, sep = "\t", quote = F)
+  message(paste(Sys.time(), "Start runing CellphoneDB"))
   system(command)
+
+  deconvoluted <- read.table("out/deconvoluted.txt",sep = "\t", header = T, check.names=FALSE)
+  means <- read.table("out/means.txt",sep = "\t", header = T, check.names=FALSE)
+  pvalues <- read.table("out/pvalues.txt",sep = "\t", header = T, check.names=FALSE)
+  significant_means <- read.table("out/significant_means.txt",sep = "\t", header = T, check.names=FALSE)
+  seu@misc[["CellphoneDB"]][[group.by]][["deconvoluted"]] <- deconvoluted
+  seu@misc[["CellphoneDB"]][[group.by]][["means"]] <- means
+  seu@misc[["CellphoneDB"]][[group.by]][["pvalues"]] <- pvalues
+  seu@misc[["CellphoneDB"]][[group.by]][["significant_means"]] <- significant_means
+  message(paste0(Sys.time(), " Results saved in the slot: SeuratObject@misc$CellphoneDB$", group.by))
+  return(seu)
 }
+
+sender <- levels(seu$cluster)
+receiver <- levels(seu$cluster)
+library(dplyr)
+library(SeuratExtend)
+library(Seurat)
+significant_means_trimmed <-
+  significant_means %>%
+  `rownames<-`(.$interacting_pair) %>%
+  .[, lapply(sender, function(x) paste(x, receiver, sep = "|")) %>% unlist] %>%
+  as.matrix()
+significant_means_trimmed[is.na(significant_means_trimmed)] <- 0
+Heatmap(significant_means_trimmed, color_scheme = "D")
+
+lr_cluster <- data.frame()
+for (i in sender) {
+  for (j in receiver) {
+    lr_cluster[i,j] <- sum(significant_means_trimmed[,c(paste(i,j,sep = "|"), paste(j,i,sep = "|"))]>0)
+  }
+}
+Heatmap(lr_cluster)
+
+ligands <- unique(significant_means[apply(significant_means_trimmed, 1, function(x) sum(x)>0),"gene_a"])
+receptors <- unique(significant_means[apply(significant_means_trimmed, 1, function(x) sum(x)>0),"gene_b"])
+lr_gene <- data.frame()
+for (i in ligands) {
+  for (j in receptors) {
+    lr_gene[i,j] <- ifelse(paste(i,j,sep = "_") %in% significant_means$interacting_pair, 1, 0)
+  }
+}
+Heatmap(lr_gene)
+
+DotPlot(seu, features = ligands, group.by = "cluster")
 
 # library(Seurat)
 # library(SeuratExtend)
 # library(purrr)
 #
 # setwd("~/R documents/cellphonedb test")
-# path = getwd()
 # CellphoneDB_GenerateCustomDB(Reactome_interactions_filtered = Reactome_interactions_filtered)
 # seu <- readRDS("~/R documents/2020-2-10 EC PyMT and E0771/rds/PyMTEC_old.rds")
 # group.by <- "cluster"
 # RunCellphoneDB(seu, group.by)
+
+
