@@ -112,7 +112,7 @@ Reactome_interact_mouse_chemo_adh <-
   apply(1, function(x) {
     if(!x[["Genesymbol.1"]] %in% filtered_genes) x <- x[c(2,1,4,3,5)]
     return(x)
-  }) %>% t() %>% as.data.frame() %>%
+  }) %>% t() %>% as.data.frame(stringsAsFactors = F) %>%
   `colnames<-`(c("Genesymbol.1","Genesymbol.2","Uniprot.1","Uniprot.2","Pubmed.references"))
 
 setwd("~/R documents/SeuratExtend")
