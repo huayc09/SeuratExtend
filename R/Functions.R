@@ -1,3 +1,48 @@
+#' @title FUNCTION_TITLE
+#' @description FUNCTION_DESCRIPTION
+#' @param pairs PARAM_DESCRIPTION
+#' @param sep PARAM_DESCRIPTION, Default: '_'
+#' @return OUTPUT_DESCRIPTION
+#' @details DETAILS
+#' @examples
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @rdname pair_rev
+#' @export
+
+pair_rev <- function(pairs, sep = "_") {
+  library(dplyr)
+  pairs_rev <-
+    strsplit(pairs, split = sep, fixed = T) %>%
+    sapply(function(x) paste(rev(x), collapse = sep))
+  return(pairs_rev)
+}
+
+#' @title FUNCTION_TITLE
+#' @description FUNCTION_DESCRIPTION
+#' @param seu PARAM_DESCRIPTION
+#' @param feature PARAM_DESCRIPTION
+#' @param group.by PARAM_DESCRIPTION
+#' @param cluster PARAM_DESCRIPTION
+#' @return OUTPUT_DESCRIPTION
+#' @details DETAILS
+#' @examples
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @rdname gene_percent
+#' @export
+
+gene_percent <- function(seu, feature, group.by, cluster) {
+  m <- FetchData(seu, vars = feature, cells = colnames(seu)[seu[[group.by]] == cluster])
+  return(apply(m, 2, function(x) sum(x>0)) / nrow(m))
+}
+
 {
 RelationPlot<-function(nodes, relation){
   require(Rgraphviz)
