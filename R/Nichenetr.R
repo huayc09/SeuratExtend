@@ -49,7 +49,7 @@ load_Nichenetr_db <- function(db, local.path.nichenetr.db = "Nichenetr", saveRDS
 #'  \code{\link[magrittr]{extract}}
 #'  \code{\link[cowplot]{plot_grid}}
 #'  \code{\link[ggpubr]{as_ggplot}},\code{\link[ggpubr]{get_legend}}
-#' @rdname Nichenetr_plots
+#' @rdname RunNichenetr
 #' @export
 #' @importFrom devtools install_github
 #' @importFrom dplyr desc select
@@ -57,7 +57,7 @@ load_Nichenetr_db <- function(db, local.path.nichenetr.db = "Nichenetr", saveRDS
 #' @importFrom cowplot plot_grid
 #' @importFrom ggpubr as_ggplot get_legend
 
-Nichenetr_plots <-
+RunNichenetr <-
   function(seu.sender, seu.receiver, ident.snd = NULL, ident.rcv = NULL, pct.snd = 0.25, pct.rcv = 0.1,
            feature.logfc.threshold.rcv = 0.5, n_best_ligands = 30, n_ligand_target_links = 200,
            local.path.nichenetr.db = "Nichenetr", save.db = T, spe = getOption("spe")) {
@@ -352,7 +352,7 @@ Nichenetr_plots <-
 # feature.logfc.threshold.rcv = 0.5
 # n_best_ligands = 30
 # n_ligand_target_links = 200
-# test <- Nichenetr_plots(seu.sender = seu.sender, seu.receiver = seu.receiver)
+# test <- RunNichenetr(seu.sender = seu.sender, seu.receiver = seu.receiver)
 
 
 # download necessary databases for ligand-to-target signaling paths
