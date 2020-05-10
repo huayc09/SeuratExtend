@@ -29,6 +29,7 @@ load_Nichenetr_db <- function(db, local.path.nichenetr.db = "Nichenetr", saveRDS
 #' @param ident.rcv PARAM_DESCRIPTION, Default: NULL
 #' @param pct.snd PARAM_DESCRIPTION, Default: 0.25
 #' @param pct.rcv PARAM_DESCRIPTION, Default: 0.1
+#' @param fixed.ligand PARAM_DESCRIPTION, Default: NULL
 #' @param feature.logfc.threshold.rcv PARAM_DESCRIPTION, Default: 0.5
 #' @param n_best_ligands PARAM_DESCRIPTION, Default: 30
 #' @param n_ligand_target_links PARAM_DESCRIPTION, Default: 200
@@ -58,7 +59,8 @@ load_Nichenetr_db <- function(db, local.path.nichenetr.db = "Nichenetr", saveRDS
 #' @importFrom ggpubr as_ggplot get_legend
 
 RunNichenetr <-
-  function(seu.sender, seu.receiver, ident.snd = NULL, ident.rcv = NULL, pct.snd = 0.25, pct.rcv = 0.1,
+  function(seu.sender, seu.receiver, ident.snd = NULL, ident.rcv = NULL,
+           pct.snd = 0.25, pct.rcv = 0.1, fixed.ligand = NULL,
            feature.logfc.threshold.rcv = 0.5, n_best_ligands = 30, n_ligand_target_links = 200,
            local.path.nichenetr.db = "Nichenetr", save.db = T, spe = getOption("spe")) {
   check_spe(spe)
@@ -126,7 +128,21 @@ RunNichenetr <-
   expressed_ligands = intersect(ligands,expressed_genes_sender)
   nichenet_results <-
     list(list_expressed_genes_sender = list_expressed_genes_sender,
-         expressed_ligands = expressed_ligands)
+         expressed_ligands = expressed_ligands,
+         par = list(
+           ident.snd = ident.snd,
+           ident.rcv = ident.rcv,
+           fixed.ligand = fixed.ligand,
+           pct.snd = pct.snd,
+           pct.rcv = pct.rcv,
+           feature.logfc.threshold.rcv = feature.logfc.threshold.rcv,
+           n_best_ligands = n_best_ligands,
+           n_ligand_target_links = n_ligand_target_links,
+           local.path.nichenetr.db = local.path.nichenetr.db,
+           save.db = save.db,
+           spe = spe
+         )
+    )
 
   for (i in ident.rcv) {
     message(paste0("\nAnalyse start: ", i))
@@ -155,8 +171,9 @@ RunNichenetr <-
       message(i, ": No feature genes after filtering. Decrease the logfc threshold?")
       next()
     }
-    feature_genes_xlsx_path <- paste0(feature_genes_folder, "/filtered_feature_genes_logfc.thr_",
-                                      feature.logfc.threshold.rcv, "_", i,".xlsx")
+    feature_genes_xlsx_path <-
+      paste0(feature_genes_folder, "/filtered_feature_genes_logfc.thr_",
+             feature.logfc.threshold.rcv, "_", i,".xlsx")
     message(paste0("Save filtered feature genes to Excel file: ", feature_genes_xlsx_path))
     write.xlsx(feature_genes[geneset_oi, ], rowNames = T, feature_genes_xlsx_path)
 
@@ -182,7 +199,8 @@ RunNichenetr <-
       top_n(n_best_ligands, pearson) %>%
       arrange(-pearson) %>%
       pull(test_ligand) %>%
-      unique()
+      unique() %>%
+      union(intersect(ligand_activities$test_ligand, fixed.ligand))
     Ligands_dotplot <-
       DotPlot(seu.sender, features = best_upstream_ligands %>% rev(), cols = "RdYlBu") + RotatedAxis()
     ggsave(paste0(feature_genes_folder, "/Ligands_dotplot.pdf"), Ligands_dotplot)
@@ -324,15 +342,121 @@ RunNichenetr <-
            best_upstream_ligands_strict = colnames(vis_ligand_receptor_network_strict),
            best_upstream_receptors = best_upstream_receptors,
            best_upstream_receptors_strict = rownames(vis_ligand_receptor_network_strict),
-
-           Ligands_dotplot = Ligands_dotplot,
-           p_ligand_target_network = p_ligand_target_network,
-           p_ligand_receptor_network = p_ligand_receptor_network,
-           p_ligand_receptor_network_strict = p_ligand_receptor_network_strict,
-           combined_plot = combined_plot)
+           ToPlot = list(
+             vis_ligand_target = vis_ligand_target,
+             vis_ligand_receptor_network = vis_ligand_receptor_network,
+             vis_ligand_receptor_network_strict = vis_ligand_receptor_network_strict,
+             vis_ligand_pearson = vis_ligand_pearson
+           )
+      )
   }
   saveRDS(nichenet_results, "Nichenetr/nichenet_results.rds")
   return(nichenet_results)
+  }
+
+#' @title FUNCTION_TITLE
+#' @description FUNCTION_DESCRIPTION
+#' @param nichenet_results PARAM_DESCRIPTION
+#' @param seu.sender PARAM_DESCRIPTION, Default: NULL
+#' @param ident.rcv PARAM_DESCRIPTION, Default: NULL
+#' @return OUTPUT_DESCRIPTION
+#' @details DETAILS
+#' @examples
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @seealso
+#'  \code{\link[cowplot]{plot_grid}}
+#'  \code{\link[ggpubr]{as_ggplot}},\code{\link[ggpubr]{get_legend}}
+#' @rdname Nichenetr_Plots
+#' @export
+#' @importFrom cowplot plot_grid
+#' @importFrom ggpubr as_ggplot get_legend
+
+Nichenetr_Plots <- function(nichenet_results, seu.sender = NULL, ident.rcv = NULL) {
+  library(nichenetr)
+  library(Seurat)
+  library(dplyr)
+  library(rlang)
+  library(ggplot2)
+
+  Plots <- list()
+  ident.rcv <- ident.rcv %||% nichenet_results$par$ident.rcv
+  if(any(!ident.rcv %in% nichenet_results$par$ident.rcv)){
+    warning(paste0("Ident(s) not found: ", setdiff(ident.rcv, nichenet_results$par$ident.rcv)))
+    ident.rcv <- intersect(ident.rcv, nichenet_results$par$ident.rcv)
+  }
+  if(is.null(seu.sender)) {
+    warning("Sender Seurat object not provided; Dot plot(s) not generated")
+  }
+  for (i in ident.rcv) {
+    if(!is.null(seu.sender)) {
+      best_upstream_ligands <- nichenet_results[[i]]$best_upstream_ligands
+      Ligands_dotplot <-
+        DotPlot(seu.sender, features = best_upstream_ligands %>% rev(), cols = "RdYlBu") +
+        RotatedAxis()
+      Plots[[i]][["Ligands_dotplot"]] <- Ligands_dotplot
+    }
+
+    p_ligand_target_network =
+      nichenet_results[[i]]$ToPlot$vis_ligand_target %>%
+      make_heatmap_ggplot("Prioritized ligands","Predicted target genes", color = "purple",
+                          legend_position = "top", x_axis_position = "top",legend_title = "Regulatory potential")  +
+      theme(axis.text.x = element_text(face = "italic")) +
+      scale_fill_gradient2(low = "whitesmoke",  high = "purple", breaks = c(0,0.006,0.012))
+
+    p_ligand_receptor_network =
+      nichenet_results[[i]]$ToPlot$vis_ligand_receptor_network %>% t() %>%
+      make_heatmap_ggplot("Ligands","Receptors", color = "mediumvioletred",
+                          x_axis_position = "top",
+                          legend_title = "Prior interaction potential")
+
+    p_ligand_receptor_network_strict =
+      nichenet_results[[i]]$ToPlot$vis_ligand_receptor_network_strict %>% t() %>%
+      make_heatmap_ggplot("Ligands","Receptors", color = "mediumvioletred", x_axis_position = "top",
+                          legend_title = "Prior interaction potential\n(bona fide)")
+
+    p_ligand_pearson = nichenet_results[[i]]$ToPlot$vis_ligand_pearson %>%
+      make_heatmap_ggplot(
+        "Prioritized ligands","Ligand activity",
+        color = "darkorange",legend_position = "top",
+        x_axis_position = "top",
+        legend_title = "Pearson correlation coefficient\ntarget gene prediction ability)") +
+      theme(legend.text = element_text(size = 9))
+
+    figures_without_legend =
+      cowplot::plot_grid(
+        p_ligand_pearson +
+          theme(legend.position = "none", axis.ticks = element_blank()) +
+          theme(axis.title.x = element_text()), p_ligand_target_network +
+          theme(legend.position = "none", axis.ticks = element_blank()) +
+          ylab(""),
+        align = "hv", nrow = 1,
+        rel_widths = c(ncol(nichenet_results[[i]]$ToPlot$vis_ligand_pearson) + 10,
+                       ncol(nichenet_results[[i]]$ToPlot$vis_ligand_target)))
+    legends = cowplot::plot_grid(
+      ggpubr::as_ggplot(ggpubr::get_legend(p_ligand_pearson)),
+      ggpubr::as_ggplot(ggpubr::get_legend(p_ligand_target_network)),
+      nrow = 1,
+      align = "h")
+
+    combined_plot = cowplot::plot_grid(
+      figures_without_legend, legends,
+      rel_heights = c(10,2), nrow = 2, align = "hv")
+
+    Plots[[i]] <-
+      c(Plots[[i]],
+        list(
+          p_ligand_target_network = p_ligand_target_network,
+          p_ligand_receptor_network = p_ligand_receptor_network,
+          p_ligand_receptor_network_strict = p_ligand_receptor_network_strict,
+          p_ligand_pearson = p_ligand_pearson,
+          combined_plot = combined_plot
+        ))
+  }
+  return(Plots)
 }
 
 # setwd("~/R documents/SeuratExtend_databases/2020-5-9 NicheNetr")
@@ -352,8 +476,10 @@ RunNichenetr <-
 # feature.logfc.threshold.rcv = 0.5
 # n_best_ligands = 30
 # n_ligand_target_links = 200
-# test <- RunNichenetr(seu.sender = seu.sender, seu.receiver = seu.receiver)
-
+# fixed.ligand = "Dll4"
+# fixed.receptor = "Notch3"
+# nichenet_results <- RunNichenetr(seu.sender = seu.sender, seu.receiver = seu.receiver)
+# p <- Nichenetr_Plots(nichenet_results, seu.sender = seu.sender)
 
 # download necessary databases for ligand-to-target signaling paths
 # {

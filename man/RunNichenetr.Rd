@@ -11,6 +11,7 @@ RunNichenetr(
   ident.rcv = NULL,
   pct.snd = 0.25,
   pct.rcv = 0.1,
+  fixed.ligand = NULL,
   feature.logfc.threshold.rcv = 0.5,
   n_best_ligands = 30,
   n_ligand_target_links = 200,
@@ -31,6 +32,8 @@ RunNichenetr(
 \item{pct.snd}{PARAM_DESCRIPTION, Default: 0.25}
 
 \item{pct.rcv}{PARAM_DESCRIPTION, Default: 0.1}
+
+\item{fixed.ligand}{PARAM_DESCRIPTION, Default: NULL}
 
 \item{feature.logfc.threshold.rcv}{PARAM_DESCRIPTION, Default: 0.5}
 
