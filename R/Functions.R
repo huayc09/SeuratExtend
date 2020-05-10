@@ -25,8 +25,9 @@ pair_rev <- function(pairs, sep = "_") {
 #' @description FUNCTION_DESCRIPTION
 #' @param seu PARAM_DESCRIPTION
 #' @param feature PARAM_DESCRIPTION
-#' @param group.by PARAM_DESCRIPTION
-#' @param cluster PARAM_DESCRIPTION
+#' @param ident PARAM_DESCRIPTION
+#' @param group.by PARAM_DESCRIPTION, Default: NULL
+#' @param DefaultAssay PARAM_DESCRIPTION, Default: 'RNA'
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -38,10 +39,44 @@ pair_rev <- function(pairs, sep = "_") {
 #' @rdname gene_percent
 #' @export
 
-gene_percent <- function(seu, feature, group.by, cluster) {
-  m <- FetchData(seu, vars = feature, cells = colnames(seu)[seu[[group.by]] == cluster])
+gene_percent <- function(seu, feature, ident, group.by = NULL, DefaultAssay = "RNA") {
+  library(Seurat)
+  DefaultAssay(seu) <- DefaultAssay
+  if(is.null(group.by)) {
+    cells <- names(Idents(seu))[Idents(seu) == ident]
+  }else{
+    cells <- colnames(seu)[seu[[group.by]] == ident]
+  }
+  m <- FetchData(seu, vars = feature, cells = cells)
   return(apply(m, 2, function(x) sum(x>0)) / nrow(m))
 }
+
+#' @title FUNCTION_TITLE
+#' @description FUNCTION_DESCRIPTION
+#' @param ident PARAM_DESCRIPTION
+#' @param seu PARAM_DESCRIPTION
+#' @param feature PARAM_DESCRIPTION, Default: rownames(seu)
+#' @param group.by PARAM_DESCRIPTION, Default: NULL
+#' @param pct PARAM_DESCRIPTION, Default: 0.1
+#' @param DefaultAssay PARAM_DESCRIPTION, Default: 'RNA'
+#' @return OUTPUT_DESCRIPTION
+#' @details DETAILS
+#' @examples
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @rdname gene_expressed
+#' @export
+
+gene_expressed <- function(ident, seu, feature = rownames(seu), group.by = NULL, pct = 0.1,
+                           DefaultAssay = "RNA") {
+  gene_percent <- gene_percent(seu = seu, feature = feature, ident = ident, group.by = group.by,
+                               DefaultAssay = DefaultAssay)
+  return(names(gene_percent)[gene_percent >= pct])
+}
+
 
 {
 RelationPlot<-function(nodes, relation){

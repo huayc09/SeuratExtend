@@ -34,7 +34,7 @@ only.end.terms = T
 slot = "counts"
 assay = "RNA"
 nCores = 4
-makeOxygen(check_sub_loc)
+makeOxygen(Nichenetr_plots)
 setwd("~/R documents/SeuratExtend")
 roxygenize()
 CalcScoreGeneral_v3(Seu, features, group.by, "zscore")

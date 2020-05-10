@@ -121,6 +121,9 @@ CellphoneDB_Plots <- function(seu, sender, receiver, group.by, top_n = 20){
   library(SeuratExtend)
   library(Seurat)
   library(reshape2)
+  library(ggplot2)
+  library(viridis)
+  library(egg)
 
   clu_pairs <-
     data.frame("sender" = rep(sender, each = length(receiver)),
@@ -129,13 +132,14 @@ CellphoneDB_Plots <- function(seu, sender, receiver, group.by, top_n = 20){
   clu_pairs$pairs <- paste(clu_pairs$sender, clu_pairs$receiver, sep = "|")
   rownames(clu_pairs) <- clu_pairs$pairs
 
+  sig <- seu@misc[["CellphoneDB"]][[group.by]][["significant_means"]]
   significant_means_trimmed <-
-    seu@misc[["CellphoneDB"]][[group.by]][["significant_means"]] %>%
+    sig %>%
     `rownames<-`(.$interacting_pair) %>%
     .[,clu_pairs$pairs]  %>%
     .[apply(.,1,function(x) !all(is.na(x))),]
   significant_means_trimmed_rev <-
-    seu@misc[["CellphoneDB"]][[group.by]][["significant_means"]] %>%
+    sig %>%
     `rownames<-`(.$interacting_pair) %>%
     .[,pair_rev(clu_pairs$pairs, sep = "|")]  %>%
     .[apply(.,1,function(x) !all(is.na(x))),] %>%
@@ -155,7 +159,32 @@ CellphoneDB_Plots <- function(seu, sender, receiver, group.by, top_n = 20){
         names(),
       ]
 
-  p_gene_clu <- Heatmap(significant_means_trimmed_top, color_scheme = "B")
+  gene_clu <-
+    data.frame("gene_pair" = rep(rownames(significant_means_trimmed_top),
+                                 n = ncol(significant_means_trimmed_top)),
+               "cluster" = rep(colnames(significant_means_trimmed_top),
+                               each = nrow(significant_means_trimmed_top)),
+               stringsAsFactors = F)
+  for (i in rownames(gene_clu)) {
+    g <- gene_clu[i,"gene_pair"]
+    c <- gene_clu[i,"cluster"]
+    gene_clu[i, "means"] <- significant_means_trimmed_top[g,c]
+    gene_clu[i, "sender"] <- clu_pairs[c, "sender"]
+    gene_clu[i, "receiver"] <- clu_pairs[c, "receiver"]
+  }
+  gene_clu$means[is.na(gene_clu$means)] <- 0
+  gene_clu$gene_pair <- factor(gene_clu$gene_pair, levels = rev(rownames(significant_means_trimmed_top)))
+  gene_clu$cluster <- factor(gene_clu$gene_pair, levels = colnames(significant_means_trimmed_top))
+
+  p_gene_clu <-
+    ggplot(gene_clu, aes(x = receiver, y = gene_pair, fill = means)) +
+    facet_grid(cols = vars(sender), scales = "free") +
+    geom_tile(colour = "white") +
+    scale_fill_viridis() +
+    theme_classic()+
+    labs(x = "", y = "")+
+    scale_y_discrete(position = "right") +
+    theme(axis.text.x=element_text(angle = 90, hjust = 1, vjust = 0))
 
   clu_clu_count <- data.frame()
   clu_clu_sum <- data.frame()
@@ -167,13 +196,18 @@ CellphoneDB_Plots <- function(seu, sender, receiver, group.by, top_n = 20){
     clu_clu_sum[s,r] <- sum(significant_means_trimmed[,sr], na.rm = T)
   }
 
-  p_clu_clu_sum <- Heatmap(clu_clu_sum, color_scheme = "E", lab_fill = "Accumulated\nmean value")
-  p_clu_clu_count <- Heatmap(clu_clu_count, color_scheme = "E", lab_fill = "Number of \ninteractions")
+  p_clu_clu_sum <- Heatmap(clu_clu_sum, color_scheme = "D", lab_fill = "Accumulated\nmean value")
+  p_clu_clu_count <- Heatmap(clu_clu_count, color_scheme = "D", lab_fill = "Number of \ninteractions")
 
   gene_pairs <- data.frame()
   for (i in rownames(significant_means_trimmed_top)) {
     g <- strsplit(i, split = "_")[[1]]
     gene_pairs[g[2], g[1]] <- 1
+  }
+  for(i in rownames(significant_means_trimmed)) {
+    a <- strsplit(i, split = "_")[[1]][1]
+    b <- strsplit(i, split = "_")[[1]][2]
+    if((a %in% rownames(gene_pairs)) & (b %in% colnames(gene_pairs))) gene_pairs[a,b] <- 1
   }
   gene_pairs[is.na(gene_pairs)] <- 0
   p_gene_pairs <- Heatmap(gene_pairs, lab_fill = "Interaction pairs")
@@ -185,14 +219,16 @@ CellphoneDB_Plots <- function(seu, sender, receiver, group.by, top_n = 20){
     .[colnames(gene_pairs),] %>%
     melt(value.name = "expression", variable.name = "cluster") %>%
     mutate("percent" = lapply(sender, function(x){
-      gene_percent(seu, feature = colnames(gene_pairs), group.by = group.by, cluster = x)
+      gene_percent(seu, feature = colnames(gene_pairs), ident = x, group.by = group.by)
     }) %>% unlist)
+  gene_clu_sender$gene_name <- factor(gene_clu_sender$gene_name, levels = colnames(gene_pairs))
+  gene_clu_sender$cluster <- factor(gene_clu_sender$cluster, levels = rev(sender))
 
   p_gene_clu_sender <-
     ggplot(gene_clu_sender, mapping = aes(x = gene_name, y = cluster, size = percent, color = expression)) +
     geom_point() +
     theme_classic() +
-    scale_color_gradientn(colors = viridis_pal(option = "B")(20))
+    scale_color_gradientn(colors = viridis_pal(option = "D")(20))
 
   gene_clu_receiver <-
     seu@misc[["CellphoneDB"]][[group.by]][["deconvoluted"]] %>%
@@ -201,19 +237,45 @@ CellphoneDB_Plots <- function(seu, sender, receiver, group.by, top_n = 20){
     .[rownames(gene_pairs),] %>%
     melt(value.name = "expression", variable.name = "cluster") %>%
     mutate("percent" = lapply(receiver, function(x){
-      gene_percent(seu, feature = rownames(gene_pairs), group.by = group.by, cluster = x)
+      gene_percent(seu, feature = rownames(gene_pairs), ident = x, group.by = group.by)
     }) %>% unlist)
+  gene_clu_receiver$gene_name <- factor(gene_clu_receiver$gene_name, levels = rev(rownames(gene_pairs)))
 
   p_gene_clu_receiver <-
     ggplot(gene_clu_receiver, mapping = aes(x = cluster, y = gene_name, size = percent, color = expression)) +
     geom_point() +
     theme_classic() +
-    scale_color_gradientn(colors = viridis_pal(option = "B")(20))
+    scale_color_gradientn(colors = viridis_pal(option = "D")(20))
+
+  p_combined <-
+    ggarrange(p_clu_clu_sum +
+                scale_y_discrete(position = "left") +
+                scale_x_discrete(position = "top") +
+                theme(legend.position = "none", axis.text.x=element_text(angle = 90, hjust = 0, vjust = 0),),
+              p_gene_clu_sender +
+                scale_y_discrete(position = "right") +
+                scale_x_discrete(position = "top") +
+                theme(legend.position = "none", axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0),
+                      axis.title = element_blank()),
+              p_gene_clu_receiver +
+                scale_y_discrete(position = "left") +
+                scale_x_discrete(position = "bottom") +
+                theme(legend.position = "none", axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0),
+                      axis.title = element_blank()),
+              p_gene_pairs +
+                scale_fill_gradient(low = "white", high = "#238A8DFF") +
+                theme(legend.position = "none", axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0)),
+              widths = c(length(receiver), ncol(gene_pairs)),
+              heights = c(length(sender), nrow(gene_pairs)),
+              ncol = 2)
 
   CellphoneDB_Plots <-
-    list(clu_pairs = clu_pairs,
+    list(sender = sender,
+         receiver = receiver,
+         clu_pairs = clu_pairs,
          significant_means_trimmed = significant_means_trimmed,
          significant_means_trimmed_top = significant_means_trimmed_top,
+         gene_clu = gene_clu,
          p_gene_clu = p_gene_clu,
          p_clu_clu_sum = p_clu_clu_sum,
          p_clu_clu_count = p_clu_clu_count,
@@ -222,14 +284,15 @@ CellphoneDB_Plots <- function(seu, sender, receiver, group.by, top_n = 20){
          gene_clu_sender = gene_clu_sender,
          p_gene_clu_sender = p_gene_clu_sender,
          gene_clu_receiver = gene_clu_receiver,
-         p_gene_clu_receiver = p_gene_clu_receiver)
+         p_gene_clu_receiver = p_gene_clu_receiver,
+         p_combined = p_combined)
   return(CellphoneDB_Plots)
 }
 
 # library(Seurat)
 # library(SeuratExtend)
 # library(purrr)
-#
+
 # setwd("~/R documents/cellphonedb test")
 # CellphoneDB_GenerateCustomDB(Reactome_interactions_filtered = Reactome_interactions_filtered)
 # seu <- readRDS("~/R documents/2020-2-10 EC PyMT and E0771/rds/PyMTEC_old.rds")
@@ -241,4 +304,4 @@ CellphoneDB_Plots <- function(seu, sender, receiver, group.by, top_n = 20){
 # receiver <- c("Bcell","DC","Macrophage","NK","pDC","Tcell","Tumor")
 # group.by <- "merge_cluster"
 # top_n <- 20
-# CellphoneDB_Plots(seu, sender, receiver, group.by)
+# p <- CellphoneDB_Plots(seu, sender, receiver, group.by)
