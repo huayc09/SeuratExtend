@@ -6,17 +6,22 @@
 \usage{
 Heatmap(
   score,
-  color_scheme = "2",
+  color_scheme = c(low = muted("blue"), mid = "white", high = muted("red")),
   lab_fill = "score",
   angle = 45,
   hjust = 1,
-  vjust = 1
+  vjust = 1,
+  legend_position = "right",
+  feature_text_subset = NULL,
+  nudge_x = ncol(score)/10,
+  hide_axis_line = TRUE,
+  expand_limits_x = NULL
 )
 }
 \arguments{
 \item{score}{PARAM_DESCRIPTION}
 
-\item{color_scheme}{PARAM_DESCRIPTION, Default: '2'}
+\item{color_scheme}{PARAM_DESCRIPTION, Default: c(low = muted("blue"), mid = "white", high = muted("red"))}
 
 \item{lab_fill}{PARAM_DESCRIPTION, Default: 'score'}
 
@@ -25,6 +30,16 @@ Heatmap(
 \item{hjust}{PARAM_DESCRIPTION, Default: 1}
 
 \item{vjust}{PARAM_DESCRIPTION, Default: 1}
+
+\item{legend_position}{PARAM_DESCRIPTION, Default: 'right'}
+
+\item{feature_text_subset}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{nudge_x}{PARAM_DESCRIPTION, Default: ncol(score)/10}
+
+\item{hide_axis_line}{PARAM_DESCRIPTION, Default: TRUE}
+
+\item{expand_limits_x}{PARAM_DESCRIPTION, Default: NULL}
 }
 \value{
 OUTPUT_DESCRIPTION

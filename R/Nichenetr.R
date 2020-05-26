@@ -30,9 +30,11 @@ load_Nichenetr_db <- function(db, local.path.nichenetr.db = "Nichenetr", saveRDS
 #' @param pct.snd PARAM_DESCRIPTION, Default: 0.25
 #' @param pct.rcv PARAM_DESCRIPTION, Default: 0.1
 #' @param fixed.ligand PARAM_DESCRIPTION, Default: NULL
+#' @param feature.logfc.threshold.snd PARAM_DESCRIPTION, Default: 0
 #' @param feature.logfc.threshold.rcv PARAM_DESCRIPTION, Default: 0.5
 #' @param n_best_ligands PARAM_DESCRIPTION, Default: 30
 #' @param n_ligand_target_links PARAM_DESCRIPTION, Default: 200
+#' @param quantile_cutoff_target PARAM_DESCRIPTION, Default: 0
 #' @param local.path.nichenetr.db PARAM_DESCRIPTION, Default: 'Nichenetr'
 #' @param save.db PARAM_DESCRIPTION, Default: T
 #' @param spe PARAM_DESCRIPTION, Default: getOption("spe")
@@ -61,7 +63,8 @@ load_Nichenetr_db <- function(db, local.path.nichenetr.db = "Nichenetr", saveRDS
 RunNichenetr <-
   function(seu.sender, seu.receiver, ident.snd = NULL, ident.rcv = NULL,
            pct.snd = 0.25, pct.rcv = 0.1, fixed.ligand = NULL,
-           feature.logfc.threshold.rcv = 0.5, n_best_ligands = 30, n_ligand_target_links = 200,
+           feature.logfc.threshold.snd = 0, feature.logfc.threshold.rcv = 0.5,
+           n_best_ligands = 30, n_ligand_target_links = 200, quantile_cutoff_target = 0,
            local.path.nichenetr.db = "Nichenetr", save.db = T, spe = getOption("spe")) {
   check_spe(spe)
   if(!require(nichenetr)){
@@ -114,14 +117,27 @@ RunNichenetr <-
 
   # sender
   message("Check sender expressed genes")
-  if("list_expressed_genes_sender.rds" %in% list.files("Nichenetr")) {
-    message("Load list of sender expressed genes: Nichenetr/list_expressed_genes_sender.rds")
-    list_expressed_genes_sender <- readRDS("Nichenetr/list_expressed_genes_sender.rds")
+  expressed_genes_sender_filename <-
+    paste0("list_expressed_genes_sender_logFC_",feature.logfc.threshold.snd,".rds")
+  if(expressed_genes_sender_filename %in% list.files("Nichenetr")) {
+    message(paste0("Load list of sender expressed genes: ", expressed_genes_sender_filename))
+    list_expressed_genes_sender <- readRDS(paste0("Nichenetr/",expressed_genes_sender_filename))
   }else{
-    list_expressed_genes_sender <-
-      lapply(ident.snd, gene_expressed, seu = seu.sender, pct = pct.snd)
-    message("Save list of sender expressed genes: Nichenetr/list_expressed_genes_sender.rds")
-    saveRDS(list_expressed_genes_sender, "Nichenetr/list_expressed_genes_sender.rds")
+    if(feature.logfc.threshold.snd > 0){
+      list_expressed_genes_sender <-
+        lapply(ident.snd, function(x){
+          g <- FindMarkers(seu.sender, ident.1 = x,
+                           logfc.threshold = feature.logfc.threshold.snd,
+                           min.pct = pct.snd,
+                           only.pos = T) %>% rownames()
+          return(g)
+        })
+    }else{
+      list_expressed_genes_sender <-
+        lapply(ident.snd, gene_expressed, seu = seu.sender, pct = pct.snd)
+    }
+    message(paste0("Save list of sender expressed genes: Nichenetr/", expressed_genes_sender_filename))
+    saveRDS(list_expressed_genes_sender, paste0("Nichenetr/",expressed_genes_sender_filename))
   }
   expressed_genes_sender <- list_expressed_genes_sender %>% unlist() %>% unique()
   ligands = lr_network %>% pull(from) %>% unique()
@@ -135,9 +151,11 @@ RunNichenetr <-
            fixed.ligand = fixed.ligand,
            pct.snd = pct.snd,
            pct.rcv = pct.rcv,
+           feature.logfc.threshold.snd = feature.logfc.threshold.snd,
            feature.logfc.threshold.rcv = feature.logfc.threshold.rcv,
            n_best_ligands = n_best_ligands,
            n_ligand_target_links = n_ligand_target_links,
+           quantile_cutoff_target = quantile_cutoff_target,
            local.path.nichenetr.db = local.path.nichenetr.db,
            save.db = save.db,
            spe = spe
@@ -218,7 +236,7 @@ RunNichenetr <-
 
     active_ligand_target_links = prepare_ligand_target_visualization(
       ligand_target_df = active_ligand_target_links_df,
-      ligand_target_matrix = ligand_target_matrix, cutoff = 0.33
+      ligand_target_matrix = ligand_target_matrix, cutoff = quantile_cutoff_target
     )
     order_ligands = intersect(best_upstream_ligands, colnames(active_ligand_target_links)) %>%
       rev() %>% make.names()
@@ -322,7 +340,7 @@ RunNichenetr <-
           theme(legend.position = "none", axis.ticks = element_blank()) +
           ylab(""),
         align = "hv", nrow = 1,
-        rel_widths = c(ncol(vis_ligand_pearson) + 10, ncol(vis_ligand_target)))
+        rel_widths = c(ncol(vis_ligand_pearson) + ncol(vis_ligand_target)/6, ncol(vis_ligand_target)))
     legends = cowplot::plot_grid(
       ggpubr::as_ggplot(ggpubr::get_legend(p_ligand_pearson)),
       ggpubr::as_ggplot(ggpubr::get_legend(p_ligand_target_network)),
@@ -434,7 +452,8 @@ Nichenetr_Plots <- function(nichenet_results, seu.sender = NULL, ident.rcv = NUL
           theme(legend.position = "none", axis.ticks = element_blank()) +
           ylab(""),
         align = "hv", nrow = 1,
-        rel_widths = c(ncol(nichenet_results[[i]]$ToPlot$vis_ligand_pearson) + 10,
+        rel_widths = c(ncol(nichenet_results[[i]]$ToPlot$vis_ligand_pearson) +
+                         ncol(nichenet_results[[i]]$ToPlot$vis_ligand_target) / 6,
                        ncol(nichenet_results[[i]]$ToPlot$vis_ligand_target)))
     legends = cowplot::plot_grid(
       ggpubr::as_ggplot(ggpubr::get_legend(p_ligand_pearson)),
@@ -462,28 +481,85 @@ Nichenetr_Plots <- function(nichenet_results, seu.sender = NULL, ident.rcv = NUL
 # setwd("~/R documents/SeuratExtend_databases/2020-5-9 NicheNetr")
 # options(max.print = 50, spe = "mouse")
 # seu.receiver <- readRDS("~/R documents/2020-2-10 EC PyMT and E0771/rds/PyMTEC_old.rds")
+# seu.receiver <- NRAS13_newMalig
 # seu.sender <- readRDS("~/R documents/2020-2-10 EC PyMT and E0771/rds/Tcell.rds")
+# seu.sender <- NRAS13_all_2
 # DefaultAssay(seu.sender) <- "RNA"
-# Idents(seu.receiver) <- 'cluster'
+# Idents(seu.receiver) <- 'seurat_clusters'
 # Idents(seu.sender) <- 'seurat_clusters'
 # ident.snd <- levels(Idents(seu.sender))
+# ident.snd <- "Endothelial cell"
 # ident.rcv <- "LN_HEV"
+# ident.rcv <- "5"
 # local.path.nichenetr.db <- "Nichenetr"
 # save.db = T
 # spe = getOption("spe")
 # pct.snd = 0.25
 # pct.rcv = 0.1
+# feature.logfc.threshold.snd = 0.25
 # feature.logfc.threshold.rcv = 0.5
+# quantile_cutoff_target = 0
 # n_best_ligands = 30
 # n_ligand_target_links = 200
 # fixed.ligand = "Dll4"
 # fixed.receptor = "Notch3"
 # nichenet_results <- RunNichenetr(seu.sender = seu.sender, seu.receiver = seu.receiver)
 # p <- Nichenetr_Plots(nichenet_results, seu.sender = seu.sender)
+#
+# # l-r interaction
+# nichenet_results <- readRDS("~/R documents/2020-5-8 NicheNet for Florian/Nichenetr/nichenet_results.rds")
+# best_upstream_ligands_strict <- nichenet_results$`5`$best_upstream_ligands_strict
+# best_upstream_receptors_strict <- nichenet_results$`5`$best_upstream_receptors_strict
+# lr <-
+#   as.data.frame(lr_network_strict)[lr_network_strict$from %in% best_upstream_ligands_strict &
+#                                      lr_network_strict$to %in% best_upstream_receptors_strict, ] %>%
+#   distinct(from, to)
+# lr$from <- lr$from %>% factor(levels = unique(.))
+# lr$to <- lr$to %>% factor(levels = unique(.))
+# l <- data.frame(gene = unique(lr$from)) %>% mutate(rank = rank(.$gene))
+# r <- data.frame(gene = unique(lr$to)) %>% mutate(rank = rank(.$gene))
+# lr$rank_l <- l$rank[lr$from]
+# lr$rank_r <- r$rank[lr$to]
+# p <-
+#   ggplot() +
+#   geom_tile(data = l, aes(x = 1, y = rank, fill = gene), color = "black") +
+#   geom_text(data = l, aes(x = 0.4, y = rank, label = gene), hjust = 1) +
+#   geom_tile(data = r, aes(x = 8, y = rank, fill = gene), color = "black") +
+#   geom_text(data = r, aes(x = 8.6, y = rank, label = gene), hjust = 0) +
+#   geom_segment(data = lr, aes(x = 1.5, xend = 7.5, y = rank_l, yend = rank_r),
+#                arrow = arrow()) +
+#   theme_classic() +
+#   theme(axis.line = element_blank(),
+#         axis.title = element_blank(),
+#         axis.text = element_blank(),
+#         axis.ticks = element_blank(),
+#         legend.position = "none") +
+#   expand_limits(x = c(-1,10))
+# ggsave("test.pdf", p)
+
+# weighted_networks_lr = weighted_networks$lr_sig %>%
+#   inner_join(lr_network %>% distinct(from,to), by = c("from","to"))
+# if(spe == "mouse") {
+#   lr_network = lr_network %>%
+#     mutate(from = convert_human_to_mouse_symbols(from),
+#            to = convert_human_to_mouse_symbols(to)) %>%
+#     drop_na()
+#   colnames(ligand_target_matrix) = colnames(ligand_target_matrix) %>%
+#     convert_human_to_mouse_symbols()
+#   rownames(ligand_target_matrix) = rownames(ligand_target_matrix) %>%
+#     convert_human_to_mouse_symbols()
+#   ligand_target_matrix = ligand_target_matrix %>%
+#     .[!is.na(rownames(ligand_target_matrix)),
+#       !is.na(colnames(ligand_target_matrix))]
+#   weighted_networks_lr = weighted_networks_lr %>%
+#     mutate(from = convert_human_to_mouse_symbols(from),
+#            to = convert_human_to_mouse_symbols(to)) %>%
+#     drop_na()
+# }
 
 # download necessary databases for ligand-to-target signaling paths
 # {
-#   weighted_networks = readRDS(url("https://zenodo.org/record/3260758/files/weighted_networks.rds"))
+#   # weighted_networks = readRDS(url("https://zenodo.org/record/3260758/files/weighted_networks.rds"))
 #   ligand_tf_matrix = readRDS(url("https://zenodo.org/record/3260758/files/ligand_tf_matrix.rds"))
 #
 #   # lr_network = readRDS(url("https://zenodo.org/record/3260758/files/lr_network.rds"))

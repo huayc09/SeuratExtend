@@ -84,6 +84,8 @@ GSEAplot <- function(seu, group.by, geneset, ident.1 = NULL, ident.2 = NULL,
   library(cowplot)
   library(Seurat)
   library(rlang)
+  library(scales)
+  library(dplyr)
 
   f <- factor(seu@meta.data[, group.by])
   ident.1 <- ident.1 %||% levels(f)[1]

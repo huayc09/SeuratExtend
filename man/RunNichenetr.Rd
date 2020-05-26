@@ -12,9 +12,11 @@ RunNichenetr(
   pct.snd = 0.25,
   pct.rcv = 0.1,
   fixed.ligand = NULL,
+  feature.logfc.threshold.snd = 0,
   feature.logfc.threshold.rcv = 0.5,
   n_best_ligands = 30,
   n_ligand_target_links = 200,
+  quantile_cutoff_target = 0,
   local.path.nichenetr.db = "Nichenetr",
   save.db = T,
   spe = getOption("spe")
@@ -35,11 +37,15 @@ RunNichenetr(
 
 \item{fixed.ligand}{PARAM_DESCRIPTION, Default: NULL}
 
+\item{feature.logfc.threshold.snd}{PARAM_DESCRIPTION, Default: 0}
+
 \item{feature.logfc.threshold.rcv}{PARAM_DESCRIPTION, Default: 0.5}
 
 \item{n_best_ligands}{PARAM_DESCRIPTION, Default: 30}
 
 \item{n_ligand_target_links}{PARAM_DESCRIPTION, Default: 200}
+
+\item{quantile_cutoff_target}{PARAM_DESCRIPTION, Default: 0}
 
 \item{local.path.nichenetr.db}{PARAM_DESCRIPTION, Default: 'Nichenetr'}
 
