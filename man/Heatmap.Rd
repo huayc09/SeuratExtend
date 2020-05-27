@@ -7,6 +7,7 @@
 Heatmap(
   score,
   color_scheme = c(low = muted("blue"), mid = "white", high = muted("red")),
+  border_color = "white",
   lab_fill = "score",
   angle = 45,
   hjust = 1,
@@ -22,6 +23,8 @@ Heatmap(
 \item{score}{PARAM_DESCRIPTION}
 
 \item{color_scheme}{PARAM_DESCRIPTION, Default: c(low = muted("blue"), mid = "white", high = muted("red"))}
+
+\item{border_color}{Tile border color, set NA to remove the border, Default: 'white'}
 
 \item{lab_fill}{PARAM_DESCRIPTION, Default: 'score'}
 

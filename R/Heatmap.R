@@ -2,6 +2,7 @@
 #' @description FUNCTION_DESCRIPTION
 #' @param score PARAM_DESCRIPTION
 #' @param color_scheme PARAM_DESCRIPTION, Default: c(low = muted("blue"), mid = "white", high = muted("red"))
+#' @param border_color Tile border color, set NA to remove the border, Default: 'white'
 #' @param lab_fill PARAM_DESCRIPTION, Default: 'score'
 #' @param angle PARAM_DESCRIPTION, Default: 45
 #' @param hjust PARAM_DESCRIPTION, Default: 1
@@ -23,7 +24,7 @@
 #' @export
 
 Heatmap <-
-  function(score, color_scheme = c(low = muted("blue"), mid = "white", high = muted("red")),
+  function(score, color_scheme = c(low = muted("blue"), mid = "white", high = muted("red")), border_color = "white",
            lab_fill = "score", angle = 45, hjust = 1, vjust = 1, legend_position = "right",
            feature_text_subset = NULL, nudge_x = ncol(score)/10, hide_axis_line = TRUE, expand_limits_x = NULL){
   library(ggplot2)
@@ -35,7 +36,7 @@ Heatmap <-
     data.frame(score, id = factor(rownames(score), levels=unique(rev(rownames(score))))) %>%
     melt()
   p <- ggplot(ToPlot, aes(variable, id)) +
-    geom_tile(aes(fill = value), colour = "white") +
+    geom_tile(aes(fill = value), colour = border_color) +
     theme_classic()+
     labs(x = "", y = "", fill = lab_fill)+
     scale_y_discrete(position = "right")+
