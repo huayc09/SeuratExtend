@@ -65,15 +65,15 @@ RunCellphoneDB <- function(seu, group.by, database = "cellphonedb_mouse_cytokine
 
   dir.create("input")
   if(is.null(database)) {
-    command <- "cellphonedb method statistical_analysis input/meta_data.txt input/counts.txt"
+    command <- "cellphonedb method statistical-analysis input/meta_data.txt input/counts.txt"
   }else if(database == "cellphonedb_mouse_cytokines"){
     file.copy(system.file("extdata/CellphoneDB", "cellphonedb_mouse_cytokines.db", package = "SeuratExtend"),
               "input/custom_db.db")
-    command <- paste0("cellphonedb method statistical_analysis input/meta_data.txt input/counts.txt ",
+    command <- paste0("cellphonedb method statistical-analysis input/meta_data.txt input/counts.txt ",
                       "--database input/custom_db.db")
   }else{
     file.copy(database, "input/custom_db.db")
-    command <- paste0("cellphonedb method statistical_analysis input/meta_data.txt input/counts.txt ",
+    command <- paste0("cellphonedb method statistical-analysis input/meta_data.txt input/counts.txt ",
                       "--database input/custom_db.db")
   }
 
