@@ -2,6 +2,7 @@ load_Nichenetr_db <- function(db, local.path.nichenetr.db = "Nichenetr", saveRDS
   links = c(
     ligand_target_matrix = "https://zenodo.org/record/3260758/files/ligand_target_matrix.rds",
     lr_network = "https://zenodo.org/record/3260758/files/lr_network.rds",
+    sig_network = "https://zenodo.org/record/3260758/files/signaling_network.rds",
     weighted_networks = "https://zenodo.org/record/3260758/files/weighted_networks.rds"
   )
   db.name <- paste0(db, ".rds")

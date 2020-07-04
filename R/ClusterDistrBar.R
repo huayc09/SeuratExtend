@@ -10,11 +10,22 @@
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
+#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc))
+#'
+#' # absolute cell count
+#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc), percent = F)
+#'
+#' # reverse x and y axis, normalized by sample size
+#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc), rev = T, normalize = T)
+#'
+#' # reverse x and y axis, not normalized by sample size
+#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc), rev = T, normalize = F)
+#'
+#' # vertical bar plot
+#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc), flip = F)
+#'
+#' # export matrix
+#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc), plot = F)
 #' @rdname ClusterDistrBar
 #' @export
 
