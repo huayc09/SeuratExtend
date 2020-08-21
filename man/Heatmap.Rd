@@ -16,7 +16,11 @@ Heatmap(
   feature_text_subset = NULL,
   nudge_x = ncol(score)/10,
   hide_axis_line = TRUE,
-  expand_limits_x = NULL
+  expand_limits_x = NULL,
+  facet_col = NULL,
+  facet_row = NULL,
+  panel.spacing = unit(5, "pt"),
+  strip.placement = "outside"
 )
 }
 \arguments{
@@ -24,7 +28,7 @@ Heatmap(
 
 \item{color_scheme}{PARAM_DESCRIPTION, Default: c(low = muted("blue"), mid = "white", high = muted("red"))}
 
-\item{border_color}{Tile border color, set NA to remove the border, Default: 'white'}
+\item{border_color}{PARAM_DESCRIPTION, Default: 'white'}
 
 \item{lab_fill}{PARAM_DESCRIPTION, Default: 'score'}
 
@@ -43,6 +47,14 @@ Heatmap(
 \item{hide_axis_line}{PARAM_DESCRIPTION, Default: TRUE}
 
 \item{expand_limits_x}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{facet_col}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{facet_row}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{panel.spacing}{PARAM_DESCRIPTION, Default: unit(5, "pt")}
+
+\item{strip.placement}{PARAM_DESCRIPTION, Default: 'outside'}
 }
 \value{
 OUTPUT_DESCRIPTION

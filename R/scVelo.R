@@ -2,10 +2,11 @@
 #' @description FUNCTION_DESCRIPTION
 #' @param seu PARAM_DESCRIPTION
 #' @param export.name PARAM_DESCRIPTION
-#' @param prefix PARAM_DESCRIPTION
-#' @param postfix PARAM_DESCRIPTION
 #' @param velocyto.loom.path PARAM_DESCRIPTION
 #' @param velocyto.loom.filenames PARAM_DESCRIPTION
+#' @param fxn.convert.loomtoseurat.cellname PARAM_DESCRIPTION, Default: NULL
+#' @param prefix PARAM_DESCRIPTION, Default: NULL
+#' @param postfix PARAM_DESCRIPTION, Default: NULL
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -17,8 +18,10 @@
 #' @rdname scVelo.SeuratToLoom
 #' @export
 
+
 scVelo.SeuratToLoom <-
-  function(seu, export.name, prefix, postfix, velocyto.loom.path, velocyto.loom.filenames){
+  function(seu, export.name, velocyto.loom.path, velocyto.loom.filenames,
+           fxn.convert.loomtoseurat.cellname = NULL, prefix = NULL, postfix = NULL){
     library(Seurat)
     library(rlist)
     library(dplyr)
@@ -26,7 +29,7 @@ scVelo.SeuratToLoom <-
 
     check.metadata.na <- sapply(seu@meta.data, function(x) any(is.na(x)))
     if(any(check.metadata.na)) {
-      warning(paste0("NA(s) exist in meta data: ",
+      message(paste0("NA(s) exist in meta data: ",
                      paste0(check.metadata.na %>% names(.)[.], collapse = ", "),
                      "\nColumn(s) removed"))
       seu@meta.data[,check.metadata.na] <- NULL
@@ -39,9 +42,9 @@ scVelo.SeuratToLoom <-
                   paste0(velocyto.loom.filenames[!check.loom.files], collapse = ", ")))
     }
 
-    pfile <- as.loom(x = seu, filename = export.name, overwrite = T)
-    genes <- pfile[["row_attrs"]][["Gene"]][]
-    cells <- pfile[["col_attrs"]][["CellID"]][]
+    genes <- rownames(seu)
+    cells <- colnames(seu)
+    seu.subset.genes <- F
 
     lfiles <- list()
     cellname <- list()
@@ -50,14 +53,28 @@ scVelo.SeuratToLoom <-
     unspliced <- list()
 
     for (i in 1:length(velocyto.loom.filenames)) {
-      lfiles[[i]] <- connect(filename = paste0(velocyto.loom.path, velocyto.loom.filenames[i]),
+      lfiles[[i]] <- connect(filename = file.path(velocyto.loom.path, velocyto.loom.filenames[i]),
                              mode = "r+", skip.validate = T)
-      cellname[[i]] <-
-        strsplit(lfiles[[i]][["col_attrs"]][["CellID"]][], split = ":", fixed = T) %>%
-        sapply(function(x) x[2])
-      cellname[[i]] <- paste0(prefix[i],sub("x", "", cellname[[i]]),postfix[i])
+
+      if(is.null(fxn.convert.loomtoseurat.cellname)){
+        cellname[[i]] <-
+          strsplit(lfiles[[i]][["col_attrs"]][["CellID"]][], split = ":", fixed = T) %>%
+          sapply(function(x) x[2])
+        cellname[[i]] <- paste0(prefix[i],sub("x", "", cellname[[i]]),postfix[i])
+      }else{
+        cellname[[i]] <- fxn.convert.loomtoseurat.cellname(velocyto.loom.filenames = i,
+                                                           loom.cellname = lfiles[[i]][["col_attrs"]][["CellID"]][])
+      }
       if(!any(cellname[[i]] %in% cells)) stop(paste0(velocyto.loom.filenames[i],": wrong prefix/postfix?"))
+
       g <- lfiles[[i]][["row_attrs"]][["Gene"]][] %>% make.unique()
+      n <- length(setdiff(genes, g))
+      if(n>0){
+        message("There are ", n, " genes in the Seurat object which cannot be found in the Velocyto output. ",
+                "Did you use different version of reference genome?")
+        genes <- intersect(genes, g)
+        seu.subset.genes <- T
+      }
       # ambiguous[[i]] <-
       #   lfiles[[i]][["layers"]][["ambiguous"]][,] %>%
       #   `colnames<-`(g) %>%
@@ -67,6 +84,7 @@ scVelo.SeuratToLoom <-
         lfiles[[i]][["layers"]][["spliced"]][,] %>%
         `colnames<-`(g) %>%
         `rownames<-`(cellname[[i]]) %>%
+        .[!is.na(rownames(.)),] %>%
         .[rownames(.) %in% cells, genes]
       unspliced[[i]] <-
         lfiles[[i]][["layers"]][["unspliced"]][,] %>%
@@ -85,9 +103,21 @@ scVelo.SeuratToLoom <-
       list.rbind() %>%
       .[cells,]
 
+    if(seu.subset.genes){
+      seu.new <- CreateSeuratObject(GetAssayData(seu, slot = "counts")[genes,], meta.data = seu@meta.data)
+      seu.new <- NormalizeData(seu.new)
+      seu.new <- FindVariableFeatures(seu.new)
+      seu.new[["RNA"]]@scale.data <- seu[[DefaultAssay(seu)]]@scale.data[genes,]
+      for (i in names(seu@reductions)) {
+        seu.new[[i]] <- CreateDimReducObject(embeddings = Embeddings(seu, reduction = i))
+      }
+      seu <- seu.new
+    }
+    pfile <- as.loom(x = seu, filename = export.name, overwrite = T)
+
     pfile$add.layer(layers = list(#"ambiguous" = ambiguous,
-                                  "spliced" = spliced,
-                                  "unspliced" = unspliced))
+      "spliced" = spliced,
+      "unspliced" = unspliced))
 
     pfile$close_all()
   }

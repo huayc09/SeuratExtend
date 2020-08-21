@@ -13,13 +13,16 @@ RunNichenetr(
   pct.rcv = 0.1,
   fixed.ligand = NULL,
   feature.logfc.threshold.snd = 0,
-  feature.logfc.threshold.rcv = 0.5,
+  feature.logfc.threshold.rcv = 0.25,
+  feature.rcv = NULL,
   n_best_ligands = 30,
   n_ligand_target_links = 200,
   quantile_cutoff_target = 0,
   local.path.nichenetr.db = "Nichenetr",
   save.db = T,
-  spe = getOption("spe")
+  spe = getOption("spe"),
+  custom_db = T,
+  regulons = NULL
 )
 }
 \arguments{
@@ -39,7 +42,9 @@ RunNichenetr(
 
 \item{feature.logfc.threshold.snd}{PARAM_DESCRIPTION, Default: 0}
 
-\item{feature.logfc.threshold.rcv}{PARAM_DESCRIPTION, Default: 0.5}
+\item{feature.logfc.threshold.rcv}{PARAM_DESCRIPTION, Default: 0.25}
+
+\item{feature.rcv}{PARAM_DESCRIPTION, Default: NULL}
 
 \item{n_best_ligands}{PARAM_DESCRIPTION, Default: 30}
 
@@ -52,6 +57,10 @@ RunNichenetr(
 \item{save.db}{PARAM_DESCRIPTION, Default: T}
 
 \item{spe}{PARAM_DESCRIPTION, Default: getOption("spe")}
+
+\item{custom_db}{PARAM_DESCRIPTION, Default: T}
+
+\item{regulons}{PARAM_DESCRIPTION, Default: NULL}
 }
 \value{
 OUTPUT_DESCRIPTION
@@ -70,8 +79,7 @@ if(interactive()){
 }
 }
 \seealso{
-\code{\link[devtools]{remote-reexports}}
- \code{\link[dplyr]{desc}},\code{\link[dplyr]{select}}
+\code{\link[dplyr]{desc}},\code{\link[dplyr]{select}}
  \code{\link[magrittr]{extract}}
  \code{\link[cowplot]{plot_grid}}
  \code{\link[ggpubr]{as_ggplot}},\code{\link[ggpubr]{get_legend}}

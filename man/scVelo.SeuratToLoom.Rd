@@ -7,10 +7,11 @@
 scVelo.SeuratToLoom(
   seu,
   export.name,
-  prefix,
-  postfix,
   velocyto.loom.path,
-  velocyto.loom.filenames
+  velocyto.loom.filenames,
+  fxn.convert.loomtoseurat.cellname = NULL,
+  prefix = NULL,
+  postfix = NULL
 )
 }
 \arguments{
@@ -18,13 +19,15 @@ scVelo.SeuratToLoom(
 
 \item{export.name}{PARAM_DESCRIPTION}
 
-\item{prefix}{PARAM_DESCRIPTION}
-
-\item{postfix}{PARAM_DESCRIPTION}
-
 \item{velocyto.loom.path}{PARAM_DESCRIPTION}
 
 \item{velocyto.loom.filenames}{PARAM_DESCRIPTION}
+
+\item{fxn.convert.loomtoseurat.cellname}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{prefix}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{postfix}{PARAM_DESCRIPTION, Default: NULL}
 }
 \value{
 OUTPUT_DESCRIPTION
