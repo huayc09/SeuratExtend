@@ -52,7 +52,7 @@ GeneSetAnalysisGO<-function(seu = NULL, dataset = "BP", root = "BP", spe = getOp
   if(all(dataset %in% names(DatabaseList[[root]]))){
     GenesetNames <- GetAllChilrenGO(DatabaseList[[root]][dataset], spe = spe)
   }else{
-    AllGeneset <- GetAllChilrenGO(DatabaseList[[root]][dataset], spe = spe)
+    AllGeneset <- GetAllChilrenGO(DatabaseList[[root]][root], spe = spe)
     if(all(dataset %in% AllGeneset)){
       GenesetNames <- GetAllChilrenGO(dataset, spe = spe)
     }else{
@@ -102,4 +102,3 @@ GeneSetAnalysisGO<-function(seu = NULL, dataset = "BP", root = "BP", spe = getOp
 # nCores = getOption("nCores")
 # export_to_matrix = F
 # seu <- GeneSetAnalysisGO(seu)
-
