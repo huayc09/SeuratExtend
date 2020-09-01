@@ -80,7 +80,7 @@ RunCellphoneDB <- function(seu, group.by, database = "cellphonedb_mouse_cytokine
   data <- GetAssayData(seu)
   meta <- seu@meta.data
   data_export <- cbind(data.frame("Gene"=rownames(data)), data)
-  meta_export <- data.frame("Cell" = rownames(meta), "cell_type" = meta[,group.by])
+  meta_export <- data.frame("Cell" = rownames(meta), "cell_type" = trimws(meta[,group.by]))
   write.table(meta_export, file = "input/meta_data.txt", row.names = F, sep = "\t", quote = F)
   write.table(data_export, file = "input/counts.txt", row.names = F, sep = "\t", quote = F)
   message(paste(Sys.time(), "Start runing CellphoneDB"))
@@ -125,6 +125,8 @@ CellphoneDB_Plots <- function(seu, sender, receiver, group.by, top_n = 20){
   library(viridis)
   library(egg)
 
+  sender <- trimws(sender)
+  receiver <- trimws(receiver)
   clu_pairs <-
     data.frame("sender" = rep(sender, each = length(receiver)),
                "receiver" = rep(receiver, n = length(sender)),
@@ -133,6 +135,8 @@ CellphoneDB_Plots <- function(seu, sender, receiver, group.by, top_n = 20){
   rownames(clu_pairs) <- clu_pairs$pairs
 
   sig <- seu@misc[["CellphoneDB"]][[group.by]][["significant_means"]]
+  check.diff <- setdiff(c(clu_pairs$pairs, pair_rev(clu_pairs$pairs, sep = "|")) %>% unique(), colnames(sig))
+  if(length(check.diff) > 0) sig[,check.diff] <- NA
   significant_means_trimmed <-
     sig %>%
     `rownames<-`(.$interacting_pair) %>%

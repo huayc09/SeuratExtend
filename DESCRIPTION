@@ -1,9 +1,9 @@
 Package: SeuratExtend
 Type: Package
 Title: SeuratExtend
-Version: 0.2.0
+Version: 0.2.2
 Author: Yichao Hua
-Maintainer: The package maintainer <yichao.hua@kuleuven.vib.be>
+Maintainer: Yichao Hua <yichao.hua@kuleuven.vib.be>
 Description: Personal package
 License: What license is it under?
 Encoding: UTF-8
