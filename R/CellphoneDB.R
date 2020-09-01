@@ -127,6 +127,8 @@ CellphoneDB_Plots <- function(seu, sender, receiver, group.by, top_n = 20){
 
   sender <- trimws(sender)
   receiver <- trimws(receiver)
+  seu@meta.data[,group.by] <- trimws(seu@meta.data[,group.by])
+
   clu_pairs <-
     data.frame("sender" = rep(sender, each = length(receiver)),
                "receiver" = rep(receiver, n = length(sender)),
