@@ -100,7 +100,7 @@ GSEAplot <- function(seu, group.by, geneset, ident.1 = NULL, ident.2 = NULL,
     .[apply(., 1, function(x) sum(x) > 0),]
   geneset <- intersect(geneset, rownames(matr))
   scores <-
-    GetAssayData(seu) %>%
+    matr %>%
     apply(1, function(x) log(mean(x[cell.1]+1)/mean(x[cell.2]+1))) %>%
     .[order(., decreasing = T)] %>%
     as.data.frame() %>%
