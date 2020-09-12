@@ -18,6 +18,7 @@ RunPalantirDiffusionMap <- function(seu, reduction = "pca", n_components = 20) {
   library(Seurat)
   library(reticulate)
   library(dplyr)
+  library(magrittr)
 
   if(!"tmp" %in% list.files()) dir.create("tmp")
   write.csv(Embeddings(seu, reduction = reduction), "tmp/dr.csv")
