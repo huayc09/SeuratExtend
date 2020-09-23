@@ -65,6 +65,10 @@ GeneSetAnalysisReactome <-
     if(is.null(seu@misc$AUCell[["cells_rankings"]])){
       message(paste(Sys.time(), "Build AUC Rank"))
       seu <- BuildAUCRank(seu, slot = slot, assay = assay, nCores = nCores)
+    } else if(!identical(colnames(seu), colnames(seu@misc$AUCell$cells_rankings))) {
+      message(Sys.time(), " Pre-existing cell ranking matrix has different cell IDs with current seurat object. ",
+              "Re-build AUC Rank")
+      seu <- BuildAUCRank(seu, slot = slot, assay = assay, nCores = nCores)
     }
     message(paste(Sys.time(), "Calculating", length(GenesetList), "gene set(s)"))
     n.items.part <- 2e6 / ncol(seu) * nCores

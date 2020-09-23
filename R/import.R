@@ -15,6 +15,14 @@ package_data <- list(
     install = function(){
       devtools::install_github("saeyslab/nichenetr")
     }
+  ),
+  "biomaRt" = list(
+    website = "https://bioconductor.org/packages/release/bioc/html/biomaRt.html",
+    tutorial = "https://bioconductor.org/packages/release/bioc/vignettes/biomaRt/inst/doc/biomaRt.html",
+    install_info = 'BiocManager::install("biomaRt")',
+    install = function(){
+      BiocManager::install("biomaRt")
+    }
   )
 )
 

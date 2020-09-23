@@ -44,7 +44,11 @@ GeneSetAnalysis <- function(seu = NULL, genesets, title = "genesets",
   GenesetList <- genesets[filter]
   nCores <- nCores %||% parallel::detectCores()
   if(is.null(seu@misc$AUCell[["cells_rankings"]])){
-    message(paste(Sys.time(), "Build AUC Rank"))
+    message(Sys.time(), " Build AUC Rank")
+    seu <- BuildAUCRank(seu, slot = slot, assay = assay, nCores = nCores)
+  } else if(!identical(colnames(seu), colnames(seu@misc$AUCell$cells_rankings))) {
+    message(Sys.time(), " Pre-existing cell ranking matrix has different cell IDs with current seurat object. ",
+            "Re-build AUC Rank")
     seu <- BuildAUCRank(seu, slot = slot, assay = assay, nCores = nCores)
   }
   message(paste(Sys.time(), "Calculating", length(GenesetList), "gene set(s)"))

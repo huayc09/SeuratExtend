@@ -1,7 +1,7 @@
 Package: SeuratExtend
 Type: Package
 Title: SeuratExtend
-Version: 0.2.2
+Version: 0.2.3
 Author: Yichao Hua
 Maintainer: Yichao Hua <yichao.hua@kuleuven.vib.be>
 Description: Personal package
@@ -10,7 +10,7 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 Imports: 
-    Seurat, dplyr, rlist, mosaic, ggplot2, ggrepel, reshape2, purrr, magrittr, tidyr, scales, ggpubr
+    Seurat, dplyr, rlist, mosaic, ggplot2, ggrepel, reshape2, purrr, magrittr, tidyr, scales, ggpubr, BiocManager
 Suggests:
     rgl, GSVA, GSVAdata, nichenetr, slingshot, destiny, AUCell, biomaRt, ontologyIndex, doParallel, doRNG, mgsa, GSEABase, egg, loomR, hdf5r
 Depends: 
