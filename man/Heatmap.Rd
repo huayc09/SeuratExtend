@@ -7,20 +7,24 @@
 Heatmap(
   score,
   color_scheme = c(low = muted("blue"), mid = "white", high = muted("red")),
-  border_color = "white",
+  border_color = NULL,
   lab_fill = "score",
   angle = 45,
   hjust = 1,
   vjust = 1,
   legend_position = "right",
   feature_text_subset = NULL,
-  nudge_x = ncol(score)/10,
+  segment.width = c(1, 2.5, 1),
+  segment.size = 0.2,
+  text.spacing = 2,
+  text.size = 2.5,
   hide_axis_line = TRUE,
   expand_limits_x = NULL,
   facet_col = NULL,
   facet_row = NULL,
   panel.spacing = unit(5, "pt"),
-  strip.placement = "outside"
+  strip.placement = "outside",
+  ...
 )
 }
 \arguments{
@@ -28,7 +32,7 @@ Heatmap(
 
 \item{color_scheme}{PARAM_DESCRIPTION, Default: c(low = muted("blue"), mid = "white", high = muted("red"))}
 
-\item{border_color}{PARAM_DESCRIPTION, Default: 'white'}
+\item{border_color}{PARAM_DESCRIPTION, Default: NULL}
 
 \item{lab_fill}{PARAM_DESCRIPTION, Default: 'score'}
 
@@ -42,7 +46,13 @@ Heatmap(
 
 \item{feature_text_subset}{PARAM_DESCRIPTION, Default: NULL}
 
-\item{nudge_x}{PARAM_DESCRIPTION, Default: ncol(score)/10}
+\item{segment.width}{PARAM_DESCRIPTION, Default: c(1, 2.5, 1)}
+
+\item{segment.size}{PARAM_DESCRIPTION, Default: 0.2}
+
+\item{text.spacing}{PARAM_DESCRIPTION, Default: 2}
+
+\item{text.size}{PARAM_DESCRIPTION, Default: 2.5}
 
 \item{hide_axis_line}{PARAM_DESCRIPTION, Default: TRUE}
 
@@ -55,6 +65,8 @@ Heatmap(
 \item{panel.spacing}{PARAM_DESCRIPTION, Default: unit(5, "pt")}
 
 \item{strip.placement}{PARAM_DESCRIPTION, Default: 'outside'}
+
+\item{...}{PARAM_DESCRIPTION}
 }
 \value{
 OUTPUT_DESCRIPTION
@@ -71,4 +83,7 @@ if(interactive()){
  #EXAMPLE1
  }
 }
+}
+\seealso{
+\code{\link[grid]{grid.draw}}
 }

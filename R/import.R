@@ -23,6 +23,14 @@ package_data <- list(
     install = function(){
       BiocManager::install("biomaRt")
     }
+  ),
+  "mgsa" = list(
+    website = "https://www.bioconductor.org/packages/release/bioc/html/mgsa.html",
+    tutorial = "https://www.bioconductor.org/packages/release/bioc/vignettes/mgsa/inst/doc/mgsa.pdf",
+    install_info = 'BiocManager::install("mgsa")',
+    install = function(){
+      BiocManager::install("mgsa")
+    }
   )
 )
 

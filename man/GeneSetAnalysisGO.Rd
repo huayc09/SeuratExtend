@@ -16,7 +16,9 @@ GeneSetAnalysisGO(
   slot = "counts",
   assay = "RNA",
   nCores = getOption("nCores"),
-  export_to_matrix = F
+  export_to_matrix = F,
+  verbose = TRUE,
+  n.items.part = 5e+05/ncol(seu) * parallel::detectCores()
 )
 }
 \arguments{
@@ -43,6 +45,10 @@ GeneSetAnalysisGO(
 \item{nCores}{PARAM_DESCRIPTION, Default: getOption("nCores")}
 
 \item{export_to_matrix}{PARAM_DESCRIPTION, Default: F}
+
+\item{verbose}{PARAM_DESCRIPTION, Default: TRUE}
+
+\item{n.items.part}{PARAM_DESCRIPTION, Default: 5e+05/ncol(seu) * parallel::detectCores()}
 }
 \value{
 OUTPUT_DESCRIPTION

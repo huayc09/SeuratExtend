@@ -12,6 +12,7 @@ RoxygenNote: 7.1.1
 Imports: 
     Seurat, dplyr, rlist, mosaic, ggplot2, ggrepel, reshape2, purrr, magrittr, tidyr, scales, ggpubr, BiocManager
 Suggests:
-    rgl, GSVA, GSVAdata, nichenetr, slingshot, destiny, AUCell, biomaRt, ontologyIndex, doParallel, doRNG, mgsa, GSEABase, egg, loomR, hdf5r
+    rgl, GSVA, GSVAdata, nichenetr, slingshot, destiny, AUCell, biomaRt, ontologyIndex, 
+    doMC, doRNG, doParallel, foreach, mgsa, GSEABase, egg, loomR, hdf5r, mgsa
 Depends: 
     R (>= 2.10)

@@ -12,6 +12,8 @@
 #' @param assay PARAM_DESCRIPTION, Default: 'RNA'
 #' @param nCores PARAM_DESCRIPTION, Default: getOption("nCores")
 #' @param export_to_matrix PARAM_DESCRIPTION, Default: F
+#' @param verbose PARAM_DESCRIPTION, Default: TRUE
+#' @param n.items.part PARAM_DESCRIPTION, Default: 5e+05/ncol(seu) * parallel::detectCores()
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -29,7 +31,8 @@
 GeneSetAnalysisGO<-function(seu = NULL, dataset = "BP", root = "BP", spe = getOption("spe"),
                             ratio = 0.4, n.min = 1, n.max = Inf, only.end.terms = F,
                             slot = "counts", assay = "RNA", nCores = getOption("nCores"),
-                            export_to_matrix = F){
+                            export_to_matrix = F, verbose = TRUE,
+                            n.items.part = 5e5 / ncol(seu) * parallel::detectCores()){
   check_spe(spe)
   DatabaseList<-list("BP"=c("BP" = "GO:0008150",
                             "immune_system_process" = "GO:0002376",
@@ -72,23 +75,15 @@ GeneSetAnalysisGO<-function(seu = NULL, dataset = "BP", root = "BP", spe = getOp
   GenesetList <- GO_Data[[spe]]$GO2Gene[GenesetNames]
   nCores <- nCores %||% parallel::detectCores()
   if(is.null(seu@misc$AUCell[["cells_rankings"]])){
-    message(paste(Sys.time(), "Build AUC Rank"))
+    if(verbose) message(paste(Sys.time(), "Build AUC Rank"))
     seu <- BuildAUCRank(seu, slot = slot, assay = assay, nCores = nCores)
   } else if(!identical(colnames(seu), colnames(seu@misc$AUCell$cells_rankings))) {
-    message(Sys.time(), " Pre-existing cell ranking matrix has different cell IDs with current seurat object. ",
+    if(verbose) message(Sys.time(), " Pre-existing cell ranking matrix has different cell IDs with current seurat object. ",
             "Re-build AUC Rank")
     seu <- BuildAUCRank(seu, slot = slot, assay = assay, nCores = nCores)
   }
-  message(paste(Sys.time(), "Calculating", length(GenesetList), "gene set(s)"))
-  n.items.part <- 1e6 / ncol(seu) * nCores
-  splited_terms <- split(GenesetList, ceiling((1:length(GenesetList))/n.items.part))
-  message(paste(Sys.time(), "Split gene set(s) into", length(splited_terms), "part(s)"))
-  AUC_matrix <-
-    splited_terms %>%
-    lapply(function(x) AUCell_calcAUC(x, seu@misc$AUCell[["cells_rankings"]], nCores = nCores) %>% getAUC()) %>%
-    list.rbind() %>%
-    .[apply(., 1, sum)>0, ]
-  message(paste0("\n", Sys.time(), " Done"))
+  AUC_matrix <- calcAUC_matrix(GenesetList, rankings = seu@misc$AUCell$cells_rankings,
+                               nCores = nCores, n.items.part = n.items.part, verbose = verbose)
   if(export_to_matrix) return(AUC_matrix)
   seu@misc[["AUCell"]][["GO"]][[dataset]] <- AUC_matrix
   return(seu)
