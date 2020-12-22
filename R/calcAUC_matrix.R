@@ -19,12 +19,11 @@
 #' @rdname calcAUC_matrix
 #' @export
 #' @importFrom parallel detectCores
-#' @importFrom AUCell AUCell_calcAUC
 
 calcAUC_matrix <-
   function(GenesetList, rankings, nCores = NULL, verbose = TRUE,
            n.items.part = 5e5 / ncol(rankings) * parallel::detectCores()) {
-    library(AUCell)
+    import("AUCell")
     library(rlang)
     library(parallel)
     library(rlist)
