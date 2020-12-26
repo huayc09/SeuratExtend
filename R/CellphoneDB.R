@@ -592,7 +592,7 @@ CellphoneDB_Plots_Circlize <-
     lgd_gene <- ComplexHeatmap::Legend(col_fun = col_fun, title = "Gene Expression",
                                        direction = "horizontal", legend_width = unit(20, "mm"))
     pushViewport(viewport(x = unit(1, "npc"), y = unit(0, "npc"), width = 0.25, height = 0.2, just = c("right", "bottom")))
-    draw(lgd_gene)
+    ComplexHeatmap::draw(lgd_gene)
   }
 
 # library(Seurat)
