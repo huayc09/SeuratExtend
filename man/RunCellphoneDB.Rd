@@ -4,14 +4,27 @@
 \alias{RunCellphoneDB}
 \title{FUNCTION_TITLE}
 \usage{
-RunCellphoneDB(seu, group.by, database = "cellphonedb_mouse_cytokines")
+RunCellphoneDB(
+  seu,
+  group.by,
+  cpdb.dir = NULL,
+  method = c("analysis", "statistical_analysis"),
+  database = "cellphonedb_mouse_cytokines",
+  export.to.Seurat = T
+)
 }
 \arguments{
 \item{seu}{PARAM_DESCRIPTION}
 
 \item{group.by}{PARAM_DESCRIPTION}
 
+\item{cpdb.dir}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{method}{PARAM_DESCRIPTION, Default: c("analysis", "statistical_analysis")}
+
 \item{database}{PARAM_DESCRIPTION, Default: 'cellphonedb_mouse_cytokines'}
+
+\item{export.to.Seurat}{PARAM_DESCRIPTION, Default: T}
 }
 \value{
 OUTPUT_DESCRIPTION

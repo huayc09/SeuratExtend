@@ -4,18 +4,30 @@
 \alias{CellphoneDB_Plots}
 \title{FUNCTION_TITLE}
 \usage{
-CellphoneDB_Plots(seu, sender, receiver, group.by, top_n = 20)
+CellphoneDB_Plots(
+  seu = NULL,
+  output = NULL,
+  sender = NULL,
+  receiver = NULL,
+  group.by = NULL,
+  top_n = 20,
+  Dotplot = F
+)
 }
 \arguments{
-\item{seu}{PARAM_DESCRIPTION}
+\item{seu}{PARAM_DESCRIPTION, Default: NULL}
 
-\item{sender}{PARAM_DESCRIPTION}
+\item{output}{PARAM_DESCRIPTION, Default: NULL}
 
-\item{receiver}{PARAM_DESCRIPTION}
+\item{sender}{PARAM_DESCRIPTION, Default: NULL}
 
-\item{group.by}{PARAM_DESCRIPTION}
+\item{receiver}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{group.by}{PARAM_DESCRIPTION, Default: NULL}
 
 \item{top_n}{PARAM_DESCRIPTION, Default: 20}
+
+\item{Dotplot}{PARAM_DESCRIPTION, Default: F}
 }
 \value{
 OUTPUT_DESCRIPTION

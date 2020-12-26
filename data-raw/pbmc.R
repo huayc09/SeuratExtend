@@ -18,6 +18,9 @@ DimPlot(pbmc, reduction = "umap", label = TRUE, pt.size = 0.5) + NoLegend()
 # FeaturePlot(pbmc, features = c("CCR7","S100A4"))
 pbmc@meta.data$orig.ident <- sample(c("sample1","sample2","sample2"), size = 2638, replace = T)
 pbmc@meta.data$orig.ident <- factor(pbmc$orig.ident)
+new.cluster.ids <- c("Naive CD4 T", "Memory CD4 T", "CD14+ Mono", "B", "CD8 T", "FCGR3A+ Mono",
+                     "NK", "DC", "Platelet")
+pbmc@meta.data$cluster <- new.cluster.ids[pbmc$seurat_clusters]
 
 usethis::use_data(pbmc, overwrite = TRUE)
 
