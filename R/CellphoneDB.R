@@ -165,12 +165,11 @@ CellphoneDB_Plots <- function(seu = NULL, output = NULL, sender = NULL, receiver
   }
 
   library(dplyr)
-  library(SeuratExtend)
   library(Seurat)
   library(reshape2)
   library(ggplot2)
   library(viridis)
-  library(egg)
+  import("egg")
   library(rlang)
   library(rlist)
 
@@ -403,6 +402,7 @@ CellphoneDB_Plots <- function(seu = NULL, output = NULL, sender = NULL, receiver
 #' @param receiver PARAM_DESCRIPTION, Default: NULL
 #' @param nLink PARAM_DESCRIPTION, Default: 50
 #' @param ignore PARAM_DESCRIPTION, Default: NULL
+#' @param alpha.low.link PARAM_DESCRIPTION, Default: 0.1
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -416,7 +416,7 @@ CellphoneDB_Plots <- function(seu = NULL, output = NULL, sender = NULL, receiver
 
 CellphoneDB_Plots_Circlize <-
   function(seu = NULL, output = NULL, sender = NULL, receiver = NULL, nLink = 50,
-           ignore = NULL){
+           ignore = NULL, alpha.low.link = 0.1){
     if(!is.null(output)) {
       if(is.character(output)) output <- ImportCellphoneDBOutputs(dir = output)
       if(!is.list(output)) stop("Please check 'output' argument")
@@ -432,12 +432,12 @@ CellphoneDB_Plots_Circlize <-
     library(reshape2)
     library(ggplot2)
     library(viridis)
-    library(egg)
     library(rlang)
     library(rlist)
-    library(circlize)
+    import("circlize")
     library(scales)
     library(tidyr)
+    import("ComplexHeatmap", detach = T)
 
     clusters <- colnames(output$deconvoluted)[-c(1:6)] %>% trimws()
     sender <- sender %||% clusters %>% trimws()
@@ -584,14 +584,13 @@ CellphoneDB_Plots_Circlize <-
                   lwd = 2
       )
     }
-    require(ComplexHeatmap)
-    labs<-levels(cut(FactorDf$Level,breaks = 20))
-    labs<-cbind(lower = as.numeric( sub("\\((.+),.*", "\\1", labs) ),
+    labs <- levels(cut(FactorDf$Level,breaks = 20))
+    labs <- cbind(lower = as.numeric( sub("\\((.+),.*", "\\1", labs) ),
                 upper = as.numeric( sub("[^,]*,([^]]*)\\]", "\\1", labs) ))
-    labs<-apply(labs, 1, mean)
-    col_fun<-colorRamp2(labs, viridis_pal(option = "D")(20))
-    lgd_gene = Legend(col_fun = col_fun, title = "Gene Expression",
-                      direction = "horizontal", legend_width = unit(20, "mm"))
+    labs <- apply(labs, 1, mean)
+    col_fun <- colorRamp2(labs, viridis_pal(option = "D")(20))
+    lgd_gene <- ComplexHeatmap::Legend(col_fun = col_fun, title = "Gene Expression",
+                                       direction = "horizontal", legend_width = unit(20, "mm"))
     pushViewport(viewport(x = unit(1, "npc"), y = unit(0, "npc"), width = 0.25, height = 0.2, just = c("right", "bottom")))
     draw(lgd_gene)
   }

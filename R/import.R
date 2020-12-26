@@ -39,6 +39,14 @@ package_data <- list(
     install = function(){
       remotes::install_github("aertslab/AUCell")
     }
+  ),
+  "ComplexHeatmap" = list(
+    website = "https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html",
+    tutorial = "https://jokergoo.github.io/ComplexHeatmap-reference/book/",
+    install_info = 'BiocManager::install("ComplexHeatmap")',
+    install = function(){
+      BiocManager::install("ComplexHeatmap")
+    }
   )
 )
 
@@ -46,6 +54,7 @@ package_data <- list(
 #' @description FUNCTION_DESCRIPTION
 #' @param package PARAM_DESCRIPTION
 #' @param hpc.mode PARAM_DESCRIPTION, Default: F
+#' @param detach PARAM_DESCRIPTION, Default: F
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -57,17 +66,24 @@ package_data <- list(
 #' @rdname import
 #' @export
 
-import <- function(package, hpc.mode = F){
+import <- function(package, hpc.mode = F, detach = F){
   if(!require(package, character.only = T)) {
-    message(paste0("Required package '", package, "' not installed\n"))
-    message(paste0("Website: ", package_data[[package]]$website))
-    message(paste0("Tutorial: ", package_data[[package]]$tutorial))
-    message(paste0("Recommended installation:\n", package_data[[package]]$install_info),"\n")
+    message("Required package '", package, "' not installed\n")
+    if(package %in% names(package_data)) {
+      message("Website: ", package_data[[package]]$website)
+      message("Tutorial: ", package_data[[package]]$tutorial)
+      message("Recommended installation:\n", package_data[[package]]$install_info,"\n")
+    }
     if(!hpc.mode){
       input <- readline(prompt="Try install? y/[n] ")
     } else input <- "y"
-    if(input %in% c("y","yes","Y","Yes")) package_data[[package]]$install()
+    if(input %in% c("y","yes","Y","Yes")){
+      if(package %in% names(package_data))
+        package_data[[package]]$install() else
+          install.packages(package)
+    }
   }
   library(package, character.only = T)
+  if(detach) detach(paste0("package:",package), unload = TRUE, character.only = T)
 }
 
