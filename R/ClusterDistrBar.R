@@ -7,6 +7,7 @@
 #' @param percent PARAM_DESCRIPTION, Default: T
 #' @param plot PARAM_DESCRIPTION, Default: T
 #' @param flip PARAM_DESCRIPTION, Default: T
+#' @param width PARAM_DESCRIPTION, Default: 0.9
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -30,7 +31,7 @@
 #' @export
 
 ClusterDistrBar <- function(origin, cluster, rev = F, normalize = rev, percent = T,
-                            plot = T, flip = T){
+                            plot = T, flip = T, width = 0.9){
   library(dplyr)
   library(rlist)
   library(ggplot2)
@@ -57,7 +58,7 @@ ClusterDistrBar <- function(origin, cluster, rev = F, normalize = rev, percent =
   if(flip) ToPlot$Var2 <- ToPlot$Var2 %>% factor(levels = rev(levels(.)))
   p <-
     ggplot(ToPlot, aes(x = Var2, y = value, fill = Var1)) +
-    geom_bar(stat="identity", position = position_stack(reverse = TRUE)) +
+    geom_bar(stat="identity", position = position_stack(reverse = TRUE), width = width) +
     theme_classic() +
     labs(x = x.label, y = y.label, fill = fill.label) +
     if(flip) coord_flip()

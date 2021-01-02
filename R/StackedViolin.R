@@ -6,6 +6,9 @@
 #' @param features PARAM_DESCRIPTION, Default: NULL
 #' @param ncol PARAM_DESCRIPTION, Default: 1
 #' @param lab_fill PARAM_DESCRIPTION, Default: 'group'
+#' @param scales PARAM_DESCRIPTION, Default: 'free_y'
+#' @param type PARAM_DESCRIPTION, Default: c("violin", "boxplot")
+#' @param outlier.size PARAM_DESCRIPTION, Default: 1
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -14,16 +17,15 @@
 #'  #EXAMPLE1
 #'  }
 #' }
-#' @seealso
-#'  \code{\link[reshape2]{melt}}
 #' @rdname StackedViolin
 #' @export
-#' @importFrom reshape2 melt
 
-StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fill = "group"){
-  require(ggplot2)
-  require(rlang)
-  require(dplyr)
+StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fill = "group",
+                          scales = "free_y", type = c("violin","boxplot"), outlier.size = 1){
+  library(ggplot2)
+  library(rlang)
+  library(dplyr)
+  library(reshape2)
   features <- features %||% rownames(matr)
   if(!is_empty(setdiff(features, rownames(matr)))){
     message(paste0(setdiff(features, rownames(matr)), collapse = ", "), " not found")
@@ -32,11 +34,20 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
   f2 <- f2 %||% data.frame(row.names = colnames(matr))
   ToPlot <-
     cbind(f, f2, as.data.frame(t(matr[features,]))) %>%
-    reshape2::melt(measure.vars = features)
+    melt(measure.vars = features)
+  type <- type[1]
+  if(type == "violin") {
+    p <- ggplot(ToPlot, aes(x=f,y=value, fill=f)) +
+      geom_violin(scale = "width")
+  } else if(type == "boxplot") {
+    p <- ggplot(ToPlot, aes(x=f,y=value, fill=f)) +
+      geom_boxplot(outlier.size = outlier.size)
+  } else {
+    stop('"type" argument should be "violin" or "boxplot"')
+  }
   if(is_empty(f2)){
-    p<-ggplot(ToPlot, aes(x=f,y=value, fill=f))+
-      geom_violin(scale = "width")+
-      facet_wrap( ~variable, ncol = ncol, strip.position="left")+
+    p <- p +
+      facet_wrap( ~variable, ncol = ncol, strip.position="left", scales = scales)+
       ylab(NULL) +
       xlab(NULL) +
       theme(strip.background = element_blank(),
@@ -46,9 +57,8 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
       theme_classic() +
       labs(fill = lab_fill)
   }else{
-    p<-ggplot(ToPlot, aes(x=f,y=value, fill=f))+
-      geom_violin(scale = "width")+
-      facet_grid(vars(variable), vars(f2), switch = c("both"))+
+    p <- p +
+      facet_grid(vars(variable), vars(f2), switch = c("both"), scales = scales)+
       ylab(NULL) +
       xlab(NULL) +
       theme(strip.background = element_blank(),
@@ -70,6 +80,9 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
 #' @param split.by PARAM_DESCRIPTION, Default: NULL
 #' @param cell PARAM_DESCRIPTION, Default: NULL
 #' @param ncol PARAM_DESCRIPTION, Default: 1
+#' @param scales PARAM_DESCRIPTION, Default: 'free_y'
+#' @param type PARAM_DESCRIPTION, Default: c("violin", "boxplot")
+#' @param outlier.size PARAM_DESCRIPTION, Default: 1
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -81,13 +94,16 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
 #' @rdname StackedViolin_v3
 #' @export
 
-StackedViolin_v3 <- function(seu, features, group.by = "seurat_clusters", split.by = NULL, cell = NULL, ncol = 1){
+StackedViolin_v3 <-
+  function(seu, features, group.by = "seurat_clusters", split.by = NULL, cell = NULL,
+           ncol = 1, scales = "free_y", type = c("violin","boxplot"), outlier.size = 1){
   require(rlang)
   cell <- cell %||% colnames(seu)
-  matr <- as.matrix(GetAssayData(seu))[features, cell]
+  matr <- t(FetchData(seu, vars = features, cells = cell))
   f <- factor(seu[[group.by]][cell,])
   f2 <- seu[[split.by]][cell,]
-  p <- StackedViolin(matr, f, f2, features, ncol, lab_fill = group.by)
+  p <- StackedViolin(matr, f, f2, features, ncol, lab_fill = group.by,
+                     scales = scales, type = type, outlier.size = outlier.size)
   return(p)
 }
 
