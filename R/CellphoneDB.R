@@ -75,6 +75,7 @@ ImportCellphoneDBOutputs <- function(seu = NULL, dir = "out"){
 #' @param method PARAM_DESCRIPTION, Default: c("analysis", "statistical_analysis")
 #' @param database PARAM_DESCRIPTION, Default: 'cellphonedb_mouse_cytokines'
 #' @param export.to.Seurat PARAM_DESCRIPTION, Default: T
+#' @param NormalizeData PARAM_DESCRIPTION, Default: T
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -87,7 +88,7 @@ ImportCellphoneDBOutputs <- function(seu = NULL, dir = "out"){
 #' @export
 
 RunCellphoneDB <- function(seu, group.by, cpdb.dir = NULL, method = c("analysis", "statistical_analysis"),
-                           database = "cellphonedb_mouse_cytokines", export.to.Seurat = T) {
+                           database = "cellphonedb_mouse_cytokines", export.to.Seurat = T, NormalizeData = T) {
   message("Check if CellphoneDB is installed and able to run in terminal")
   cpdb.path <- ifelse(is.null(cpdb.dir),
                       "cellphonedb",
@@ -117,7 +118,12 @@ RunCellphoneDB <- function(seu, group.by, cpdb.dir = NULL, method = c("analysis"
                       "--database input/custom_db.db")
   }
 
-  data <- GetAssayData(seu)
+  if(NormalizeData) {
+    if(!any(grepl("NormalizeData",names(seu@commands)))) seu <- NormalizeData(seu)
+    data <- GetAssayData(seu, slot = "data")
+  } else {
+    data <- GetAssayData(seu, slot = "counts")
+  }
   meta <- seu@meta.data
   data_export <- cbind(data.frame("Gene"=rownames(data)), data)
   meta_export <- data.frame("Cell" = rownames(meta), "cell_type" = trimws(meta[,group.by]))

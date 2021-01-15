@@ -19,6 +19,8 @@
 #' @param facet_row PARAM_DESCRIPTION, Default: NULL
 #' @param panel.spacing PARAM_DESCRIPTION, Default: unit(5, "pt")
 #' @param strip.placement PARAM_DESCRIPTION, Default: 'outside'
+#' @param ncol PARAM_DESCRIPTION, Default: NULL
+#' @param nrow PARAM_DESCRIPTION, Default: NULL
 #' @param ... PARAM_DESCRIPTION
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
@@ -39,7 +41,8 @@ Heatmap <-
            lab_fill = "score", angle = 45, hjust = 1, vjust = 1, legend_position = "right",
            feature_text_subset = NULL, segment.width = c(1,2.5,1), segment.size = 0.2, text.spacing = 2, text.size = 2.5,
            hide_axis_line = TRUE, expand_limits_x = NULL,
-           facet_col = NULL, facet_row = NULL, panel.spacing = unit(5, "pt"), strip.placement = "outside", ...){
+           facet_col = NULL, facet_row = NULL, panel.spacing = unit(5, "pt"), strip.placement = "outside",
+           ncol = NULL, nrow = NULL, ...){
     library(ggplot2)
     library(reshape2)
     library(viridis)
@@ -148,12 +151,20 @@ Heatmap <-
     }
 
     if(!is.null(facet_col) | !is.null(facet_row)){
+      if(!is.null(ncol) | !is.null(nrow)) {
+        p <- p +
+          facet_rep_wrap(
+            facets = vars(facet_col), ncol = ncol, nrow = nrow,
+            scales = "fixed")
+      } else {
+        p <- p +
+          facet_grid(
+            rows = if(is.null(facet_row)) NULL else vars(facet_row),
+            cols = if(is.null(facet_col)) NULL else vars(facet_col),
+            scales = "free", space = "free",
+            switch = "y")
+      }
       p <- p +
-        facet_grid(
-          rows = if(is.null(facet_row)) NULL else vars(facet_row),
-          cols = if(is.null(facet_col)) NULL else vars(facet_col),
-          scales = "free", space = "free",
-          switch = "y") +
         theme(panel.grid = element_blank(),
               strip.background = element_rect(size = 0),
               panel.spacing = panel.spacing,
@@ -166,7 +177,6 @@ Heatmap <-
         p <- grid::grid.draw(g)
       }
     }
-
     return(p)
 }
 
