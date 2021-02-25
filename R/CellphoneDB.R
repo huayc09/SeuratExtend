@@ -200,18 +200,19 @@ CellphoneDB_Plots <- function(seu = NULL, output = NULL, sender = NULL, receiver
   rownames(clu_pairs) <- clu_pairs$pairs
 
   sig <- output[["significant_means"]]
+  sig <- sig[!duplicated(sig$interacting_pair),]
   check.diff <- setdiff(c(clu_pairs$pairs, pair_rev(clu_pairs$pairs, sep = "|")) %>% unique(), colnames(sig))
   if(length(check.diff) > 0) sig[,check.diff] <- NA
   significant_means_trimmed <-
     sig %>%
     `rownames<-`(.$interacting_pair) %>%
-    .[,clu_pairs$pairs]  %>%
-    .[apply(.,1,function(x) !all(is.na(x))),]
+    .[,clu_pairs$pairs, drop = F]  %>%
+    .[apply(.,1,function(x) !all(is.na(x))),, drop = F]
   significant_means_trimmed_rev <-
     sig %>%
     `rownames<-`(.$interacting_pair) %>%
-    .[,pair_rev(clu_pairs$pairs, sep = "|")]  %>%
-    .[apply(.,1,function(x) !all(is.na(x))),] %>%
+    .[,pair_rev(clu_pairs$pairs, sep = "|"), drop = F]  %>%
+    .[apply(.,1,function(x) !all(is.na(x))),, drop = F] %>%
     `rownames<-`(pair_rev(rownames(.))) %>%
     `colnames<-`(pair_rev(colnames(.), sep = "|"))
   significant_means_trimmed <-
@@ -225,25 +226,18 @@ CellphoneDB_Plots <- function(seu = NULL, output = NULL, sender = NULL, receiver
       apply(significant_means_trimmed, 1, function(x) max(x, na.rm = T)) %>%
         sort(decreasing = T) %>%
         head(top_n) %>%
-        names(),
+        names(),, drop = F
     ]
 
-  gene_clu <-
-    data.frame("gene_pair" = rep(rownames(significant_means_trimmed_top),
-                                 n = ncol(significant_means_trimmed_top)),
-               "cluster" = rep(colnames(significant_means_trimmed_top),
-                               each = nrow(significant_means_trimmed_top)),
-               stringsAsFactors = F)
-  for (i in rownames(gene_clu)) {
-    g <- gene_clu[i,"gene_pair"]
-    c <- gene_clu[i,"cluster"]
-    gene_clu[i, "means"] <- significant_means_trimmed_top[g,c]
-    gene_clu[i, "sender"] <- clu_pairs[c, "sender"]
-    gene_clu[i, "receiver"] <- clu_pairs[c, "receiver"]
-  }
+  significant_means_trimmed_top$gene_pair <- rownames(significant_means_trimmed_top)
+  gene_clu <- melt(significant_means_trimmed_top,
+                   id.vars = "gene_pair",
+                   variable.name = "cluster",
+                   value.name = "means")
+  gene_clu[,c("sender","receiver")] <- clu_pairs[gene_clu$cluster,c("sender","receiver")]
   gene_clu$means[is.na(gene_clu$means)] <- 0
   gene_clu$gene_pair <- factor(gene_clu$gene_pair, levels = rev(rownames(significant_means_trimmed_top)))
-  gene_clu$cluster <- factor(gene_clu$gene_pair, levels = colnames(significant_means_trimmed_top))
+  gene_clu$cluster <- factor(gene_clu$cluster, levels = colnames(significant_means_trimmed_top) %>% .[-length(.)])
 
   p_gene_clu <-
     ggplot(gene_clu, aes(x = receiver, y = gene_pair, fill = means)) +
@@ -253,7 +247,7 @@ CellphoneDB_Plots <- function(seu = NULL, output = NULL, sender = NULL, receiver
     theme_classic()+
     labs(x = "", y = "")+
     scale_y_discrete(position = "right") +
-    theme(axis.text.x=element_text(angle = 90, hjust = 1, vjust = 0))
+    theme(axis.text.x=element_text(angle = 90, hjust = 1, vjust = 0.5))
 
   clu_clu_count <- data.frame()
   clu_clu_sum <- data.frame()
@@ -289,7 +283,7 @@ CellphoneDB_Plots <- function(seu = NULL, output = NULL, sender = NULL, receiver
     dec_sender[[i]] <-
       cbind(data.frame(gene_name = i,
                        complex_name = i),
-            apply(dec_sender[[i]][,-c(1:2)], 2, mean) %>% t)
+            apply(dec_sender[[i]][,-c(1:2), drop = F], 2, mean) %>% t)
   }
   dec_sender <- list.rbind(dec_sender)
   dec_receiver <-
@@ -302,7 +296,7 @@ CellphoneDB_Plots <- function(seu = NULL, output = NULL, sender = NULL, receiver
     dec_receiver[[i]] <-
       cbind(data.frame(gene_name = i,
                        complex_name = i),
-            apply(dec_receiver[[i]][,-c(1:2)], 2, mean) %>% t)
+            apply(dec_receiver[[i]][,-c(1:2), drop = F], 2, mean) %>% t)
   }
   dec_receiver <- list.rbind(dec_receiver)
 
@@ -343,12 +337,12 @@ CellphoneDB_Plots <- function(seu = NULL, output = NULL, sender = NULL, receiver
     gene_clu_sender <-
       dec_sender %>%
       `rownames<-`(.$gene_name) %>%
-      .[colnames(gene_pairs),sender]
+      .[colnames(gene_pairs),sender, drop = F]
     p_gene_clu_sender <- Heatmap(t(gene_clu_sender), color_scheme = c("white",muted("red")))
     gene_clu_receiver <-
       dec_receiver %>%
       `rownames<-`(.$gene_name) %>%
-      .[rownames(gene_pairs),receiver]
+      .[rownames(gene_pairs),receiver, drop = F]
     p_gene_clu_receiver <- Heatmap(gene_clu_receiver, color_scheme = c("white",muted("blue")))
     p_clu_clu_sum <- Heatmap(clu_clu_sum, color_scheme = c("white",muted("magenta")), lab_fill = "Accumulated\nmean value")
     p_clu_clu_count <- Heatmap(clu_clu_count, color_scheme = c("white",muted("magenta")), lab_fill = "Number of \ninteractions")
@@ -358,27 +352,30 @@ CellphoneDB_Plots <- function(seu = NULL, output = NULL, sender = NULL, receiver
     ggarrange(p_clu_clu_sum +
                 scale_y_discrete(position = "left") +
                 scale_x_discrete(position = "top") +
-                theme(legend.position = "none", axis.text.x=element_text(angle = 90, hjust = 0, vjust = 0),),
+                theme(legend.position = "none",
+                      axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0.5)),
               p_gene_clu_sender +
                 scale_y_discrete(position = "right") +
                 scale_x_discrete(position = "top") +
-                theme(legend.position = "none", axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0),
+                theme(legend.position = "none",
+                      axis.text.x = element_text(angle = 90, hjust = 0, vjust = 0.5),
                       axis.title = element_blank(),
                       axis.line = element_blank(),
                       axis.ticks = element_blank()),
               p_gene_clu_receiver +
                 scale_y_discrete(position = "left") +
                 scale_x_discrete(position = "bottom") +
-                theme(legend.position = "none", axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0),
+                theme(legend.position = "none",
+                      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
                       axis.title = element_blank(),
                       axis.line = element_blank(),
                       axis.ticks = element_blank()),
               p_gene_pairs +
                 scale_fill_gradient(low = "white", high = "#238A8DFF") +
-                theme(legend.position = "none", axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0)),
+                theme(legend.position = "none",
+                      axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)),
               widths = c(length(receiver), ncol(gene_pairs)),
-              heights = c(length(sender), nrow(gene_pairs)),
-              ncol = 2)
+              heights = c(length(sender), nrow(gene_pairs)))
 
   CellphoneDB_Plots <-
     list(sender = sender,
@@ -465,30 +462,31 @@ CellphoneDB_Plots_Circlize <-
     rownames(clu_pairs) <- clu_pairs$pairs
 
     sig <- output[["significant_means"]]
+    sig <- sig[!duplicated(sig$interacting_pair),]
     if(!is.null(ignore)) sig <- sig[!sig$interacting_pair %in% ignore, ]
     significant_means_trimmed <-
       sig %>%
       `rownames<-`(.$interacting_pair) %>%
-      .[,clu_pairs$pairs]  %>%
-      .[apply(.,1,function(x) !all(is.na(x))),]
+      .[,clu_pairs$pairs, drop = F]  %>%
+      .[apply(.,1,function(x) !all(is.na(x))),, drop = F]
     significant_means_trimmed_rev <-
       sig %>%
       `rownames<-`(.$interacting_pair) %>%
-      .[,pair_rev(clu_pairs$pairs, sep = "|")]  %>%
-      .[apply(.,1,function(x) !all(is.na(x))),] %>%
+      .[,pair_rev(clu_pairs$pairs, sep = "|"), drop = F]  %>%
+      .[apply(.,1,function(x) !all(is.na(x))),, drop = F] %>%
       `rownames<-`(pair_rev(rownames(.))) %>%
       `colnames<-`(pair_rev(colnames(.), sep = "|"))
     significant_means_trimmed <-
       rbind(significant_means_trimmed,
             significant_means_trimmed_rev[
               setdiff(rownames(significant_means_trimmed_rev),
-                      rownames(significant_means_trimmed)),])
+                      rownames(significant_means_trimmed)),, drop = F])
 
     thr <- significant_means_trimmed %>% as.matrix %>% .[order(.,decreasing = T)[nLink]]
     significant_means_trimmed_top <-
       significant_means_trimmed %>%
       .[apply(., 1, function(x) max(x, na.rm = T) >= thr),
-        apply(., 2, function(x) max(x, na.rm = T) >= thr)]
+        apply(., 2, function(x) max(x, na.rm = T) >= thr), drop = F]
     LinkDf <-
       melt(cbind(significant_means_trimmed_top,
                  Interaction = rownames(significant_means_trimmed_top)),
@@ -506,11 +504,11 @@ CellphoneDB_Plots_Circlize <-
       dec[[i]] <-
         cbind(data.frame(gene_name = i,
                          complex_name = i),
-              apply(dec[[i]][,-c(1:2)], 2, mean) %>% t)
+              apply(dec[[i]][,-c(1:2), drop = F], 2, mean) %>% t)
     }
     dec <- list.rbind(dec)
 
-    FactorDf<-data.frame()
+    FactorDf <- data.frame()
     for (i in rownames(LinkDf)) {
       FactorDf[paste0(i,"a"),"Celltype"]<-LinkDf[i,"CellType1"]
       FactorDf[paste0(i,"a"),"Gene"]<-LinkDf[i,"gene_a"]
@@ -523,7 +521,7 @@ CellphoneDB_Plots_Circlize <-
     for (i in rownames(FactorDf)) {
       FactorDf[i,"Level"] <- dec[dec$gene_name==FactorDf[i,"Gene"], FactorDf[i,"Celltype"]]
     }
-    FactorDf$Celltype<-factor(FactorDf$Celltype, levels = unique(c(sender,receiver)))
+    FactorDf$Celltype <- factor(FactorDf$Celltype, levels = unique(c(sender,receiver)) %>% intersect(FactorDf$Celltype))
     FactorDf <- FactorDf %>%
       .[order(.$Level, decreasing = T),] %>%
       .[order(.$Celltype),]
@@ -571,7 +569,7 @@ CellphoneDB_Plots_Circlize <-
                                CELL_META$sector.index, cex = 0.8, col = "white")
                  })
 
-    require(scales)
+
     for (i in rownames(LinkDf)) {
       LinkDf[i,"col"]<-alpha(CelltypeCol[CelltypeCol$Celltype==LinkDf[i,"CellType1"],"col"],
                              alpha = (LinkDf[i, "value"]-min(LinkDf$value))/(max(LinkDf$value)-min(LinkDf$value))*

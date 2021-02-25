@@ -77,6 +77,30 @@ gene_expressed <- function(ident, seu, feature = rownames(seu), group.by = NULL,
   return(names(gene_percent)[gene_percent >= pct])
 }
 
+#' @title FUNCTION_TITLE
+#' @description FUNCTION_DESCRIPTION
+#' @param fun PARAM_DESCRIPTION
+#' @param next.line PARAM_DESCRIPTION, Default: T
+#' @param ... PARAM_DESCRIPTION
+#' @return OUTPUT_DESCRIPTION
+#' @details DETAILS
+#' @examples
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @rdname write.py.fun
+#' @export
+
+write.py.fun <- function(fun, next.line = T, ...) {
+  par <- c(...)
+  par <- paste(names(par), par, sep = " = ", collapse = ", ")
+  text <- paste0(fun, "(", par, ")")
+  if(next.line) text <- paste0(text, "\n")
+  return(text)
+}
+
 
 {
 RelationPlot<-function(nodes, relation){

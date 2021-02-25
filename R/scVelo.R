@@ -121,3 +121,32 @@ scVelo.SeuratToLoom <-
 
     pfile$close_all()
   }
+
+
+scVelo.RunBasic <- function(loom, save.adata = "adata.obj"){
+  library(reticulate)
+  code <- paste0("import scvelo as scv\n",
+                 "import scanpy as sc\n",
+                 "import numpy as np\n",
+                 "import matplotlib.cm as cm\n",
+                 "scv.logging.print_version()\n",
+                 "scv.settings.verbosity = 3\n",
+                 "scv.settings.presenter_view = True\n",
+                 "scv.set_figure_params('scvelo')\n",
+                 "import loompy\n",
+                 'ds = loompy.connect("', loom, '")\n',
+                 'del ds.layers["norm_data"]\n',
+                 'del ds.layers["scale_data"]\n',
+                 'ds.close()\n',
+                 'adata = scv.read("', loom, '")\n',
+                 "adata\n",
+                 "scv.pp.filter_and_normalize(adata, min_shared_counts=20, n_top_genes=2000)\n",
+                 "scv.pp.moments(adata, n_pcs=30, n_neighbors=30)\n",
+                 "scv.tl.velocity(adata)\n",
+                 "scv.tl.velocity_graph(adata)\n",
+                 "import pickle\n",
+                 'pickle_out = open("', save.adata, '","wb")\n',
+                 "pickle.dump(adata, pickle_out)\n",
+                 "pickle_out.close()\n")
+  py_run_string(code)
+}
