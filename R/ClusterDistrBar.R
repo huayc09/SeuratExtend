@@ -61,6 +61,7 @@ ClusterDistrBar <- function(origin, cluster, rev = F, normalize = rev, percent =
     geom_bar(stat="identity", position = position_stack(reverse = TRUE), width = width) +
     theme_classic() +
     labs(x = x.label, y = y.label, fill = fill.label) +
+    scale_y_continuous(expand = c(0, 0)) +
     if(flip) coord_flip()
   return(p)
 }
