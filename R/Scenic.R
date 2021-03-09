@@ -41,6 +41,7 @@ ImportPyscenicLoom <- function(loom.path, seu = NULL) {
     return(results)
   } else {
     seu@misc[["SCENIC"]] <- results
+    seu[["TF"]] <- CreateAssayObject(data = t(RegulonsAUC))
     return(seu)
   }
 }
