@@ -178,6 +178,7 @@ CellphoneDB_Plots <- function(seu = NULL, output = NULL, sender = NULL, receiver
   import("egg")
   library(rlang)
   library(rlist)
+  library(tidyr)
 
   clusters <- colnames(output$deconvoluted)[-c(1:6)] %>% trimws()
   sender <- sender %||% clusters %>% trimws()
@@ -219,7 +220,7 @@ CellphoneDB_Plots <- function(seu = NULL, output = NULL, sender = NULL, receiver
     rbind(significant_means_trimmed,
           significant_means_trimmed_rev[
             setdiff(rownames(significant_means_trimmed_rev),
-                    rownames(significant_means_trimmed)),])
+                    rownames(significant_means_trimmed)),, drop = F])
 
   significant_means_trimmed_top <-
     significant_means_trimmed[
@@ -278,7 +279,7 @@ CellphoneDB_Plots <- function(seu = NULL, output = NULL, sender = NULL, receiver
           dec$complex_name %in% colnames(gene_pairs),
         c("gene_name","complex_name",sender)] %>%
     unique() %>%
-    split(.$complex_name)
+    split(.$complex_name %>% replace_na(""))
   for (i in setdiff(names(dec_sender), "")) {
     dec_sender[[i]] <-
       cbind(data.frame(gene_name = i,
@@ -291,7 +292,7 @@ CellphoneDB_Plots <- function(seu = NULL, output = NULL, sender = NULL, receiver
           dec$complex_name %in% rownames(gene_pairs),
         c("gene_name","complex_name",receiver)] %>%
     unique() %>%
-    split(.$complex_name)
+    split(.$complex_name %>% replace_na(""))
   for (i in setdiff(names(dec_receiver), "")) {
     dec_receiver[[i]] <-
       cbind(data.frame(gene_name = i,
