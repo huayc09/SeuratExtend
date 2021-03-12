@@ -117,6 +117,7 @@ write.py.fun <- function(fun, next.line = T, ...) {
 #' @export
 
 viewdf <- function(df, n = 3){
+  df_orig <- df
   cl <- class(df)
   dm <- dim(df)
   if(ncol(df) > n * 2){
@@ -131,9 +132,10 @@ viewdf <- function(df, n = 3){
                 matrix(".", nrow = 3, ncol = ncol(df)) %>% `colnames<-`(colnames(df)) %>% `rownames<-`(c(".",". ",".  ")),
                 df[tail(ns, n),,drop = F])
   }
-  return(list(df = df,
-              class = cl,
-              dim = dm))
+  print(list(df = df,
+             class = cl,
+             dim = dm),
+        quote = F)
 }
 
 {
