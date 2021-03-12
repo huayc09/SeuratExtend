@@ -10,7 +10,8 @@ RunCellphoneDB(
   cpdb.dir = NULL,
   method = c("analysis", "statistical_analysis"),
   database = "cellphonedb_mouse_cytokines",
-  export.to.Seurat = T
+  export.to.Seurat = T,
+  NormalizeData = T
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ RunCellphoneDB(
 \item{database}{PARAM_DESCRIPTION, Default: 'cellphonedb_mouse_cytokines'}
 
 \item{export.to.Seurat}{PARAM_DESCRIPTION, Default: T}
+
+\item{NormalizeData}{PARAM_DESCRIPTION, Default: T}
 }
 \value{
 OUTPUT_DESCRIPTION

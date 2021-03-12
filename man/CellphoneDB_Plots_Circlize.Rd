@@ -10,7 +10,8 @@ CellphoneDB_Plots_Circlize(
   sender = NULL,
   receiver = NULL,
   nLink = 50,
-  ignore = NULL
+  ignore = NULL,
+  alpha.low.link = 0.1
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ CellphoneDB_Plots_Circlize(
 \item{nLink}{PARAM_DESCRIPTION, Default: 50}
 
 \item{ignore}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{alpha.low.link}{PARAM_DESCRIPTION, Default: 0.1}
 }
 \value{
 OUTPUT_DESCRIPTION

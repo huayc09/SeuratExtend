@@ -4,12 +4,14 @@
 \alias{import}
 \title{FUNCTION_TITLE}
 \usage{
-import(package, hpc.mode = F)
+import(package, hpc.mode = F, detach = F)
 }
 \arguments{
 \item{package}{PARAM_DESCRIPTION}
 
 \item{hpc.mode}{PARAM_DESCRIPTION, Default: F}
+
+\item{detach}{PARAM_DESCRIPTION, Default: F}
 }
 \value{
 OUTPUT_DESCRIPTION

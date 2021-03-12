@@ -10,7 +10,10 @@ StackedViolin(
   f2 = NULL,
   features = NULL,
   ncol = 1,
-  lab_fill = "group"
+  lab_fill = "group",
+  scales = "free_y",
+  type = c("violin", "boxplot"),
+  outlier.size = 1
 )
 }
 \arguments{
@@ -25,6 +28,12 @@ StackedViolin(
 \item{ncol}{PARAM_DESCRIPTION, Default: 1}
 
 \item{lab_fill}{PARAM_DESCRIPTION, Default: 'group'}
+
+\item{scales}{PARAM_DESCRIPTION, Default: 'free_y'}
+
+\item{type}{PARAM_DESCRIPTION, Default: c("violin", "boxplot")}
+
+\item{outlier.size}{PARAM_DESCRIPTION, Default: 1}
 }
 \value{
 OUTPUT_DESCRIPTION
@@ -41,7 +50,4 @@ if(interactive()){
  #EXAMPLE1
  }
 }
-}
-\seealso{
-\code{\link[reshape2]{melt}}
 }

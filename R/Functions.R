@@ -101,6 +101,40 @@ write.py.fun <- function(fun, next.line = T, ...) {
   return(text)
 }
 
+#' @title FUNCTION_TITLE
+#' @description FUNCTION_DESCRIPTION
+#' @param df PARAM_DESCRIPTION
+#' @param n PARAM_DESCRIPTION, Default: 3
+#' @return OUTPUT_DESCRIPTION
+#' @details DETAILS
+#' @examples
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @rdname viewdf
+#' @export
+
+viewdf <- function(df, n = 3){
+  cl <- class(df)
+  dm <- dim(df)
+  if(ncol(df) > n * 2){
+    ns <- 1:ncol(df)
+    df <- cbind(df[,head(ns, n),drop = F],
+                matrix(".", ncol = 3, nrow = nrow(df)) %>% `colnames<-`(rep(".",3)),
+                df[,tail(ns, n),drop = F])
+  }
+  if(nrow(df) > n * 2){
+    ns <- 1:nrow(df)
+    df <- rbind(df[head(ns, n),,drop = F],
+                matrix(".", nrow = 3, ncol = ncol(df)) %>% `colnames<-`(colnames(df)) %>% `rownames<-`(c(".",". ",".  ")),
+                df[tail(ns, n),,drop = F])
+  }
+  return(list(df = df,
+              class = cl,
+              dim = dm))
+}
 
 {
 RelationPlot<-function(nodes, relation){

@@ -4,7 +4,12 @@
 \alias{HumanToMouseGenesymbol}
 \title{FUNCTION_TITLE}
 \usage{
-HumanToMouseGenesymbol(human_genes, mirror = NULL, local.mode = T)
+HumanToMouseGenesymbol(
+  human_genes,
+  mirror = NULL,
+  local.mode = T,
+  keep.seq = F
+)
 }
 \arguments{
 \item{human_genes}{PARAM_DESCRIPTION}
@@ -12,6 +17,8 @@ HumanToMouseGenesymbol(human_genes, mirror = NULL, local.mode = T)
 \item{mirror}{PARAM_DESCRIPTION, Default: NULL}
 
 \item{local.mode}{PARAM_DESCRIPTION, Default: T}
+
+\item{keep.seq}{PARAM_DESCRIPTION, Default: F}
 }
 \value{
 OUTPUT_DESCRIPTION

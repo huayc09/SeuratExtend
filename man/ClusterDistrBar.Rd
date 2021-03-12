@@ -11,7 +11,8 @@ ClusterDistrBar(
   normalize = rev,
   percent = T,
   plot = T,
-  flip = T
+  flip = T,
+  width = 0.9
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ ClusterDistrBar(
 \item{plot}{PARAM_DESCRIPTION, Default: T}
 
 \item{flip}{PARAM_DESCRIPTION, Default: T}
+
+\item{width}{PARAM_DESCRIPTION, Default: 0.9}
 }
 \value{
 OUTPUT_DESCRIPTION

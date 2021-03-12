@@ -24,6 +24,8 @@ Heatmap(
   facet_row = NULL,
   panel.spacing = unit(5, "pt"),
   strip.placement = "outside",
+  ncol = NULL,
+  nrow = NULL,
   ...
 )
 }
@@ -65,6 +67,10 @@ Heatmap(
 \item{panel.spacing}{PARAM_DESCRIPTION, Default: unit(5, "pt")}
 
 \item{strip.placement}{PARAM_DESCRIPTION, Default: 'outside'}
+
+\item{ncol}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{nrow}{PARAM_DESCRIPTION, Default: NULL}
 
 \item{...}{PARAM_DESCRIPTION}
 }
