@@ -7,8 +7,13 @@
 #' @param ncol PARAM_DESCRIPTION, Default: 1
 #' @param lab_fill PARAM_DESCRIPTION, Default: 'group'
 #' @param scales PARAM_DESCRIPTION, Default: 'free_y'
-#' @param type PARAM_DESCRIPTION, Default: c("violin", "boxplot")
-#' @param outlier.size PARAM_DESCRIPTION, Default: 1
+#' @param violin PARAM_DESCRIPTION, Default: T
+#' @param box PARAM_DESCRIPTION, Default: T
+#' @param width PARAM_DESCRIPTION, Default: 0.9
+#' @param pt PARAM_DESCRIPTION, Default: F
+#' @param pt.style PARAM_DESCRIPTION, Default: c("quasirandom", "jitter")
+#' @param pt.size PARAM_DESCRIPTION, Default: 1.5
+#' @param pt.alpha PARAM_DESCRIPTION, Default: 0.35
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -21,7 +26,8 @@
 #' @export
 
 StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fill = "group",
-                          scales = "free_y", type = c("violin","boxplot"), outlier.size = 1){
+                          scales = "free_y", violin = T, box = T, width = 0.9,
+                          pt = F, pt.style = c("quasirandom", "jitter"), pt.size = 1.5, pt.alpha = 0.35){
   library(ggplot2)
   library(rlang)
   library(dplyr)
@@ -33,39 +39,56 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
   }
   f2 <- f2 %||% data.frame(row.names = colnames(matr))
   ToPlot <-
-    cbind(f, f2, as.data.frame(t(matr[features,]))) %>%
+    cbind(f, f2, as.data.frame(t(matr[features,,drop = F]))) %>%
     melt(measure.vars = features)
   type <- type[1]
-  if(type == "violin") {
-    p <- ggplot(ToPlot, aes(x=f,y=value, fill=f)) +
-      geom_violin(scale = "width")
-  } else if(type == "boxplot") {
-    p <- ggplot(ToPlot, aes(x=f,y=value, fill=f)) +
-      geom_boxplot(outlier.size = outlier.size)
-  } else {
-    stop('"type" argument should be "violin" or "boxplot"')
+  if(!violin & !box & !pt) stop("No plot type defined (violin/boxplot/point)")
+  x <- ifelse(is_empty(f2), "f", "f2")
+  p <- ggplot(ToPlot, aes_string(x = x, y = "value", fill = x))
+  if(violin) {
+    p <- p +
+      geom_violin(scale = "width", width = width)
   }
+  if(pt) {
+    pt.style <- pt.style[1]
+    if(!pt.style %in% c("quasirandom", "jitter")) stop('"pt.style" shoule be "quasirandom" or "jitter"')
+    if(pt.style == "jitter") p <- p + geom_jitter(width = width/2, size = pt.size, alpha= pt.alpha)
+    if(pt.style == "quasirandom") {
+      import("ggbeeswarm")
+      p <- p + geom_quasirandom(size = pt.size, width = width/2, alpha= pt.alpha)
+    }
+  }
+  if(box) {
+    outlier.size <- ifelse(pt, 0, pt.size)
+    if(violin){
+      p <- p +
+        geom_boxplot(fill = "white", outlier.size = outlier.size, width = 0.1, outlier.alpha = pt.alpha)
+    } else {
+      p <- p +
+        geom_boxplot(outlier.size = outlier.size, width = width)
+    }
+  }
+
   if(is_empty(f2)){
     p <- p +
       facet_wrap( ~variable, ncol = ncol, strip.position="left", scales = scales)+
       ylab(NULL) +
       xlab(NULL) +
+      theme_classic() +
       theme(strip.background = element_blank(),
             strip.placement = "outside",
             legend.position = "none",
             axis.text.x=element_text(angle = 45,hjust = 1)) +
-      theme_classic() +
       labs(fill = lab_fill)
   }else{
     p <- p +
-      facet_grid(vars(variable), vars(f2), switch = c("both"), scales = scales)+
+      facet_grid(vars(variable), vars(f), switch = c("both"), scales = scales)+
       ylab(NULL) +
       xlab(NULL) +
+      theme_classic() +
       theme(strip.background = element_blank(),
             strip.placement = "outside",
-            legend.position = "none",
-            axis.text.x=element_text(angle = 45,hjust = 1)) +
-      theme_classic() +
+            axis.text.x = element_blank()) +
       labs(fill = lab_fill)
   }
 
@@ -79,10 +102,7 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
 #' @param group.by PARAM_DESCRIPTION, Default: 'seurat_clusters'
 #' @param split.by PARAM_DESCRIPTION, Default: NULL
 #' @param cell PARAM_DESCRIPTION, Default: NULL
-#' @param ncol PARAM_DESCRIPTION, Default: 1
-#' @param scales PARAM_DESCRIPTION, Default: 'free_y'
-#' @param type PARAM_DESCRIPTION, Default: c("violin", "boxplot")
-#' @param outlier.size PARAM_DESCRIPTION, Default: 1
+#' @param ... PARAM_DESCRIPTION
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -95,15 +115,13 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
 #' @export
 
 StackedViolin_v3 <-
-  function(seu, features, group.by = "seurat_clusters", split.by = NULL, cell = NULL,
-           ncol = 1, scales = "free_y", type = c("violin","boxplot"), outlier.size = 1){
+  function(seu, features, group.by = "seurat_clusters", split.by = NULL, cell = NULL, ...){
   require(rlang)
   cell <- cell %||% colnames(seu)
   matr <- t(FetchData(seu, vars = features, cells = cell))
   f <- factor(seu[[group.by]][cell,])
   f2 <- seu[[split.by]][cell,]
-  p <- StackedViolin(matr, f, f2, features, ncol, lab_fill = group.by,
-                     scales = scales, type = type, outlier.size = outlier.size)
+  p <- StackedViolin(matr, f, f2, features, ...)
   return(p)
 }
 
@@ -119,3 +137,4 @@ StackedViolin_v3 <-
 # lab_fill = "group"
 # StackedViolin(matr, f, f2, ncol = 2)
 # StackedViolin_v3(seu = seu, features = features, split.by = split.by)
+# StackedViolin_v3(pbmc, features = c("CD3D"), violin = T, box = T, pt = F)

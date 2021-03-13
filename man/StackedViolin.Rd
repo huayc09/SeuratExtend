@@ -12,8 +12,13 @@ StackedViolin(
   ncol = 1,
   lab_fill = "group",
   scales = "free_y",
-  type = c("violin", "boxplot"),
-  outlier.size = 1
+  violin = T,
+  box = T,
+  width = 0.9,
+  pt = F,
+  pt.style = c("quasirandom", "jitter"),
+  pt.size = 1.5,
+  pt.alpha = 0.35
 )
 }
 \arguments{
@@ -31,9 +36,19 @@ StackedViolin(
 
 \item{scales}{PARAM_DESCRIPTION, Default: 'free_y'}
 
-\item{type}{PARAM_DESCRIPTION, Default: c("violin", "boxplot")}
+\item{violin}{PARAM_DESCRIPTION, Default: T}
 
-\item{outlier.size}{PARAM_DESCRIPTION, Default: 1}
+\item{box}{PARAM_DESCRIPTION, Default: T}
+
+\item{width}{PARAM_DESCRIPTION, Default: 0.9}
+
+\item{pt}{PARAM_DESCRIPTION, Default: F}
+
+\item{pt.style}{PARAM_DESCRIPTION, Default: c("quasirandom", "jitter")}
+
+\item{pt.size}{PARAM_DESCRIPTION, Default: 1.5}
+
+\item{pt.alpha}{PARAM_DESCRIPTION, Default: 0.35}
 }
 \value{
 OUTPUT_DESCRIPTION

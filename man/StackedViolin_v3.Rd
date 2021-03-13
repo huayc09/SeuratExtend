@@ -10,10 +10,7 @@ StackedViolin_v3(
   group.by = "seurat_clusters",
   split.by = NULL,
   cell = NULL,
-  ncol = 1,
-  scales = "free_y",
-  type = c("violin", "boxplot"),
-  outlier.size = 1
+  ...
 )
 }
 \arguments{
@@ -27,13 +24,7 @@ StackedViolin_v3(
 
 \item{cell}{PARAM_DESCRIPTION, Default: NULL}
 
-\item{ncol}{PARAM_DESCRIPTION, Default: 1}
-
-\item{scales}{PARAM_DESCRIPTION, Default: 'free_y'}
-
-\item{type}{PARAM_DESCRIPTION, Default: c("violin", "boxplot")}
-
-\item{outlier.size}{PARAM_DESCRIPTION, Default: 1}
+\item{...}{PARAM_DESCRIPTION}
 }
 \value{
 OUTPUT_DESCRIPTION
