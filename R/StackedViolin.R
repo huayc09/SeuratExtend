@@ -79,7 +79,8 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
             strip.placement = "outside",
             legend.position = "none",
             axis.text.x=element_text(angle = 45,hjust = 1)) +
-      labs(fill = lab_fill)
+      labs(fill = lab_fill) +
+      scale_y_continuous(expand = c(0, 0))
   }else{
     p <- p +
       facet_grid(vars(variable), vars(f), switch = c("both"), scales = scales)+
@@ -89,7 +90,8 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
       theme(strip.background = element_blank(),
             strip.placement = "outside",
             axis.text.x = element_blank()) +
-      labs(fill = lab_fill)
+      labs(fill = lab_fill) +
+      scale_y_continuous(expand = c(0, 0))
   }
 
   return(p)
