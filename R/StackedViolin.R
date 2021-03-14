@@ -41,13 +41,17 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
   ToPlot <-
     cbind(f, f2, as.data.frame(t(matr[features,,drop = F]))) %>%
     melt(measure.vars = features)
-  type <- type[1]
   if(!violin & !box & !pt) stop("No plot type defined (violin/boxplot/point)")
   x <- ifelse(is_empty(f2), "f", "f2")
   p <- ggplot(ToPlot, aes_string(x = x, y = "value", fill = x))
   if(violin) {
     p <- p +
       geom_violin(scale = "width", width = width)
+  }
+  if(box & !violin) {
+    outlier.size <- ifelse(pt, 0, pt.size)
+    p <- p +
+      geom_boxplot(outlier.size = outlier.size, width = width)
   }
   if(pt) {
     pt.style <- pt.style[1]
@@ -58,15 +62,10 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
       p <- p + geom_quasirandom(size = pt.size, width = width/2, alpha= pt.alpha)
     }
   }
-  if(box) {
+  if(box & violin) {
     outlier.size <- ifelse(pt, 0, pt.size)
-    if(violin){
-      p <- p +
-        geom_boxplot(fill = "white", outlier.size = outlier.size, width = 0.1, outlier.alpha = pt.alpha)
-    } else {
-      p <- p +
-        geom_boxplot(outlier.size = outlier.size, width = width)
-    }
+    p <- p +
+      geom_boxplot(fill = "white", outlier.size = outlier.size, width = 0.1, outlier.alpha = pt.alpha)
   }
 
   if(is_empty(f2)){
@@ -80,7 +79,7 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
             legend.position = "none",
             axis.text.x=element_text(angle = 45,hjust = 1)) +
       labs(fill = lab_fill) +
-      scale_y_continuous(expand = c(0, 0))
+      scale_y_continuous(expand = expansion(mult = c(0,0.05)))
   }else{
     p <- p +
       facet_grid(vars(variable), vars(f), switch = c("both"), scales = scales)+
@@ -91,7 +90,7 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
             strip.placement = "outside",
             axis.text.x = element_blank()) +
       labs(fill = lab_fill) +
-      scale_y_continuous(expand = c(0, 0))
+      scale_y_continuous(expand = expansion(mult = c(0,0.05)))
   }
 
   return(p)
