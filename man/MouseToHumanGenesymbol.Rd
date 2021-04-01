@@ -8,7 +8,8 @@ MouseToHumanGenesymbol(
   mouse_genes,
   mirror = NULL,
   local.mode = T,
-  keep.seq = F
+  keep.seq = F,
+  match = T
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ MouseToHumanGenesymbol(
 \item{local.mode}{PARAM_DESCRIPTION, Default: T}
 
 \item{keep.seq}{PARAM_DESCRIPTION, Default: F}
+
+\item{match}{PARAM_DESCRIPTION, Default: T}
 }
 \value{
 OUTPUT_DESCRIPTION

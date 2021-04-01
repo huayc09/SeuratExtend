@@ -4,6 +4,7 @@
 #' @param mirror PARAM_DESCRIPTION, Default: NULL
 #' @param local.mode PARAM_DESCRIPTION, Default: T
 #' @param keep.seq PARAM_DESCRIPTION, Default: F
+#' @param match PARAM_DESCRIPTION, Default: T
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -15,7 +16,7 @@
 #' @rdname HumanToMouseGenesymbol
 #' @export
 
-HumanToMouseGenesymbol <- function(human_genes, mirror = NULL, local.mode = T, keep.seq = F){
+HumanToMouseGenesymbol <- function(human_genes, mirror = NULL, local.mode = T, keep.seq = F, match = T){
   if(is.vector(human_genes)){
     if(local.mode){
       genelist <- mouse_human_genesymbols[mouse_human_genesymbols$HGNC.symbol %in% human_genes, 2:1]
@@ -37,6 +38,7 @@ HumanToMouseGenesymbol <- function(human_genes, mirror = NULL, local.mode = T, k
       }
       return(genelist2)
     }
+    if(!match) genelist <- unique(genelist$MGI.symbol)
     return(genelist)
   }else{
     library(magrittr)
@@ -54,6 +56,7 @@ HumanToMouseGenesymbol <- function(human_genes, mirror = NULL, local.mode = T, k
 #' @param mirror PARAM_DESCRIPTION, Default: NULL
 #' @param local.mode PARAM_DESCRIPTION, Default: T
 #' @param keep.seq PARAM_DESCRIPTION, Default: F
+#' @param match PARAM_DESCRIPTION, Default: T
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -65,7 +68,7 @@ HumanToMouseGenesymbol <- function(human_genes, mirror = NULL, local.mode = T, k
 #' @rdname MouseToHumanGenesymbol
 #' @export
 
-MouseToHumanGenesymbol <- function(mouse_genes, mirror = NULL, local.mode = T, keep.seq = F){
+MouseToHumanGenesymbol <- function(mouse_genes, mirror = NULL, local.mode = T, keep.seq = F, match = T){
   if(is.vector(mouse_genes)){
     if(local.mode){
       genelist <- mouse_human_genesymbols[mouse_human_genesymbols$MGI.symbol %in% mouse_genes, ]
@@ -87,6 +90,7 @@ MouseToHumanGenesymbol <- function(mouse_genes, mirror = NULL, local.mode = T, k
       }
       return(genelist2)
     }
+    if(!match) genelist <- unique(genelist$HGNC.symbol)
     return(genelist)
   }else{
     library(magrittr)
