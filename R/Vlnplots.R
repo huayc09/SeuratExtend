@@ -1,4 +1,38 @@
-#' @param matr Matrix.Row - features; columns - cells
+#' @include generics.R
+#'
+NULL
+
+#' @param seu (Seurat version) Seurat object
+#' @param group.by (Seurat version) A variable name in meta.data to
+#' group the violin plots by
+#' @param split.by (Seurat version) A variable name in meta.data to
+#' split the violin plots by
+#' @param cell (Seurat version) Cell names to use, Default: all cells
+#' @rdname VlnPlot2
+#' @export
+
+VlnPlot2.Seurat <- function(
+  seu,
+  features,
+  group.by = NULL,
+  split.by = NULL,
+  cell = NULL,
+  ...
+) {
+  require(rlang)
+  cell <- cell %||% colnames(seu)
+  matr <- t(FetchData(seu, vars = features, cells = cell))
+  if(is.null(group.by)) {
+    f <- factor(Idents(seu)[cell])
+  }else{
+    f <- factor(seu[[group.by]][cell,])
+  }
+  f2 <- seu[[split.by]][cell,]
+  p <- VlnPlot2.default(matr, f, f2, features, ...)
+  return(p)
+}
+
+#' @param matr Matrix or data frame.Row - features; columns - cells
 #' @param f Factor or vector. Identity of each cell. Should be the
 #' same length of cells
 #' @param f2 Factor or vector. Similar to \code{f}. A variable to split
@@ -110,38 +144,8 @@ VlnPlot2.default <- function(
   return(p)
 }
 
-#' @param seu (Seurat version) Seurat object
-#' @param group.by (Seurat version) A variable name in meta.data to
-#' group the violin plots by
-#' @param split.by (Seurat version) A variable name in meta.data to
-#' split the violin plots by
-#' @param cell (Seurat version) Cell names to use, Default: all cells
-#' @rdname VlnPlot2
-#' @export
-
-VlnPlot2.Seurat <- function(
-  seu,
-  features,
-  group.by = NULL,
-  split.by = NULL,
-  cell = NULL,
-  ...
-) {
-  require(rlang)
-  cell <- cell %||% colnames(seu)
-  matr <- t(FetchData(seu, vars = features, cells = cell))
-  if(is.null(group.by)) {
-    f <- factor(Idents(seu)[cell])
-  }else{
-    f <- factor(seu[[group.by]][cell,])
-  }
-  f2 <- seu[[split.by]][cell,]
-  p <- VlnPlot2.default(matr, f, f2, features, ...)
-  return(p)
-}
-
 #' @title StackedViolin
-#' @description Alias of VlnPlot2
+#' @description Alias of \code{\link[SeuratExtend:VlnPlot2]{VlnPlot2()}}
 #' @seealso \code{\link[SeuratExtend:VlnPlot2]{VlnPlot2()}}
 #' @rdname StackedViolin
 #' @export

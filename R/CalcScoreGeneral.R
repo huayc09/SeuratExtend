@@ -1,32 +1,79 @@
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param matr PARAM_DESCRIPTION
-#' @param f PARAM_DESCRIPTION
-#' @param method PARAM_DESCRIPTION, Default: 'zscore'
-#' @param exp.transform PARAM_DESCRIPTION, Default: F
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
-#' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @rdname CalcScoreGeneral
+#' @include generics.R
+#'
+NULL
+
+#' @param seu (Seurat version) Seurat object
+#' #' @param features (Seurat version) Features to plot (gene expression, metrics, PC scores,
+#' anything that can be retreived by FetchData), Default: NULL (All features
+#' in matrix)
+#' @param group.by (Seurat version) A variable name in meta.data to
+#' group the violin plots by
+#' @param cell (Seurat version) Cell names to use, Default: all cells
+#' @param slot Slot to pull feature data for
+#' @rdname CalcStats
 #' @export
 
-CalcScoreGeneral<-function(matr, f, method = "zscore", exp.transform = F){
+CalcStats.Seurat <-
+  function(
+    seu,
+    features,
+    group.by = NULL,
+    cells = NULL,
+    slot = "data",
+    method = "zscore",
+    exp.transform = F
+  ) {
+    library(Seurat)
+    cells <- cells %||% colnames(seu)
+    matr <- FetchData(object = seu, vars = features, cells = cells, slot = slot)
+    if(is.null(group.by)) {
+      f <- factor(Idents(seu)[cells])
+    }else{
+      f <- factor(seu[[group.by]][cells,])
+    }
+    scores <- CalcStats.default(
+      matr,
+      f = f,
+      method = method,
+      exp.transform = exp.transform,
+      t = T)
+    return(scores)
+}
+
+#' @param matr Matrix or data frame.Row - features; columns - cells
+#' @param f Factor or vector. Identity of each cell. Should be the
+#' same length of cells
+#' @param method Should be either "mean", "median", "zscore", "tscore",
+#' "p", or "logFC". Default: 'zscore'
+#' @param exp.transform Whether to transform the data with
+#' \code{\link[base:expm1]{expm1}}, Default: F
+#' @param t If your matrix has features in columns and cells in rows,
+#' you should transpose the matrix first. Default: F
+#' @rdname CalcStats
+#' @export
+
+CalcStats.default <- function(
+  matr,
+  f,
+  method = "zscore",
+  exp.transform = F,
+  t = F
+) {
   library(dplyr)
   library(rlist)
   library(mosaic)
   library(purrr)
   library(tidyr)
+
   f <- factor(f)
   if(exp.transform) matr <- expm1(matr)
-  scores <-
-    matr %>%
-    t() %>%
-    as.data.frame()
+  if(!t) scores <- t(matr) else scores <- matr
+  scores <- as.data.frame(scores)
+  method <- tolower(method)
+  if(nrow(scores) != length(f)) {
+    stop("'f' should be the same length as number of matrix columns. \n",
+         "Maybe need transpose? (t = TRUE)")
+  }
 
   if(method=="mean"){
     scores<-
@@ -43,8 +90,8 @@ CalcScoreGeneral<-function(matr, f, method = "zscore", exp.transform = F){
       list.cbind() %>%
       as.data.frame()
   }else if(method=="zscore"){
-    scores<-
-      CalcScoreGeneral(matr, f, "mean") %>%
+    scores <-
+      CalcStats.default(scores, f, "mean", t = T) %>%
       apply(1, zscore) %>%
       t() %>%
       as.data.frame()
@@ -66,7 +113,7 @@ CalcScoreGeneral<-function(matr, f, method = "zscore", exp.transform = F){
       list.cbind() %>%
       as.data.frame() %>%
       setNames(., levels(f))
-  }else if(method=="logFC"){
+  }else if(method=="logfc"){
     scores <-
       levels(f) %>%
       lapply(function(x) split(scores,f==x)) %>%
@@ -75,43 +122,22 @@ CalcScoreGeneral<-function(matr, f, method = "zscore", exp.transform = F){
       list.cbind() %>%
       as.data.frame() %>%
       setNames(., levels(f))
+  }else{
+    stop("'method' should be one of 'mean', 'median', 'tscore', 'zscore', 'p' or 'logFC")
   }
   scores <- drop_na(scores)
   return(scores)
 }
 
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param Seu PARAM_DESCRIPTION
-#' @param features PARAM_DESCRIPTION
-#' @param group.by PARAM_DESCRIPTION
-#' @param method PARAM_DESCRIPTION
-#' @param assay PARAM_DESCRIPTION, Default: 'RNA'
-#' @param exp.transform PARAM_DESCRIPTION, Default: F
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
-#' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @rdname CalcScoreGeneral_v3
+#' @title CalcScoreGeneral
+#' @description Alias of \code{\link[SeuratExtend:CalcStats]{CalcStats()}}
+#' @seealso \code{\link[SeuratExtend:CalcStats]{CalcStats()}}
+#' @rdname CalcScoreGeneral
 #' @export
 
-CalcScoreGeneral_v3<-function(Seu, features, group.by, method, assay = "RNA", exp.transform = F){
-  library(Seurat)
-  if(any(!features %in% rownames(Seu))) {
-    WrongGenes <- setdiff(features, rownames(Seu))
-    warning(paste0(paste(WrongGenes, collapse = ", "), " are not detected in the matrix"))
-    features <- intersect(features, rownames(Seu))
-  }
-  matr <- as.matrix(GetAssayData(Seu, assay = assay)[features,])
-  f <- factor(Seu@meta.data[, group.by])
-  return(CalcScoreGeneral(matr, f, method, exp.transform))
-}
+CalcScoreGeneral <- CalcStats.default
 
-# matr <- GetAssayData(seu)[c("Selp","Vwf","Chst4","Trp53i11","Cdh5"),]
-# f <- seu@meta.data$cluster
-# CalcScoreGeneral(matr, f, "LogFC") %>%
-#   Heatmap()
+#' @rdname CalcScoreGeneral
+#' @export
+
+CalcScoreGeneral_v3 <- CalcStats.Seurat

@@ -2,32 +2,24 @@
 % Please edit documentation in R/CalcScoreGeneral.R
 \name{CalcScoreGeneral}
 \alias{CalcScoreGeneral}
-\title{FUNCTION_TITLE}
+\alias{CalcScoreGeneral_v3}
+\title{CalcScoreGeneral}
 \usage{
-CalcScoreGeneral(matr, f, method = "zscore", exp.transform = F)
-}
-\arguments{
-\item{matr}{PARAM_DESCRIPTION}
+CalcScoreGeneral(matr, f, method = "zscore", exp.transform = F, t = F)
 
-\item{f}{PARAM_DESCRIPTION}
-
-\item{method}{PARAM_DESCRIPTION, Default: 'zscore'}
-
-\item{exp.transform}{PARAM_DESCRIPTION, Default: F}
-}
-\value{
-OUTPUT_DESCRIPTION
+CalcScoreGeneral_v3(
+  seu,
+  features,
+  group.by = NULL,
+  cells = NULL,
+  slot = "data",
+  method = "zscore",
+  exp.transform = F
+)
 }
 \description{
-FUNCTION_DESCRIPTION
+Alias of \code{\link[SeuratExtend:CalcStats]{CalcStats()}}
 }
-\details{
-DETAILS
-}
-\examples{
-\dontrun{
-if(interactive()){
- #EXAMPLE1
- }
-}
+\seealso{
+\code{\link[SeuratExtend:CalcStats]{CalcStats()}}
 }
