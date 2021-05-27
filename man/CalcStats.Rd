@@ -25,13 +25,16 @@ CalcStats(object, ...)
 
 \item{...}{Arguments passed to other methods}
 
-\item{seu}{(Seurat version) Seurat object
-#' @param features (Seurat version) Features to plot (gene expression, metrics, PC scores,
+\item{seu}{(Seurat version) Seurat object}
+
+\item{features}{(Seurat version) Features to plot (gene expression, metrics, PC scores,
 anything that can be retreived by FetchData), Default: NULL (All features
 in matrix)}
 
 \item{group.by}{(Seurat version) A variable name in meta.data to
 group the violin plots by}
+
+\item{cells}{(Seurat version) Cell names to use, Default: all cells}
 
 \item{slot}{Slot to pull feature data for}
 
@@ -48,8 +51,6 @@ same length of cells}
 
 \item{t}{If your matrix has features in columns and cells in rows,
 you should transpose the matrix first. Default: F}
-
-\item{cell}{(Seurat version) Cell names to use, Default: all cells}
 }
 \value{
 matrix

@@ -3,12 +3,12 @@
 NULL
 
 #' @param seu (Seurat version) Seurat object
-#' #' @param features (Seurat version) Features to plot (gene expression, metrics, PC scores,
+#' @param features (Seurat version) Features to plot (gene expression, metrics, PC scores,
 #' anything that can be retreived by FetchData), Default: NULL (All features
 #' in matrix)
 #' @param group.by (Seurat version) A variable name in meta.data to
 #' group the violin plots by
-#' @param cell (Seurat version) Cell names to use, Default: all cells
+#' @param cells (Seurat version) Cell names to use, Default: all cells
 #' @param slot Slot to pull feature data for
 #' @rdname CalcStats
 #' @export
