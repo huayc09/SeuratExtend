@@ -8,8 +8,8 @@ library(roxygen2)
 library(sinew)
 options(max.print = 50, spe = "mouse", nCores = 12)
 
-usethis::use_data(mouse_human_genesymbols, overwrite = TRUE)
-makeOxygen(color_iwh)
+usethis::use_data(PanglaoDB_data, overwrite = TRUE)
+makeOxygen(VlnPlot2.default)
 roxygenize()
 
 

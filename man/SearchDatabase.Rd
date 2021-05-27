@@ -12,7 +12,7 @@ SearchDatabase(
   export.to.data.frame = F,
   n.min = 1,
   n.max = Inf,
-  only.end.terms = T
+  only.end.terms = F
 )
 }
 \arguments{
@@ -30,7 +30,7 @@ SearchDatabase(
 
 \item{n.max}{PARAM_DESCRIPTION, Default: Inf}
 
-\item{only.end.terms}{PARAM_DESCRIPTION, Default: T}
+\item{only.end.terms}{PARAM_DESCRIPTION, Default: F}
 }
 \value{
 OUTPUT_DESCRIPTION

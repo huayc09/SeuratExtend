@@ -7,7 +7,7 @@
 #' @param export.to.data.frame PARAM_DESCRIPTION, Default: F
 #' @param n.min PARAM_DESCRIPTION, Default: 1
 #' @param n.max PARAM_DESCRIPTION, Default: Inf
-#' @param only.end.terms PARAM_DESCRIPTION, Default: T
+#' @param only.end.terms PARAM_DESCRIPTION, Default: F
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -22,7 +22,7 @@
 SearchDatabase <-
   function(item, type = c("gene", "SetID", "SetName"), database = c("GO", "Reactome"),
            spe = getOption("spe"), export.to.data.frame = F,
-           n.min = 1, n.max = Inf, only.end.terms = T){
+           n.min = 1, n.max = Inf, only.end.terms = F){
     check_spe(spe)
     library(dplyr)
     library(rlist)
@@ -139,7 +139,7 @@ SearchDatabase <-
     }
     message("\nFiltering outputs")
     SearchResult <- list()
-    if("GO" %in% database){
+    if("GO" %in% database & !is.null(ID_GO)){
       ID_GO <- FilterGOTerms(ID_GO, spe = spe, n.min = n.min, n.max = n.max,
                              only.end.terms = only.end.terms)
       for (i in ID_GO) {
@@ -151,7 +151,7 @@ SearchDatabase <-
         SearchResult[[ListName]]$Genes <- Genes
       }
     }
-    if("Reactome" %in% database){
+    if("Reactome" %in% database & !is.null(ID_Rct)){
       ID_Rct <- FilterReactomeTerms(ID_Rct, spe = spe, n.min = n.min, n.max = n.max,
                                     only.end.terms = only.end.terms)
       for (i in ID_Rct) {

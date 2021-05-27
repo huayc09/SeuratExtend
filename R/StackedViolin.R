@@ -1,33 +1,39 @@
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param matr PARAM_DESCRIPTION
-#' @param f PARAM_DESCRIPTION
-#' @param f2 PARAM_DESCRIPTION, Default: NULL
-#' @param features PARAM_DESCRIPTION, Default: NULL
-#' @param ncol PARAM_DESCRIPTION, Default: 1
-#' @param lab_fill PARAM_DESCRIPTION, Default: 'group'
-#' @param scales PARAM_DESCRIPTION, Default: 'free_y'
-#' @param violin PARAM_DESCRIPTION, Default: T
-#' @param box PARAM_DESCRIPTION, Default: T
-#' @param width PARAM_DESCRIPTION, Default: 0.9
-#' @param pt PARAM_DESCRIPTION, Default: F
-#' @param pt.style PARAM_DESCRIPTION, Default: c("quasirandom", "jitter")
-#' @param pt.size PARAM_DESCRIPTION, Default: 1.5
-#' @param pt.alpha PARAM_DESCRIPTION, Default: 0.35
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
-#' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @rdname StackedViolin
+#' @param matr Matrix.Row - features; columns - cells
+#' @param f Factor or vector. Identity of each cell. Should be the
+#' same length of cells
+#' @param f2 Factor or vector. Similar to \code{f}. A variable to split
+#' the violin plots by. Default: NULL
+#' @param features Features to plot (gene expression, metrics, PC scores,
+#' anything that can be retreived by FetchData), Default: NULL (All features
+#' in matrix)
+#' @param ncol Number of columns if multiple plots are displayed, Default: 1
+#' @param lab_fill Title of figure legend, Default: 'group'
+#' @param scales scales parameter passed to \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}
+#' , Default: 'free_y'
+#' @param violin Whether to plot violin plot, Default: T
+#' @param box Whether to plot box plot, Default: T
+#' @param width Width of box plot, Default: 0.9
+#' @param pt Whether to plot points, Default: T
+#' @param pt.style Position adjustment, Default: c("jitter", "quasirandom")
+#' @param pt.size Point size, Default: 1
+#' @param pt.alpha Point transparency, Default: 0.35
+#' @rdname VlnPlot2
 #' @export
 
-StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fill = "group",
-                          scales = "free_y", violin = T, box = T, width = 0.9,
-                          pt = F, pt.style = c("quasirandom", "jitter"), pt.size = 1.5, pt.alpha = 0.35){
+VlnPlot2.default <- function(
+  matr, f, f2 = NULL,
+  features = NULL,
+  ncol = 1,
+  lab_fill = "group",
+  scales = "free_y",
+  violin = T,
+  box = T,
+  width = 0.9,
+  pt = T,
+  pt.style = c("jitter","quasirandom"),
+  pt.size = 1,
+  pt.alpha = 0.35
+) {
   library(ggplot2)
   library(rlang)
   library(dplyr)
@@ -49,9 +55,13 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
       geom_violin(scale = "width", width = width)
   }
   if(box & !violin) {
-    outlier.size <- ifelse(pt, 0, pt.size)
-    p <- p +
-      geom_boxplot(outlier.size = outlier.size, width = width)
+    if(pt) {
+      p <- p +
+        geom_boxplot(outlier.shape = NA, width = width)
+    } else {
+      p <- p +
+        geom_boxplot(outlier.size = pt.size, width = width)
+    }
   }
   if(pt) {
     pt.style <- pt.style[1]
@@ -63,11 +73,14 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
     }
   }
   if(box & violin) {
-    outlier.size <- ifelse(pt, 0, pt.size)
-    p <- p +
-      geom_boxplot(fill = "white", outlier.size = outlier.size, width = 0.1, outlier.alpha = pt.alpha)
+    if(pt) {
+      p <- p +
+        geom_boxplot(outlier.shape = NA, width = 0.1, fill = "white")
+    } else {
+      p <- p +
+        geom_boxplot(fill = "white", outlier.size = pt.size, width = 0.1, outlier.alpha = pt.alpha)
+    }
   }
-
   if(is_empty(f2)){
     p <- p +
       facet_wrap( ~variable, ncol = ncol, strip.position="left", scales = scales)+
@@ -77,7 +90,8 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
       theme(strip.background = element_blank(),
             strip.placement = "outside",
             legend.position = "none",
-            axis.text.x=element_text(angle = 45,hjust = 1)) +
+            axis.text.x = element_text(angle = 45,hjust = 1),
+            strip.text = element_text(face = "bold", size = 10)) +
       labs(fill = lab_fill) +
       scale_y_continuous(expand = expansion(mult = c(0,0.05)))
   }else{
@@ -88,54 +102,57 @@ StackedViolin <- function(matr, f, f2 = NULL, features = NULL, ncol = 1, lab_fil
       theme_classic() +
       theme(strip.background = element_blank(),
             strip.placement = "outside",
-            axis.text.x = element_blank()) +
+            axis.text.x = element_blank(),
+            strip.text.y = element_text(face = "bold", size = 10)) +
       labs(fill = lab_fill) +
       scale_y_continuous(expand = expansion(mult = c(0,0.05)))
   }
-
   return(p)
 }
 
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param seu PARAM_DESCRIPTION
-#' @param features PARAM_DESCRIPTION
-#' @param group.by PARAM_DESCRIPTION, Default: 'seurat_clusters'
-#' @param split.by PARAM_DESCRIPTION, Default: NULL
-#' @param cell PARAM_DESCRIPTION, Default: NULL
-#' @param ... PARAM_DESCRIPTION
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
-#' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @rdname StackedViolin_v3
+#' @param seu (Seurat version) Seurat object
+#' @param group.by (Seurat version) A variable name in meta.data to
+#' group the violin plots by
+#' @param split.by (Seurat version) A variable name in meta.data to
+#' split the violin plots by
+#' @param cell (Seurat version) Cell names to use, Default: all cells
+#' @rdname VlnPlot2
 #' @export
 
-StackedViolin_v3 <-
-  function(seu, features, group.by = "seurat_clusters", split.by = NULL, cell = NULL, ...){
+VlnPlot2.Seurat <- function(
+  seu,
+  features,
+  group.by = NULL,
+  split.by = NULL,
+  cell = NULL,
+  ...
+) {
   require(rlang)
   cell <- cell %||% colnames(seu)
   matr <- t(FetchData(seu, vars = features, cells = cell))
-  f <- factor(seu[[group.by]][cell,])
+  if(is.null(group.by)) {
+    f <- factor(Idents(seu)[cell])
+  }else{
+    f <- factor(seu[[group.by]][cell,])
+  }
   f2 <- seu[[split.by]][cell,]
-  p <- StackedViolin(matr, f, f2, features, ...)
+  p <- VlnPlot2.default(matr, f, f2, features, ...)
   return(p)
 }
 
-# seu <- readRDS("~/R documents/2020-2-10 EC PyMT and E0771/rds/PyMTEC_old.rds")
-# matr <- as.matrix(GetAssayData(seu))[1:20,]
-# f <- seu@meta.data$cluster
-# f2 <- NULL
-# features = c("Selp","Sele","Vwf","Glycam1")
-# cell = NULL
-# split.by = "orig.ident"
-# group.by = "seurat_clusters"
-# ncol = 1
-# lab_fill = "group"
-# StackedViolin(matr, f, f2, ncol = 2)
-# StackedViolin_v3(seu = seu, features = features, split.by = split.by)
-# StackedViolin_v3(pbmc, features = c("CD3D"), violin = T, box = T, pt = F)
+#' @title StackedViolin
+#' @description Alias of VlnPlot2
+#' @seealso \code{\link[SeuratExtend:VlnPlot2]{VlnPlot2()}}
+#' @rdname StackedViolin
+#' @export
+
+StackedViolin <- VlnPlot2.default
+
+
+#' @rdname StackedViolin
+#' @export
+
+StackedViolin_v3 <- VlnPlot2.Seurat
+
+
+

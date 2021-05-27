@@ -1,9 +1,9 @@
 Package: SeuratExtend
 Type: Package
 Title: SeuratExtend
-Version: 0.3.4
+Version: 0.4.0
 Author: Yichao Hua
-Maintainer: Yichao Hua <yichao.hua@kuleuven.vib.be>
+Maintainer: Yichao Hua <yichao.hua@kuleuven.be>
 Description: Personal package
 License: What license is it under?
 Encoding: UTF-8
@@ -15,4 +15,4 @@ Suggests:
     rgl, GSVA, GSVAdata, nichenetr, slingshot, destiny, AUCell, biomaRt, ontologyIndex, 
     doMC, doRNG, doParallel, foreach, mgsa, GSEABase, egg, loomR, hdf5r, mgsa, ComplexHeatmap, circlize
 Depends: 
-    R (>= 2.10)
+    R (>= 3.6)

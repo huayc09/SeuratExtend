@@ -2,7 +2,8 @@
 % Please edit documentation in R/StackedViolin.R
 \name{StackedViolin}
 \alias{StackedViolin}
-\title{FUNCTION_TITLE}
+\alias{StackedViolin_v3}
+\title{StackedViolin}
 \usage{
 StackedViolin(
   matr,
@@ -15,54 +16,24 @@ StackedViolin(
   violin = T,
   box = T,
   width = 0.9,
-  pt = F,
-  pt.style = c("quasirandom", "jitter"),
-  pt.size = 1.5,
+  pt = T,
+  pt.style = c("jitter", "quasirandom"),
+  pt.size = 1,
   pt.alpha = 0.35
 )
-}
-\arguments{
-\item{matr}{PARAM_DESCRIPTION}
 
-\item{f}{PARAM_DESCRIPTION}
-
-\item{f2}{PARAM_DESCRIPTION, Default: NULL}
-
-\item{features}{PARAM_DESCRIPTION, Default: NULL}
-
-\item{ncol}{PARAM_DESCRIPTION, Default: 1}
-
-\item{lab_fill}{PARAM_DESCRIPTION, Default: 'group'}
-
-\item{scales}{PARAM_DESCRIPTION, Default: 'free_y'}
-
-\item{violin}{PARAM_DESCRIPTION, Default: T}
-
-\item{box}{PARAM_DESCRIPTION, Default: T}
-
-\item{width}{PARAM_DESCRIPTION, Default: 0.9}
-
-\item{pt}{PARAM_DESCRIPTION, Default: F}
-
-\item{pt.style}{PARAM_DESCRIPTION, Default: c("quasirandom", "jitter")}
-
-\item{pt.size}{PARAM_DESCRIPTION, Default: 1.5}
-
-\item{pt.alpha}{PARAM_DESCRIPTION, Default: 0.35}
-}
-\value{
-OUTPUT_DESCRIPTION
+StackedViolin_v3(
+  seu,
+  features,
+  group.by = NULL,
+  split.by = NULL,
+  cell = NULL,
+  ...
+)
 }
 \description{
-FUNCTION_DESCRIPTION
+Alias of VlnPlot2
 }
-\details{
-DETAILS
-}
-\examples{
-\dontrun{
-if(interactive()){
- #EXAMPLE1
- }
-}
+\seealso{
+\code{\link[SeuratExtend:VlnPlot2]{VlnPlot2()}}
 }
