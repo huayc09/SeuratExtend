@@ -64,6 +64,7 @@ GeneSetAnalysisGO<-function(seu = NULL, dataset = "BP", root = "BP", spe = getOp
     }
   }
   message(paste(Sys.time(), "Start filtering gene sets"))
+  DefaultAssay(seu) <- assay
   filter <- sapply(GO_Data[[spe]]$GO2Gene[GenesetNames],
                    function(x){
                      length(x) >= n.min &

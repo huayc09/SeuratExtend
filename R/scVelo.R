@@ -2,7 +2,7 @@
 #' @description FUNCTION_DESCRIPTION
 #' @param seu PARAM_DESCRIPTION
 #' @param export.name PARAM_DESCRIPTION
-#' @param velocyto.loom.path PARAM_DESCRIPTION
+#' @param velocyto.loom.path PARAM_DESCRIPTION, Default: NULL
 #' @param velocyto.loom.filenames PARAM_DESCRIPTION
 #' @param fxn.convert.loomtoseurat.cellname PARAM_DESCRIPTION, Default: NULL
 #' @param prefix PARAM_DESCRIPTION, Default: NULL
@@ -18,14 +18,15 @@
 #' @rdname scVelo.SeuratToLoom
 #' @export
 
-
 scVelo.SeuratToLoom <-
-  function(seu, export.name, velocyto.loom.path, velocyto.loom.filenames,
+  function(seu, export.name, velocyto.loom.path = NULL, velocyto.loom.filenames,
            fxn.convert.loomtoseurat.cellname = NULL, prefix = NULL, postfix = NULL){
     library(Seurat)
     library(rlist)
     library(dplyr)
-    library(loomR)
+    library(rlang)
+    import("loomR")
+    import("SeuratDisk")
 
     check.metadata.na <- sapply(seu@meta.data, function(x) any(is.na(x)))
     if(any(check.metadata.na)) {
@@ -35,13 +36,23 @@ scVelo.SeuratToLoom <-
       seu@meta.data[,check.metadata.na] <- NULL
     }
 
-    check.loom.files <- velocyto.loom.filenames %in% list.files(velocyto.loom.path)
-    if(!any(check.loom.files)) {
-      stop(paste0("Loom file(s) not found in path ",
-                  velocyto.loom.path, ": ",
-                  paste0(velocyto.loom.filenames[!check.loom.files], collapse = ", ")))
+    if(!is.null(velocyto.loom.path)) {
+      loom.files <- file.path(velocyto.loom.path, velocyto.loom.filenames)
+    } else {
+      loom.files <- velocyto.loom.filenames
+    }
+    if(any(!file.exists(loom.files))) {
+      stop(paste0("Loom file(s) not found: ",
+                  paste0(loom.files[!file.exists(loom.files)], collapse = ", ")
+                  )
+           )
     }
 
+    if(DefaultAssay(seu) != "RNA" &
+       is_empty(GetAssayData(seu, slot = "counts"))) {
+      seu@assays[[DefaultAssay(seu)]]@counts <-
+        GetAssayData(seu, slot = "counts", assay = "RNA")
+    }
     genes <- rownames(seu)
     cells <- colnames(seu)
     seu.subset.genes <- F
@@ -115,13 +126,26 @@ scVelo.SeuratToLoom <-
     }
     pfile <- as.loom(x = seu, filename = export.name, overwrite = T)
 
-    pfile$add.layer(layers = list(#"ambiguous" = ambiguous,
-      "spliced" = spliced,
-      "unspliced" = unspliced))
+    pfile$add_layer(x = t(spliced), name = "spliced")
+    pfile$add_layer(x = t(unspliced), name = "unspliced")
 
     pfile$close_all()
   }
 
+#' @title FUNCTION_TITLE
+#' @description FUNCTION_DESCRIPTION
+#' @param loom PARAM_DESCRIPTION
+#' @param save.adata PARAM_DESCRIPTION, Default: 'adata.obj'
+#' @return OUTPUT_DESCRIPTION
+#' @details DETAILS
+#' @examples
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @rdname scVelo.RunBasic
+#' @export
 
 scVelo.RunBasic <- function(loom, save.adata = "adata.obj"){
   library(reticulate)

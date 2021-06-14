@@ -138,6 +138,27 @@ viewdf <- function(df, n = 3){
         quote = F)
 }
 
+#' @title FUNCTION_TITLE
+#' @description FUNCTION_DESCRIPTION
+#' @param ... PARAM_DESCRIPTION
+#' @return OUTPUT_DESCRIPTION
+#' @details DETAILS
+#' @examples
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @rdname assign.list
+#' @export
+
+assign.list <- function(...) {
+  x <- list(...)
+  for (i in names(x)) {
+    assign(i, x[[i]],envir = globalenv())
+  }
+}
+
 {
 RelationPlot<-function(nodes, relation){
   require(Rgraphviz)

@@ -55,6 +55,7 @@ GeneSetAnalysisReactome <-
       return(seu)
     }
     message(paste(Sys.time(), "Start filtering gene sets"))
+    DefaultAssay(seu) <- assay
     filter <- sapply(Reactome_Data[[spe]]$Path2Gene[GenesetNames],
                      function(x){
                        length(x) >= n.min &

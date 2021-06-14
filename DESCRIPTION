@@ -1,7 +1,7 @@
 Package: SeuratExtend
 Type: Package
 Title: SeuratExtend
-Version: 0.4.0
+Version: 0.4.1
 Author: Yichao Hua
 Maintainer: Yichao Hua <yichao.hua@kuleuven.be>
 Description: Personal package
@@ -17,10 +17,10 @@ Suggests:
 Depends: 
     R (>= 3.6)
 Collate: 
+    'AUCell_basic.R'
     'AutoNameClusters.R'
-    'BuildAUCRank.R'
     'generics.R'
-    'CalcScoreGeneral.R'
+    'CalcStats.R'
     'CellphoneDB.R'
     'ClusterDistrBar.R'
     'Colors.R'
@@ -51,7 +51,6 @@ Collate:
     'UniprotToGenesymbol.R'
     'Vlnplots.R'
     'WaterfallPlot.R'
-    'calcAUC_matrix.R'
     'import.R'
     'runGSVA.R'
     'scVelo.R'

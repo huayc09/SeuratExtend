@@ -47,6 +47,14 @@ package_data <- list(
     install = function(){
       BiocManager::install("ComplexHeatmap")
     }
+  ),
+    "SeuratDisk" = list(
+      website = "https://github.com/mojaveazure/seurat-disk",
+      tutorial = "https://github.com/mojaveazure/seurat-disk",
+      install_info = 'remotes::install_github("mojaveazure/seurat-disk")',
+      install = function(){
+        remotes::install_github("mojaveazure/seurat-disk")
+      }
   )
 )
 

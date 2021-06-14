@@ -7,7 +7,7 @@
 scVelo.SeuratToLoom(
   seu,
   export.name,
-  velocyto.loom.path,
+  velocyto.loom.path = NULL,
   velocyto.loom.filenames,
   fxn.convert.loomtoseurat.cellname = NULL,
   prefix = NULL,
@@ -19,7 +19,7 @@ scVelo.SeuratToLoom(
 
 \item{export.name}{PARAM_DESCRIPTION}
 
-\item{velocyto.loom.path}{PARAM_DESCRIPTION}
+\item{velocyto.loom.path}{PARAM_DESCRIPTION, Default: NULL}
 
 \item{velocyto.loom.filenames}{PARAM_DESCRIPTION}
 

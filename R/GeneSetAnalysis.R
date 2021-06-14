@@ -38,6 +38,7 @@ GeneSetAnalysis <- function(seu = NULL, genesets, title = "genesets",
   library(rlist)
 
   message(paste(Sys.time(), "Start filtering gene sets"))
+  DefaultAssay(seu) <- assay
   filter <- sapply(genesets,
                    function(x){
                      length(x) >= n.min &
