@@ -48,11 +48,7 @@ scVelo.SeuratToLoom <-
            )
     }
 
-    if(DefaultAssay(seu) != "RNA" &
-       is_empty(GetAssayData(seu, slot = "counts"))) {
-      seu@assays[[DefaultAssay(seu)]]@counts <-
-        GetAssayData(seu, slot = "counts", assay = "RNA")
-    }
+    DefaultAssay(seu) <- "RNA"
     genes <- rownames(seu)
     cells <- colnames(seu)
     seu.subset.genes <- F
@@ -172,5 +168,54 @@ scVelo.RunBasic <- function(loom, save.adata = "adata.obj"){
                  'pickle_out = open("', save.adata, '","wb")\n',
                  "pickle.dump(adata, pickle_out)\n",
                  "pickle_out.close()\n")
+  py_run_string(code)
+}
+
+#' @title FUNCTION_TITLE
+#' @description FUNCTION_DESCRIPTION
+#' @param adata PARAM_DESCRIPTION
+#' @param seu PARAM_DESCRIPTION
+#' @param dr PARAM_DESCRIPTION, Default: NULL
+#' @return OUTPUT_DESCRIPTION
+#' @details DETAILS
+#' @examples
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @rdname scVelo.AddDimReduc
+#' @export
+
+scVelo.AddDimReduc <- function(adata, seu, dr = NULL) {
+  library(reticulate)
+  library(rlang)
+  dr_list <- Reductions(seu)
+  dr <- dr %||% dr_list
+  if(!all(dr %in% dr_list)){
+    stop("Dimention reduction '", dr, "' not found.\n",
+         "Available option(s): ", paste0(dr_list, collapse = ", "))
+  }
+  code <- paste0("import pickle\n",
+                 'pickle_in = open("',adata,'","rb")\n',
+                 "adata = pickle.load(pickle_in)\n",
+                 "from numpy import genfromtxt")
+  py_run_string(code)
+  for (i in dr) {
+    nc <- ncol(Embeddings(seu, reduction = i))
+    export.dr(seu, i)
+    code <- paste0(
+      "adata.obsm['",i,"_cell_embeddings'] = genfromtxt('tmp/dr.csv', ",
+      "delimiter=',', skip_header=1, usecols=range(1,", nc + 1 ,"))"
+    )
+    py_run_string(code)
+  }
+  code <- paste0(
+    "import scvelo as scv\n",
+    "scv.tl.velocity_graph(adata)\n",
+    'pickle_out = open("', adata, '","wb")\n',
+    "pickle.dump(adata, pickle_out)\n",
+    "pickle_out.close()\n"
+  )
   py_run_string(code)
 }

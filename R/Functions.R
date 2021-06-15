@@ -159,6 +159,29 @@ assign.list <- function(...) {
   }
 }
 
+#' @title FUNCTION_TITLE
+#' @description FUNCTION_DESCRIPTION
+#' @param seu PARAM_DESCRIPTION
+#' @param dr PARAM_DESCRIPTION
+#' @param file PARAM_DESCRIPTION, Default: 'tmp/dr.csv'
+#' @return OUTPUT_DESCRIPTION
+#' @details DETAILS
+#' @examples
+#' \dontrun{
+#' if(interactive()){
+#'  #EXAMPLE1
+#'  }
+#' }
+#' @rdname export.dr
+#' @export
+
+export.dr <- function(seu, dr, file = "tmp/dr.csv") {
+  if(grepl("^tmp/", file) & !file.exists("tmp")) {
+    dir.create("tmp")
+  }
+  write.csv(Embeddings(seu, reduction = dr), file = file, quote = F)
+}
+
 {
 RelationPlot<-function(nodes, relation){
   require(Rgraphviz)
