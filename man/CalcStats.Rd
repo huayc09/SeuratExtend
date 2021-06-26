@@ -15,10 +15,22 @@ CalcStats(object, ...)
   cells = NULL,
   slot = "data",
   method = "zscore",
-  exp.transform = F
+  exp.transform = F,
+  order = NULL,
+  n = Inf,
+  p.threshold = 0.05
 )
 
-\method{CalcStats}{default}(matr, f, method = "zscore", exp.transform = F, t = F)
+\method{CalcStats}{default}(
+  matr,
+  f,
+  method = "zscore",
+  exp.transform = F,
+  t = F,
+  order = NULL,
+  n = Inf,
+  p.threshold = 0.05
+)
 }
 \arguments{
 \item{object}{An object; either Seurat object or matrix}
@@ -43,6 +55,14 @@ group the violin plots by}
 
 \item{exp.transform}{Whether to transform the data with
 \code{\link[base:expm1]{expm1}}, Default: F}
+
+\item{order}{Re-order rows by "value" or "p" (in t.test)}
+
+\item{n}{Top n rows of each cluster. Ignored when
+\code{order} is \code{NULL}. Default: \code{Inf}}
+
+\item{p.threshold}{When \code{order = "p"}, rows with pvalue greater
+than \code{p.threshold} are removed.}
 
 \item{matr}{Matrix or data frame.Row - features; columns - cells}
 
@@ -83,5 +103,9 @@ CalcStats(matr, f = pbmc$cluster, method = "zscore", t = TRUE)
 
 # Heatmap
 CalcStats(pbmc, genes) \%>\% Heatmap(lab_fill = "zscore")
+
+# Order rows
+CalcStats(pbmc, VariableFeatures(pbmc), method = "zscore", order = "p", n = 4) \%>\%
+  Heatmap(lab_fill = "zscore")
 
 }

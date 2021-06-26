@@ -1,7 +1,7 @@
 Package: SeuratExtend
 Type: Package
 Title: SeuratExtend
-Version: 0.4.1
+Version: 0.4.2
 Author: Yichao Hua
 Maintainer: Yichao Hua <yichao.hua@kuleuven.be>
 Description: Personal package
@@ -46,7 +46,6 @@ Collate:
     'RunDiffusionMap.R'
     'RunSlingshot.R'
     'Scenic.R'
-    'ScoreAndOrder.R'
     'SearchDatabase.R'
     'UniprotToGenesymbol.R'
     'Vlnplots.R'

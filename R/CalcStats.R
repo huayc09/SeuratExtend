@@ -21,7 +21,10 @@ CalcStats.Seurat <-
     cells = NULL,
     slot = "data",
     method = "zscore",
-    exp.transform = F
+    exp.transform = F,
+    order = NULL,
+    n = Inf,
+    p.threshold = 0.05
   ) {
     library(Seurat)
     cells <- cells %||% colnames(seu)
@@ -36,7 +39,10 @@ CalcStats.Seurat <-
       f = f,
       method = method,
       exp.transform = exp.transform,
-      t = T)
+      t = T,
+      order = order,
+      n = n,
+      p.threshold = p.threshold)
     return(scores)
 }
 
@@ -49,6 +55,11 @@ CalcStats.Seurat <-
 #' \code{\link[base:expm1]{expm1}}, Default: F
 #' @param t If your matrix has features in columns and cells in rows,
 #' you should transpose the matrix first. Default: F
+#' @param order Re-order rows by "value" or "p" (in t.test)
+#' @param n Top n rows of each cluster. Ignored when
+#' \code{order} is \code{NULL}. Default: \code{Inf}
+#' @param p.threshold When \code{order = "p"}, rows with pvalue greater
+#' than \code{p.threshold} are removed.
 #' @rdname CalcStats
 #' @export
 
@@ -57,7 +68,10 @@ CalcStats.default <- function(
   f,
   method = "zscore",
   exp.transform = F,
-  t = F
+  t = F,
+  order = NULL,
+  n = Inf,
+  p.threshold = 0.05
 ) {
   library(dplyr)
   library(rlist)
@@ -126,10 +140,44 @@ CalcStats.default <- function(
     stop("'method' should be one of 'mean', 'median', 'tscore', 'zscore', 'p' or 'logFC")
   }
   scores <- drop_na(scores)
+  if(!is.null(order)) {
+    row.max <- apply(scores, 1, which.max)
+    scores.order <- split(scores, row.max)
+
+    if(order == "value" | order == method) {
+      for (i in names(scores.order)) {
+        tmp <- scores.order[[i]]
+        tmp <- tmp[order(tmp[[as.numeric(i)]], decreasing = T),]
+        tmp <- head(tmp, n)
+        scores.order[[i]] <- tmp
+      }
+      scores.order <- setNames(scores.order, NULL)
+      scores <- list.rbind(scores.order)
+    } else if (order == "p") {
+      for (i in names(scores.order)) {
+        tmp <- scores.order[[i]]
+        if(!t) scores2 <- t(matr) else scores2 <- matr
+        scores2 <- as.data.frame(scores2)
+        scores2 <- scores2[,rownames(tmp),drop = F]
+        clust.id <- levels(f)[as.numeric(i)]
+        feature.p <-
+          apply(scores2, 2, function(x) {
+            t.test(x[f==clust.id], x[f!=clust.id])[["p.value"]]
+          })
+        feature.p <- sort(feature.p[feature.p < p.threshold])
+        tmp <- tmp[head(names(feature.p), n),]
+        scores.order[[i]] <- tmp
+      }
+      scores.order <- setNames(scores.order, NULL)
+      scores <- list.rbind(scores.order)
+    } else {
+      stop("'order' must be 'value' or 'p'")
+    }
+  }
   return(scores)
 }
 
-#' @title CalcScoreGeneral
+#' @title CalcScoreGeneral, ScoreAndOrder
 #' @description Alias of \code{\link[SeuratExtend:CalcStats]{CalcStats()}}
 #' @seealso \code{\link[SeuratExtend:CalcStats]{CalcStats()}}
 #' @rdname CalcScoreGeneral
@@ -141,3 +189,8 @@ CalcScoreGeneral <- CalcStats.default
 #' @export
 
 CalcScoreGeneral_v3 <- CalcStats.Seurat
+
+#' @rdname CalcScoreGeneral
+#' @export
+
+ScoreAndOrder <- CalcStats.default

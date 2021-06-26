@@ -48,6 +48,10 @@ VlnPlot2 <- function(object, ...) {
 #' # Heatmap
 #' CalcStats(pbmc, genes) %>% Heatmap(lab_fill = "zscore")
 #'
+#' # Order rows
+#' CalcStats(pbmc, VariableFeatures(pbmc), method = "zscore", order = "p", n = 4) %>%
+#'   Heatmap(lab_fill = "zscore")
+#'
 #' @rdname CalcStats
 #' @export
 

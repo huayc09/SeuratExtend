@@ -3,9 +3,19 @@
 \name{CalcScoreGeneral}
 \alias{CalcScoreGeneral}
 \alias{CalcScoreGeneral_v3}
-\title{CalcScoreGeneral}
+\alias{ScoreAndOrder}
+\title{CalcScoreGeneral, ScoreAndOrder}
 \usage{
-CalcScoreGeneral(matr, f, method = "zscore", exp.transform = F, t = F)
+CalcScoreGeneral(
+  matr,
+  f,
+  method = "zscore",
+  exp.transform = F,
+  t = F,
+  order = NULL,
+  n = Inf,
+  p.threshold = 0.05
+)
 
 CalcScoreGeneral_v3(
   seu,
@@ -14,7 +24,21 @@ CalcScoreGeneral_v3(
   cells = NULL,
   slot = "data",
   method = "zscore",
-  exp.transform = F
+  exp.transform = F,
+  order = NULL,
+  n = Inf,
+  p.threshold = 0.05
+)
+
+ScoreAndOrder(
+  matr,
+  f,
+  method = "zscore",
+  exp.transform = F,
+  t = F,
+  order = NULL,
+  n = Inf,
+  p.threshold = 0.05
 )
 }
 \description{

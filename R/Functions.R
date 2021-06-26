@@ -830,4 +830,33 @@ check_spe <- function(spe){
   #   es <- gsva(new_matrix, Gmtfile, min.sz=10, max.sz=500, verbose=TRUE, parallel.sz=1)
   #   return(es)
   # }
+  # ScoreAndOrder<-function(matr, f, method = "zscore", order = "p", n = Inf, p.threshold = 0.05){
+  #   library(purrr)
+  #   f <- factor(f)
+  #   score <- CalcScoreGeneral(matr, f, method)
+  #   if(order=="value") {
+  #     score <-
+  #       score %>%
+  #       split(factor(levels(f)[apply(., 1, which.max)], levels = levels(f))) %>%
+  #       map2(names(.), function(x, i) x[order(x[[i]], decreasing = T),] %>% head(n)) %>%
+  #       setNames(NULL) %>%
+  #       list.rbind()
+  #   } else if(order=="p") {
+  #     score <-
+  #       score %>%
+  #       split(factor(levels(f)[apply(., 1, which.max)], levels = levels(f))) %>%
+  #       map2(names(.), function(x, i) {
+  #         as.data.frame(matr)[rownames(x),] %>%
+  #           apply(1, function(y) t.test(y[f==i], y[f!=i])[["p.value"]]) %>%
+  #           .[order(.)] %>%
+  #           .[.<p.threshold] %>%
+  #           names() %>%
+  #           x[.,] %>%
+  #           head(n)
+  #       }) %>%
+  #       setNames(NULL) %>%
+  #       list.rbind()
+  #   }
+  #   return(score)
+  # }
 }
