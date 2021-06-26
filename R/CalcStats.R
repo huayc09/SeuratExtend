@@ -52,7 +52,7 @@ CalcStats.Seurat <-
 #' @param method Should be either "mean", "median", "zscore", "tscore",
 #' "p", or "logFC". Default: 'zscore'
 #' @param exp.transform Whether to transform the data with
-#' \code{\link[base:expm1]{expm1}}, Default: F
+#' \code{\link[base:log]{expm1}}, Default: F
 #' @param t If your matrix has features in columns and cells in rows,
 #' you should transpose the matrix first. Default: F
 #' @param order Re-order rows by "value" or "p" (in t.test)
@@ -128,10 +128,14 @@ CalcStats.default <- function(
       as.data.frame() %>%
       setNames(., levels(f))
   }else if(method=="logfc"){
+    if(!exp.transform) {
+      warning("When calculating Log2FC of log-normalized gene expression data, ",
+              "you should consider set 'exp.transform' to TRUE")
+    }
     scores <-
       levels(f) %>%
       lapply(function(x) split(scores,f==x)) %>%
-      lapply(function(x) map2(x$`TRUE`, x$`FALSE`, function(x,y) log(mean(x+1)/mean(y+1)))) %>%
+      lapply(function(x) map2(x$`TRUE`, x$`FALSE`, function(x,y) log2(mean(x+1)/mean(y+1)))) %>%
       lapply(list.rbind) %>%
       list.cbind() %>%
       as.data.frame() %>%

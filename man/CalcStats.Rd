@@ -54,7 +54,7 @@ group the violin plots by}
 "p", or "logFC". Default: 'zscore'}
 
 \item{exp.transform}{Whether to transform the data with
-\code{\link[base:expm1]{expm1}}, Default: F}
+\code{\link[base:log]{expm1}}, Default: F}
 
 \item{order}{Re-order rows by "value" or "p" (in t.test)}
 
