@@ -4,12 +4,17 @@
 \alias{color_iwh}
 \title{color_iwh}
 \usage{
-color_iwh(n, col.space = c("default", "intense", "pastel"), set = 1)
+color_iwh(
+  n,
+  col.space = c("default", "intense", "pastel", "all", "all_hard"),
+  set = 1
+)
 }
 \arguments{
 \item{n}{How many colors to generate}
 
-\item{col.space}{Color space, Default: c("default", "intense", "pastel")}
+\item{col.space}{Color space, Options: "default", "intense", "pastel",
+"all" (k-Means) or "all_hard" (force vector)}
 
 \item{set}{Several random presets, Default: 1}
 }

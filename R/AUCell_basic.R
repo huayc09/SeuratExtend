@@ -73,7 +73,8 @@ calcAUC_matrix <-
         .[apply(., 1, sum)>0, ]
     } else {
       AUCell_calcAUC2 <- function(x, rankings, nCores, verbose) {
-        library(doParallel)
+        import("doParallel")
+        import("doRNG")
         library(foreach)
         cl <- makeCluster(nCores)
         registerDoParallel(cl)
