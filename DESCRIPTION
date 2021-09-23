@@ -26,6 +26,7 @@ Collate:
     'Colors.R'
     'Dimplot3d.R'
     'EnsemblToGenesymbol.R'
+    'FeaturePlot.R'
     'FilterGOTerms.R'
     'FilterReactomeTerms.R'
     'Functions.R'

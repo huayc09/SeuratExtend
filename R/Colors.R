@@ -96,6 +96,16 @@ color_iwh <- function(
 #'   show_col()
 #' @rdname ryb2rgb
 #' @export
+
+ryb2rgb <- function(ryb = c(0,0,0)){
+  ryb2 <- sca(ryb)
+  x <- ang(ryb2)
+  tar <- seg.x(x)
+  tar <- sca(tar, range = c(1-max(ryb), 1-min(ryb)))
+  col <- rgb(tar[1], tar[2], tar[3])
+  return(col)
+}
+
 ryb_ref <- data.frame(
   # 0 = red, 2 = yellow, 4 = blue, 6 = red
   x = c(0,1,2,3,4,5,6),
@@ -143,12 +153,3 @@ ang <- function(ryb = c(0,0.5,1)){
   x <- seg(t(range), ryb[-min.ryb])
   return(x)
 }
-ryb2rgb <- function(ryb = c(r = 0.3, y = 0.5, b = 0.2)){
-  ryb2 <- sca(ryb)
-  x <- ang(ryb2)
-  tar <- seg.x(x)
-  tar <- sca(tar, range = c(1-max(ryb), 1-min(ryb)))
-  col <- rgb(tar[1], tar[2], tar[3])
-  return(col)
-}
-
