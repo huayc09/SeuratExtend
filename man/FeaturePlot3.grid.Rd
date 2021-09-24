@@ -11,7 +11,8 @@ FeaturePlot3.grid(
   color.range = c(0.1, 0.95),
   reduction = "umap",
   order = T,
-  pt.size = 0.1
+  pt.size = 0.1,
+  legend = F
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ FeaturePlot3.grid(
 \item{order}{PARAM_DESCRIPTION, Default: T}
 
 \item{pt.size}{PARAM_DESCRIPTION, Default: 0.1}
+
+\item{legend}{PARAM_DESCRIPTION, Default: F}
 }
 \value{
 OUTPUT_DESCRIPTION

@@ -115,6 +115,7 @@ FeaturePlot3 <- function(
 #' @param reduction PARAM_DESCRIPTION, Default: 'umap'
 #' @param order PARAM_DESCRIPTION, Default: T
 #' @param pt.size PARAM_DESCRIPTION, Default: 0.1
+#' @param legend PARAM_DESCRIPTION, Default: F
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -132,7 +133,8 @@ FeaturePlot3.grid <- function(
   color.range = c(0.1,0.95),
   reduction = "umap",
   order = T,
-  pt.size = 0.1
+  pt.size = 0.1,
+  legend = F
 ){
   library(Seurat)
   library(reshape2)
@@ -264,24 +266,26 @@ FeaturePlot3.grid <- function(
           strip.background = element_rect(fill = NA))
 
   # figure legend
-  p.leg <- list()
-  for (i in 1:3) {
-    if(!all(is.na(ft[i,]))){
-      p.tmp <-
-        ggplot(data.frame(value = 0:1), aes(x = 1, y = 1, color = value)) +
-        geom_point() +
-        scale_color_gradient(
-          low = colors[4], high = colors[i],
-          breaks = c(0,1), labels = c("min", "max")) +
-        labs(color = NULL) +
-        theme(legend.justification = c(0,1))
-      p.leg[[as.character(i)]] <- get_legend(p.tmp)
+  if(legend){
+    p.leg <- list()
+    for (i in 1:3) {
+      if(!all(is.na(ft[i,]))){
+        p.tmp <-
+          ggplot(data.frame(value = 0:1), aes(x = 1, y = 1, color = value)) +
+          geom_point() +
+          scale_color_gradient(
+            low = colors[4], high = colors[i],
+            breaks = c(0,1), labels = c("min", "max")) +
+          labs(color = NULL) +
+          theme(legend.justification = c(0,1))
+        p.leg[[as.character(i)]] <- get_legend(p.tmp)
+      }
     }
+    p <- ggarrange(
+      p, ggarrange(plotlist = p.leg, ncol = 1),
+      widths = c(8,1)
+    )
   }
-  p <- ggarrange(
-    p, ggarrange(plotlist = p.leg, ncol = 1),
-    widths = c(8,1)
-  )
   return(p)
 }
 
