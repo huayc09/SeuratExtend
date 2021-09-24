@@ -109,9 +109,9 @@ ryb2rgb <- function(ryb = c(0,0,0)){
 ryb_ref <- data.frame(
   # 0 = red, 2 = yellow, 4 = blue, 6 = red
   x = c(0,1,2,3,4,5,6),
-  r = c(1,1,1,0.5,0,0.5,1),
-  y = c(0,0.5,0.75,1,0.5,0,0),
-  b = c(0.25,0,0,0,1,1,0.25)
+  r = c(    1,  1,   1,   0,  0, 0.625,    1),
+  y = c(0.125,0.5,0.75,0.75,0.5, 0.125,0.125),
+  b = c(0.125,  0,   0,   0,  1,0.9375,0.125)
 )
 seg <- function(range, weight = c(1,1)){
   len <- range[,2] - range[,1]
@@ -153,3 +153,10 @@ ang <- function(ryb = c(0,0.5,1)){
   x <- seg(t(range), ryb[-min.ryb])
   return(x)
 }
+
+tmp <- data.frame(
+  r = c(1,  1,   1, 0,  0,0.625,  1),
+  y = c(0.125,0.5,0.75,0.75,0.5,  0.125,  0.125),
+  b = c(0.125,  0,   0,    0,  1,  0.9375,0.125))
+show_col(apply(tmp, 1, function(x) rgb(x[1],x[2],x[3])))
+show_col(rgb(160,32,240, maxColorValue = 255))
