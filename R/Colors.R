@@ -101,7 +101,7 @@ ryb2rgb <- function(ryb = c(0,0,0)){
   ryb2 <- sca(ryb)
   x <- ang(ryb2)
   tar <- seg.x(x)
-  tar <- sca(tar, range = c(1-max(ryb), 1-min(ryb)))
+  tar <- sca(c(tar,0,1), range = c(1-max(ryb), 1-min(ryb)))[1:3]
   col <- rgb(tar[1], tar[2], tar[3])
   return(col)
 }
@@ -154,9 +154,3 @@ ang <- function(ryb = c(0,0.5,1)){
   return(x)
 }
 
-tmp <- data.frame(
-  r = c(1,  1,   1, 0,  0,0.625,  1),
-  y = c(0.125,0.5,0.75,0.75,0.5,  0.125,  0.125),
-  b = c(0.125,  0,   0,    0,  1,  0.9375,0.125))
-show_col(apply(tmp, 1, function(x) rgb(x[1],x[2],x[3])))
-show_col(rgb(160,32,240, maxColorValue = 255))
