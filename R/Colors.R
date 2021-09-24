@@ -110,8 +110,8 @@ ryb_ref <- data.frame(
   # 0 = red, 2 = yellow, 4 = blue, 6 = red
   x = c(0,1,2,3,4,5,6),
   r = c(1,1,1,0.5,0,0.5,1),
-  y = c(0,0.5,1,1,0.5,0,0),
-  b = c(0,0,0,0,1,1,0)
+  y = c(0,0.5,0.75,1,0.5,0,0),
+  b = c(0.25,0,0,0,1,1,0.25)
 )
 seg <- function(range, weight = c(1,1)){
   len <- range[,2] - range[,1]
