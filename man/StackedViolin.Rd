@@ -17,9 +17,11 @@ StackedViolin(
   box = T,
   width = 0.9,
   pt = T,
+  hide.outlier = F,
   pt.style = c("jitter", "quasirandom"),
   pt.size = 1,
-  pt.alpha = 0.35
+  pt.alpha = 0.35,
+  strip.position = "left"
 )
 
 StackedViolin_v3(

@@ -22,9 +22,11 @@ VlnPlot2(object, ...)
   box = T,
   width = 0.9,
   pt = T,
+  hide.outlier = F,
   pt.style = c("jitter", "quasirandom"),
   pt.size = 1,
-  pt.alpha = 0.35
+  pt.alpha = 0.35,
+  strip.position = "left"
 )
 }
 \arguments{
@@ -69,11 +71,16 @@ the violin plots by. Default: NULL}
 
 \item{pt}{Whether to plot points, Default: T}
 
+\item{hide.outlier}{Whether to hide outlier points of boxplot, Default: F}
+
 \item{pt.style}{Position adjustment, Default: c("jitter", "quasirandom")}
 
 \item{pt.size}{Point size, Default: 1}
 
 \item{pt.alpha}{Point transparency, Default: 0.35}
+
+\item{strip.position}{Were to put the strip ("top", "bottom", "left" (default)
+or "right"). Only use when \code{f2 = NULL}}
 }
 \value{
 ggplot object

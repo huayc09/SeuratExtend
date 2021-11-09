@@ -48,9 +48,12 @@ VlnPlot2.Seurat <- function(
 #' @param box Whether to plot box plot, Default: T
 #' @param width Width of box plot, Default: 0.9
 #' @param pt Whether to plot points, Default: T
+#' @param hide.outlier Whether to hide outlier points of boxplot, Default: F
 #' @param pt.style Position adjustment, Default: c("jitter", "quasirandom")
 #' @param pt.size Point size, Default: 1
 #' @param pt.alpha Point transparency, Default: 0.35
+#' @param strip.position Were to put the strip ("top", "bottom", "left" (default)
+#' or "right"). Only use when \code{f2 = NULL}
 #' @rdname VlnPlot2
 #' @export
 
@@ -64,9 +67,11 @@ VlnPlot2.default <- function(
   box = T,
   width = 0.9,
   pt = T,
+  hide.outlier = F,
   pt.style = c("jitter","quasirandom"),
   pt.size = 1,
-  pt.alpha = 0.35
+  pt.alpha = 0.35,
+  strip.position = "left"
 ) {
   library(ggplot2)
   library(rlang)
@@ -89,7 +94,7 @@ VlnPlot2.default <- function(
       geom_violin(scale = "width", width = width)
   }
   if(box & !violin) {
-    if(pt) {
+    if(pt | hide.outlier) {
       p <- p +
         geom_boxplot(outlier.shape = NA, width = width)
     } else {
@@ -107,7 +112,7 @@ VlnPlot2.default <- function(
     }
   }
   if(box & violin) {
-    if(pt) {
+    if(pt | hide.outlier) {
       p <- p +
         geom_boxplot(outlier.shape = NA, width = 0.1, fill = "white")
     } else {
@@ -117,7 +122,7 @@ VlnPlot2.default <- function(
   }
   if(is_empty(f2)){
     p <- p +
-      facet_wrap( ~variable, ncol = ncol, strip.position="left", scales = scales)+
+      facet_wrap( ~variable, ncol = ncol, strip.position=strip.position, scales = scales)+
       ylab(NULL) +
       xlab(NULL) +
       theme_classic() +

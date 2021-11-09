@@ -1,7 +1,7 @@
 Package: SeuratExtend
 Type: Package
 Title: SeuratExtend
-Version: 0.4.5
+Version: 0.4.6
 Author: Yichao Hua
 Maintainer: Yichao Hua <yichao.hua@kuleuven.be>
 Description: Personal package
