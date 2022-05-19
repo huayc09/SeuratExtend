@@ -1,17 +1,19 @@
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param origin PARAM_DESCRIPTION
-#' @param cluster PARAM_DESCRIPTION
-#' @param rev PARAM_DESCRIPTION, Default: F
-#' @param normalize PARAM_DESCRIPTION, Default: rev
-#' @param percent PARAM_DESCRIPTION, Default: T
-#' @param plot PARAM_DESCRIPTION, Default: T
-#' @param flip PARAM_DESCRIPTION, Default: T
-#' @param width PARAM_DESCRIPTION, Default: 0.9
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
+#' @title Cluster proportion bar plot
+#' @description Plot the percentage/absolute cell count of each cluster in each sample
+#' @param origin factor/vector of sample
+#' @param cluster factor/vector of cluster
+#' @param rev If TRUE, plot the proportion of sample in each cluster, Default: F
+#' @param normalize Normalize sample size to 100, Default: rev
+#' @param percent If FALSE, plot absolute cell number instead of percentage, Default: T
+#' @param plot Generate plot (TRUE) or matrix (FALSE), Default: T
+#' @param flip If plot bars horizontally, Default: T
+#' @param width Width of bars, Default: 0.9
+#' @param border Border color, Default: NA
+#' @return ggplot object or matrix
+#' @details See example
 #' @examples
-#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc))
+#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc)) +
+#'   scale_fill_manual(values = color_iwh(9,3))
 #'
 #' # absolute cell count
 #' ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc), percent = F)
@@ -31,7 +33,7 @@
 #' @export
 
 ClusterDistrBar <- function(origin, cluster, rev = F, normalize = rev, percent = T,
-                            plot = T, flip = T, width = 0.9){
+                            plot = T, flip = T, width = 0.9, border = NA){
   library(dplyr)
   library(rlist)
   library(ggplot2)
@@ -58,7 +60,7 @@ ClusterDistrBar <- function(origin, cluster, rev = F, normalize = rev, percent =
   if(flip) ToPlot$Var2 <- ToPlot$Var2 %>% factor(levels = rev(levels(.)))
   p <-
     ggplot(ToPlot, aes(x = Var2, y = value, fill = Var1)) +
-    geom_bar(stat="identity", position = position_stack(reverse = TRUE), width = width) +
+    geom_bar(stat="identity", position = position_stack(reverse = TRUE), width = width, color = border) +
     theme_classic() +
     labs(x = x.label, y = y.label, fill = fill.label) +
     scale_y_continuous(expand = c(0, 0)) +
@@ -66,21 +68,20 @@ ClusterDistrBar <- function(origin, cluster, rev = F, normalize = rev, percent =
   return(p)
 }
 
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param meta PARAM_DESCRIPTION
-#' @param cluster PARAM_DESCRIPTION
-#' @param origin PARAM_DESCRIPTION
-#' @param method PARAM_DESCRIPTION, Default: 'value'
-#' @param do.heatmap PARAM_DESCRIPTION, Default: T
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
+#' @title Cluster proportion bar plot
+#' @description deprecated function of \code{\link[SeuratExtend:ClusterDistrBar]{ClusterDistrBar()}}
+#' @param meta meta data data.frame
+#' @param cluster variable name of cluster
+#' @param origin variable name of sample
+#' @param method 'percent'or 'value'
+#' @param do.heatmap Generate plot (TRUE) or matrix (FALSE), Default: T
+#' @return ggplot object or matrix
+#' @seealso \code{\link[SeuratExtend:ClusterDistrBar]{ClusterDistrBar()}}
 #' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
+#' meta <- seu@meta.data
+#' origin <- meta$orig.ident
+#' cluster <- meta$cluster
+#' BarOfCluster(meta, "cluster", "orig.ident", method = "percent", do.heatmap = T)
 #' @rdname BarOfCluster
 #' @export
 
@@ -89,8 +90,3 @@ BarOfCluster <- function(meta,cluster,origin,method="value",do.heatmap=T){
   ClusterDistrBar(origin = meta[,origin], cluster = meta[,cluster], percent = method=="percent", plot = do.heatmap)
 }
 
-# meta <- seu@meta.data
-# origin <- meta$orig.ident
-# cluster <- meta$cluster
-# ClusterDistrBar(origin, cluster, rev = T)
-# BarOfCluster(meta, "cluster", "orig.ident", method = "percent", do.heatmap = T)

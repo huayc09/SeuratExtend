@@ -2,34 +2,33 @@
 % Please edit documentation in R/ClusterDistrBar.R
 \name{BarOfCluster}
 \alias{BarOfCluster}
-\title{FUNCTION_TITLE}
+\title{Cluster proportion bar plot}
 \usage{
 BarOfCluster(meta, cluster, origin, method = "value", do.heatmap = T)
 }
 \arguments{
-\item{meta}{PARAM_DESCRIPTION}
+\item{meta}{meta data data.frame}
 
-\item{cluster}{PARAM_DESCRIPTION}
+\item{cluster}{variable name of cluster}
 
-\item{origin}{PARAM_DESCRIPTION}
+\item{origin}{variable name of sample}
 
-\item{method}{PARAM_DESCRIPTION, Default: 'value'}
+\item{method}{'percent'or 'value'}
 
-\item{do.heatmap}{PARAM_DESCRIPTION, Default: T}
+\item{do.heatmap}{Generate plot (TRUE) or matrix (FALSE), Default: T}
 }
 \value{
-OUTPUT_DESCRIPTION
+ggplot object or matrix
 }
 \description{
-FUNCTION_DESCRIPTION
-}
-\details{
-DETAILS
+deprecated function of \code{\link[SeuratExtend:ClusterDistrBar]{ClusterDistrBar()}}
 }
 \examples{
-\dontrun{
-if(interactive()){
- #EXAMPLE1
- }
+meta <- seu@meta.data
+origin <- meta$orig.ident
+cluster <- meta$cluster
+BarOfCluster(meta, "cluster", "orig.ident", method = "percent", do.heatmap = T)
 }
+\seealso{
+\code{\link[SeuratExtend:ClusterDistrBar]{ClusterDistrBar()}}
 }

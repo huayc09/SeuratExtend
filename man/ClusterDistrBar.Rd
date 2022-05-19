@@ -2,7 +2,7 @@
 % Please edit documentation in R/ClusterDistrBar.R
 \name{ClusterDistrBar}
 \alias{ClusterDistrBar}
-\title{FUNCTION_TITLE}
+\title{Cluster proportion bar plot}
 \usage{
 ClusterDistrBar(
   origin,
@@ -12,37 +12,41 @@ ClusterDistrBar(
   percent = T,
   plot = T,
   flip = T,
-  width = 0.9
+  width = 0.9,
+  border = NA
 )
 }
 \arguments{
-\item{origin}{PARAM_DESCRIPTION}
+\item{origin}{factor/vector of sample}
 
-\item{cluster}{PARAM_DESCRIPTION}
+\item{cluster}{factor/vector of cluster}
 
-\item{rev}{PARAM_DESCRIPTION, Default: F}
+\item{rev}{If TRUE, plot the proportion of sample in each cluster, Default: F}
 
-\item{normalize}{PARAM_DESCRIPTION, Default: rev}
+\item{normalize}{Normalize sample size to 100, Default: rev}
 
-\item{percent}{PARAM_DESCRIPTION, Default: T}
+\item{percent}{If FALSE, plot absolute cell number instead of percentage, Default: T}
 
-\item{plot}{PARAM_DESCRIPTION, Default: T}
+\item{plot}{Generate plot (TRUE) or matrix (FALSE), Default: T}
 
-\item{flip}{PARAM_DESCRIPTION, Default: T}
+\item{flip}{If plot bars horizontally, Default: T}
 
-\item{width}{PARAM_DESCRIPTION, Default: 0.9}
+\item{width}{Width of bars, Default: 0.9}
+
+\item{border}{Border color, Default: NA}
 }
 \value{
-OUTPUT_DESCRIPTION
+ggplot object or matrix
 }
 \description{
-FUNCTION_DESCRIPTION
+Plot the percentage/absolute cell count of each cluster in each sample
 }
 \details{
-DETAILS
+See example
 }
 \examples{
-ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc))
+ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc)) +
+  scale_fill_manual(values = color_iwh(9,3))
 
 # absolute cell count
 ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc), percent = F)

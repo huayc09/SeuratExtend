@@ -9,7 +9,7 @@ library(sinew)
 options(max.print = 50, spe = "mouse", nCores = 12)
 
 usethis::use_data(PanglaoDB_data, overwrite = TRUE)
-makeOxygen(FeaturePlot3.grid)
+makeOxygen(ClusterDistrBar)
 roxygenize()
 
 
