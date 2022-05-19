@@ -59,7 +59,7 @@ ClusterDistrBar <- function(origin, cluster, rev = F, normalize = rev, percent =
 
   if(flip) ToPlot$Var2 <- ToPlot$Var2 %>% factor(levels = rev(levels(.)))
   p <-
-    ggplot(ToPlot, aes(x = Var2, y = value, fill = Var1)) +
+    ggplot(ToPlot, aes(x = Var2, y = value, fill = factor(Var1))) +
     geom_bar(stat="identity", position = position_stack(reverse = TRUE), width = width, color = border) +
     theme_classic() +
     labs(x = x.label, y = y.label, fill = fill.label) +
