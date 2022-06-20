@@ -9,6 +9,7 @@ library(sinew)
 options(max.print = 50, spe = "human", nCores = 12)
 
 usethis::use_data(PanglaoDB_data, overwrite = TRUE)
+usethis::use_gpl_license(version = 3, include_future = TRUE)
 makeOxygen(calcAUC_matrix)
 roxygenize()
 

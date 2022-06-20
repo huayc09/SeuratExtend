@@ -17,9 +17,11 @@ BuildAUCRank(seu, slot = "counts", assay = "RNA")
 Seurat object.
 }
 \description{
-Build AUCell ranking matrix using 'AUCell' package: \n
+Build AUCell ranking matrix using 'AUCell' package:
+
 Aibar et al. (2017) SCENIC: single-cell regulatory network inference and clustering.
-Nature Methods. doi: 10.1038/nmeth.4463 \n
+Nature Methods. doi: 10.1038/nmeth.4463
+
 Aibar. et al. (2016) AUCell: Analysis of 'gene set' activity in single-cell RNA-seq data.
 R/Bioconductor package.
 }

@@ -55,6 +55,22 @@ package_data <- list(
       install = function(){
         remotes::install_github("mojaveazure/seurat-disk")
       }
+  ),
+  "DelayedArray" = list(
+    website = "https://bioconductor.org/packages/release/bioc/html/DelayedArray.html",
+    tutorial = "https://bioconductor.org/packages/release/bioc/html/DelayedArray.html",
+    install_info = 'BiocManager::install("DelayedArray")',
+    install = function(){
+      BiocManager::install("DelayedArray")
+    }
+  ),
+  "DelayedMatrixStats" = list(
+    website = "https://bioconductor.org/packages/release/bioc/html/DelayedMatrixStats.html",
+    tutorial = "https://bioconductor.org/packages/release/bioc/html/DelayedMatrixStats.html",
+    install_info = 'BiocManager::install("DelayedMatrixStats")',
+    install = function(){
+      BiocManager::install("DelayedMatrixStats")
+    }
   )
 )
 

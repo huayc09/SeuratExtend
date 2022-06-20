@@ -1,39 +1,11 @@
-# imported from AUCell package
-
-AUCell_buildRankings <-
-  new("MethodDefinition", .Data = function (
-    exprMat, featureType = "genes",
-    plotStats = TRUE, splitByBlocks = FALSE, BPPARAM = NULL,
-    keepZeroesAsNA = FALSE, verbose = TRUE, nCores = NULL, mctype = NULL,
-    ...) {
-    .local <- function (
-    exprMat, featureType = "genes", plotStats = TRUE,
-    splitByBlocks = FALSE, BPPARAM = NULL, keepZeroesAsNA = FALSE,
-    verbose = TRUE, nCores = NULL, mctype = NULL)
-    {
-      .AUCell_buildRankings(
-        exprMat = exprMat, featureType = featureType,
-        splitByBlocks = splitByBlocks, BPPARAM = BPPARAM,
-        plotStats = plotStats, keepZeroesAsNA = keepZeroesAsNA,
-        verbose = verbose, nCores = nCores, mctype = mctype)
-    }
-    .local(exprMat, featureType, plotStats, splitByBlocks, BPPARAM,
-           keepZeroesAsNA, verbose, nCores, mctype, ...)
-  }, target = new(
-    "signature", .Data = "dgCMatrix", names = "exprMat",
-    package = "Matrix"), defined = new(
-      "signature", .Data = "dgCMatrix",
-      names = "exprMat", package = "Matrix"), generic = "AUCell_buildRankings")
+# modified from AUCell package version 1.19
 
 .AUCell_buildRankings <-
-  function (exprMat, featureType = "genes", splitByBlocks = FALSE,
-            keepZeroesAsNA = FALSE, BPPARAM = NULL, plotStats = TRUE,
-            verbose = TRUE, nCores = NULL, mctype = NULL) {
-    library(DelayedArray)
-    if ((!splitByBlocks) && ("dgCMatrix" %in% class(exprMat)))
-      stop("To use a dgCMatrix as input set 'splitByBlocks=TRUE'.")
-    if (!is.null(nCores))
-      warning("nCores is no longer used. It will be deprecated in the next AUCell version.")
+  function (exprMat, featureType = "genes",
+            keepZeroesAsNA = FALSE, BPPARAM = NULL, plotStats = FALSE,
+            verbose = TRUE) {
+    import("DelayedArray")
+    import("DelayedMatrixStats")
     if (keepZeroesAsNA) {
       zeroesCoords <- which(exprMat == 0, arr.ind = TRUE)
     }
@@ -57,24 +29,19 @@ AUCell_buildRankings <-
     rowNames <- rownames(exprMat)
     colNames <- colnames(exprMat)
     exprMat <- -exprMat
-    if (splitByBlocks) {
-      exprMat <- do.call(cbind, blockApply(
-        DelayedArray(exprMat),
-        FUN = DelayedMatrixStats::colRanks, ties.method = "random",
-        preserveShape = TRUE, BPPARAM = BPPARAM, grid = colAutoGrid(exprMat)))
-    }
-    else {
-      exprMat <- DelayedMatrixStats::colRanks(exprMat, ties.method = "random",
-                                              preserveShape = TRUE, decreasing = TRUE)
-    }
+
+    exprMat <- do.call(cbind, blockApply(
+      DelayedArray(exprMat),
+      FUN = colRanks, ties.method = "random",
+      preserveShape = TRUE, BPPARAM = BPPARAM, grid = colAutoGrid(exprMat)))
+
     rownames(exprMat) <- rowNames
     colnames(exprMat) <- colNames
     if (keepZeroesAsNA) {
       exprMat[which(zeroesCoords == 0, arr.ind = TRUE)] <- NA
     }
     names(dimnames(exprMat)) <- c(featureType, "cells")
-    new("aucellResults", SummarizedExperiment::SummarizedExperiment(assays = list(ranking = exprMat)),
-        nGenesDetected = nGenesDetected)
+    return(exprMat)
   }
 
 #' @title Build AUCell Rank
@@ -103,14 +70,14 @@ BuildAUCRank <- function(seu, slot = "counts", assay = "RNA"){
   # check_pkg_version("AUCell","1.18")
   seu@misc$AUCell<-list()
   seu@misc$AUCell[["cells_rankings"]] <-
-    AUCell_buildRankings(
-      exprMat = GetAssayData(seu, slot = slot, assay = assay),
-      splitByBlocks = T, plotStats = F)
+    .AUCell_buildRankings(
+      exprMat = GetAssayData(seu, slot = slot, assay = assay))
   return(seu)
 }
 
-#  Imported from AUCell package
+# modified from AUCell package version 1.19
 
+# Method for class "aucellResults"
 getAUC <- function(object) {
   SummarizedExperiment::assays(object)[["AUC"]]
 }
@@ -118,20 +85,6 @@ getAUC <- function(object) {
 getRanking <- function(object) {
   SummarizedExperiment::assays(object)[["ranking"]]
 }
-
-AUCell_calcAUC <-
-  new("MethodDefinition", .Data = function (
-    geneSets, rankings,
-    nCores = 1, normAUC = TRUE,
-    aucMaxRank = ceiling(0.05 * nrow(rankings)), verbose = TRUE) {
-    .AUCell_calcAUC(
-      geneSets = geneSets, rankings = rankings,
-      nCores = nCores, aucMaxRank = aucMaxRank, verbose = verbose)
-  }, target = new(
-    "signature", .Data = "list", names = "geneSets",
-    package = "methods"), defined = new(
-      "signature", .Data = "list",
-      names = "geneSets", package = "methods"), generic = "AUCell_calcAUC")
 
 .AUCell_calcAUC <- function (
     geneSets, rankings,
@@ -157,15 +110,7 @@ AUCell_calcAUC <-
             immediate. = TRUE)
   if (aucMaxRank <= 0)
     stop("aucMaxRank should be a positive value.")
-  if (!methods::is(rankings, "aucellResults") || SummarizedExperiment::assayNames(rankings) !=
-      "ranking") {
-    if (methods::is(rankings, "matrixWrapper")) {
-      stop("These rankings were built with a previous AUCell version. ",
-           "Please update them with updateAucellResults(..., objectType=\"ranking\")")
-    }
-    stop("Rankings should be a the object returned by AUCell_buildRankings()")
-  }
-  else {
+  if (methods::is(rankings, "aucellResults")) {
     rankings <- getRanking(rankings)
   }
   if (!normAUC)
@@ -220,15 +165,14 @@ AUCell_calcAUC <-
   }
   aucMatrix <- aucMatrix[intersect(names(geneSets), rownames(aucMatrix)),
                          , drop = FALSE]
-  missingSets <- names(geneSets)[which(!names(geneSets) %in%
-                                         rownames(aucMatrix))]
+  missingSets <- names(geneSets)[
+    which(!names(geneSets) %in% rownames(aucMatrix))]
   if (length(missingSets) > 0)
     warning("The AUC for the following sets was not calculated: ",
             paste(missingSets, collapse = ", "))
-  missingGenes <- as.matrix(aucMatrix[, c("missing", "nGenes"),
-                                      drop = FALSE])
-  missingPercent <- as.numeric(missingGenes[, "missing"])/as.numeric(missingGenes[,
-                                                                                  "nGenes"])
+  missingGenes <- as.matrix(aucMatrix[, c("missing", "nGenes"), drop = FALSE])
+  missingPercent <- as.numeric(
+    missingGenes[, "missing"])/as.numeric(missingGenes[,"nGenes"])
   missingPercent <- setNames(missingPercent, rownames(missingGenes))
   if (all(missingPercent >= 0.8))
     stop("Fewer than 20% of the genes in the gene sets are included in the rankings.",
@@ -236,8 +180,8 @@ AUCell_calcAUC <-
   if (any(missingPercent > 0.8)) {
     warning("The following gene sets will be excluded from the analysis",
             "(less than 20% of their genes are available):\n",
-            paste(names(missingPercent)[which(missingPercent >=
-                                                0.8)], collapse = ", "), sep = "", immediate. = TRUE)
+            paste(names(missingPercent)[which(missingPercent >= 0.8)],
+                  collapse = ", "), sep = "", immediate. = TRUE)
     aucMatrix <- aucMatrix[which(missingPercent < 0.8),
                            , drop = FALSE]
   }
@@ -259,7 +203,7 @@ AUCell_calcAUC <-
   }
   aucMatrix <- aucMatrix[, 1:(ncol(aucMatrix) - 2), drop = FALSE]
   names(dimnames(aucMatrix)) <- c("gene sets", "cells")
-  new("aucellResults", SummarizedExperiment::SummarizedExperiment(assays = list(AUC = aucMatrix)))
+  return(aucMatrix)
 }
 
 .AUC.geneSet_norm <-
@@ -288,29 +232,6 @@ AUCell_calcAUC <-
     sum(diff(c(x, aucThreshold)) * y)/maxAUC
   }
 
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param GenesetList PARAM_DESCRIPTION
-#' @param rankings PARAM_DESCRIPTION
-#' @param nCores PARAM_DESCRIPTION, Default: 1
-#' @param verbose PARAM_DESCRIPTION, Default: TRUE
-#' @param n.items.part PARAM_DESCRIPTION, Default: NULL
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
-#' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @seealso
-#'  \code{\link[parallel]{detectCores}}
-#'  \code{\link[rlist]{list.rbind}}
-#' @rdname calcAUC_matrix
-#' @export
-#' @importFrom parallel detectCores
-#' @importFrom rlist list.rbind
-
 calcAUC_matrix <- function(
     GenesetList,
     rankings,
@@ -337,9 +258,9 @@ calcAUC_matrix <- function(
   if(verbose) message(Sys.time(), " Calculating ", length(GenesetList), " gene set(s)")
 
   if(is.null(n.items.part) &  nCores == 1) {
-    AUC_matrix <- AUCell_calcAUC(GenesetList, rankings, nCores = nCores, verbose = verbose)
-    AUC_matrix <- getAUC(AUC_matrix)
+    AUC_matrix <- .AUCell_calcAUC(GenesetList, rankings, nCores = nCores, verbose = verbose)
   }else if(is.null(n.items.part)) {
+    if(verbose) message(Sys.time(), " Using ", nCores, " cores")
     GenesetList2 <- split(GenesetList, ceiling(seq_along(GenesetList) * nCores / length(GenesetList)))
     import("doParallel")
     import("doRNG")
@@ -347,19 +268,18 @@ calcAUC_matrix <- function(
     cl <- makeCluster(nCores)
     registerDoParallel(cl)
     AUC <- foreach(i = GenesetList2) %dopar%
-      getAUC(AUCell_calcAUC(i, rankings = rankings, nCores = 1, verbose = FALSE))
+      .AUCell_calcAUC(i, rankings = rankings, nCores = 1, verbose = FALSE)
     stopCluster(cl)
     AUC_matrix <- rlist::list.rbind(AUC)
   }else{
     if(verbose) message(Sys.time(), " Split gene set(s) into ", n.items.part, " part(s)")
     splited_terms <- split(GenesetList, ceiling(seq_along(GenesetList) * n.items.part / length(GenesetList)))
     for (i in names(splited_terms)) {
-      splited_terms[[i]] <- calcAUC_matrix(splited_terms[[i]], rankings = rankings, nCores = nCores, verbose = FALSE)
+      splited_terms[[i]] <- calcAUC_matrix(
+        splited_terms[[i]], rankings = rankings, nCores = nCores, verbose = FALSE)
     }
     AUC_matrix <- rlist::list.rbind(splited_terms)
   }
   if(verbose) message(Sys.time(), " Done")
   return(AUC_matrix)
 }
-
-
