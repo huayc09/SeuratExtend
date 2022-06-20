@@ -4,12 +4,15 @@ NULL
 
 #' @param seu (Seurat version) Seurat object
 #' @param features (Seurat version) Features to plot (gene expression, metrics, PC scores,
-#' anything that can be retreived by FetchData), Default: NULL (All features
+#' anything that can be retrieved by FetchData), Default: NULL (All features
 #' in matrix)
 #' @param group.by (Seurat version) A variable name in meta.data to
-#' group the violin plots by
+#' group the violin plots by, or string with the same length of cells
 #' @param cells (Seurat version) Cell names to use, Default: all cells
-#' @param slot Slot to pull feature data for
+#' @param slot (Seurat version) Slot to pull feature data for
+#' @param assay (Seurat version) Name of assay to use, defaults to the active assay
+#' @param priority (Seurat version) If set to "expr", force fetch data from expression matrix
+#' instead of meta.data
 #' @rdname CalcStats
 #' @export
 
@@ -20,23 +23,27 @@ CalcStats.Seurat <-
     group.by = NULL,
     cells = NULL,
     slot = "data",
+    assay = NULL,
     method = "zscore",
     exp.transform = F,
     order = NULL,
     n = Inf,
-    p.threshold = 0.05
+    p.threshold = 0.05,
+    priority = c("expr","none")
   ) {
-    library(Seurat)
-    cells <- cells %||% colnames(seu)
-    matr <- FetchData(object = seu, vars = features, cells = cells, slot = slot)
-    if(is.null(group.by)) {
-      f <- factor(Idents(seu)[cells])
-    }else{
-      f <- factor(seu[[group.by]][cells,])
-    }
+    Std.matr <- Seu2Matr(
+      seu = seu,
+      features = features,
+      group.by = group.by,
+      cells = cells,
+      slot = slot,
+      assay = assay,
+      priority = priority
+    )
+
     scores <- CalcStats.default(
-      matr,
-      f = f,
+      matr = Std.matr$matr,
+      f = Std.matr$f,
       method = method,
       exp.transform = exp.transform,
       t = T,
@@ -74,76 +81,33 @@ CalcStats.default <- function(
   p.threshold = 0.05
 ) {
   library(dplyr)
-  library(rlist)
   library(mosaic)
-  library(purrr)
-  library(tidyr)
 
   f <- factor(f)
   if(exp.transform) matr <- expm1(matr)
-  if(!t) scores <- t(matr) else scores <- matr
-  scores <- as.data.frame(scores)
+  if(!t) matr <- t(matr)
+  matr <- as.data.frame(matr)
   method <- tolower(method)
-  if(nrow(scores) != length(f)) {
+  if(nrow(matr) != length(f)) {
     stop("'f' should be the same length as number of matrix columns. \n",
          "Maybe need transpose? (t = TRUE)")
   }
 
-  if(method=="mean"){
-    scores<-
-      scores %>%
-      split(f) %>%
-      lapply(function(x) apply(x,2,mean)) %>%
-      list.cbind() %>%
-      as.data.frame()
-  }else if(method=="median"){
-    scores<-
-      scores %>%
-      split(f) %>%
-      lapply(function(x) apply(x,2,median)) %>%
-      list.cbind() %>%
-      as.data.frame()
-  }else if(method=="zscore"){
-    scores <-
-      CalcStats.default(scores, f, "mean", t = T) %>%
-      apply(1, zscore) %>%
-      t() %>%
-      as.data.frame()
-  }else if(method=="tscore"){
-    scores<-
-      levels(f) %>%
-      lapply(function(x) split(scores,f==x)) %>%
-      lapply(function(x) map2(x$`TRUE`, x$`FALSE`, function(x,y) t.test(x,y)[["statistic"]])) %>%
-      lapply(list.rbind) %>%
-      list.cbind() %>%
-      as.data.frame() %>%
-      setNames(., levels(f))
-  }else if(method=="p"){
-    scores<-
-      levels(f) %>%
-      lapply(function(x) split(scores,f==x)) %>%
-      lapply(function(x) map2(x$`TRUE`, x$`FALSE`, function(x,y) -log10(t.test(x,y)[["p.value"]]))) %>%
-      lapply(list.rbind) %>%
-      list.cbind() %>%
-      as.data.frame() %>%
-      setNames(., levels(f))
-  }else if(method=="logfc"){
-    if(!exp.transform) {
-      warning("When calculating Log2FC of log-normalized gene expression data, ",
-              "you should consider set 'exp.transform' to TRUE")
-    }
-    scores <-
-      levels(f) %>%
-      lapply(function(x) split(scores,f==x)) %>%
-      lapply(function(x) map2(x$`TRUE`, x$`FALSE`, function(x,y) log2(mean(x+1)/mean(y+1)))) %>%
-      lapply(list.rbind) %>%
-      list.cbind() %>%
-      as.data.frame() %>%
-      setNames(., levels(f))
-  }else{
-    stop("'method' should be one of 'mean', 'median', 'tscore', 'zscore', 'p' or 'logFC")
+  if(method == "logfc" & !exp.transform) {
+    warning("When calculating Log2FC of log-normalized gene expression data, ",
+            "you should consider set 'exp.transform' to TRUE")
   }
-  scores <- drop_na(scores)
+  scores <- switch(
+    method,
+    mean = CalcMean(matr, f, "mean"),
+    median = CalcMean(matr, f, "median"),
+    zscore = CalcZscore(matr, f),
+    tscore = CalcTscore(matr, f, "tscore"),
+    p = CalcTscore(matr, f, "p"),
+    logfc = CalcTscore(matr, f, "logfc")
+  )
+  scores <- tidyr::drop_na(scores)
+
   if(!is.null(order)) {
     row.max <- apply(scores, 1, which.max)
     scores.order <- split(scores, row.max)
@@ -156,24 +120,21 @@ CalcStats.default <- function(
         scores.order[[i]] <- tmp
       }
       scores.order <- setNames(scores.order, NULL)
-      scores <- list.rbind(scores.order)
+      scores <- rlist::list.rbind(scores.order)
     } else if (order == "p") {
       for (i in names(scores.order)) {
         tmp <- scores.order[[i]]
-        if(!t) scores2 <- t(matr) else scores2 <- matr
-        scores2 <- as.data.frame(scores2)
-        scores2 <- scores2[,rownames(tmp),drop = F]
+        scores2 <- matr[,rownames(tmp),drop = F]
         clust.id <- levels(f)[as.numeric(i)]
-        feature.p <-
-          apply(scores2, 2, function(x) {
-            t.test(x[f==clust.id], x[f!=clust.id])[["p.value"]]
-          })
-        feature.p <- sort(feature.p[feature.p < p.threshold])
-        tmp <- tmp[head(names(feature.p), n),]
+
+        scores2 <- CalcTscore(scores2, f, "p", idents = clust.id)
+        scores2 <- scores2[scores2[[1]] > -log10(p.threshold), ,drop = F]
+        feature.p <- rownames(scores2)[order(scores2[[1]], decreasing = T)]
+        tmp <- tmp[head(feature.p, n),]
         scores.order[[i]] <- tmp
       }
       scores.order <- setNames(scores.order, NULL)
-      scores <- list.rbind(scores.order)
+      scores <- rlist::list.rbind(scores.order)
     } else {
       stop("'order' must be 'value' or 'p'")
     }
@@ -198,3 +159,54 @@ CalcScoreGeneral_v3 <- CalcStats.Seurat
 #' @export
 
 ScoreAndOrder <- CalcStats.default
+
+# Internal ----------------------------------------------------------------
+
+CalcMean <- function(matr, f, method = c("mean","median")) {
+  matr <- split(matr, f)
+  method <- method[1]
+  fun <- switch(
+    method,
+    mean = base::mean,
+    median = base::median
+    )
+  matr <- lapply(matr, function(x) apply(x,2,fun))
+  matr <- rlist::list.cbind(matr)
+  matr <- as.data.frame(matr)
+  return(matr)
+}
+
+CalcZscore <- function(matr, f) {
+  matr <- CalcMean(matr, f)
+  matr <- apply(matr, 1, mosaic::zscore, simplify = F)
+  matr <- rlist::list.rbind(matr)
+  matr <- as.data.frame(matr)
+  return(matr)
+}
+
+CalcTscore <-
+  function(
+    matr, f,
+    method = c("tscore","p","logfc"),
+    idents = NULL
+  ) {
+    method <- method[1]
+    idents <- idents %||% levels(f)
+    t.list <- list()
+    for (i in idents) {
+      ident.info <- CheckIdent(f, ident.1 = i)
+      t.list[[i]] <- apply(matr, 2, function(x) {
+        x1 <- x[ident.info$cell.1]
+        x2 <- x[ident.info$cell.2]
+        switch(
+          method,
+          tscore = t.test(x1, x2)[["statistic"]],
+          p = -log10(t.test(x1, x2)[["p.value"]]),
+          logfc = log2( (mean(x1) + 1) / (mean(x2) + 1) )
+        )
+      })
+    }
+    matr <- rlist::list.cbind(t.list)
+    matr <- as.data.frame(matr)
+    return(matr)
+  }

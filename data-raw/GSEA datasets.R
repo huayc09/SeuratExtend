@@ -45,15 +45,10 @@ Genesets[["mouse"]][["GSEA_mouse_gene_transformed"]] <-
     })
   })
 
-HEV_markers_Girards <- readRDS("~/R documents/SeuratExtend_databases/Other gene sets/HEV_markers_Girards.rds")
-Genesets[["mouse"]][["HEV_markers_Girards"]] <- HEV_markers_Girards %>% lapply(rownames)
-Genesets[["mouse"]][["HEV_markers_Girards_top30"]] <- HEV_markers_Girards %>% lapply(function(x) rownames(x)[1:30])
-
-EC_3T_markers <- read_excel("~/R documents/SeuratExtend_databases/Other gene sets/EC_3T_markers.xlsx")
-EC_markers_Junbin <- as.list(EC_3T_markers)
-Genesets[["human"]][["EC_markers_Junbin"]] <- EC_markers_Junbin
-
 Genesets_data <- Genesets
-usethis::use_data(Genesets_data, overwrite = TRUE)
+usethis::use_data(Genesets_data, overwrite = TRUE) # this data is moved to SeuratExtendData package
 
-
+hall50 <- list()
+hall50[["human"]] <- Genesets_data$human$GSEA$`hallmark gene sets`
+hall50[["mouse"]] <- Genesets_data$mouse$GSEA_mouse_gene_transformed$`hallmark gene sets`
+usethis::use_data(hall50, overwrite = TRUE)

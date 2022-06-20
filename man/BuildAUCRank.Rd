@@ -2,32 +2,31 @@
 % Please edit documentation in R/AUCell_basic.R
 \name{BuildAUCRank}
 \alias{BuildAUCRank}
-\title{FUNCTION_TITLE}
+\title{Build AUCell Rank}
 \usage{
-BuildAUCRank(seu, slot = "counts", assay = "RNA", nCores = getOption("nCores"))
+BuildAUCRank(seu, slot = "counts", assay = "RNA")
 }
 \arguments{
-\item{seu}{PARAM_DESCRIPTION}
+\item{seu}{Seurat object}
 
-\item{slot}{PARAM_DESCRIPTION, Default: 'counts'}
+\item{slot}{Slot to pull feature data for, Default: 'counts'}
 
-\item{assay}{PARAM_DESCRIPTION, Default: 'RNA'}
-
-\item{nCores}{PARAM_DESCRIPTION, Default: getOption("nCores")}
+\item{assay}{Name of assay to use, Default: 'RNA'}
 }
 \value{
-OUTPUT_DESCRIPTION
+Seurat object.
 }
 \description{
-FUNCTION_DESCRIPTION
+Build AUCell ranking matrix using 'AUCell' package: \n
+Aibar et al. (2017) SCENIC: single-cell regulatory network inference and clustering.
+Nature Methods. doi: 10.1038/nmeth.4463 \n
+Aibar. et al. (2016) AUCell: Analysis of 'gene set' activity in single-cell RNA-seq data.
+R/Bioconductor package.
 }
 \details{
-DETAILS
+AUCell ranking matrix is saved in seu@misc$AUCell[["cells_rankings"]]
 }
 \examples{
-\dontrun{
-if(interactive()){
- #EXAMPLE1
- }
-}
+pbmc <- BuildAUCRank(pbmc)
+pbmc@misc$AUCell[["cells_rankings"]]
 }

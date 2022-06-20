@@ -8,13 +8,24 @@
 \usage{
 VlnPlot2(object, ...)
 
-\method{VlnPlot2}{Seurat}(seu, features, group.by = NULL, split.by = NULL, cell = NULL, ...)
+\method{VlnPlot2}{Seurat}(
+  seu,
+  features,
+  group.by = NULL,
+  split.by = NULL,
+  cell = NULL,
+  slot = "data",
+  assay = NULL,
+  priority = c("expr", "none"),
+  ...
+)
 
 \method{VlnPlot2}{default}(
   matr,
   f,
   f2 = NULL,
   features = NULL,
+  t = F,
   ncol = 1,
   lab_fill = "group",
   scales = "free_y",
@@ -25,8 +36,8 @@ VlnPlot2(object, ...)
   hide.outlier = F,
   pt.style = c("jitter", "quasirandom"),
   pt.size = 1,
-  pt.alpha = 0.35,
-  strip.position = "left"
+  pt.alpha = 1,
+  strip.position = "top"
 )
 }
 \arguments{
@@ -48,6 +59,13 @@ split the violin plots by}
 
 \item{cell}{(Seurat version) Cell names to use, Default: all cells}
 
+\item{slot}{(Seurat version) Slot to pull feature data for}
+
+\item{assay}{(Seurat version) Name of assay to use, defaults to the active assay}
+
+\item{priority}{(Seurat version) If set to "expr", force fetch data from expression matrix
+instead of meta.data}
+
 \item{matr}{Matrix or data frame.Row - features; columns - cells}
 
 \item{f}{Factor or vector. Identity of each cell. Should be the
@@ -55,6 +73,9 @@ same length of cells}
 
 \item{f2}{Factor or vector. Similar to \code{f}. A variable to split
 the violin plots by. Default: NULL}
+
+\item{t}{If your matrix has features in columns and cells in rows,
+you should transpose the matrix first. Default: F}
 
 \item{ncol}{Number of columns if multiple plots are displayed, Default: 1}
 
@@ -77,9 +98,9 @@ the violin plots by. Default: NULL}
 
 \item{pt.size}{Point size, Default: 1}
 
-\item{pt.alpha}{Point transparency, Default: 0.35}
+\item{pt.alpha}{Point transparency, Default: 1}
 
-\item{strip.position}{Were to put the strip ("top", "bottom", "left" (default)
+\item{strip.position}{Were to put the strip ("top" (default), "bottom", "left",
 or "right"). Only use when \code{f2 = NULL}}
 }
 \value{

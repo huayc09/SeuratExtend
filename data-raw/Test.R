@@ -6,10 +6,10 @@ library(rlist)
 library(purrr)
 library(roxygen2)
 library(sinew)
-options(max.print = 50, spe = "mouse", nCores = 12)
+options(max.print = 50, spe = "human", nCores = 12)
 
 usethis::use_data(PanglaoDB_data, overwrite = TRUE)
-makeOxygen(ClusterDistrBar)
+makeOxygen(calcAUC_matrix)
 roxygenize()
 
 

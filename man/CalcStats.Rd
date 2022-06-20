@@ -14,11 +14,13 @@ CalcStats(object, ...)
   group.by = NULL,
   cells = NULL,
   slot = "data",
+  assay = NULL,
   method = "zscore",
   exp.transform = F,
   order = NULL,
   n = Inf,
-  p.threshold = 0.05
+  p.threshold = 0.05,
+  priority = c("expr", "none")
 )
 
 \method{CalcStats}{default}(
@@ -40,15 +42,17 @@ CalcStats(object, ...)
 \item{seu}{(Seurat version) Seurat object}
 
 \item{features}{(Seurat version) Features to plot (gene expression, metrics, PC scores,
-anything that can be retreived by FetchData), Default: NULL (All features
+anything that can be retrieved by FetchData), Default: NULL (All features
 in matrix)}
 
 \item{group.by}{(Seurat version) A variable name in meta.data to
-group the violin plots by}
+group the violin plots by, or string with the same length of cells}
 
 \item{cells}{(Seurat version) Cell names to use, Default: all cells}
 
-\item{slot}{Slot to pull feature data for}
+\item{slot}{(Seurat version) Slot to pull feature data for}
+
+\item{assay}{(Seurat version) Name of assay to use, defaults to the active assay}
 
 \item{method}{Should be either "mean", "median", "zscore", "tscore",
 "p", or "logFC". Default: 'zscore'}
@@ -63,6 +67,9 @@ group the violin plots by}
 
 \item{p.threshold}{When \code{order = "p"}, rows with pvalue greater
 than \code{p.threshold} are removed.}
+
+\item{priority}{(Seurat version) If set to "expr", force fetch data from expression matrix
+instead of meta.data}
 
 \item{matr}{Matrix or data frame.Row - features; columns - cells}
 

@@ -23,11 +23,13 @@ CalcScoreGeneral_v3(
   group.by = NULL,
   cells = NULL,
   slot = "data",
+  assay = NULL,
   method = "zscore",
   exp.transform = F,
   order = NULL,
   n = Inf,
-  p.threshold = 0.05
+  p.threshold = 0.05,
+  priority = c("expr", "none")
 )
 
 ScoreAndOrder(

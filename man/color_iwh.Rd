@@ -2,7 +2,7 @@
 % Please edit documentation in R/Colors.R
 \name{color_iwh}
 \alias{color_iwh}
-\title{color_iwh}
+\title{Discrete color presets}
 \usage{
 color_iwh(
   n,

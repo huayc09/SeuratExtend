@@ -10,6 +10,7 @@ StackedViolin(
   f,
   f2 = NULL,
   features = NULL,
+  t = F,
   ncol = 1,
   lab_fill = "group",
   scales = "free_y",
@@ -20,8 +21,8 @@ StackedViolin(
   hide.outlier = F,
   pt.style = c("jitter", "quasirandom"),
   pt.size = 1,
-  pt.alpha = 0.35,
-  strip.position = "left"
+  pt.alpha = 1,
+  strip.position = "top"
 )
 
 StackedViolin_v3(
@@ -30,6 +31,9 @@ StackedViolin_v3(
   group.by = NULL,
   split.by = NULL,
   cell = NULL,
+  slot = "data",
+  assay = NULL,
+  priority = c("expr", "none"),
   ...
 )
 }

@@ -22,5 +22,7 @@ new.cluster.ids <- c("Naive CD4 T", "Memory CD4 T", "CD14+ Mono", "B", "CD8 T", 
                      "NK", "DC", "Platelet")
 pbmc@meta.data$cluster <- new.cluster.ids[pbmc$seurat_clusters]
 
+pbmc <- subset(pbmc, cells = sample(colnames(pbmc), 500))
+
 usethis::use_data(pbmc, overwrite = TRUE)
 

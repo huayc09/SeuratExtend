@@ -2,46 +2,61 @@
 % Please edit documentation in R/runGSVA.R
 \name{GSEAplot}
 \alias{GSEAplot}
-\title{FUNCTION_TITLE}
+\title{GSEA plot}
 \usage{
 GSEAplot(
   seu,
-  group.by,
+  group.by = NULL,
   geneset,
   ident.1 = NULL,
   ident.2 = NULL,
+  cells = NULL,
+  slot = "data",
+  assay = NULL,
   logFC.cutoff = c(-1, 1),
+  p.position = c(0.8, 0.85),
+  sample = 500,
   title = deparse(substitute(geneset))
 )
 }
 \arguments{
-\item{seu}{PARAM_DESCRIPTION}
+\item{seu}{Seurat object}
 
-\item{group.by}{PARAM_DESCRIPTION}
+\item{group.by}{A variable name in meta.data to
+group the violin plots by, or string with the same length of cells}
 
-\item{geneset}{PARAM_DESCRIPTION}
+\item{geneset}{A list of genes}
 
-\item{ident.1}{PARAM_DESCRIPTION, Default: NULL}
+\item{ident.1}{Cell type name}
 
-\item{ident.2}{PARAM_DESCRIPTION, Default: NULL}
+\item{ident.2}{(Optional) Second cell type name to compare with 'ident.1'}
 
-\item{logFC.cutoff}{PARAM_DESCRIPTION, Default: c(-1, 1)}
+\item{cells}{Cell names to use, Default: all cells}
 
-\item{title}{PARAM_DESCRIPTION, Default: deparse(substitute(geneset))}
+\item{slot}{Slot to pull feature data for, Default: 'data'}
+
+\item{assay}{Name of assay to use, defaults to the active assay}
+
+\item{logFC.cutoff}{Range of Log2 fold change of ranked genes, Default: c(-1, 1)}
+
+\item{p.position}{Where to put ES and p value text, Default: c(0.8, 0.85)}
+
+\item{sample}{Points used for drawing curves. Default: 500}
+
+\item{title}{Title of geneset}
 }
 \value{
-OUTPUT_DESCRIPTION
+Plot
 }
 \description{
-FUNCTION_DESCRIPTION
+Generate plot that mimic the Gene Set Enrichment computational analysis
+published by the Broad Institute
 }
 \details{
-DETAILS
+P value is calculated using Kolmogorov-Smirnov Tests
 }
 \examples{
-\dontrun{
-if(interactive()){
- #EXAMPLE1
- }
-}
+GSEAplot(
+  pbmc, ident.1 = "Naive CD4 T", title = "INTERFERON_GAMMA_RESPONSE",
+  geneset = hall50$human$HALLMARK_INTERFERON_GAMMA_RESPONSE)
 }

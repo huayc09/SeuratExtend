@@ -8,6 +8,10 @@ NULL
 #' @param split.by (Seurat version) A variable name in meta.data to
 #' split the violin plots by
 #' @param cell (Seurat version) Cell names to use, Default: all cells
+#' @param slot (Seurat version) Slot to pull feature data for
+#' @param assay (Seurat version) Name of assay to use, defaults to the active assay
+#' @param priority (Seurat version) If set to "expr", force fetch data from expression matrix
+#' instead of meta.data
 #' @rdname VlnPlot2
 #' @export
 
@@ -17,18 +21,28 @@ VlnPlot2.Seurat <- function(
   group.by = NULL,
   split.by = NULL,
   cell = NULL,
+  slot = "data",
+  assay = NULL,
+  priority = c("expr","none"),
   ...
 ) {
-  require(rlang)
-  cell <- cell %||% colnames(seu)
-  matr <- t(FetchData(seu, vars = features, cells = cell))
-  if(is.null(group.by)) {
-    f <- factor(Idents(seu)[cell])
-  }else{
-    f <- factor(seu[[group.by]][cell,])
-  }
-  f2 <- seu[[split.by]][cell,]
-  p <- VlnPlot2.default(matr, f, f2, features, ...)
+  Std.matr <- Seu2Matr(
+    seu = seu,
+    features = features,
+    group.by = group.by,
+    split.by = split.by,
+    cells = cell,
+    slot = slot,
+    assay = assay,
+    priority = priority
+  )
+
+  p <- VlnPlot2.default(
+    matr = Std.matr$matr,
+    f = Std.matr$f,
+    f2 = Std.matr$f2,
+    t = T,
+    ...)
   return(p)
 }
 
@@ -40,6 +54,8 @@ VlnPlot2.Seurat <- function(
 #' @param features Features to plot (gene expression, metrics, PC scores,
 #' anything that can be retreived by FetchData), Default: NULL (All features
 #' in matrix)
+#' @param t If your matrix has features in columns and cells in rows,
+#' you should transpose the matrix first. Default: F
 #' @param ncol Number of columns if multiple plots are displayed, Default: 1
 #' @param lab_fill Title of figure legend, Default: 'group'
 #' @param scales scales parameter passed to \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}
@@ -51,8 +67,8 @@ VlnPlot2.Seurat <- function(
 #' @param hide.outlier Whether to hide outlier points of boxplot, Default: F
 #' @param pt.style Position adjustment, Default: c("jitter", "quasirandom")
 #' @param pt.size Point size, Default: 1
-#' @param pt.alpha Point transparency, Default: 0.35
-#' @param strip.position Were to put the strip ("top", "bottom", "left" (default)
+#' @param pt.alpha Point transparency, Default: 1
+#' @param strip.position Were to put the strip ("top" (default), "bottom", "left",
 #' or "right"). Only use when \code{f2 = NULL}
 #' @rdname VlnPlot2
 #' @export
@@ -60,6 +76,7 @@ VlnPlot2.Seurat <- function(
 VlnPlot2.default <- function(
   matr, f, f2 = NULL,
   features = NULL,
+  t = F,
   ncol = 1,
   lab_fill = "group",
   scales = "free_y",
@@ -70,21 +87,22 @@ VlnPlot2.default <- function(
   hide.outlier = F,
   pt.style = c("jitter","quasirandom"),
   pt.size = 1,
-  pt.alpha = 0.35,
-  strip.position = "left"
+  pt.alpha = 1,
+  strip.position = "top"
 ) {
   library(ggplot2)
-  library(rlang)
   library(dplyr)
   library(reshape2)
-  features <- features %||% rownames(matr)
-  if(!is_empty(setdiff(features, rownames(matr)))){
-    message(paste0(setdiff(features, rownames(matr)), collapse = ", "), " not found")
-    features <- intersect(features, rownames(matr))
+  library(rlang)
+  if(!t) matr <- t(matr)
+  features <- features %||% colnames(matr)
+  if(!is_empty(setdiff(features, colnames(matr)))){
+    message(paste0(setdiff(features, colnames(matr)), collapse = ", "), " not found")
+    features <- intersect(features, colnames(matr))
   }
-  f2 <- f2 %||% data.frame(row.names = colnames(matr))
+  f2 <- f2 %||% data.frame(row.names = rownames(matr))
   ToPlot <-
-    cbind(f, f2, as.data.frame(t(matr[features,,drop = F]))) %>%
+    cbind(f, f2, as.data.frame(matr[,features,drop = F])) %>%
     melt(measure.vars = features)
   if(!violin & !box & !pt) stop("No plot type defined (violin/boxplot/point)")
   x <- ifelse(is_empty(f2), "f", "f2")

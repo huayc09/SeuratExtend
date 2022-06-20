@@ -7,9 +7,9 @@
 calcAUC_matrix(
   GenesetList,
   rankings,
-  nCores = NULL,
+  nCores = 1,
   verbose = TRUE,
-  n.items.part = 5e+05/ncol(rankings) * parallel::detectCores()
+  n.items.part = NULL
 )
 }
 \arguments{
@@ -17,11 +17,11 @@ calcAUC_matrix(
 
 \item{rankings}{PARAM_DESCRIPTION}
 
-\item{nCores}{PARAM_DESCRIPTION, Default: NULL}
+\item{nCores}{PARAM_DESCRIPTION, Default: 1}
 
 \item{verbose}{PARAM_DESCRIPTION, Default: TRUE}
 
-\item{n.items.part}{PARAM_DESCRIPTION, Default: 5e+05/ncol(rankings) * parallel::detectCores()}
+\item{n.items.part}{PARAM_DESCRIPTION, Default: NULL}
 }
 \value{
 OUTPUT_DESCRIPTION
@@ -41,5 +41,5 @@ if(interactive()){
 }
 \seealso{
 \code{\link[parallel]{detectCores}}
- \code{\link[AUCell]{AUCell_calcAUC}}
+ \code{\link[rlist]{list.rbind}}
 }

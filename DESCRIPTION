@@ -1,7 +1,7 @@
 Package: SeuratExtend
 Type: Package
 Title: SeuratExtend
-Version: 0.4.7
+Version: 0.4.9
 Author: Yichao Hua
 Maintainer: Yichao Hua <yichao.hua@kuleuven.be>
 Description: Personal package
@@ -10,15 +10,16 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.2
 Imports: 
-    Seurat, dplyr, rlist, mosaic, ggplot2, reshape2, purrr, magrittr, tidyr, scales, ggpubr, BiocManager
+    Seurat, dplyr, remotes, rlist, mosaic, ggplot2, reshape2, purrr, magrittr, tidyr, scales, ggpubr, BiocManager
 Suggests:
     rgl, GSVA, GSVAdata, nichenetr, slingshot, destiny, AUCell, biomaRt, ontologyIndex, 
     doMC, doRNG, doParallel, foreach, mgsa, GSEABase, egg, loomR, hdf5r, mgsa, ComplexHeatmap, circlize
 Depends: 
-    R (>= 3.6)
+    R (>= 3.6), SeuratExtendData
+Remotes: 
+    huayc09/SeuratExtendData
 Collate: 
     'AUCell_basic.R'
-    'AutoNameClusters.R'
     'generics.R'
     'CalcStats.R'
     'CellphoneDB.R'
@@ -39,6 +40,7 @@ Collate:
     'GetEndTermsGO.R'
     'GetEndTermsReactome.R'
     'Heatmap.R'
+    'Internal.R'
     'Nichenetr.R'
     'Palantir.R'
     'RenameGO.R'
