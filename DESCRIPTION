@@ -1,7 +1,7 @@
 Package: SeuratExtend
 Type: Package
 Title: SeuratExtend
-Version: 0.4.9
+Version: 0.4.9.1
 Author: Yichao Hua
 Maintainer: Yichao Hua <yichao.hua@kuleuven.be>
 Description: Personal package
@@ -28,22 +28,18 @@ Collate:
     'Dimplot3d.R'
     'EnsemblToGenesymbol.R'
     'FeaturePlot.R'
-    'FilterGOTerms.R'
     'FilterReactomeTerms.R'
     'Functions.R'
     'GeneSetAnalysis.R'
     'GeneSetAnalysisGO.R'
     'GeneSetAnalysisReactome.R'
     'GenesymbolConversion.R'
-    'GetAllChilrenGO.R'
     'GetAllChilrenReactome.R'
-    'GetEndTermsGO.R'
     'GetEndTermsReactome.R'
     'Heatmap.R'
     'Internal.R'
     'Nichenetr.R'
     'Palantir.R'
-    'RenameGO.R'
     'RenameReactome.R'
     'RunBasicUmap.R'
     'RunDiffusionMap.R'

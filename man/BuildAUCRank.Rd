@@ -4,7 +4,7 @@
 \alias{BuildAUCRank}
 \title{Build AUCell Rank}
 \usage{
-BuildAUCRank(seu, slot = "counts", assay = "RNA")
+BuildAUCRank(seu, slot = "counts", assay = "RNA", verbose = TRUE)
 }
 \arguments{
 \item{seu}{Seurat object}
@@ -12,6 +12,8 @@ BuildAUCRank(seu, slot = "counts", assay = "RNA")
 \item{slot}{Slot to pull feature data for, Default: 'counts'}
 
 \item{assay}{Name of assay to use, Default: 'RNA'}
+
+\item{verbose}{Should the function show progress messages? Default: TRUE}
 }
 \value{
 Seurat object.

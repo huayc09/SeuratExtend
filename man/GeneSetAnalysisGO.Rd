@@ -6,7 +6,8 @@
 \usage{
 GeneSetAnalysisGO(
   seu = NULL,
-  dataset = "BP",
+  dataset = NULL,
+  parent = NULL,
   root = "BP",
   spe = getOption("spe"),
   ratio = 0.4,
@@ -15,16 +16,20 @@ GeneSetAnalysisGO(
   only.end.terms = F,
   slot = "counts",
   assay = "RNA",
-  nCores = getOption("nCores"),
+  nCores = 1,
+  aucMaxRank = NULL,
+  title = NULL,
   export_to_matrix = F,
   verbose = TRUE,
-  n.items.part = 5e+05/ncol(seu) * parallel::detectCores()
+  n.items.part = NULL
 )
 }
 \arguments{
 \item{seu}{PARAM_DESCRIPTION, Default: NULL}
 
-\item{dataset}{PARAM_DESCRIPTION, Default: 'BP'}
+\item{dataset}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{parent}{PARAM_DESCRIPTION, Default: NULL}
 
 \item{root}{PARAM_DESCRIPTION, Default: 'BP'}
 
@@ -42,13 +47,17 @@ GeneSetAnalysisGO(
 
 \item{assay}{PARAM_DESCRIPTION, Default: 'RNA'}
 
-\item{nCores}{PARAM_DESCRIPTION, Default: getOption("nCores")}
+\item{nCores}{PARAM_DESCRIPTION, Default: 1}
+
+\item{aucMaxRank}{PARAM_DESCRIPTION, Default: NULL}
+
+\item{title}{PARAM_DESCRIPTION, Default: NULL}
 
 \item{export_to_matrix}{PARAM_DESCRIPTION, Default: F}
 
 \item{verbose}{PARAM_DESCRIPTION, Default: TRUE}
 
-\item{n.items.part}{PARAM_DESCRIPTION, Default: 5e+05/ncol(seu) * parallel::detectCores()}
+\item{n.items.part}{PARAM_DESCRIPTION, Default: NULL}
 }
 \value{
 OUTPUT_DESCRIPTION
@@ -65,7 +74,4 @@ if(interactive()){
  #EXAMPLE1
  }
 }
-}
-\seealso{
-\code{\link[parallel]{detectCores}}
 }

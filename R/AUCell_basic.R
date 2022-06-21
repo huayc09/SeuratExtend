@@ -55,6 +55,7 @@
 #' @param seu Seurat object
 #' @param slot Slot to pull feature data for, Default: 'counts'
 #' @param assay Name of assay to use, Default: 'RNA'
+#' @param verbose Should the function show progress messages? Default: TRUE
 #' @return Seurat object.
 #' @details AUCell ranking matrix is saved in seu@misc$AUCell[["cells_rankings"]]
 #' @examples
@@ -63,16 +64,27 @@
 #' @rdname BuildAUCRank
 #' @export
 
-BuildAUCRank <- function(seu, slot = "counts", assay = "RNA"){
-  # import("AUCell")
+BuildAUCRank <- function(seu, slot = "counts", assay = "RNA", verbose = TRUE){
   library(SeuratObject)
-
-  # check_pkg_version("AUCell","1.18")
-  seu@misc$AUCell<-list()
-  seu@misc$AUCell[["cells_rankings"]] <-
-    .AUCell_buildRankings(
-      exprMat = GetAssayData(seu, slot = slot, assay = assay))
-  return(seu)
+  cr_empty <- is.null(seu@misc$AUCell[["cells_rankings"]])
+  gene_match <- identical(colnames(seu), colnames(seu@misc$AUCell$cells_rankings))
+  if(!cr_empty & gene_match) {
+    if(verbose) message(Sys.time(), " Using pre-exiting cell ranking matrix in 'misc' slot")
+    return(seu)
+  } else {
+    if(!cr_empty & !gene_match) {
+      if(verbose) message(
+        Sys.time(),
+        " Pre-existing cell ranking matrix has different cell IDs with current seurat object. ",
+        "Re-build AUC Rank")
+    }
+    if(verbose) message(Sys.time(), " Build AUC Rank")
+    seu@misc$AUCell<-list()
+    seu@misc$AUCell[["cells_rankings"]] <-
+      .AUCell_buildRankings(
+        exprMat = GetAssayData(seu, slot = slot, assay = assay))
+    return(seu)
+  }
 }
 
 # modified from AUCell package version 1.19
@@ -88,9 +100,10 @@ getRanking <- function(object) {
 
 .AUCell_calcAUC <- function (
     geneSets, rankings,
-    nCores = 1, mctype = c("domc","snow")[1],
+    nCores = 1,
     normAUC = TRUE,
-    aucMaxRank = ceiling(0.05 * nrow(rankings)), verbose = TRUE) {
+    aucMaxRank = ceiling(0.05 * nrow(rankings)),
+    verbose = TRUE) {
   if (!is.list(geneSets))
     stop("geneSets should be a named list.")
   if (is.null(names(geneSets)))
@@ -125,28 +138,23 @@ getRanking <- function(object) {
     aucMatrix <- t(aucMatrix)
   }
   if (nCores > 1) {
-    if (!mctype %in% c("domc"))
-      stop("Valid 'mctype': 'doMC'")
-    if (mctype == "snow") {
-      cl <- parallel::makeCluster(nCores, type = "SOCK")
-      doSNOW::registerDoSNOW(cl)
-      if (verbose)
-        message("Using ", length(cl), " cores with SNOW.")
-      parallel::clusterExport(cl, c("geneSets", "rankings",
-                                    "aucMaxRank", ".AUC.geneSet", ".auc", ".AUC.geneSet_norm",
-                                    ".AUC.geneSet_old"), envir = environment())
-      opts <- list(preschedule = TRUE)
-      aucMatrix <- suppressWarnings(
-        plyr::llply(.data = names(geneSets),
-                    .fun = function(gSetName) setNames(list(
-                      .AUC.geneSet(geneSet = geneSets[[gSetName]],
-                                   rankings = rankings, aucMaxRank = aucMaxRank,
-                                   gSetName = gSetName)), gSetName), .parallel = TRUE,
-                    .paropts = list(.options.snow = opts), .inform = FALSE))
-      aucMatrix <- do.call(rbind, unlist(aucMatrix, recursive = FALSE))
-      parallel::stopCluster(cl)
-    }
-    if (mctype == "domc") {
+    sysname <- Sys.info()[["sysname"]]
+    if(sysname == "Windows") {
+      import("doParallel")
+      import("doRNG")
+      import("foreach")
+      cl <- makeCluster(nCores)
+      registerDoParallel(cl)
+      aucMatrix <- foreach(gSetName = names(geneSets)) %dopar% {
+        .AUC.geneSet_norm(
+          geneSet = geneSets[[gSetName]],
+          rankings = rankings, aucMaxRank = ceiling(0.05 * nrow(rankings)),
+          gSetName = gSetName)
+      }
+      stopCluster(cl)
+      aucMatrix <- setNames(aucMatrix, names(geneSets))
+      aucMatrix <- rlist::list.rbind(aucMatrix)
+    } else {
       import("doMC")
       import("foreach")
       registerDoMC(nCores)
@@ -236,6 +244,7 @@ calcAUC_matrix <- function(
     GenesetList,
     rankings,
     nCores = 1,
+    aucMaxRank = ceiling(0.05 * nrow(rankings)),
     verbose = TRUE,
     n.items.part = NULL) {
 
@@ -254,31 +263,21 @@ calcAUC_matrix <- function(
       n.items.part <- NULL
     }
   }
-  # sysname <- Sys.info()[["sysname"]]
   if(verbose) message(Sys.time(), " Calculating ", length(GenesetList), " gene set(s)")
-
-  if(is.null(n.items.part) &  nCores == 1) {
-    AUC_matrix <- .AUCell_calcAUC(GenesetList, rankings, nCores = nCores, verbose = verbose)
-  }else if(is.null(n.items.part)) {
-    if(verbose) message(Sys.time(), " Using ", nCores, " cores")
-    GenesetList2 <- split(GenesetList, ceiling(seq_along(GenesetList) * nCores / length(GenesetList)))
-    import("doParallel")
-    import("doRNG")
-    import("foreach")
-    cl <- makeCluster(nCores)
-    registerDoParallel(cl)
-    AUC <- foreach(i = GenesetList2) %dopar%
-      .AUCell_calcAUC(i, rankings = rankings, nCores = 1, verbose = FALSE)
-    stopCluster(cl)
-    AUC_matrix <- rlist::list.rbind(AUC)
+  if(is.null(n.items.part)) {
+    AUC_matrix <- .AUCell_calcAUC(
+      GenesetList, rankings,
+      nCores = nCores, aucMaxRank = aucMaxRank,
+      verbose = verbose)
   }else{
     if(verbose) message(Sys.time(), " Split gene set(s) into ", n.items.part, " part(s)")
     splited_terms <- split(GenesetList, ceiling(seq_along(GenesetList) * n.items.part / length(GenesetList)))
     for (i in names(splited_terms)) {
       splited_terms[[i]] <- calcAUC_matrix(
-        splited_terms[[i]], rankings = rankings, nCores = nCores, verbose = FALSE)
+        splited_terms[[i]], rankings = rankings, nCores = nCores, aucMaxRank = aucMaxRank, verbose = FALSE)
     }
     AUC_matrix <- rlist::list.rbind(splited_terms)
+    names(dimnames(AUC_matrix)) <- c("gene sets", "cells")
   }
   if(verbose) message(Sys.time(), " Done")
   return(AUC_matrix)

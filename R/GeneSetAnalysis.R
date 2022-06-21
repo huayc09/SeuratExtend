@@ -8,10 +8,11 @@
 #' @param n.max PARAM_DESCRIPTION, Default: Inf
 #' @param slot PARAM_DESCRIPTION, Default: 'counts'
 #' @param assay PARAM_DESCRIPTION, Default: 'RNA'
-#' @param nCores PARAM_DESCRIPTION, Default: getOption("nCores")
+#' @param nCores PARAM_DESCRIPTION, Default: 1
+#' @param aucMaxRank PARAM_DESCRIPTION, Default: NULL
 #' @param export_to_matrix PARAM_DESCRIPTION, Default: F
 #' @param verbose PARAM_DESCRIPTION, Default: TRUE
-#' @param n.items.part PARAM_DESCRIPTION, Default: 5e+05/ncol(seu) * parallel::detectCores()
+#' @param n.items.part PARAM_DESCRIPTION, Default: NULL
 #' @return OUTPUT_DESCRIPTION
 #' @details DETAILS
 #' @examples
@@ -20,58 +21,78 @@
 #'  #EXAMPLE1
 #'  }
 #' }
-#' @seealso
-#'  \code{\link[parallel]{detectCores}}
 #' @rdname GeneSetAnalysis
 #' @export
-#' @importFrom parallel detectCores
 
-GeneSetAnalysis <- function(seu = NULL, genesets, title = "genesets",
-                            ratio = 0.4, n.min = 1, n.max = Inf,
-                            slot = "counts", assay = "RNA", nCores = getOption("nCores"),
-                            export_to_matrix = F, verbose = TRUE,
-                            n.items.part = 5e5 / ncol(seu) * parallel::detectCores()){
-  library(Seurat)
-  library(dplyr)
-  library(rlang)
-  library(AUCell)
-  library(rlist)
+GeneSetAnalysis <- function(
+    seu = NULL,
+    genesets,
+    title = "genesets",
+    ratio = 0.4, n.min = 1, n.max = Inf,
+    slot = "counts", assay = "RNA", nCores = 1,
+    aucMaxRank = NULL,
+    export_to_matrix = F, verbose = TRUE,
+    n.items.part = NULL) {
 
-  message(paste(Sys.time(), "Start filtering gene sets"))
+  library(SeuratObject)
   DefaultAssay(seu) <- assay
-  filter <- sapply(genesets,
-                   function(x){
-                     length(x) >= n.min &
-                       length(x) <= n.max &
-                       sum(rownames(seu) %in% x)/length(x) > (1 - ratio)
-                   })
-  GenesetList <- genesets[filter]
-  nCores <- nCores %||% parallel::detectCores()
-  if(is.null(seu@misc$AUCell[["cells_rankings"]])){
-    if(verbose) message(Sys.time(), " Build AUC Rank")
-    seu <- BuildAUCRank(seu, slot = slot, assay = assay, nCores = nCores)
-  } else if(!identical(colnames(seu), colnames(seu@misc$AUCell$cells_rankings))) {
-    if(verbose) message(Sys.time(), " Pre-existing cell ranking matrix has different cell IDs with current seurat object. ",
-                        "Re-build AUC Rank")
-    seu <- BuildAUCRank(seu, slot = slot, assay = assay, nCores = nCores)
-  }
-  AUC_matrix <- calcAUC_matrix(GenesetList, rankings = seu@misc$AUCell$cells_rankings,
-                               nCores = nCores, n.items.part = n.items.part, verbose = verbose)
+  genesets <- FilterGenesets(
+    genes_in_data = rownames(seu),
+    genesets = genesets,
+    ratio = ratio,
+    n.min = n.min,
+    n.max = n.max,
+    verbose = verbose)
+
+  seu <- BuildAUCRank(
+    seu,
+    slot = slot,
+    assay = assay,
+    verbose = verbose)
+
+  if(is.null(aucMaxRank)) aucMaxRank <- ceiling(0.05 * nrow(seu))
+  AUC_matrix <- calcAUC_matrix(
+    GenesetList = genesets,
+    rankings = seu@misc$AUCell$cells_rankings,
+    nCores = nCores,
+    aucMaxRank = aucMaxRank,
+    verbose = verbose,
+    n.items.part = n.items.part)
+
   if(export_to_matrix) return(AUC_matrix)
   seu@misc[["AUCell"]][[title]] <- AUC_matrix
   return(seu)
 }
 
-# seu <- readRDS("~/R documents/2020-2-10 EC PyMT and E0771/rds/PyMTEC_old.rds")
-# ratio = 0.4
-# n.min = 1
-# n.max = Inf
-# title = "genesets"
-# slot = "counts"
-# assay = "RNA"
-# nCores = getOption("nCores")
-# export_to_matrix = F
-# genesets <- Genesets_data$mouse$GSEA_mouse_gene_transformed$`hallmark gene sets`
-#
-# seu <- GeneSetAnalysis(seu, genesets, nCores = 12)
-# seu@misc$AUCell$genesets[1:5,1:5]
+# Internal ----------------------------------------------------------------
+
+FilterGenesets <- function(
+    genes_in_data,
+    genesets,
+    ratio = 0.4,
+    n.min = 1,
+    n.max = Inf,
+    verbose = TRUE) {
+  if(verbose) {
+    message(paste0(
+      Sys.time(),
+      " Start filtering ",length(genesets)," gene set(s): "),
+      "n(Genes) >= ", n.min, ", n(Genes) <= ", n.max,
+      ", at least ", ratio * 100, "% of genes found in the datasets")
+  }
+  filter <- sapply(
+    genesets,
+    function(x){
+      length(x) >= n.min &
+        length(x) <= n.max &
+        sum(genes_in_data %in% x)/length(x) > ratio
+    })
+  if(!any(filter)) stop("No gene set(s) pass the filter. Please check inputs.")
+  genesets <- genesets[filter]
+  if(verbose) {
+    message(paste(
+      Sys.time(),
+      length(genesets),"gene set(s) passed the filter"))
+  }
+  return(genesets)
+}
