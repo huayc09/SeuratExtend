@@ -1,26 +1,50 @@
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param seu PARAM_DESCRIPTION, Default: NULL
-#' @param genesets PARAM_DESCRIPTION
-#' @param title PARAM_DESCRIPTION, Default: 'genesets'
-#' @param ratio PARAM_DESCRIPTION, Default: 0.4
-#' @param n.min PARAM_DESCRIPTION, Default: 1
-#' @param n.max PARAM_DESCRIPTION, Default: Inf
-#' @param slot PARAM_DESCRIPTION, Default: 'counts'
-#' @param assay PARAM_DESCRIPTION, Default: 'RNA'
-#' @param nCores PARAM_DESCRIPTION, Default: 1
-#' @param aucMaxRank PARAM_DESCRIPTION, Default: NULL
-#' @param export_to_matrix PARAM_DESCRIPTION, Default: F
-#' @param verbose PARAM_DESCRIPTION, Default: TRUE
-#' @param n.items.part PARAM_DESCRIPTION, Default: NULL
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
+#' @title Gene Set Enrichment Analysis
+#' @description Calculate GSEA score of gene sets at single cell level, By 'AUCell' package:
+#'
+#' Aibar et al. (2017) SCENIC: single-cell regulatory network inference and clustering.
+#' Nature Methods. doi: 10.1038/nmeth.4463
+#'
+#' Aibar. et al. (2016) AUCell: Analysis of 'gene set' activity in single-cell RNA-seq data.
+#' R/Bioconductor package.
+#'
+#' Can use either customized genesets, or pre-built GO or Reactome database
+#' @param seu Seurat object
+#' @param genesets List of gene-sets (or signatures) to test in the cells.
+#' The gene-sets should be provided as character list.
+#' @param title Name of slot where the data will be saved
+#' @param ratio Minimum ratio of genes in the geneset detected in the datasets, Default: 0.4
+#' @param n.min Min number of genes in the geneset, Default: 1
+#' @param n.max Max number of genes in the geneset, Default: Inf
+#' @param slot Slot to pull feature data for, Default: 'counts'
+#' @param assay Name of assay to use, Default: 'RNA'
+#' @param nCores Number of cores to use for computation. Default: 1
+#' @param aucMaxRank Threshold to calculate the AUC
+#' @param export_to_matrix If TRUE, then return a AUCell matrix instead of Seurat object
+#' @param verbose Should the function show progress messages? Default: TRUE
+#' @param n.items.part If the datasets/genesets are huge, split the genesets into n parts to
+#' let it run with lower RAM
+#' @return Seurat object or Matrix
+#' @details If return Seurat object, AUCell matrix is saved in seu@misc[["AUCell"]][[title]]
 #' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
+#' options(spe = "human")
+#'
+#' # Geneset enrichment analysis (GSEA) using customized genesets
+#' pbmc <- GeneSetAnalysis(pbmc, genesets = hall50$human)
+#' matr <- pbmc@misc$AUCell$genesets
+#' Heatmap(CalcStats(matr, f = pbmc$cluster), lab_fill = "zscore")
+#'
+#' # GSEA using GO database
+#' pbmc <- GeneSetAnalysisGO(pbmc, parent = "immune_system_process")
+#'  <- pbmc@misc$AUCell$GO$immune_system_process
+#' matr <- RenameGO(matr)
+#' Heatmap(CalcStats(matr, f = pbmc$cluster, order = "p", n = 5), lab_fill = "zscore")
+#'
+#' # GSEA using Reactome database
+#' pbmc <- GeneSetAnalysisReactome(pbmc, parent = "Immune System")
+#' matr <- pbmc@misc$AUCell$Reactome$`Immune System`
+#' matr <- RenameReactome(matr)
+#' Heatmap(CalcStats(matr, f = pbmc$cluster, order = "p", n = 5), lab_fill = "zscore")
+#'
 #' @rdname GeneSetAnalysis
 #' @export
 
