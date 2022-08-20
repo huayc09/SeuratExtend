@@ -37,8 +37,9 @@ Seu2Matr <-
     }
 
     if(priority[1] == "expr") {
-      if(any(features %in% colnames(seu@meta.data))) {
-        feature.rep <- intersect(features, colnames(seu@meta.data))
+      check.rep <- intersect(rownames(seu), colnames(seu@meta.data))
+      if(any(features %in% check.rep)) {
+        feature.rep <- intersect(features, check.rep)
         if(verbose) {
           warning("'Features' found in both expression matrix and 'meta.data' (",
                   feature.rep[1],
