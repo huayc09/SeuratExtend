@@ -35,7 +35,7 @@
 #'
 #' # GSEA using GO database
 #' pbmc <- GeneSetAnalysisGO(pbmc, parent = "immune_system_process")
-#'  <- pbmc@misc$AUCell$GO$immune_system_process
+#' matr <- pbmc@misc$AUCell$GO$immune_system_process
 #' matr <- RenameGO(matr)
 #' Heatmap(CalcStats(matr, f = pbmc$cluster, order = "p", n = 5), lab_fill = "zscore")
 #'
