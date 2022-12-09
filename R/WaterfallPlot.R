@@ -5,6 +5,7 @@
 #' @param ident.1 PARAM_DESCRIPTION, Default: NULL
 #' @param ident.2 PARAM_DESCRIPTION, Default: NULL
 #' @param exp.transform PARAM_DESCRIPTION, Default: F
+#' @param order PARAM_DESCRIPTION, Default: T
 #' @param length PARAM_DESCRIPTION, Default: 'tscore'
 #' @param color PARAM_DESCRIPTION, Default: 'tscore'
 #' @param len.threshold PARAM_DESCRIPTION, Default: 0
@@ -26,7 +27,7 @@
 #' @export
 
 WaterfallPlot <-
-  function(matr, f, ident.1 = NULL, ident.2 = NULL, exp.transform = F,
+  function(matr, f, ident.1 = NULL, ident.2 = NULL, exp.transform = F, order = T,
            length = "tscore", color = "tscore", len.threshold = 0, col.threshold = 0,
            flip = T, y.label = length, angle = NULL, hjust = NULL, vjust = NULL){
     library(rlang)
@@ -68,8 +69,12 @@ WaterfallPlot <-
       as.data.frame() %>%
       drop_na() %>%
       .[abs(.[,length]) > len.threshold, ,drop = FALSE] %>%
-      .[abs(.[,color]) > col.threshold, ,drop = FALSE] %>%
-      .[order(.[,length], decreasing = !flip), ,drop = FALSE] %>%
+      .[abs(.[,color]) > col.threshold, ,drop = FALSE]
+    if(order) {
+      scores <- scores %>%
+        .[order(.[,length], decreasing = !flip), ,drop = FALSE]
+    }
+    scores <- scores %>%
       as.data.frame() %>%
       mutate(rank = factor(rownames(.), levels = rownames(.)),
              length = .[[length]],
@@ -103,6 +108,7 @@ WaterfallPlot <-
 #' @param ident.1 PARAM_DESCRIPTION, Default: NULL
 #' @param ident.2 PARAM_DESCRIPTION, Default: NULL
 #' @param exp.transform PARAM_DESCRIPTION, Default: T
+#' @param order PARAM_DESCRIPTION, Default: T
 #' @param length PARAM_DESCRIPTION, Default: 'logFC'
 #' @param color PARAM_DESCRIPTION, Default: 'p'
 #' @param len.threshold PARAM_DESCRIPTION, Default: 0
@@ -125,7 +131,7 @@ WaterfallPlot <-
 
 WaterfallPlot_v3 <-
   function(Seu, features, group.by, assay = "RNA", ident.1 = NULL, ident.2 = NULL, exp.transform = T,
-           length = "logFC", color = "p", len.threshold = 0, col.threshold = 0,
+           order = T, length = "logFC", color = "p", len.threshold = 0, col.threshold = 0,
            flip = F, y.label = length, angle = NULL, hjust = NULL, vjust = NULL){
     library(Seurat)
     if(any(!features %in% rownames(Seu))) {
@@ -135,7 +141,7 @@ WaterfallPlot_v3 <-
     }
     matr <- GetAssayData(Seu, assay = assay)[features,]
     f <- Seu@meta.data[, group.by]
-    return(WaterfallPlot(matr, f, ident.1, ident.2, exp.transform,
+    return(WaterfallPlot(matr, f, ident.1, ident.2, exp.transform, order,
                          length, color, len.threshold, col.threshold,
                          flip, y.label, angle, hjust, vjust))
   }

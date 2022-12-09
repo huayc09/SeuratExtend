@@ -10,6 +10,7 @@ WaterfallPlot(
   ident.1 = NULL,
   ident.2 = NULL,
   exp.transform = F,
+  order = T,
   length = "tscore",
   color = "tscore",
   len.threshold = 0,
@@ -31,6 +32,8 @@ WaterfallPlot(
 \item{ident.2}{PARAM_DESCRIPTION, Default: NULL}
 
 \item{exp.transform}{PARAM_DESCRIPTION, Default: F}
+
+\item{order}{PARAM_DESCRIPTION, Default: T}
 
 \item{length}{PARAM_DESCRIPTION, Default: 'tscore'}
 

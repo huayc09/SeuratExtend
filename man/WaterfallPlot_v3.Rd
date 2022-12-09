@@ -12,6 +12,7 @@ WaterfallPlot_v3(
   ident.1 = NULL,
   ident.2 = NULL,
   exp.transform = T,
+  order = T,
   length = "logFC",
   color = "p",
   len.threshold = 0,
@@ -37,6 +38,8 @@ WaterfallPlot_v3(
 \item{ident.2}{PARAM_DESCRIPTION, Default: NULL}
 
 \item{exp.transform}{PARAM_DESCRIPTION, Default: T}
+
+\item{order}{PARAM_DESCRIPTION, Default: T}
 
 \item{length}{PARAM_DESCRIPTION, Default: 'logFC'}
 
