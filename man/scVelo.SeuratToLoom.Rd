@@ -2,7 +2,7 @@
 % Please edit documentation in R/scVelo.R
 \name{scVelo.SeuratToLoom}
 \alias{scVelo.SeuratToLoom}
-\title{FUNCTION_TITLE}
+\title{Export loom for scVelo}
 \usage{
 scVelo.SeuratToLoom(
   seu,
@@ -10,38 +10,34 @@ scVelo.SeuratToLoom(
   velocyto.loom.path = NULL,
   velocyto.loom.filenames,
   fxn.convert.loomtoseurat.cellname = NULL,
+  cell.id.match.table = NULL,
   prefix = NULL,
   postfix = NULL
 )
 }
 \arguments{
-\item{seu}{PARAM_DESCRIPTION}
+\item{seu}{Seurat object}
 
-\item{export.name}{PARAM_DESCRIPTION}
+\item{export.name}{Name of loom file}
 
-\item{velocyto.loom.path}{PARAM_DESCRIPTION, Default: NULL}
+\item{velocyto.loom.path}{Directory to velocyto output (loom file), Default: getwd()}
 
-\item{velocyto.loom.filenames}{PARAM_DESCRIPTION}
+\item{velocyto.loom.filenames}{File names of velocyto output (loom file)}
 
-\item{fxn.convert.loomtoseurat.cellname}{PARAM_DESCRIPTION, Default: NULL}
+\item{fxn.convert.loomtoseurat.cellname}{(Experimental) function to convert velocyto
+cell names to Seurat cell names}
 
-\item{prefix}{PARAM_DESCRIPTION, Default: NULL}
+\item{prefix}{Seurat cell id prefix to barcode (usually sample name)}
 
-\item{postfix}{PARAM_DESCRIPTION, Default: NULL}
+\item{postfix}{Seurat cell id postfix to barcode (usually '-1')}
 }
 \value{
-OUTPUT_DESCRIPTION
+a loom file
 }
 \description{
-FUNCTION_DESCRIPTION
+Export Seurat object to loom for scVelo run, and merge
+velocyto output (spliced/unspliced matrix) into the the loom
 }
 \details{
-DETAILS
-}
-\examples{
-\dontrun{
-if(interactive()){
- #EXAMPLE1
- }
-}
+See above
 }
