@@ -12,7 +12,7 @@ Seu2Matr <-
     priority = c("expr","none"),
     verbose = TRUE
   ) {
-    library(SeuratObject)
+    if(!require(SeuratObject)) library(Seurat)
 
     if(!is.null(assay)) DefaultAssay(seu) <- assay
 
