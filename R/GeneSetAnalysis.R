@@ -58,7 +58,7 @@ GeneSetAnalysis <- function(
     export_to_matrix = F, verbose = TRUE,
     n.items.part = NULL) {
 
-  library(SeuratObject)
+  if(!require(SeuratObject)) library(Seurat)
   DefaultAssay(seu) <- assay
   genesets <- FilterGenesets(
     genes_in_data = rownames(seu),
