@@ -1,40 +1,66 @@
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param score PARAM_DESCRIPTION
-#' @param color_scheme PARAM_DESCRIPTION, Default: c(low = muted("blue"), mid = "white", high = muted("red"))
-#' @param border_color PARAM_DESCRIPTION, Default: NULL
-#' @param lab_fill PARAM_DESCRIPTION, Default: 'score'
-#' @param angle PARAM_DESCRIPTION, Default: 45
-#' @param hjust PARAM_DESCRIPTION, Default: 1
-#' @param vjust PARAM_DESCRIPTION, Default: 1
-#' @param legend_position PARAM_DESCRIPTION, Default: 'right'
-#' @param feature_text_subset PARAM_DESCRIPTION, Default: NULL
-#' @param segment.width PARAM_DESCRIPTION, Default: c(1, 2.5, 1)
-#' @param segment.size PARAM_DESCRIPTION, Default: 0.2
-#' @param text.spacing PARAM_DESCRIPTION, Default: 2
-#' @param text.size PARAM_DESCRIPTION, Default: 2.5
-#' @param hide_axis_line PARAM_DESCRIPTION, Default: TRUE
-#' @param expand_limits_x PARAM_DESCRIPTION, Default: NULL
-#' @param facet_col PARAM_DESCRIPTION, Default: NULL
-#' @param facet_row PARAM_DESCRIPTION, Default: NULL
-#' @param panel.spacing PARAM_DESCRIPTION, Default: unit(5, "pt")
-#' @param strip.placement PARAM_DESCRIPTION, Default: 'outside'
-#' @param ncol PARAM_DESCRIPTION, Default: NULL
-#' @param nrow PARAM_DESCRIPTION, Default: NULL
-#' @param ... PARAM_DESCRIPTION
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
+#' @title Heatmap
+#' @description Generates a heatmap plot.
+#' @param score A matrix for input, for instance, one generated using the CalcStats function.
+#' @param color_scheme Color scheme for the heatmap. Default: c(low = muted("blue"), mid = "white", high = muted("red")).
+#' @param border_color Color for the tile borders. Default: NULL.
+#' @param lab_fill Label for the color. Default: 'score'.
+#' @param angle Angle of the x-axis text. Passed to element_text(). Default: 45.
+#' @param hjust Horizontal justification of x-axis text. Passed to element_text(). Default: 1.
+#' @param vjust Vertical justification of x-axis text. Passed to element_text(). Default: 1.
+#' @param legend_position Position of the figure legend. Default: 'right'.
+#' @param feature_text_subset A subset of feature names to be shown. Useful when there are many features. Default: NULL.
+#' @param segment.width Adjust the width ratio of the line connecting heatmap rows and feature text. Only effective when `feature_text_subset` is set. Default: c(1, 2.5, 1).
+#' @param segment.size Thickness of the line connecting heatmap rows and feature text. Only effective when `feature_text_subset` is set. Default: 0.2.
+#' @param text.spacing Spacing between feature texts. Only effective when `feature_text_subset` is set. Default: 2.
+#' @param text.size Font size of the feature text. Only effective when `feature_text_subset` is set. Default: 2.5.
+#' @param hide_axis_line Whether to hide the axis line or not. Default: TRUE.
+#' @param expand_limits_x Sometimes the first name on the x-axis (e.g., cluster name) might be too long and surpass the left boundary of the plot. Expand the x-axis's left boundary to display the entire cluster name. Default: NULL.
+#' @param facet_col Vector or factor to split the heatmap columns. Default: NULL.
+#' @param facet_row Vector or factor to split the heatmap rows. Default: NULL.
+#' @param panel.spacing Spacing between panels when rows or columns are split. Default: unit(5, "pt").
+#' @param strip.placement Placement of panel names when rows or columns are split. Default: 'outside'.
+#' @param ncol Number of columns when either `facet_col` or `facet_row` is not NULL, wrapping the heatmap. Default: NULL.
+#' @param nrow Number of rows when either `facet_col` or `facet_row` is not NULL, wrapping the heatmap. Default: NULL.
+#' @param ... Additional parameters passed to the `theme` function of ggplot2.
+#' @return A ggplot object.
+#' @details For more detailed usage, see the examples provided.
 #' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @seealso
-#'  \code{\link[grid]{grid.draw}}
+#' # First, create a matrix using the CalcStats function.
+#' genes <- VariableFeatures(pbmc)
+#' toplot <- CalcStats(pbmc, features = genes, method = "zscore", order = "p", n = 5)
+#'
+#' # Generate a basic heatmap.
+#' Heatmap(toplot, lab_fill = "zscore")
+#'
+#' # Modify the color theme to range from white to dark green.
+#' Heatmap(toplot, lab_fill = "zscore", color_scheme = c("white", muted("green")))
+#'
+#' # Use a color theme that transitions from dark blue to light yellow (centered at 0) to dark red.
+#' Heatmap(toplot, lab_fill = "zscore", color_scheme = c(
+#'   low = muted("blue"),
+#'   mid = "lightyellow",
+#'   high = muted("red"))
+#' )
+#'
+#' # Employ the viridis color theme, options include A, B, C, D, or E.
+#' Heatmap(toplot, lab_fill = "zscore", color_scheme = "A")
+#'
+#' # Expand the x-axis left boundary to ensure the full name of the first cluster is visible.
+#' Heatmap(toplot, lab_fill = "zscore", expand_limits_x = -0.5)
+#'
+#' # Construct a dense matrix with data for 500 genes.
+#' toplot2 <- CalcStats(pbmc, features = genes[1:500], method = "zscore", order = "p")
+#'
+#' # Display only a subset of gene names.
+#' Heatmap(toplot2, lab_fill = "zscore", feature_text_subset = genes[1:20], expand_limits_x = c(-0.5, 11))
+#'
+#' # Divide the heatmap into rows based on gene groups.
+#' gene_groups <- sample(c("group1", "group2", "group3"), nrow(toplot2), replace = TRUE)
+#' Heatmap(toplot2, lab_fill = "zscore", facet_row = gene_groups) +
+#'   theme(axis.text.y = element_blank())
+#'
 #' @rdname Heatmap
 #' @export
-#' @importFrom grid grid.draw
 
 Heatmap <-
   function(score, color_scheme = c(low = muted("blue"), mid = "white", high = muted("red")), border_color = NULL,
@@ -180,25 +206,4 @@ Heatmap <-
     return(p)
 }
 
-# score <- CalcScoreGeneral_v3(pbmc, features = VariableFeatures(pbmc)[1:10], group.by = "seurat_clusters", method = "zscore")
-# colnames(score) <- rep(1:3, times = 3)
-# colnames(score) %>% class
-# Heatmap(score, facet_col = rep(letters[1:3], each = 3), facet_row = c(rep("a",4), rep("b",6)), border_color = NA) +
-#   theme(strip.placement = "outside")
-
-# p2 <-
-#   ggplot(ToPlot, aes(x = variable, y = 0.001, fill = facet_col)) +
-#   geom_bar(stat = "identity",
-#            width = 1) +
-#   theme_void()+
-#   theme(panel.spacing.x = unit(5, "pt")) +
-#   scale_x_discrete(expand = c(0,0)) +
-#   facet_grid(cols = vars(facet_col), scales = "free_x")
-# legend <- plot_grid(get_legend(p), get_legend(p2), ncol = 1)
-# p <- p + theme(legend.position = "none")
-# p2 <- p2 + theme(legend.position = "none")
-# plot_grid(p2, p, align = "v", ncol = 1, axis = "lr", rel_heights = c(0.5, 15))
-
-# Heatmap(matrix(sample(-5000:4999), ncol = 10) %>% as.data.frame(),
-#         feature_text_subset = c(1:10, 30:40, 990:999), facet_col = c("Z",1,1,2,2,2,3,3,3,"Z"), expand_limits_x = c(1))
 

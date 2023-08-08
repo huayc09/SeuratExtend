@@ -1,19 +1,21 @@
 Package: SeuratExtend
 Type: Package
 Title: SeuratExtend
-Version: 0.5.1.1
+Version: 0.5.2
 Author: Yichao Hua
 Maintainer: Yichao Hua <yichao.hua@kuleuven.be>
-Description: Personal package
+Description: SeuratExtend is an R package designed to improve and simplify the analysis of scRNA-seq data using the Seurat object. It provides an array of enhanced visualization tools, an integrated functional and pathway analysis pipeline, seamless integration with popular Python tools, and a suite of utility functions to aid in data manipulation and presentation.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.3
+VignetteBuilder: knitr
 Imports: 
     Seurat, dplyr, remotes, rlist, mosaic, ggplot2, reshape2, purrr, magrittr, tidyr, scales, ggpubr, BiocManager
 Suggests:
     rgl, GSVA, GSVAdata, nichenetr, slingshot, destiny, AUCell, biomaRt, ontologyIndex, 
-    doMC, doRNG, doParallel, foreach, mgsa, GSEABase, egg, loomR, hdf5r, mgsa, ComplexHeatmap, circlize
+    doMC, doRNG, doParallel, foreach, mgsa, GSEABase, egg, loomR, hdf5r, mgsa, ComplexHeatmap, circlize,
+    knitr, rmarkdown
 Depends: 
     R (>= 3.6), SeuratExtendData
 Remotes: 
