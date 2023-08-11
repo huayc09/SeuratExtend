@@ -58,3 +58,39 @@ VlnPlot2 <- function(object, ...) {
 CalcStats <- function(object, ...) {
   UseMethod(generic = "CalcStats", object = object)
 }
+
+#' @title Waterfall Plot
+#' @description Generates a waterfall plot.
+#' @param object Either a Seurat object or a matrix.
+#' @param ... Additional arguments passed to other methods.
+#' @return A ggplot object.
+#' @details For more detailed usage, see the examples provided.
+#' @examples
+#' # First, create a matrix using the GeneSetAnalysis() function.
+#' # Rows represent the Hallmark 50 genesets, and columns represent cells.
+#' pbmc <- GeneSetAnalysis(pbmc, genesets = hall50$human)
+#' matr <- pbmc@misc$AUCell$genesets
+#'
+#' # Generate a waterfall plot comparing CD14+ Mono with CD8 T cells.
+#' WaterfallPlot(matr, f = pbmc$cluster, ident.1 = "CD14+ Mono", ident.2 = "CD8 T")
+#'
+#' # Keep only bars with a length (tscore, in this instance) greater than 1.
+#' WaterfallPlot(matr, f = pbmc$cluster, ident.1 = "CD14+ Mono", ident.2 = "CD8 T", len.threshold = 1)
+#'
+#' # Use a Seurat object as input and compare 100 genes, using LogFC as bar length.
+#' genes <- VariableFeatures(pbmc)[1:100]
+#' WaterfallPlot(
+#'   pbmc, group.by = "cluster", features = genes,
+#'   ident.1 = "CD14+ Mono", ident.2 = "CD8 T", length = "logFC")
+#'
+#' # Keep only the top and bottom 20 genes.
+#' WaterfallPlot(
+#'   pbmc, group.by = "cluster", features = genes,
+#'   ident.1 = "CD14+ Mono", ident.2 = "CD8 T", length = "logFC",
+#'   top.n = 20)
+#' @rdname WaterfallPlot
+#' @export
+
+WaterfallPlot <- function(object, ...) {
+  UseMethod(generic = "WaterfallPlot", object = object)
+}

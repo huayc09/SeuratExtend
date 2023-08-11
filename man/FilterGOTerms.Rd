@@ -11,7 +11,7 @@ FilterGOTerms(
   spe = getOption("spe"),
   n.min = 1,
   n.max = Inf,
-  only.end.terms = T,
+  only.end.terms = F,
   change.name = F,
   parent = NULL
 )
@@ -21,7 +21,7 @@ FilterReactomeTerms(
   spe = getOption("spe"),
   n.min = 1,
   n.max = Inf,
-  only.end.terms = T,
+  only.end.terms = F,
   change.name = F,
   parent = NULL
 )

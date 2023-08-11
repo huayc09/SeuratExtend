@@ -2,76 +2,36 @@
 % Please edit documentation in R/WaterfallPlot.R
 \name{WaterfallPlot_v3}
 \alias{WaterfallPlot_v3}
-\title{FUNCTION_TITLE}
+\title{WaterfallPlot_v3}
 \usage{
 WaterfallPlot_v3(
-  Seu,
+  seu,
   features,
-  group.by,
-  assay = "RNA",
+  group.by = NULL,
+  cell = NULL,
+  slot = "data",
+  assay = NULL,
+  priority = c("expr", "none"),
   ident.1 = NULL,
   ident.2 = NULL,
-  exp.transform = T,
-  order = T,
+  exp.transform = (length == "logFC"),
+  order = TRUE,
   length = "logFC",
   color = "p",
   len.threshold = 0,
   col.threshold = 0,
-  flip = F,
+  top.n = NULL,
+  flip = FALSE,
   y.label = length,
   angle = NULL,
   hjust = NULL,
-  vjust = NULL
+  vjust = NULL,
+  title = NULL
 )
 }
-\arguments{
-\item{Seu}{PARAM_DESCRIPTION}
-
-\item{features}{PARAM_DESCRIPTION}
-
-\item{group.by}{PARAM_DESCRIPTION}
-
-\item{assay}{PARAM_DESCRIPTION, Default: 'RNA'}
-
-\item{ident.1}{PARAM_DESCRIPTION, Default: NULL}
-
-\item{ident.2}{PARAM_DESCRIPTION, Default: NULL}
-
-\item{exp.transform}{PARAM_DESCRIPTION, Default: T}
-
-\item{order}{PARAM_DESCRIPTION, Default: T}
-
-\item{length}{PARAM_DESCRIPTION, Default: 'logFC'}
-
-\item{color}{PARAM_DESCRIPTION, Default: 'p'}
-
-\item{len.threshold}{PARAM_DESCRIPTION, Default: 0}
-
-\item{col.threshold}{PARAM_DESCRIPTION, Default: 0}
-
-\item{flip}{PARAM_DESCRIPTION, Default: F}
-
-\item{y.label}{PARAM_DESCRIPTION, Default: length}
-
-\item{angle}{PARAM_DESCRIPTION, Default: NULL}
-
-\item{hjust}{PARAM_DESCRIPTION, Default: NULL}
-
-\item{vjust}{PARAM_DESCRIPTION, Default: NULL}
-}
-\value{
-OUTPUT_DESCRIPTION
-}
 \description{
-FUNCTION_DESCRIPTION
+Alias of \code{\link[SeuratExtend:WaterfallPlot]{WaterfallPlot()}}, Seurat version
 }
-\details{
-DETAILS
-}
-\examples{
-\dontrun{
-if(interactive()){
- #EXAMPLE1
- }
-}
+\seealso{
+\code{\link[SeuratExtend:WaterfallPlot]{WaterfallPlot()}}
 }

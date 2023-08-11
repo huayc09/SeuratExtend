@@ -73,7 +73,7 @@ GeneSetAnalysisReactome <- function(
 
 FilterReactomeTerms <-
   function(term, spe = getOption("spe"), n.min = 1, n.max = Inf,
-           only.end.terms = T, change.name = F, parent = NULL){
+           only.end.terms = F, change.name = F, parent = NULL){
     check_spe(spe)
     library(SeuratExtendData)
     if(is.vector(term)){
@@ -133,6 +133,7 @@ GetChilrenReactome <- function(term, spe = getOption("spe")){
 }
 
 GetAllChilrenReactome <- function(term, spe = getOption("spe")){
+  check_spe(spe)
   Child <- GetChilrenReactome(term, spe)
   if(length(Child) > length(term)) return(GetAllChilrenReactome(Child, spe)) else return(term)
 }
