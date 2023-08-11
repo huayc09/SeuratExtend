@@ -66,7 +66,7 @@ split the violin plots by}
 \item{priority}{(Seurat version) If set to "expr", force fetch data from expression matrix
 instead of meta.data}
 
-\item{matr}{Matrix or data frame.Row - features; columns - cells}
+\item{matr}{Matrix or data frame. Row - features; columns - cells}
 
 \item{f}{Factor or vector. Identity of each cell. Should be the
 same length of cells}

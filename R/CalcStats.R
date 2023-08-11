@@ -7,7 +7,7 @@ NULL
 #' anything that can be retrieved by FetchData), Default: NULL (All features
 #' in matrix)
 #' @param group.by (Seurat version) A variable name in meta.data to
-#' group the violin plots by, or string with the same length of cells
+#' group by, or string with the same length of cells
 #' @param cells (Seurat version) Cell names to use, Default: all cells
 #' @param slot (Seurat version) Slot to pull feature data for
 #' @param assay (Seurat version) Name of assay to use, defaults to the active assay

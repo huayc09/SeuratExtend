@@ -46,7 +46,7 @@ VlnPlot2.Seurat <- function(
   return(p)
 }
 
-#' @param matr Matrix or data frame.Row - features; columns - cells
+#' @param matr Matrix or data frame. Row - features; columns - cells
 #' @param f Factor or vector. Identity of each cell. Should be the
 #' same length of cells
 #' @param f2 Factor or vector. Similar to \code{f}. A variable to split

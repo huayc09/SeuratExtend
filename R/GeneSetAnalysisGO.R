@@ -109,7 +109,7 @@ FilterGOTerms <- function(
     spe = getOption("spe"),
     n.min = 1,
     n.max = Inf,
-    only.end.terms = T,
+    only.end.terms = F,
     change.name = F,
     parent = NULL){
   check_spe(spe)
@@ -186,6 +186,7 @@ GetChilrenGO <- function(term, spe = getOption("spe")){
 }
 
 GetAllChilrenGO <- function(term, spe = getOption("spe")){
+  check_spe(spe)
   Child <- GetChilrenGO(term, spe)
   if(length(Child) > length(term)) return(GetAllChilrenGO(Child, spe)) else return(term)
 }
@@ -212,6 +213,7 @@ getGOdatabase <- function(
     root = "BP",
     spe = getOption("spe")) {
 
+  check_spe(spe)
   roots_go <- c("BP" = "GO:0008150","MF" = "GO:0003674","CC" = "GO:0005575")
   if(!any(root %in% names(roots_go))) {
     stop("'root' database should be in 'BP', 'MF' and 'CC'")
