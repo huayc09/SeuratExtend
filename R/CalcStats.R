@@ -2,17 +2,13 @@
 #'
 NULL
 
-#' @param seu (Seurat version) Seurat object
-#' @param features (Seurat version) Features to plot (gene expression, metrics, PC scores,
-#' anything that can be retrieved by FetchData), Default: NULL (All features
-#' in matrix)
-#' @param group.by (Seurat version) A variable name in meta.data to
-#' group by, or string with the same length of cells
-#' @param cells (Seurat version) Cell names to use, Default: all cells
-#' @param slot (Seurat version) Slot to pull feature data for
-#' @param assay (Seurat version) Name of assay to use, defaults to the active assay
-#' @param priority (Seurat version) If set to "expr", force fetch data from expression matrix
-#' instead of meta.data
+#' @param seu A Seurat object. Only applicable when using the Seurat method.
+#' @param features Features for computation, including gene expression, metrics, PC scores, or any other data retrievable via `FetchData()`. Defaults to NULL, implying all features in the matrix. Only applicable for the Seurat method.
+#' @param group.by A variable from `meta.data` for grouping or a character vector of equal length as the number of cells. Only applicable for the Seurat method.
+#' @param cells Cell identifiers to be used. Defaults to all cells. Only applicable for the Seurat method.
+#' @param slot Slot from which to fetch feature data. Only applicable for the Seurat method.
+#' @param assay Name of the assay to use. Defaults to the active assay. Only applicable for the Seurat method.
+#' @param priority If set to "expr", fetches data from the expression matrix over `meta.data`. Only applicable for the Seurat method.
 #' @rdname CalcStats
 #' @export
 
@@ -53,20 +49,14 @@ CalcStats.Seurat <-
     return(scores)
 }
 
-#' @param matr Matrix or data frame.Row - features; columns - cells
-#' @param f Factor or vector. Identity of each cell. Should be the
-#' same length of cells
-#' @param method Should be either "mean", "median", "zscore", "tscore",
-#' "p", or "logFC". Default: 'zscore'
-#' @param exp.transform Whether to transform the data with
-#' \code{\link[base:log]{expm1}}, Default: F
-#' @param t If your matrix has features in columns and cells in rows,
-#' you should transpose the matrix first. Default: F
-#' @param order Re-order rows by "value" or "p" (in t.test)
-#' @param n Top n rows of each cluster. Ignored when
-#' \code{order} is \code{NULL}. Default: \code{Inf}
-#' @param p.threshold When \code{order = "p"}, rows with pvalue greater
-#' than \code{p.threshold} are removed.
+#' @param matr A matrix or data frame with rows as features and columns as cells.
+#' @param f A factor or vector indicating cell identity. It should match the column length of `matr`.
+#' @param method Computation method, one of: "mean", "median", "zscore", "tscore", "p", or "logFC". Default: "zscore".
+#' @param exp.transform Indicates if data should be transformed with `expm1`. Default: FALSE.
+#' @param t Transpose matrix if features are columns and cells are rows. Default: FALSE.
+#' @param order Sort rows by either "value" or "p" (t.test).
+#' @param n Top n rows for each cluster. Ignored if `order` is NULL. Default: Inf.
+#' @param p.threshold Rows with p-value greater than this threshold are omitted when `order = "p"`.
 #' @rdname CalcStats
 #' @export
 

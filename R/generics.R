@@ -19,38 +19,44 @@ VlnPlot2 <- function(object, ...) {
   UseMethod(generic = "VlnPlot2", object = object)
 }
 
-#' @title Calculate statistics of matrix
-#' @description Calculate mean, median, tscore or zscore of matrix, group by clusters.
-#' @param object An object; either Seurat object or matrix
+#' @title Calculate Matrix Statistics Grouped by Clusters
+#' @description Computes various statistics (mean, median, zscore, tscore, etc.) on a matrix, grouped by clusters.
+#' @param object An object. Can either be a Seurat object or a matrix.
 #' @param ... Arguments passed to other methods
-#' @return matrix
-#' @details Calculate statistis of each feature of each cell type. "p" value according
-#' to t.test.
-#'
-#' For calculating LogFC of log normalized data, it is recommended to set
-#' \code{exp.transform} to \code{TRUE}
+#' @return A matrix.
+#' @details Computes statistics for each feature across cell types. "p" value is determined by t-test.
+#' For log-normalized data's LogFC computation, it's advised to set `exp.transform` to TRUE.
 #' @examples
-#' # Use Seurat object as input
+#' library(Seurat)
+#' library(SeuratExtend)
 #'
-#' genes <- VariableFeatures(pbmc)[1:10]
+#' # Using a Seurat object as input. First, select some genes for calculation:
+#' genes <- VariableFeatures(pbmc)[1:20]
 #'
-#' CalcStats(pbmc, genes, method = "zscore")
+#' # Calculate zscore, grouping by the default 'ident' (cluster):
+#' genes.zscore <- CalcStats(pbmc, features = genes, method = "zscore")
+#' head(genes.zscore)
 #'
-#' CalcStats(pbmc, genes, method = "tscore", group.by = "orig.ident")
+#' # Visualize with a heatmap:
+#' Heatmap(genes.zscore, lab_fill = "zscore")
 #'
-#' # Use matrix as input
+#' # Select more genes and retain the top 4 genes of each cluster, sorted by p-value.
+#' # This can be a convenient method to display the top marker genes of each cluster:
+#' genes <- VariableFeatures(pbmc)
+#' genes.zscore <- CalcStats(
+#'   pbmc, features = genes, method = "zscore", group.by = "cluster",
+#'   order = "p", n = 4)
+#' Heatmap(genes.zscore, lab_fill = "zscore")
 #'
-#' matr <- FetchData(pbmc, genes)
-#' matr
+#' # It's also possible to use a matrix as input. For instance, we initially perform
+#' # Geneset Enrichment Analysis (GSEA) using the Hallmark 50 geneset and obtain the AUCell matrix
+#' # (rows represent pathways, columns represent cells):
+#' pbmc <- GeneSetAnalysis(pbmc, genesets = hall50$human)
+#' matr <- pbmc@misc$AUCell$genesets
 #'
-#' CalcStats(matr, f = pbmc$cluster, method = "zscore", t = TRUE)
-#'
-#' # Heatmap
-#' CalcStats(pbmc, genes) %>% Heatmap(lab_fill = "zscore")
-#'
-#' # Order rows
-#' CalcStats(pbmc, VariableFeatures(pbmc), method = "zscore", order = "p", n = 4) %>%
-#'   Heatmap(lab_fill = "zscore")
+#' # Next, we calculate the zscore, grouped by 'cluster':
+#' gsea.zscore <- CalcStats(matr, f = pbmc$cluster, method = "zscore")
+#' Heatmap(gsea.zscore, lab_fill = "zscore")
 #'
 #' @rdname CalcStats
 #' @export

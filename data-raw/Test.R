@@ -10,7 +10,8 @@ options(max.print = 100, spe = "human", nCores = 12)
 
 usethis::use_data(PanglaoDB_data, overwrite = TRUE)
 usethis::use_gpl_license(version = 3, include_future = TRUE)
-makeOxygen(WaterfallPlot_v3)
+rmarkdown::render("vignettes/CalcStats.Rmd", output_format = "md_document")
+makeOxygen()
 roxygenize()
 
 

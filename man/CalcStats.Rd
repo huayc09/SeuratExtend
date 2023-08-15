@@ -4,7 +4,7 @@
 \alias{CalcStats}
 \alias{CalcStats.Seurat}
 \alias{CalcStats.default}
-\title{Calculate statistics of matrix}
+\title{Calculate Matrix Statistics Grouped by Clusters}
 \usage{
 CalcStats(object, ...)
 
@@ -35,84 +35,80 @@ CalcStats(object, ...)
 )
 }
 \arguments{
-\item{object}{An object; either Seurat object or matrix}
+\item{object}{An object. Can either be a Seurat object or a matrix.}
 
 \item{...}{Arguments passed to other methods}
 
-\item{seu}{(Seurat version) Seurat object}
+\item{seu}{A Seurat object. Only applicable when using the Seurat method.}
 
-\item{features}{(Seurat version) Features to plot (gene expression, metrics, PC scores,
-anything that can be retrieved by FetchData), Default: NULL (All features
-in matrix)}
+\item{features}{Features for computation, including gene expression, metrics, PC scores, or any other data retrievable via `FetchData()`. Defaults to NULL, implying all features in the matrix. Only applicable for the Seurat method.}
 
-\item{group.by}{(Seurat version) A variable name in meta.data to
-group by, or string with the same length of cells}
+\item{group.by}{A variable from `meta.data` for grouping or a character vector of equal length as the number of cells. Only applicable for the Seurat method.}
 
-\item{cells}{(Seurat version) Cell names to use, Default: all cells}
+\item{cells}{Cell identifiers to be used. Defaults to all cells. Only applicable for the Seurat method.}
 
-\item{slot}{(Seurat version) Slot to pull feature data for}
+\item{slot}{Slot from which to fetch feature data. Only applicable for the Seurat method.}
 
-\item{assay}{(Seurat version) Name of assay to use, defaults to the active assay}
+\item{assay}{Name of the assay to use. Defaults to the active assay. Only applicable for the Seurat method.}
 
-\item{method}{Should be either "mean", "median", "zscore", "tscore",
-"p", or "logFC". Default: 'zscore'}
+\item{method}{Computation method, one of: "mean", "median", "zscore", "tscore", "p", or "logFC". Default: "zscore".}
 
-\item{exp.transform}{Whether to transform the data with
-\code{\link[base:log]{expm1}}, Default: F}
+\item{exp.transform}{Indicates if data should be transformed with `expm1`. Default: FALSE.}
 
-\item{order}{Re-order rows by "value" or "p" (in t.test)}
+\item{order}{Sort rows by either "value" or "p" (t.test).}
 
-\item{n}{Top n rows of each cluster. Ignored when
-\code{order} is \code{NULL}. Default: \code{Inf}}
+\item{n}{Top n rows for each cluster. Ignored if `order` is NULL. Default: Inf.}
 
-\item{p.threshold}{When \code{order = "p"}, rows with pvalue greater
-than \code{p.threshold} are removed.}
+\item{p.threshold}{Rows with p-value greater than this threshold are omitted when `order = "p"`.}
 
-\item{priority}{(Seurat version) If set to "expr", force fetch data from expression matrix
-instead of meta.data}
+\item{priority}{If set to "expr", fetches data from the expression matrix over `meta.data`. Only applicable for the Seurat method.}
 
-\item{matr}{Matrix or data frame.Row - features; columns - cells}
+\item{matr}{A matrix or data frame with rows as features and columns as cells.}
 
-\item{f}{Factor or vector. Identity of each cell. Should be the
-same length of cells}
+\item{f}{A factor or vector indicating cell identity. It should match the column length of `matr`.}
 
-\item{t}{If your matrix has features in columns and cells in rows,
-you should transpose the matrix first. Default: F}
+\item{t}{Transpose matrix if features are columns and cells are rows. Default: FALSE.}
 }
 \value{
-matrix
+A matrix.
 }
 \description{
-Calculate mean, median, tscore or zscore of matrix, group by clusters.
+Computes various statistics (mean, median, zscore, tscore, etc.) on a matrix, grouped by clusters.
 }
 \details{
-Calculate statistis of each feature of each cell type. "p" value according
-to t.test.
-
-For calculating LogFC of log normalized data, it is recommended to set
-\code{exp.transform} to \code{TRUE}
+Computes statistics for each feature across cell types. "p" value is determined by t-test.
+For log-normalized data's LogFC computation, it's advised to set `exp.transform` to TRUE.
 }
 \examples{
-# Use Seurat object as input
+library(Seurat)
+library(SeuratExtend)
 
-genes <- VariableFeatures(pbmc)[1:10]
+# Using a Seurat object as input. First, select some genes for calculation:
+genes <- VariableFeatures(pbmc)[1:20]
 
-CalcStats(pbmc, genes, method = "zscore")
+# Calculate zscore, grouping by the default 'ident' (cluster):
+genes.zscore <- CalcStats(pbmc, features = genes, method = "zscore")
+head(genes.zscore)
 
-CalcStats(pbmc, genes, method = "tscore", group.by = "orig.ident")
+# Visualize with a heatmap:
+Heatmap(genes.zscore, lab_fill = "zscore")
 
-# Use matrix as input
+# Select more genes and retain the top 4 genes of each cluster, sorted by p-value.
+# This can be a convenient method to display the top marker genes of each cluster:
+genes <- VariableFeatures(pbmc)
+genes.zscore <- CalcStats(
+  pbmc, features = genes, method = "zscore", group.by = "cluster",
+  order = "p", n = 4)
+Heatmap(genes.zscore, lab_fill = "zscore")
 
-matr <- FetchData(pbmc, genes)
-matr
+# It's also possible to use a matrix as input. For instance, we initially perform
+# Geneset Enrichment Analysis (GSEA) using the Hallmark 50 geneset and obtain the AUCell matrix
+# (rows represent pathways, columns represent cells):
+pbmc <- GeneSetAnalysis(pbmc, genesets = hall50$human)
+matr <- pbmc@misc$AUCell$genesets
 
-CalcStats(matr, f = pbmc$cluster, method = "zscore", t = TRUE)
-
-# Heatmap
-CalcStats(pbmc, genes) \%>\% Heatmap(lab_fill = "zscore")
-
-# Order rows
-CalcStats(pbmc, VariableFeatures(pbmc), method = "zscore", order = "p", n = 4) \%>\%
-  Heatmap(lab_fill = "zscore")
+# Next, we calculate the zscore, grouped by 'cluster':
+gsea.zscore <- CalcStats(matr, f = pbmc$cluster, method = "zscore")
+Heatmap(gsea.zscore, lab_fill = "zscore")
 
 }

@@ -1,0 +1,76 @@
+---
+title: "Using the CalcStats Function from SeuratExtend"
+author: "Yichao Hua"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using the CalcStats Function from SeuratExtend}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Introduction
+
+The `CalcStats` function from the `SeuratExtend` package provides a comprehensive approach to compute various statistics, such as mean, median, z-scores, or LogFC, for genomic data. This function can handle data stored in Seurat objects or standard matrices, allowing for versatile analyses tailored to single-cell datasets.
+
+Whether you're analyzing genes or pathways, `CalcStats` simplifies the task by computing statistics for selected features across different cell groups or clusters.
+
+## Usage
+
+Depending on your data type, whether a Seurat object or a matrix, the approach to using `CalcStats` varies slightly.
+
+### Using a Seurat Object
+
+Begin by selecting a subset of features, such as genes. For this example, let's pick the first 20 variable features from a Seurat object:
+
+```{r, message=FALSE, warning=FALSE}
+library(Seurat)
+library(SeuratExtend)
+
+genes <- VariableFeatures(pbmc)[1:20]
+```
+
+Using `CalcStats`, compute your desired metric, like z-scores, for each feature across different cell clusters:
+
+```{r, message=FALSE, warning=FALSE}
+genes.zscore <- CalcStats(pbmc, features = genes, method = "zscore", group.by = "cluster")
+head(genes.zscore)
+```
+
+Display the computed statistics using a heatmap:
+
+```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=5}
+Heatmap(genes.zscore, lab_fill = "zscore")
+```
+
+Select more genes and retain the top 4 genes of each cluster, sorted by p-value. This can be a convenient method to display the top marker genes of each cluster:
+
+```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=7}
+genes <- VariableFeatures(pbmc)
+genes.zscore <- CalcStats(
+  pbmc, features = genes, method = "zscore", group.by = "cluster", 
+  order = "p", n = 4)
+Heatmap(genes.zscore, lab_fill = "zscore")
+```
+
+### Using Matrices as Input
+
+For instance, you might perform Enrichment Analysis (GSEA) using the Hallmark 50 geneset and obtain the AUCell matrix (rows represent pathways, columns represent cells):
+
+```{r, message=FALSE, warning=FALSE}
+pbmc <- GeneSetAnalysis(pbmc, genesets = hall50$human)
+matr <- pbmc@misc$AUCell$genesets
+```
+
+Using the matrix, compute the z-scores for the genesets across various cell clusters:
+
+```{r, message=FALSE, warning=FALSE}
+gsea.zscore <- CalcStats(matr, f = pbmc$cluster, method = "zscore")
+```
+
+Present the z-scores using a heatmap:
+
+```{r, message=FALSE, warning=FALSE, fig.width=7.5, fig.height=8.5}
+Heatmap(gsea.zscore, lab_fill = "zscore")
+```
+
