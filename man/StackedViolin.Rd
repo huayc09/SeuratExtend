@@ -20,9 +20,17 @@ StackedViolin(
   pt = T,
   hide.outlier = F,
   pt.style = c("jitter", "quasirandom"),
-  pt.size = 1,
+  pt.size = 0.2,
   pt.alpha = 1,
-  strip.position = "top"
+  strip.position = "top",
+  stat.method = c("none", "wilcox.test", "t.test"),
+  p.adjust.method = "holm",
+  label = c("p.signif", "p", "p.adj", "p.format"),
+  comparisons = NULL,
+  hide.ns = TRUE,
+  step.increase = 0.12,
+  tip.length = 0.03,
+  ...
 )
 
 StackedViolin_v3(
@@ -34,6 +42,25 @@ StackedViolin_v3(
   slot = "data",
   assay = NULL,
   priority = c("expr", "none"),
+  ncol = 1,
+  lab_fill = "group",
+  scales = "free_y",
+  violin = T,
+  box = T,
+  width = 0.9,
+  pt = T,
+  hide.outlier = F,
+  pt.style = c("jitter", "quasirandom"),
+  pt.size = 0.2,
+  pt.alpha = 1,
+  strip.position = "top",
+  stat.method = c("none", "wilcox.test", "t.test"),
+  p.adjust.method = "holm",
+  label = c("p.signif", "p", "p.adj", "p.format"),
+  comparisons = NULL,
+  hide.ns = TRUE,
+  step.increase = 0.12,
+  tip.length = 0.03,
   ...
 )
 }

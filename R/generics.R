@@ -1,8 +1,6 @@
-#' @title Modified violin plot
-#' @description Modified violin plots of Seurat style. More compact for multiple variables.
-#' Input can be Seurat object or data frame.
-#' @param object An object; either Seurat object or matrix
-#' @param ... Arguments passed to other methods
+#' @title Enhanced Violin Plot
+#' @description Generates advanced violin plots distinct from Seurat's VlnPlot. This improved version offers a more compact design for efficient space utilization, the ability to overlay a boxplot, and convenient inclusion of statistical annotations. The function accommodates input in the form of either a Seurat object or a data frame.
+#' @param object An object, either a Seurat object or matrix.
 #' @return ggplot object
 #' @details See above
 #' @examples
@@ -22,7 +20,6 @@ VlnPlot2 <- function(object, ...) {
 #' @title Calculate Matrix Statistics Grouped by Clusters
 #' @description Computes various statistics (mean, median, zscore, tscore, etc.) on a matrix, grouped by clusters.
 #' @param object An object. Can either be a Seurat object or a matrix.
-#' @param ... Arguments passed to other methods
 #' @return A matrix.
 #' @details Computes statistics for each feature across cell types. "p" value is determined by t-test.
 #' For log-normalized data's LogFC computation, it's advised to set `exp.transform` to TRUE.
