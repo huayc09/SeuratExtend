@@ -58,7 +58,7 @@ VlnPlot2.Seurat <- function(
     f = Std.matr$f,
     f2 = Std.matr$f2,
     t = T,
-    ncol = 1,
+    ncol = ncol,
     lab_fill = lab_fill,
     scales = scales,
     violin = violin,
@@ -157,6 +157,18 @@ VlnPlot2.default <- function(
     pt.size = pt.size,
     pt.alpha = pt.alpha,
     strip.position = strip.position
+  )
+
+  p <- vlnplot2_Stat(
+    p = p,
+    stat.method = stat.method,
+    p.adjust.method = p.adjust.method,
+    label = label,
+    comparisons = comparisons,
+    hide.ns = hide.ns,
+    step.increase = step.increase,
+    tip.length = tip.length,
+    ...
   )
 
   return(p)

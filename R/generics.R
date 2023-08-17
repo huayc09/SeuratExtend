@@ -2,14 +2,50 @@
 #' @description Generates advanced violin plots distinct from Seurat's VlnPlot. This improved version offers a more compact design for efficient space utilization, the ability to overlay a boxplot, and convenient inclusion of statistical annotations. The function accommodates input in the form of either a Seurat object or a data frame.
 #' @param object An object, either a Seurat object or matrix.
 #' @return ggplot object
-#' @details See above
+#' @return A ggplot object.
+#' @details This function provides a range of customization options to generate violin plots, with or without additional graphical elements such as boxplots and points. You can specify features to plot, control the appearance of violin plots, boxplots, and points, adjust point position, group data, split violin plots, selectively use cells, control the column layout of multiple plots, and add statistical annotations. For a detailed overview, refer to the provided examples.
+#'
 #' @examples
-#' VlnPlot2(pbmc, features = c("CD3D","CD79A"))
+#' library(Seurat)
+#' library(SeuratExtend)
 #'
-#' VlnPlot2(pbmc, features = c("CD3D","CD79A"), split.by = "orig.ident")
+#' # Using Seurat object as input:
 #'
-#' VlnPlot2(pbmc, features = c("CD3D","CD79A"), violin = F)
+#' # Basic violin plot with box plot and points:
+#' genes <- c("CD3D","CD14","CD79A")
+#' VlnPlot2(pbmc, features = genes)
 #'
+#' # Without violin plot, only box plot, and use quasirandom style for point position adjustment:
+#' VlnPlot2(pbmc, features = genes, violin = F, pt.style = "quasirandom")
+#'
+#' # Hide points but display outlier points of the box plot:
+#' VlnPlot2(pbmc, features = genes, pt = FALSE)
+#'
+#' # When hiding points, outliers are shown by default (recommended). However, outliers can be hidden for a cleaner appearance:
+#' VlnPlot2(pbmc, features = genes, pt = FALSE, hide.outlier = T)
+#'
+#' # Group by cluster and split each cluster by samples:
+#' VlnPlot2(pbmc, features = genes, group.by = "cluster", split.by = "orig.ident")
+#'
+#' # Display only cells from certain subtypes (e.g. B cell, CD14+ Mono, and CD8 T cell), and arrange plots in 3 columns:
+#' cells <- colnames(pbmc)[pbmc$cluster %in% c("B", "CD14+ Mono", "CD8 T")]
+#' VlnPlot2(pbmc, features = genes, group.by = "cluster", cell = cells, ncol = 3)
+#'
+#' # Add statistical annotations using the Wilcoxon test for pairwise comparisons and hide non-significant results:
+#' VlnPlot2(pbmc, features = genes, group.by = "cluster", cell = cells, ncol = 3,
+#'          stat.method = "wilcox.test", hide.ns = TRUE)
+#'
+#' # Display statistics comparing only the first 2 clusters using a t-test:
+#' VlnPlot2(pbmc, features = genes, group.by = "cluster", cell = cells, ncol = 3,
+#'          stat.method = "t.test", comparisons = list(c(1:2)), hide.ns = FALSE)
+#'
+#' # Using a matrix as input:
+#' # For instance, after performing Geneset Enrichment Analysis (GSEA) using the Hallmark 50 geneset to obtain the AUCell matrix:
+#' pbmc <- GeneSetAnalysis(pbmc, genesets = hall50$human)
+#' matr <- pbmc@misc$AUCell$genesets
+#'
+#' # Create violin plots for the first three pathways:
+#' VlnPlot2(matr[1:3,], f = pbmc$cluster)
 #' @rdname VlnPlot2
 #' @export
 
