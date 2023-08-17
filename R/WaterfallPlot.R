@@ -194,12 +194,6 @@ WaterfallPlot_Calc <- function(
     scores[["logFC"]] <-
       apply(matr, 1, function(x) log(mean(x[cell.1]+1)/mean(x[cell.2]+1)), simplify = TRUE)
   }
-  # scores <- scores %>%
-  #   list.cbind() %>%
-  #   as.data.frame() %>%
-  #   drop_na() %>%
-  #   .[abs(.[,length]) > len.threshold, ,drop = FALSE] %>%
-  #   .[abs(.[,color]) > col.threshold, ,drop = FALSE]
   scores <- as.data.frame(list.cbind(scores))
   scores <- scores %>%
     mutate(rank = rownames(.),
@@ -213,11 +207,6 @@ WaterfallPlot_Calc <- function(
   if(order) {
     scores <- arrange(scores, desc(length))
   }
-  # scores <- scores %>%
-  #   as.data.frame() %>%
-  #   mutate(rank = factor(rownames(.), levels = rownames(.)),
-  #          length = .[[length]],
-  #          color = .[[color]])
   if(!is.null(top.n)) {
     if(length(top.n) == 1) top.n <- c(top.n, top.n)
     scores2 <- split(scores, ifelse(scores$length > 0, "pos","neg"))

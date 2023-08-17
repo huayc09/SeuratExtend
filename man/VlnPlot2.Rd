@@ -4,7 +4,7 @@
 \alias{VlnPlot2}
 \alias{VlnPlot2.Seurat}
 \alias{VlnPlot2.default}
-\title{Modified violin plot}
+\title{Enhanced Violin Plot}
 \usage{
 VlnPlot2(object, ...)
 
@@ -17,6 +17,25 @@ VlnPlot2(object, ...)
   slot = "data",
   assay = NULL,
   priority = c("expr", "none"),
+  ncol = 1,
+  lab_fill = "group",
+  scales = "free_y",
+  violin = T,
+  box = T,
+  width = 0.9,
+  pt = T,
+  hide.outlier = F,
+  pt.style = c("jitter", "quasirandom"),
+  pt.size = 0.2,
+  pt.alpha = 1,
+  strip.position = "top",
+  stat.method = c("none", "wilcox.test", "t.test"),
+  p.adjust.method = "holm",
+  label = c("p.signif", "p", "p.adj", "p.format"),
+  comparisons = NULL,
+  hide.ns = TRUE,
+  step.increase = 0.12,
+  tip.length = 0.03,
   ...
 )
 
@@ -35,80 +54,91 @@ VlnPlot2(object, ...)
   pt = T,
   hide.outlier = F,
   pt.style = c("jitter", "quasirandom"),
-  pt.size = 1,
+  pt.size = 0.2,
   pt.alpha = 1,
-  strip.position = "top"
+  strip.position = "top",
+  stat.method = c("none", "wilcox.test", "t.test"),
+  p.adjust.method = "holm",
+  label = c("p.signif", "p", "p.adj", "p.format"),
+  comparisons = NULL,
+  hide.ns = TRUE,
+  step.increase = 0.12,
+  tip.length = 0.03,
+  ...
 )
 }
 \arguments{
-\item{object}{An object; either Seurat object or matrix}
+\item{object}{An object, either a Seurat object or matrix.}
 
-\item{...}{Arguments passed to other methods}
+\item{...}{Further arguments passed to the \code{\link[ggpubr:stat_pvalue_manual]{ggpubr::stat_pvalue_manual()}}.}
 
-\item{seu}{(Seurat version) Seurat object}
+\item{seu}{A Seurat object. Only applicable for the Seurat method.}
 
-\item{features}{Features to plot (gene expression, metrics, PC scores,
-anything that can be retreived by FetchData), Default: NULL (All features
-in matrix)}
+\item{features}{Features to depict, such as gene expression, metrics, PC scores, or any data obtainable via `FetchData()`. Default: NULL (all features in matrix).}
 
-\item{group.by}{(Seurat version) A variable name in meta.data to
-group the violin plots by}
+\item{group.by}{A variable from `meta.data` for grouping or a character vector of equal length as the number of cells. Only applicable for the Seurat method.}
 
-\item{split.by}{(Seurat version) A variable name in meta.data to
-split the violin plots by}
+\item{split.by}{A variable from `meta.data` to bifurcate the violin plots. Only applicable for the Seurat method.}
 
-\item{cell}{(Seurat version) Cell names to use, Default: all cells}
+\item{slot}{Slot to retrieve feature data from. Only applicable for the Seurat method.}
 
-\item{slot}{(Seurat version) Slot to pull feature data for}
+\item{assay}{Name of the assay to employ. Defaults to the active assay. Only applicable for the Seurat method.}
 
-\item{assay}{(Seurat version) Name of assay to use, defaults to the active assay}
+\item{priority}{If set to "expr", extracts data from the expression matrix over `meta.data`. Only applicable for the Seurat method.}
 
-\item{priority}{(Seurat version) If set to "expr", force fetch data from expression matrix
-instead of meta.data}
+\item{ncol}{Specifies the number of columns for display if multiple plots are shown. Default: 1.}
 
-\item{matr}{Matrix or data frame. Row - features; columns - cells}
+\item{lab_fill}{Label for the figure legend. Default: 'group'.}
 
-\item{f}{Factor or vector. Identity of each cell. Should be the
-same length of cells}
+\item{scales}{Scales parameter passed to \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}. Default: 'free_y'.}
 
-\item{f2}{Factor or vector. Similar to \code{f}. A variable to split
-the violin plots by. Default: NULL}
+\item{violin}{Indicates whether to generate a violin plot. Default: TRUE.}
 
-\item{t}{If your matrix has features in columns and cells in rows,
-you should transpose the matrix first. Default: F}
+\item{box}{Indicates whether to depict a box plot. Default: TRUE.}
 
-\item{ncol}{Number of columns if multiple plots are displayed, Default: 1}
+\item{width}{Width of the box plot. Default: 0.9.}
 
-\item{lab_fill}{Title of figure legend, Default: 'group'}
+\item{pt}{Indicates if points should be plotted. Default: TRUE.}
 
-\item{scales}{scales parameter passed to \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}
-, Default: 'free_y'}
+\item{hide.outlier}{Conceals outlier points from the box plot. Default: FALSE.}
 
-\item{violin}{Whether to plot violin plot, Default: T}
+\item{pt.style}{Position adjustment. Default choices: "jitter", "quasirandom".}
 
-\item{box}{Whether to plot box plot, Default: T}
+\item{pt.size}{Point size setting. Default: 0.2.}
 
-\item{width}{Width of box plot, Default: 0.9}
+\item{pt.alpha}{Adjusts the transparency of points. Default: 1.}
 
-\item{pt}{Whether to plot points, Default: T}
+\item{strip.position}{Positions the strip ("top" (default), "bottom", "left", or "right"). Only used when `f2 = NULL`.}
 
-\item{hide.outlier}{Whether to hide outlier points of boxplot, Default: F}
+\item{stat.method}{Determines if pairwise statistics are added to the plot. Either "wilcox.test" or "t.test". Default: "none".}
 
-\item{pt.style}{Position adjustment, Default: c("jitter", "quasirandom")}
+\item{label}{Specifies label type. Options include "p.signif" (showing significance levels), "p.format" (formatted p value), or "p", "p.adj". Default: "p.signif".}
 
-\item{pt.size}{Point size, Default: 1}
+\item{comparisons}{List of length-2 vectors, each containing either names of two x-axis values or two integers pointing to groups of interest for comparison. Default: all groups.}
 
-\item{pt.alpha}{Point transparency, Default: 1}
+\item{hide.ns}{If TRUE, the 'ns' symbol is concealed when displaying significance levels. Default: TRUE.}
 
-\item{strip.position}{Were to put the strip ("top" (default), "bottom", "left",
-or "right"). Only use when \code{f2 = NULL}}
+\item{step.increase}{Numeric vector denoting the increase in fraction of total height for each additional comparison, minimizing overlap. Default: 0.12.}
+
+\item{tip.length}{Numeric vector indicating the fraction of total height the bar descends to specify the exact column. For a line display instead of a bracket, set to 0. Default: 0.03.}
+
+\item{matr}{A matrix or data frame with rows as features and columns as cells.}
+
+\item{f}{A factor or vector indicating the identity of each cell. Should match the column length of `matr`.}
+
+\item{f2}{A factor or vector akin to `f` for splitting the violin plots. Default: NULL.}
+
+\item{t}{If the matrix has features in columns and cells in rows, transpose the matrix first. Default: FALSE.}
+
+\item{cells}{Cell identifiers for use. Defaults to all cells. Only applicable for the Seurat method.}
+
+\item{method}{Method for adjusting p-values, especially when conducting multiple pairwise tests or dealing with multiple grouping variables. Options include "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", and "none". Note: Adjustments are independently conducted for each variable in formulas containing multiple variables. Default: 'holm'.}
 }
 \value{
 ggplot object
 }
 \description{
-Modified violin plots of Seurat style. More compact for multiple variables.
-Input can be Seurat object or data frame.
+Generates advanced violin plots distinct from Seurat's VlnPlot. This improved version offers a more compact design for efficient space utilization, the ability to overlay a boxplot, and convenient inclusion of statistical annotations. The function accommodates input in the form of either a Seurat object or a data frame.
 }
 \details{
 See above

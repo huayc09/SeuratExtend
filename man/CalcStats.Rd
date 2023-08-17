@@ -37,8 +37,6 @@ CalcStats(object, ...)
 \arguments{
 \item{object}{An object. Can either be a Seurat object or a matrix.}
 
-\item{...}{Arguments passed to other methods}
-
 \item{seu}{A Seurat object. Only applicable when using the Seurat method.}
 
 \item{features}{Features for computation, including gene expression, metrics, PC scores, or any other data retrievable via `FetchData()`. Defaults to NULL, implying all features in the matrix. Only applicable for the Seurat method.}
