@@ -2,30 +2,34 @@
 % Please edit documentation in R/Palantir.R
 \name{RunPalantirDiffusionMap}
 \alias{RunPalantirDiffusionMap}
-\title{FUNCTION_TITLE}
+\title{(Deprecated) Run Palantir Diffusion Map}
 \usage{
 RunPalantirDiffusionMap(seu, reduction = "pca", n_components = 20)
 }
 \arguments{
-\item{seu}{PARAM_DESCRIPTION}
+\item{seu}{A Seurat object.}
 
-\item{reduction}{PARAM_DESCRIPTION, Default: 'pca'}
+\item{reduction}{A character string specifying the dimension reduction to use. Default: 'pca'.}
 
-\item{n_components}{PARAM_DESCRIPTION, Default: 20}
+\item{n_components}{An integer specifying how many dimensions to use as input. Default: 20.}
 }
 \value{
-OUTPUT_DESCRIPTION
+A Seurat object with added dm, ms, and t-SNE embeddings.
 }
 \description{
-FUNCTION_DESCRIPTION
-}
-\details{
-DETAILS
+This is a deprecated version of the Palantir Diffusion Map function.
+Please refer to the updated function, \code{\link{Palantir.RunDM}}, for the latest features and improvements.
+This older version, in addition to calculating the diffusion map (dm) and multiscale_space (ms),
+also calculates t-SNE. To use the t-SNE feature, the \code{multicore-tsne} package needs to be installed in the conda environment.
 }
 \examples{
 \dontrun{
-if(interactive()){
- #EXAMPLE1
- }
+library(Seurat)
+library(SeuratExtend)
+pbmc <- RunPalantirDiffusionMap(pbmc)
+DimPlot(pbmc, reduction = "tsne", label = TRUE)
 }
+}
+\seealso{
+\code{\link{Palantir.RunDM}} for the updated version of this function.
 }

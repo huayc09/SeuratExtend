@@ -2,18 +2,17 @@ package_data <- list(
   "loomR" = list(
     website = "https://github.com/mojaveazure/loomR",
     tutorial = "https://satijalab.org/loomR/loomR_tutorial.html",
-    install_info = 'install.packages("hdf5r")\ndevtools::install_github(repo = "mojaveazure/loomR")',
+    install_info = 'install.packages("hdf5r")\nremotes::install_github(repo = "mojaveazure/loomR")',
     install = function(){
-      install.packages("hdf5r")
-      devtools::install_github(repo = 'mojaveazure/loomR', ref = 'develop')
+      remotes::install_github(repo = 'mojaveazure/loomR', ref = 'develop')
     }
   ),
   "nichenetr" = list(
     website = "https://github.com/saeyslab/nichenetr",
     tutorial = "https://github.com/saeyslab/nichenetr",
-    install_info = 'devtools::install_github("saeyslab/nichenetr")',
+    install_info = 'remotes::install_github("saeyslab/nichenetr")',
     install = function(){
-      devtools::install_github("saeyslab/nichenetr")
+      remotes::install_github("saeyslab/nichenetr")
     }
   ),
   "biomaRt" = list(
@@ -71,24 +70,15 @@ package_data <- list(
     install = function(){
       BiocManager::install("DelayedMatrixStats")
     }
+  ),
+  "slingshot" = list(
+    website = "https://bioconductor.org/packages/release/bioc/html/slingshot.html",
+    tutorial = "https://bioconductor.org/packages/release/bioc/html/slingshot.html",
+    install = function(){
+      BiocManager::install("slingshot")
+    }
   )
 )
-
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param package PARAM_DESCRIPTION
-#' @param hpc.mode PARAM_DESCRIPTION, Default: F
-#' @param detach PARAM_DESCRIPTION, Default: F
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
-#' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @rdname import
-#' @export
 
 import <- function(package, hpc.mode = F, detach = F){
   if(!require(package, character.only = T)) {

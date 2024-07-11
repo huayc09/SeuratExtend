@@ -50,7 +50,11 @@ Seu2Matr <-
       }
     }
 
-    matr <- FetchData(object = seu, vars = features, cells = cells, slot = slot)
+    if (utils::packageVersion("SeuratObject") >= "5.0.0") {
+      matr <- FetchData(object = seu, vars = features, cells = cells, layer = slot, clean = "none")
+    } else {
+      matr <- FetchData(object = seu, vars = features, cells = cells, slot = slot)
+    }
 
     if(is.null(group.by)) {
       f <- factor(Idents(seu)[cells])
@@ -146,6 +150,8 @@ CheckIdent <-
   else x
 }
 
+is_empty <- function (x) length(x) == 0
+
 # Check species
 
 check_spe <- function(spe){
@@ -159,5 +165,14 @@ check_pkg_version <- function(package, version.min) {
   if(version.pkg < version.min) {
     stop("Current version of package '", package,"' is ", version.pkg,
          ", but version ", version.min, " is required")
+  }
+}
+
+# message only once
+message_only_once <- function(title, message) {
+  option.title <- paste0("seuratextend_warning_",title)
+  if(getOption(option.title, TRUE)) {
+    message(message, "\nThis message is shown once per session")
+    options(setNames(list(FALSE), option.title))
   }
 }

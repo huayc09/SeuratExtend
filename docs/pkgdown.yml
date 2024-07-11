@@ -1,11 +1,6 @@
-pandoc: 2.19.2
-pkgdown: 2.0.7
+pandoc: 3.1.11
+pkgdown: 2.0.9
 pkgdown_sha: ~
-articles:
-  1-Visualization-website: 1-Visualization-website.html
-  2-GSEA-website: 2-GSEA-website.html
-  3-Utilities-website: 3-Utilities-website.html
-  4-SCENIC-website: 4-SCENIC-website.html
-  5-Trajectory-website: 5-Trajectory-website.html
-last_built: 2024-05-02T13:30Z
+articles: {}
+last_built: 2024-07-10T21:45Z
 

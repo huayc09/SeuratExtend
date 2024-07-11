@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SeuratExtend • SeuratExtend</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -44,27 +44,30 @@
 </li>
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Articles
+    Vignettes
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/1-Visualization-website.html">Enhanced Visualization</a>
+      <a href="articles/Visualization.html">Enhanced Visualization</a>
     </li>
     <li>
-      <a href="articles/2-GSEA-website.html">Geneset Enrichment Analysis (GSEA)</a>
+      <a href="articles/GSEA.html">Geneset Enrichment Analysis (GSEA) </a>
     </li>
     <li>
-      <a href="articles/5-Trajectory-website.html">Trajectory and Pseudotime Analysis</a>
+      <a href="articles/Trajectory.html">Trajectory and Pseudotime Analysis </a>
     </li>
     <li>
-      <a href="articles/4-SCENIC-website.html">SCENIC for Gene Regulatory Networks Analysis</a>
+      <a href="articles/SCENIC.html">SCENIC for Gene Regulatory Networks Analysis </a>
     </li>
     <li>
-      <a href="articles/3-Utilities-website.html">Utility Tools and Functions</a>
+      <a href="articles/Utilities.html">Utility Tools and Functions</a>
     </li>
   </ul>
+</li>
+<li>
+  <a href="articles/FAQ.html">FAQ</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right"></ul>
@@ -79,6 +82,7 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
+
 <div class="section level1">
 <div class="page-header"><h1 id="seuratextend-an-enhanced-toolkit-for-scrna-seq-analysis">SeuratExtend: An Enhanced Toolkit for scRNA-seq Analysis<a class="anchor" aria-label="anchor" href="#seuratextend-an-enhanced-toolkit-for-scrna-seq-analysis"></a>
 </h1></div>
@@ -86,12 +90,16 @@
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
 <p><code>SeuratExtend</code> is an R package designed to provide an improved and easy-to-use toolkit for scRNA-seq analysis and visualization, built upon the Seurat object. While <code>Seurat</code> is a widely-used tool in the R community that offers a foundational framework for scRNA-seq analysis, it has limitations when it comes to more advanced analysis and customized visualization. <code>SeuratExtend</code> expands upon <code>Seurat</code> by offering an array of enhanced visualization tools, an integrated functional and pathway analysis pipeline, seamless integration with popular Python tools, and a suite of utility functions for data manipulation and presentation. Designed to be user-friendly even for beginners, the package retains a level of professionalism that ensures rigorous analysis.</p>
-<p><strong>Key Features:</strong></p>
+<p><strong>Key Features</strong>:</p>
 <ul>
-    <li><strong>Enhanced Data Visualization</strong>: Includes heatmaps, violin plots, feature plots, waterfall plots, proportion bars, and GSEA plots.</li>
-    <li><strong>Integrated Functional and Pathway Analysis</strong>: Supports GO and Reactome databases, with the option to use custom databases.</li>
-    <li><strong>Python Tool Integration</strong>: Easily apply tools like scVelo, SCENIC, and Palantir within R using the Seurat object.</li>
-    <li><strong>Utility Functions</strong>: Assorted functions for calculations and color selections to streamline your scRNA-seq analysis.</li>
+<li>
+<strong>Enhanced Data Visualization</strong>: Includes heatmaps, violin plots, feature plots, waterfall plots, proportion bars, and GSEA plots.</li>
+<li>
+<strong>Integrated Functional and Pathway Analysis</strong>: Supports GO and Reactome databases, with the option to use custom databases.</li>
+<li>
+<strong>Python Tool Integration</strong>: Easily apply tools like scVelo, SCENIC, and Palantir within R using the Seurat object.</li>
+<li>
+<strong>Utility Functions</strong>: Assorted functions for calculations and color selections to streamline your scRNA-seq analysis.</li>
 </ul>
 </div>
 <div class="section level2">
@@ -114,111 +122,116 @@
 </div>
 <div class="section level3">
 <h3 id="enhanced-visualization">
-<a href="articles/1-Visualization-website.html">Enhanced Visualization</a><a class="anchor" aria-label="anchor" href="#enhanced-visualization"></a>
+<a href="articles/Visualization.html">Enhanced Visualization</a><a class="anchor" aria-label="anchor" href="#enhanced-visualization"></a>
 </h3>
 <ul>
 <li>
-<a href="articles/1-Visualization-website.html#generate-a-heatmap-plot">Generate a Heatmap Plot</a> <code>Heatmap</code>
+<a href="articles/Visualization.html#generate-a-heatmap-plot">Generate a Heatmap Plot</a> <code>Heatmap</code>
 </li>
 <li>
-<a href="articles/1-Visualization-website.html#create-an-enhanced-dimensional-reduction-plot">Create an Enhanced Dimensional Reduction Plot</a> <code>DimPlot2</code> <code>FeaturePlot3</code> <code>FeaturePlot3.grid</code>
+<a href="articles/Visualization.html#create-an-enhanced-dimensional-reduction-plot">Create an Enhanced Dimensional Reduction Plot</a> <code>DimPlot2</code> <code>FeaturePlot3</code> <code>FeaturePlot3.grid</code>
 </li>
 <li>
-<a href="articles/1-Visualization-website.html#create-an-enhanced-violin-plot">Create an Enhanced Violin Plot</a> <code>VlnPlot2</code>
+<a href="articles/Visualization.html#create-an-enhanced-violin-plot">Create an Enhanced Violin Plot</a> <code>VlnPlot2</code>
 </li>
 <li>
-<a href="articles/1-Visualization-website.html#visualize-cluster-distribution-in-samples">Visualize Cluster Distribution in Samples</a> <code>ClusterDistrBar</code>
+<a href="articles/Visualization.html#visualize-cluster-distribution-in-samples">Visualize Cluster Distribution in Samples</a> <code>ClusterDistrBar</code>
 </li>
 <li>
-<a href="articles/1-Visualization-website.html#generate-a-waterfall-plot">Generate a Waterfall Plot</a> <code>WaterfallPlot</code>
+<a href="articles/Visualization.html#generate-a-waterfall-plot">Generate a Waterfall Plot</a> <code>WaterfallPlot</code>
 </li>
 <li>
-<a href="articles/1-Visualization-website.html#explore-color-functions">Explore Color Functions</a> <code>color_pro</code> <code>color_iwh</code> <code>ryb2rgb</code> <code>save_colors</code>
+<a href="Visualization.html#explore-color-functions">Explore Color Functions</a> <code>color_pro</code> <code>color_iwh</code> <code>ryb2rgb</code> <code>save_colors</code>
 </li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="geneset-enrichment-analysis-gsea">
-<a href="articles/2-GSEA-website.html">Geneset Enrichment Analysis (GSEA)</a><a class="anchor" aria-label="anchor" href="#geneset-enrichment-analysis-gsea"></a>
+<a href="articles/GSEA.html">Geneset Enrichment Analysis (GSEA)</a><a class="anchor" aria-label="anchor" href="#geneset-enrichment-analysis-gsea"></a>
 </h3>
 <ul>
 <li>
-<a href="articles/2-GSEA-website.html#conduct-gsea-using-the-go-or-reactome-database">Conduct GSEA using the GO or Reactome database</a> <code>GeneSetAnalysisGO</code> <code>GeneSetAnalysisReactome</code>
+<a href="articles/GSEA.html#conduct-gsea-using-the-go-or-reactome-database">Conduct GSEA using the GO or Reactome database</a> <code>GeneSetAnalysisGO</code> <code>GeneSetAnalysisReactome</code>
 </li>
 <li>
-<a href="articles/2-GSEA-website.html#perform-gsea-using-customized-genesets">Perform GSEA using customized genesets</a> <code>GeneSetAnalysis</code>
+<a href="articles/GSEA.html#perform-gsea-using-customized-genesets">Perform GSEA using customized genesets</a> <code>GeneSetAnalysis</code>
 </li>
 <li>
-<a href="articles/2-GSEA-website.html#find-pathways-in-the-goreactome-database-or-customized-genesets">Find pathways in the GO/Reactome database or customized genesets</a> <code>SearchDatabase</code> <code>SearchPathways</code>
+<a href="articles/GSEA.html#find-pathways-in-the-goreactome-database-or-customized-genesets">Find pathways in the GO/Reactome database or customized genesets</a> <code>SearchDatabase</code> <code>SearchPathways</code>
 </li>
 <li>
-<a href="articles/2-GSEA-website.html#convert-goreactome-pathway-ids-to-pathway-names">Convert GO/Reactome pathway IDs to pathway names</a> <code>RenameGO</code> <code>RenameReactome</code>
+<a href="articles/GSEA.html#convert-goreactome-pathway-ids-to-pathway-names">Convert GO/Reactome pathway IDs to pathway names</a> <code>RenameGO</code> <code>RenameReactome</code>
 </li>
 <li>
-<a href="articles/2-GSEA-website.html#filter-the-goreactome-pathway-list-based-on-certain-criteria">Filter the GO/Reactome pathway list based on certain criteria</a> <code>FilterGOTerms</code> <code>FilterReactomeTerms</code>
+<a href="articles/GSEA.html#filter-the-goreactome-pathway-list-based-on-certain-criteria">Filter the GO/Reactome pathway list based on certain criteria</a> <code>FilterGOTerms</code> <code>FilterReactomeTerms</code>
 </li>
 <li>
-<a href="articles/2-GSEA-website.html#create-a-gsea-plot-emulating-the-broad-institute-analysis">Create a GSEA plot emulating the Broad Institute analysis</a> <code>GSEAplot</code>
+<a href="articles/GSEA.html#create-a-gsea-plot-emulating-the-broad-institute-analysis">Create a GSEA plot emulating the Broad Institute analysis</a> <code>GSEAplot</code>
 </li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="trajectory-and-pseudotime-analysis">
-<a href="articles/5-Trajectory-website.html">Trajectory and Pseudotime Analysis</a><a class="anchor" aria-label="anchor" href="#trajectory-and-pseudotime-analysis"></a>
+<a href="articles/Trajectory.html">Trajectory and Pseudotime Analysis</a><a class="anchor" aria-label="anchor" href="#trajectory-and-pseudotime-analysis"></a>
 </h3>
 <ul>
 <li>
-<a href="articles/5-Trajectory-website.html#analyzing-single-cell-trajectories-with-scvelo">scVelo Tutorial for Trajectory Analysis</a> <code>scVelo.SeuratToAnndata</code> <code>scVelo.Plot</code>
+<a href="articles/Trajectory.html#analyzing-single-cell-trajectories-with-scvelo">scVelo Tutorial for Trajectory Analysis</a> <code>scVelo.SeuratToAnndata</code> <code>scVelo.Plot</code>
 </li>
 <li>
-<a href="articles/5-Trajectory-website.html#palantir-tutorial-for-trajectory-and-pseudotime-analysis">Palantir Tutorial for Trajectory and Pseudotime Analysis</a> <code>Palantir.RunDM</code> <code>Palantir.Pseudotime</code>
+<a href="articles/Trajectory.html#palantir-tutorial-for-trajectory-and-pseudotime-analysis">Palantir Tutorial for Trajectory and Pseudotime Analysis</a> <code>Palantir.RunDM</code> <code>Palantir.Pseudotime</code>
 </li>
 <li>
-<a href="articles/5-Trajectory-website.html#magic-for-denoising-and-smoothing-gene-expression">MAGIC for Denoising and Smoothing Gene Expression</a> <code>Palantir.Magic</code>
+<a href="articles/Trajectory.html#magic-for-denoising-and-smoothing-gene-expression">MAGIC for Denoising and Smoothing Gene Expression</a> <code>Palantir.Magic</code>
 </li>
 <li>
-<a href="articles/5-Trajectory-website.html#cellrank-tutorial-for-trajectory-analysis">CellRank Tutorial for Trajectory Analysis</a> <code>Cellrank.Compute</code> <code>Cellrank.Plot</code>
+<a href="articles/Trajectory.html#cellrank-tutorial-for-trajectory-analysis">CellRank Tutorial for Trajectory Analysis</a> <code>Cellrank.Compute</code> <code>Cellrank.Plot</code>
 </li>
 <li>
-<a href="articles/5-Trajectory-website.html#gene-expression-dynamics-along-differentiation-trajectories">Gene Expression Dynamics Along Differentiation Trajectories</a> <code>GeneTrendCurve.Palantir</code> <code>GeneTrendHeatmap.Palantir</code> <code>GeneTrendCurve.Slingshot</code> <code>GeneTrendHeatmap.Slingshot</code>
+<a href="articles/Trajectory.html#gene-expression-dynamics-along-differentiation-trajectories">Gene Expression Dynamics Along Differentiation Trajectories</a> <code>GeneTrendCurve.Palantir</code> <code>GeneTrendHeatmap.Palantir</code> <code>GeneTrendCurve.Slingshot</code> <code>GeneTrendHeatmap.Slingshot</code>
 </li>
 <li>
-<a href="articles/5-Trajectory-website.html#slingshot-tutorial-for-pseudotime-analysis">Slingshot Tutorial for Pseudotime Analysis</a> <code>RunSlingshot</code>
+<a href="articles/Trajectory.html#slingshot-tutorial-for-pseudotime-analysis">Slingshot Tutorial for Pseudotime Analysis</a> <code>RunSlingshot</code>
 </li>
 <li>
-<a href="articles/5-Trajectory-website.html#integration-of-seurat-with-python-tools">Integration of Seurat with Python Tools</a> <code>create_condaenv_seuratextend</code> <code>Seu2Adata</code> <code>Seu2Loom</code> <code>adata.LoadLoom</code> <code>adata.AddDR</code> <code>adata.AddMetadata</code> <code>adata.Save</code> <code>adata.Load</code>
+<a href="articles/Trajectory.html#integration-of-seurat-with-python-tools">Integration of Seurat with Python Tools</a> <code>create_condaenv_seuratextend</code> <code>Seu2Adata</code> <code>Seu2Loom</code> <code>adata.LoadLoom</code> <code>adata.AddDR</code> <code>adata.AddMetadata</code> <code>adata.Save</code> <code>adata.Load</code>
 </li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="scenic-for-gene-regulatory-networks-analysis">
-<a href="articles/4-SCENIC-website.html">SCENIC for Gene Regulatory Networks Analysis</a><a class="anchor" aria-label="anchor" href="#scenic-for-gene-regulatory-networks-analysis"></a>
+<a href="articles/SCENIC.html">SCENIC for Gene Regulatory Networks Analysis</a><a class="anchor" aria-label="anchor" href="#scenic-for-gene-regulatory-networks-analysis"></a>
 </h3>
 <ul>
 <li>
-<a href="articles/4-SCENIC-website.html#importing-scenic-loom-files-into-seurat">Importing SCENIC Loom Files into Seurat</a> <code>ImportPyscenicLoom</code>
+<a href="articles/SCENIC.html#importing-scenic-loom-files-into-seurat">Importing SCENIC Loom Files into Seurat</a> <code>ImportPyscenicLoom</code>
 </li>
-<li><a href="articles/4-SCENIC-website.html#visualizing-scenic-results">Visualizing SCENIC Results</a></li>
+<li><a href="articles/SCENIC.html#visualizing-scenic-results">Visualizing SCENIC Results</a></li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="utility-tools-and-functions">
-<a href="articles/3-Utilities-website.html">Utility Tools and Functions</a><a class="anchor" aria-label="anchor" href="#utility-tools-and-functions"></a>
+<a href="articles/Utilities.html">Utility Tools and Functions</a><a class="anchor" aria-label="anchor" href="#utility-tools-and-functions"></a>
 </h3>
 <ul>
 <li>
-<a href="articles/3-Utilities-website.html#facilitate-gene-naming-conversions">Facilitate Gene Naming Conversions</a> <code>HumanToMouseGenesymbol</code> <code>MouseToHumanGenesymbol</code> <code>EnsemblToGenesymbol</code> <code>GenesymbolToEnsembl</code> <code>UniprotToGenesymbol</code>
+<a href="articles/Utilities.html#facilitate-gene-naming-conversions">Facilitate Gene Naming Conversions</a> <code>HumanToMouseGenesymbol</code> <code>MouseToHumanGenesymbol</code> <code>EnsemblToGenesymbol</code> <code>GenesymbolToEnsembl</code> <code>UniprotToGenesymbol</code>
 </li>
 <li>
-<a href="articles/3-Utilities-website.html#compute-statistics-grouped-by-clusters">Compute Statistics Grouped by Clusters</a> <code>CalcStats</code>
+<a href="articles/Utilities.html#compute-statistics-grouped-by-clusters">Compute Statistics Grouped by Clusters</a> <code>CalcStats</code>
 </li>
 <li>
-<a href="articles/3-Utilities-website.html#assess-proportion-of-positive-cells-in-clusters">Assess Proportion of Positive Cells in Clusters</a> <code>feature_percent</code>
+<a href="articles/Utilities.html#assess-proportion-of-positive-cells-in-clusters">Assess Proportion of Positive Cells in Clusters</a> <code>feature_percent</code>
 </li>
 <li>
-<a href="articles/3-Utilities-website.html#run-standard-seurat-pipeline">Run Standard Seurat Pipeline</a> <code>RunBasicSeurat</code>
+<a href="articles/Utilities.html#run-standard-seurat-pipeline">Run Standard Seurat Pipeline</a> <code>RunBasicSeurat</code>
 </li>
 </ul>
+</div>
+<div class="section level3">
+<h3 id="faq">
+<a href="articles/FAQ.html">FAQ</a><a class="anchor" aria-label="anchor" href="#faq"></a>
+</h3>
 </div>
 </div>
 <div class="section level2">
@@ -228,44 +241,48 @@
 <div class="section level3">
 <h3 id="visualizing-clusters">Visualizing Clusters<a class="anchor" aria-label="anchor" href="#visualizing-clusters"></a>
 </h3>
-<pre class="{r}"><code><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat" class="external-link">Seurat</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat" class="external-link">Seurat</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SeuratExtend</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Visualizing cell clusters using DimPlot2</span></span>
-<span><span class="fu"><a href="reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span></span></code></pre>
+<span><span class="fu"><a href="reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span></span></code></pre></div>
 <p><img src="articles/quick_start_files/figure-markdown_strict/unnamed-chunk-6-1.png"></p>
 </div>
 <div class="section level3">
 <h3 id="analyzing-cluster-distribution">Analyzing Cluster Distribution<a class="anchor" aria-label="anchor" href="#analyzing-cluster-distribution"></a>
 </h3>
 <p>To check the percentage of each cluster within different samples:</p>
-<pre class="{r}"><code><span><span class="co"># Cluster distribution bar plot</span></span>
-<span><span class="fu"><a href="reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span><span class="op">)</span></span></code></pre>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Cluster distribution bar plot</span></span>
+<span><span class="fu"><a href="reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span><span class="op">)</span></span></code></pre></div>
 <p><img src="articles/quick_start_files/figure-markdown_strict/unnamed-chunk-7-1.png"></p>
 </div>
 <div class="section level3">
 <h3 id="marker-gene-analysis-with-heatmap">Marker Gene Analysis with Heatmap<a class="anchor" aria-label="anchor" href="#marker-gene-analysis-with-heatmap"></a>
 </h3>
 <p>To examine the marker genes of each cluster and visualize them using a heatmap:</p>
-<pre class="{r}"><code><span><span class="co"># Calculating z-scores for variable features</span></span>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Calculating z-scores for variable features</span></span>
 <span><span class="va">genes.zscore</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/CalcStats.html">CalcStats</a></span><span class="op">(</span></span>
 <span>  <span class="va">pbmc</span>,</span>
-<span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/SeuratObject/man/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span>,</span>
+<span>  features <span class="op">=</span> <span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span>,</span>
 <span>  group.by <span class="op">=</span> <span class="st">"cluster"</span>,</span>
 <span>  order <span class="op">=</span> <span class="st">"p"</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>
 <span>  </span>
 <span><span class="co"># Displaying heatmap</span></span>
-<span><span class="fu"><a href="reference/Heatmap.html">Heatmap</a></span><span class="op">(</span><span class="va">genes.zscore</span>, lab_fill <span class="op">=</span> <span class="st">"zscore"</span><span class="op">)</span></span></code></pre>
+<span><span class="fu"><a href="reference/Heatmap.html">Heatmap</a></span><span class="op">(</span><span class="va">genes.zscore</span>, lab_fill <span class="op">=</span> <span class="st">"zscore"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="articles/quick_start_files/figure-markdown_strict/unnamed-chunk-8-1.png"></p>
 </div>
 <div class="section level3">
 <h3 id="enhanced-visualization-of-marker-genes">Enhanced Visualization of Marker Genes<a class="anchor" aria-label="anchor" href="#enhanced-visualization-of-marker-genes"></a>
 </h3>
 <p>For visualizing specific markers via a violin plot that incorporates box plots, median lines, and performs statistical testing:</p>
-<pre class="{r}"><code><span><span class="co"># Specifying genes and cells of interest</span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Specifying genes and cells of interest</span></span>
 <span><span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD3D"</span>, <span class="st">"CD14"</span>, <span class="st">"CD79A"</span><span class="op">)</span></span>
-<span><span class="va">cells</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SeuratObject/man/WhichCells.html" class="external-link">WhichCells</a></span><span class="op">(</span><span class="va">pbmc</span>, idents <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"B cell"</span>, <span class="st">"CD8 T cell"</span>, <span class="st">"Mono CD14"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">cells</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/WhichCells.html" class="external-link">WhichCells</a></span><span class="op">(</span><span class="va">pbmc</span>, idents <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"B cell"</span>, <span class="st">"CD8 T cell"</span>, <span class="st">"Mono CD14"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Violin plot with statistical analysis</span></span>
 <span><span class="fu"><a href="reference/VlnPlot2.html">VlnPlot2</a></span><span class="op">(</span></span>
@@ -273,21 +290,23 @@
 <span>  features <span class="op">=</span> <span class="va">genes</span>,</span>
 <span>  group.by <span class="op">=</span> <span class="st">"cluster"</span>,</span>
 <span>  cells <span class="op">=</span> <span class="va">cells</span>,</span>
-<span>  stat.method <span class="op">=</span> <span class="st">"wilcox.test"</span><span class="op">)</span></span></code></pre>
+<span>  stat.method <span class="op">=</span> <span class="st">"wilcox.test"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="articles/quick_start_files/figure-markdown_strict/unnamed-chunk-9-1.png"></p>
 </div>
 <div class="section level3">
 <h3 id="visualizing-multiple-markers-on-umap">Visualizing Multiple Markers on UMAP<a class="anchor" aria-label="anchor" href="#visualizing-multiple-markers-on-umap"></a>
 </h3>
 <p>Displaying three markers on a single UMAP, using RYB coloring for each marker:</p>
-<pre class="{r}"><code><span><span class="fu"><a href="reference/FeaturePlot3.html">FeaturePlot3</a></span><span class="op">(</span><span class="va">pbmc</span>, feature.1 <span class="op">=</span> <span class="st">"CD3D"</span>, feature.2 <span class="op">=</span> <span class="st">"CD14"</span>, feature.3 <span class="op">=</span> <span class="st">"CD79A"</span><span class="op">)</span></span></code></pre>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/FeaturePlot3.html">FeaturePlot3</a></span><span class="op">(</span><span class="va">pbmc</span>, feature.1 <span class="op">=</span> <span class="st">"CD3D"</span>, feature.2 <span class="op">=</span> <span class="st">"CD14"</span>, feature.3 <span class="op">=</span> <span class="st">"CD79A"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="articles/quick_start_files/figure-markdown_strict/unnamed-chunk-10-1.png"></p>
 </div>
 <div class="section level3">
 <h3 id="conducting-geneset-enrichment-analysis-gsea">Conducting Geneset Enrichment Analysis (GSEA)<a class="anchor" aria-label="anchor" href="#conducting-geneset-enrichment-analysis-gsea"></a>
 </h3>
 <p>Examining all the pathways of the immune process in the Gene Ontology (GO) database, and visualizing by a heatmap that displays the top pathways of each cluster across multiple cell types:</p>
-<pre class="{r}"><code><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>spe <span class="op">=</span> <span class="st">"human"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>spe <span class="op">=</span> <span class="st">"human"</span><span class="op">)</span></span>
 <span><span class="va">pbmc</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/GeneSetAnalysis.html">GeneSetAnalysisGO</a></span><span class="op">(</span><span class="va">pbmc</span>, parent <span class="op">=</span> <span class="st">"immune_system_process"</span>, n.min <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="va">matr</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/RenameGO.html">RenameGO</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">AUCell</span><span class="op">$</span><span class="va">GO</span><span class="op">$</span><span class="va">immune_system_process</span><span class="op">)</span></span>
 <span><span class="va">go_zscore</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/CalcStats.html">CalcStats</a></span><span class="op">(</span></span>
@@ -295,26 +314,28 @@
 <span>  f <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>,</span>
 <span>  order <span class="op">=</span> <span class="st">"p"</span>,</span>
 <span>  n <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/Heatmap.html">Heatmap</a></span><span class="op">(</span><span class="va">go_zscore</span>, lab_fill <span class="op">=</span> <span class="st">"zscore"</span><span class="op">)</span></span></code></pre>
+<span><span class="fu"><a href="reference/Heatmap.html">Heatmap</a></span><span class="op">(</span><span class="va">go_zscore</span>, lab_fill <span class="op">=</span> <span class="st">"zscore"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="articles/quick_start_files/figure-markdown_strict/unnamed-chunk-11-1.png"></p>
 </div>
 <div class="section level3">
 <h3 id="detailed-comparison-of-two-cell-types">Detailed Comparison of Two Cell Types<a class="anchor" aria-label="anchor" href="#detailed-comparison-of-two-cell-types"></a>
 </h3>
 <p>Using a GSEA plot to focus on a specific pathway for deeper comparative analysis:</p>
-<pre class="{r}"><code><span><span class="fu"><a href="reference/GSEAplot.html">GSEAplot</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/GSEAplot.html">GSEAplot</a></span><span class="op">(</span></span>
 <span>  <span class="va">pbmc</span>,</span>
 <span>  ident.1 <span class="op">=</span> <span class="st">"B cell"</span>,</span>
 <span>  ident.2 <span class="op">=</span> <span class="st">"CD8 T cell"</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">"GO:0042113 B cell activation (335g)"</span>,</span>
-<span>  geneset <span class="op">=</span> <span class="va">GO_Data</span><span class="op">$</span><span class="va">human</span><span class="op">$</span><span class="va">GO2Gene</span><span class="op">[[</span><span class="st">"GO:0042113"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre>
+<span>  geneset <span class="op">=</span> <span class="va">GO_Data</span><span class="op">$</span><span class="va">human</span><span class="op">$</span><span class="va">GO2Gene</span><span class="op">[[</span><span class="st">"GO:0042113"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <p><img src="articles/quick_start_files/figure-markdown_strict/unnamed-chunk-12-1.png"></p>
 </div>
 <div class="section level3">
 <h3 id="importing-and-visualizing-scenic-analysis">Importing and Visualizing SCENIC Analysis<a class="anchor" aria-label="anchor" href="#importing-and-visualizing-scenic-analysis"></a>
 </h3>
 <p>After conducting Gene Regulatory Networks Analysis using pySCENIC, import the output and visualize various aspects within Seurat:</p>
-<pre class="{r}"><code><span><span class="co"># Downloading a pre-computed SCENIC loom file</span></span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Downloading a pre-computed SCENIC loom file</span></span>
 <span><span class="va">scenic_loom_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"pyscenic_integrated-output.loom"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://zenodo.org/records/10944066/files/pbmc3k_small_pyscenic_integrated-output.loom"</span>, <span class="va">scenic_loom_path</span><span class="op">)</span></span>
 <span></span>
@@ -327,17 +348,18 @@
 <span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cluster"</span>, <span class="st">"orig.ident"</span>, <span class="st">"CEBPA"</span>, <span class="st">"tf_CEBPA"</span><span class="op">)</span>,</span>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"tf_CEBPA"</span> <span class="op">=</span> <span class="st">"D"</span><span class="op">)</span>,</span>
 <span>  theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="articles/quick_start_files/figure-markdown_strict/unnamed-chunk-13-1.png"></p>
-<pre class="{r}"><code><span><span class="co"># Creating a waterfall plot to compare regulon activity between cell types</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/SeuratObject/man/DefaultAssay.html" class="external-link">DefaultAssay</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"TF"</span></span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Creating a waterfall plot to compare regulon activity between cell types</span></span>
+<span><span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/DefaultAssay.html" class="external-link">DefaultAssay</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"TF"</span></span>
 <span><span class="fu"><a href="reference/WaterfallPlot.html">WaterfallPlot</a></span><span class="op">(</span></span>
 <span>  <span class="va">pbmc</span>,</span>
 <span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span>,</span>
 <span>  ident.1 <span class="op">=</span> <span class="st">"Mono CD14"</span>,</span>
 <span>  ident.2 <span class="op">=</span> <span class="st">"CD8 T cell"</span>,</span>
 <span>  exp.transform <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  top.n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></code></pre>
+<span>  top.n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></code></pre></div>
 <p><img src="articles/quick_start_files/figure-markdown_strict/unnamed-chunk-14-1.png"></p>
 </div>
 <div class="section level3">
@@ -348,60 +370,68 @@
 <h4 id="download-and-prepare-the-data">Download and Prepare the Data<a class="anchor" aria-label="anchor" href="#download-and-prepare-the-data"></a>
 </h4>
 <p>First, we download a small subset of myeloid cells to illustrate the analysis:</p>
-<pre class="{r}"><code><span><span class="co"># Download the example Seurat Object with myeloid cells</span></span>
-<span><span class="va">mye_small</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/connections.html" class="external-link">url</a></span><span class="op">(</span><span class="st">"https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds"</span>, <span class="st">"rb"</span><span class="op">)</span><span class="op">)</span></span></code></pre>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Download the example Seurat Object with myeloid cells</span></span>
+<span><span class="va">mye_small</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/connections.html" class="external-link">url</a></span><span class="op">(</span><span class="st">"https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds"</span>, <span class="st">"rb"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="diffusion-map-calculation">Diffusion Map Calculation<a class="anchor" aria-label="anchor" href="#diffusion-map-calculation"></a>
 </h4>
 <p>Palantir uses diffusion maps for dimensionality reduction to infer trajectories. Here’s how to compute and visualize them:</p>
-<pre class="{r}"><code><span><span class="co"># Compute diffusion map</span></span>
-<span><span class="va">mye_small</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/Palantir-Methods.html">Palantir.RunDM</a></span><span class="op">(</span><span class="va">mye_small</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Visualize the first two diffusion map dimensions</span></span>
-<span><span class="fu"><a href="reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">mye_small</span>, reduction <span class="op">=</span> <span class="st">"ms"</span><span class="op">)</span></span></code></pre>
-<p><img src="articles/quick_start_files/figure-markdown_strict/unnamed-chunk-16-1.png"></p>
+<p>```{r} # Compute diffusion map mye_small &lt;- Palantir.RunDM(mye_small)</p>
 </div>
-<div class="section level4">
-<h4 id="pseudotime-calculation">Pseudotime Calculation<a class="anchor" aria-label="anchor" href="#pseudotime-calculation"></a>
-</h4>
-<p>Pseudotime ordering assigns each cell a time point in a trajectory, indicating its progression along a developmental path:</p>
-<pre class="{r}"><code><span><span class="co"># Calculate pseudotime with a specified start cell</span></span>
-<span><span class="va">mye_small</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/Palantir-Methods.html">Palantir.Pseudotime</a></span><span class="op">(</span><span class="va">mye_small</span>, start_cell <span class="op">=</span> <span class="st">"sample1_GAGAGGTAGCAGTACG-1"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Store pseudotime results in meta.data for easy plotting</span></span>
-<span><span class="va">ps</span> <span class="op">&lt;-</span> <span class="va">mye_small</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">Palantir</span><span class="op">$</span><span class="va">Pseudotime</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">ps</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fate1"</span>, <span class="st">"fate2"</span><span class="op">)</span></span>
-<span><span class="va">mye_small</span><span class="op">@</span><span class="va">meta.data</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">ps</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">ps</span></span>
-<span></span>
-<span><span class="co"># Visualize pseudotime and cell fates</span></span>
-<span><span class="fu"><a href="reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span></span>
-<span>  <span class="va">mye_small</span>,</span>
-<span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">ps</span><span class="op">)</span>,</span>
-<span>  reduction <span class="op">=</span> <span class="st">"ms"</span>,</span>
-<span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Entropy <span class="op">=</span> <span class="st">"D"</span><span class="op">)</span><span class="op">)</span></span></code></pre>
+</div>
+</div>
+</div>
+<div class="section level1">
+<h1 id="visualize-the-first-two-diffusion-map-dimensions">Visualize the first two diffusion map dimensions<a class="anchor" aria-label="anchor" href="#visualize-the-first-two-diffusion-map-dimensions"></a>
+</h1>
+<p>DimPlot2(mye_small, reduction = “ms”)</p>
+<pre><code>
+![](vignettes/quick_start_files/figure-markdown_strict/unnamed-chunk-16-1.png)
+
+#### Pseudotime Calculation
+
+Pseudotime ordering assigns each cell a time point in a trajectory,
+indicating its progression along a developmental path:
+
+```R
+# Calculate pseudotime with a specified start cell
+mye_small &lt;- Palantir.Pseudotime(mye_small, start_cell = "sample1_GAGAGGTAGCAGTACG-1")
+
+# Store pseudotime results in meta.data for easy plotting
+ps &lt;- mye_small@misc$Palantir$Pseudotime
+colnames(ps)[3:4] &lt;- c("fate1", "fate2")
+mye_small@meta.data[,colnames(ps)] &lt;- ps
+
+# Visualize pseudotime and cell fates
+DimPlot2(
+  mye_small,
+  features = colnames(ps),
+  reduction = "ms",
+  cols = list(Entropy = "D"))</code></pre>
 <p><img src="articles/quick_start_files/figure-markdown_strict/unnamed-chunk-17-1.png"></p>
-</div>
 <div class="section level4">
 <h4 id="visualization-along-trajectories">Visualization Along Trajectories<a class="anchor" aria-label="anchor" href="#visualization-along-trajectories"></a>
 </h4>
 <p>Visualizing gene expression or regulon activity along calculated trajectories can provide insights into dynamic changes:</p>
-<pre class="{r}"><code><span><span class="co"># Create smoothed gene expression curves along trajectory</span></span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create smoothed gene expression curves along trajectory</span></span>
 <span><span class="fu"><a href="reference/GeneTrendCurve-Methods.html">GeneTrendCurve.Palantir</a></span><span class="op">(</span></span>
 <span>  <span class="va">mye_small</span>,</span>
 <span>  pseudotime.data <span class="op">=</span> <span class="va">ps</span>,</span>
 <span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD14"</span>, <span class="st">"FCGR3A"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="articles/quick_start_files/figure-markdown_strict/unnamed-chunk-18-1.png"></p>
-<pre class="{r}"><code><span><span class="co"># Create a gene trend heatmap for different fates</span></span>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create a gene trend heatmap for different fates</span></span>
 <span><span class="fu"><a href="reference/GeneTrendHeatmap-Methods.html">GeneTrendHeatmap.Palantir</a></span><span class="op">(</span></span>
 <span>  <span class="va">mye_small</span>,</span>
-<span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/SeuratObject/man/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">mye_small</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span>,</span>
+<span>  features <span class="op">=</span> <span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">mye_small</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span>,</span>
 <span>  pseudotime.data <span class="op">=</span> <span class="va">ps</span>,</span>
 <span>  lineage <span class="op">=</span> <span class="st">"fate1"</span></span>
-<span><span class="op">)</span></span></code></pre>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="articles/quick_start_files/figure-markdown_strict/unnamed-chunk-19-1.png"></p>
-</div>
 </div>
 <div class="section level3">
 <h3 id="scvelo-analysis">scVelo Analysis<a class="anchor" aria-label="anchor" href="#scvelo-analysis"></a>
@@ -411,7 +441,8 @@
 <h4 id="preparing-for-scvelo">Preparing for scVelo<a class="anchor" aria-label="anchor" href="#preparing-for-scvelo"></a>
 </h4>
 <p>First, download the pre-calculated velocyto loom file:</p>
-<pre class="{r}"><code><span><span class="co"># Download velocyto loom file</span></span>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Download velocyto loom file</span></span>
 <span><span class="va">loom_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"pbmc10k_mye_small.loom"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://zenodo.org/records/10944066/files/pbmc10k_mye_small.loom"</span>, <span class="va">loom_path</span><span class="op">)</span></span>
 <span></span>
@@ -425,17 +456,17 @@
 <span>  velocyto.loompath <span class="op">=</span> <span class="va">loom_path</span>,</span>
 <span>  prefix <span class="op">=</span> <span class="st">"sample1_"</span>,</span>
 <span>  postfix <span class="op">=</span> <span class="st">"-1"</span></span>
-<span><span class="op">)</span></span></code></pre>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="plotting-scvelo-results">Plotting scVelo Results<a class="anchor" aria-label="anchor" href="#plotting-scvelo-results"></a>
 </h4>
 <p>Once the data is processed, visualize the RNA velocity:</p>
-<pre class="{r}"><code><span><span class="co"># Plot RNA velocity</span></span>
-<span><span class="fu"><a href="reference/scVelo.SeuratToAnndata.html">scVelo.Plot</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"cluster"</span>, basis <span class="op">=</span> <span class="st">"ms_cell_embeddings"</span>, figsize <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></code></pre>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Plot RNA velocity</span></span>
+<span><span class="fu"><a href="reference/scVelo.SeuratToAnndata.html">scVelo.Plot</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"cluster"</span>, basis <span class="op">=</span> <span class="st">"ms_cell_embeddings"</span>, figsize <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="articles/quick_start_files/figure-markdown_strict/unnamed-chunk-21-1.png"></p>
 <p>For detailed usage of the functions and more advanced analysis, please refer to the vignettes and tutorials.</p>
-</div>
 </div>
 </div>
 <div class="section level2">
@@ -454,6 +485,7 @@
 </ol>
 </div>
 </div>
+
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -493,7 +525,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer>

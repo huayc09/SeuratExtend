@@ -1,0 +1,19 @@
+navbar:
+  left:
+    - text: "Reference"
+      href: reference/index.html
+    - text: "Vignettes"
+      menu:
+        - text: "Enhanced Visualization"
+          href: articles/Visualization.html
+        - text: "Geneset Enrichment Analysis (GSEA) "
+          href: articles/GSEA.html
+        - text: "Trajectory and Pseudotime Analysis "
+          href: articles/Trajectory.html
+        - text: "SCENIC for Gene Regulatory Networks Analysis "
+          href: articles/SCENIC.html
+        - text: "Utility Tools and Functions"
+          href: articles/Utilities.html
+    - text: "FAQ"
+      href: articles/FAQ.html
+

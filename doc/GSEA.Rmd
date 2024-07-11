@@ -1,0 +1,246 @@
+---
+title: "Geneset Enrichment Analysis (GSEA)"
+author: "Yichao Hua"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Geneset Enrichment Analysis (GSEA)}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+## Table of Contents
+
+1. [Conduct GSEA using the GO or Reactome database](#go-reactome)
+2. [Perform GSEA using customized genesets](#custom-gsea)
+3. [Find pathways in the GO/Reactome database or customized genesets](#search-database)
+4. [Convert GO/Reactome pathway IDs to pathway names](#rename-pathways)
+5. [Filter the GO/Reactome pathway list based on certain criteria](#filter-pathways)
+6. [Create a GSEA plot emulating the Broad Institute analysis](#gsea-plot)
+
+## Conduct GSEA using the GO or Reactome database {#go-reactome}
+
+The `SeuratExtend` package integrates both the GO and Reactome databases, streamlining the GSEA analysis process. This is primarily facilitated through the `GeneSetAnalysisGO` and `GeneSetAnalysisReactome` functions, among other supplementary functions. In this section, we'll delve into the usage and features of these functions.
+
+### Gene Ontology (GO) Database
+
+Performing GSEA using the GO database can be resource-intensive due to its extensive size. To make the analysis more feasible, you might consider evaluating pathways under specific categories. For instance, in the example below, only the pathways under the "immune_system_process" category are evaluated. The results from this analysis are saved in the location: `seu@misc$AUCell$GO[[title]]`.
+
+```{r, message=FALSE, warning=FALSE}
+library(SeuratExtend)
+library(dplyr)
+options(max.print = 12, spe = "human")
+
+pbmc <- GeneSetAnalysisGO(pbmc, parent = "immune_system_process", nCores = 4) # calculating with 4 cores
+matr <- pbmc@misc$AUCell$GO$immune_system_process
+matr <- RenameGO(matr)
+head(matr, 2:3)
+```
+
+For the "parent" argument, you can input any term from the GO database, be it a GO ID or a pathway name. To get a glimpse of commonly used GO categories, you can run `GeneSetAnalysisGO()` without any arguments:
+
+```{r, message=FALSE, warning=FALSE}
+GeneSetAnalysisGO()
+```
+
+Here are some suggested visualization methods:
+
+- **Heatmap**: Useful for comparing multiple groups with numerous features but provides a less detailed representation.
+```{r, message=FALSE, warning=FALSE, fig.width=11.5, fig.height=7}
+Heatmap(CalcStats(matr, f = pbmc$cluster, order = "p", n = 4), lab_fill = "zscore")
+```
+  
+- **Violin Plot**: Best suited for comparing multiple groups with fewer features while presenting more details for individual data points.
+```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=6}
+VlnPlot2(matr[1:3,], f = pbmc$cluster, ncol = 1)
+```
+
+- **Waterfall Plot**: Ideal for comparing two groups.
+```{r, message=FALSE, warning=FALSE, fig.width=10.5, fig.height=7}
+WaterfallPlot(matr, f = pbmc$cluster, ident.1 = "B cell", ident.2 = "CD8 T cell", top.n = 20)
+```
+
+### Reactome Database
+
+For GSEA using the Reactome database, consider assessing pathways under certain categories to make the process more manageable. The example below evaluates pathways under the "Immune System" category. Results from this analysis are saved under: `seu@misc$AUCell$Reactome[[title]]`.
+
+```{r, message=FALSE, warning=FALSE, fig.width=10.5, fig.height=7}
+pbmc <- GeneSetAnalysisReactome(pbmc, parent = "Immune System")
+matr <- pbmc@misc$AUCell$Reactome$`Immune System`
+matr <- RenameReactome(matr)
+Heatmap(CalcStats(matr, f = pbmc$cluster, order = "p", n = 4), lab_fill = "zscore")
+```
+
+Similar to the GO database, running `GeneSetAnalysisReactome()` without any arguments lets you view commonly used categories in the Reactome database:
+
+```{r, message=FALSE, warning=FALSE}
+GeneSetAnalysisReactome()
+```
+
+## Perform GSEA using customized genesets {#custom-gsea}
+
+To conduct a Gene Set Enrichment Analysis (GSEA) with custom gene sets, the `GeneSetAnalysis` function is the tool of choice. For instance, one might consider utilizing the [Hallmark 50](https://www.gsea-msigdb.org/gsea/msigdb/human/genesets.jsp?collection=H) gene set, commonly employed for general screening. This set can be accessed via the `hall50` object. Upon execution, the resulting AUCell matrix will be stored under the path: `seu@misc$AUCell[[title]]`.
+
+```{r, message=FALSE, warning=FALSE, fig.width=7.5, fig.height=8}
+pbmc <- GeneSetAnalysis(pbmc, genesets = hall50$human)
+matr <- pbmc@misc$AUCell$genesets
+Heatmap(CalcStats(matr, f = pbmc$cluster), lab_fill = "zscore")
+```
+
+For those seeking a plethora of other gene sets, the `SeuratExtendData::Genesets_data` offers an expansive collection sourced from the [GSEA MSigDB website](https://www.gsea-msigdb.org/gsea/msigdb/human/collections.jsp). Here's how you can view the available collections:
+
+```{r, message=FALSE, warning=FALSE}
+names(SeuratExtendData::Genesets_data$human$GSEA)
+```
+
+Furthermore, for cluster annotations, the `SeuratExtend::PanglaoDB_data` contains a valuable resource: marker lists for 178 distinct cell types, curated from [PanglaoDB](https://panglaodb.se/markers.html). To explore these marker lists:
+
+```{r, message=FALSE, warning=FALSE}
+names(SeuratExtend::PanglaoDB_data$marker_list_human)
+```
+
+## Find pathways in the GO/Reactome database or customized genesets {#search-database}
+
+Navigating the plethora of pathways in databases like GO and Reactome can be overwhelming. The `SearchDatabase` function simplifies this process by offering a wide array of customizable search parameters. 
+
+### General Search
+
+The 'item' parameter is highly versatile, allowing you to search by gene name, pathway ID, or even keywords within pathway names. The following example demonstrates how to find pathways containing the gene "CD3D" or pathways with names including "metabolic."
+
+```{r, message=FALSE, warning=FALSE}
+result <- SearchDatabase(c("CD3D", "metabolic"))
+names(result)
+glimpse(head(result, 3))
+```
+
+### Type-Specific Search
+
+If you wish to limit your search to specific types of items such as gene names, you can utilize the 'type' parameter as shown below.
+
+```{r, message=FALSE, warning=FALSE}
+result <- SearchDatabase("CD3D", type = "gene")
+names(result)
+```
+
+### Database-Specific Search
+
+To focus your search within a particular database, specify the database name using the 'database' parameter.
+
+```{r, message=FALSE, warning=FALSE}
+result <- SearchDatabase("CD3D", database = "Reactome")
+names(result)
+```
+
+### Species-Specific Search
+
+You can specify either 'human' or 'mouse' using the 'spe' parameter.
+
+```{r, message=FALSE, warning=FALSE}
+result <- SearchDatabase("Cd3d", spe = "mouse")
+glimpse(head(result, 3))
+```
+
+### Customizing Return Types
+
+The function also offers flexibility in output types. For example, if you require a list of pathway IDs for downstream analysis, you can use the 'return' parameter as follows.
+
+```{r, message=FALSE, warning=FALSE}
+result <- SearchDatabase("CD3D", return = "ID")
+result
+```
+
+Alternatively, if you need the output as a gene list formatted for `GeneSetAnalysis`, adjust the 'return' parameter like so:
+
+```{r, message=FALSE, warning=FALSE}
+result <- SearchDatabase("CD3D", return = "genelist")
+glimpse(head(result, 5))
+```
+
+To export the result as a data frame, suitable for formats like Excel or CSV, set the 'export.to.data.frame' parameter to TRUE.
+
+```{r, message=FALSE, warning=FALSE}
+result <- SearchDatabase("CD3D", export.to.data.frame = TRUE)
+glimpse(result)
+```
+
+### Filtering a Customized Gene Set
+
+Lastly, you can also filter a given gene set list with the `SearchPathways` function. For instance, within the "Hallmark 50" database, you can find pathways that include the gene "CD3D" or have names that contain "interferon."
+
+```{r, message=FALSE, warning=FALSE}
+SearchPathways(genesets = hall50$human, item = c("CD3D", "interferon"))
+```
+
+## Convert GO/Reactome pathway IDs to pathway names {#rename-pathways}
+
+During the course of analyses, researchers often encounter pathway IDs from databases such as GO and Reactome. While these IDs are great for computational tasks, they can be cryptic when it comes to interpretability. `RenameGO` and `RenameReactome` functions provide a convenient means to transform these IDs into their more descriptive pathway names.
+
+The primary parameter these functions require is "item". This can either be:
+
+1. A character vector of GO or Reactome IDs. For example, this could be the output from functions like `FilterGOTerms` or `FilterReactomeTerms`.
+2. A matrix where the IDs are stored in the rownames, such as the output of `GeneSetAnalysisGO` or `GeneSetAnalysisReactome`.
+
+Convert GO IDs to their respective pathway names for human:
+
+```{r, message=FALSE, warning=FALSE}
+RenameGO(c("GO:0002376","GO:0050896"), spe = "human")
+```
+
+Similarly, for Reactome IDs:
+
+```{r, message=FALSE, warning=FALSE}
+RenameReactome(c("R-HSA-109582","R-HSA-112316"), spe = "human")
+```
+
+## Filter the GO/Reactome pathway list based on certain criteria {#filter-pathways}
+
+Both GO and Reactome databases contain thousands of pathways, but not all of which may be relevant to your study. To streamline the analysis, you can use the `FilterGOTerms` and `FilterReactomeTerms` functions to subset and refine the list of GO or Reactome pathways based on specific criteria.
+
+### Filtering GO Pathways
+
+Let's start by looking at how you can filter GO pathways:
+
+- **By Parent Term:** To select pathways under a specific category, use the `parent` parameter. For example, to get pathways related to the immune system process:
+
+```{r, message=FALSE, warning=FALSE}
+terms <- FilterGOTerms(parent = "GO:0002376")
+RenameGO(terms)
+```
+
+- **By Gene Count:** If you're interested in pathways of a specific size (i.e., containing a certain number of genes), you can further refine your previously filtered list using the `n.min` and `n.max` parameters. Building upon the pathways we selected under the "immune system process" (`terms`), to keep only those pathways that contain between 10 and 1000 genes:
+
+```{r, message=FALSE, warning=FALSE}
+terms2 <- FilterGOTerms(term = terms, n.min = 10, n.max = 1000)
+RenameGO(terms2)
+```
+
+- **End-Level Pathways:** If you prefer to look at only the end-level (most specific) pathways, set the `only.end.terms` parameter to `TRUE`.
+
+```{r, message=FALSE, warning=FALSE}
+terms3 <- FilterGOTerms(term = terms, only.end.terms = TRUE)
+RenameGO(terms3)
+```
+
+### Filtering Reactome Pathways
+
+The process for Reactome pathways is analogous. For instance, to select pathways related to the Immune System:
+
+```{r, message=FALSE, warning=FALSE}
+terms <- FilterReactomeTerms(parent = "R-HSA-168256")
+RenameReactome(terms)
+```
+
+## Create a GSEA plot emulating the Broad Institute analysis {#gsea-plot}
+
+The `GSEAplot` function is designed to generate plots that emulate the Gene Set Enrichment Analysis (GSEA) as developed by the Broad Institute. This function provides a way to visualize the enrichment of specific gene sets within different biological states or conditions.
+
+Here's how you can create a GSEA plot for the "INTERFERON_GAMMA_RESPONSE" gene set within the "Naive CD4 T" cell population of the `pbmc` dataset:
+
+```{r, message=FALSE, warning=FALSE, fig.width=5.5, fig.height=4.5}
+GSEAplot(
+  pbmc, 
+  ident.1 = "CD4 T Naive", 
+  title = "INTERFERON_GAMMA_RESPONSE",
+  geneset = hall50$human$HALLMARK_INTERFERON_GAMMA_RESPONSE
+)
+```

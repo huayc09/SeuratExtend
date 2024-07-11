@@ -2,7 +2,7 @@
 % Please edit documentation in R/Colors.R
 \name{color_iwh}
 \alias{color_iwh}
-\title{Discrete color presets}
+\title{Default discrete color presets by 'I want hue'}
 \usage{
 color_iwh(
   n,

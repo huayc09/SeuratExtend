@@ -2,24 +2,34 @@
 #'
 NULL
 
-#' @param parent ID or name of parent (top-level) geneset in GO/Reactome database,
-#' so that only the subset of genesets will be calculated. Default: NULL
-#' @param dataset (GO) Alias of 'parent', Default: NULL
-#' @param root (GO) Which root to use (BP - Biological process, MF - Molecular Function,
-#' CC - Cellular Component), Default: 'BP'
-#' @param spe Species (human or mouse), Default: getOption("spe")
-#' @param only.end.terms If only the end-level pathways/genesets are used for calculation, Default: F
+#' @param parent ID or name of the parent (top-level) gene set in the GO/Reactome database.
+#' This restricts the analysis to a subset of gene sets. Default: NULL.
+#' @param dataset (GO) Alias for 'parent'. Default: NULL.
+#' @param root (GO) Specifies which root category to use:
+#' 'BP' (Biological Process), 'MF' (Molecular Function), or 'CC' (Cellular Component). Default: 'BP'.
+#' @param spe Species, either 'human' or 'mouse'. Default: getOption("spe").
+#' @param only.end.terms Boolean indicating whether only the end-level pathways or gene sets
+#' should be used for calculation. Default: FALSE.
 #' @rdname GeneSetAnalysis
 #' @export
 
 GeneSetAnalysisGO <- function(
     seu = NULL,
-    dataset = NULL, parent = NULL, root = "BP", spe = getOption("spe"),
-    ratio = 0.4, n.min = 1, n.max = Inf, only.end.terms = F,
-    slot = "counts", assay = "RNA", nCores = 1,
+    dataset = NULL,
+    parent = NULL,
+    root = "BP",
+    spe = getOption("spe"),
+    ratio = 0.4,
+    n.min = 1,
+    n.max = Inf,
+    only.end.terms = F,
+    slot = "counts",
+    assay = "RNA",
+    nCores = 1,
     aucMaxRank = NULL,
     title = NULL,
-    export_to_matrix = F, verbose = TRUE,
+    export_to_matrix = F,
+    verbose = TRUE,
     n.items.part = NULL){
 
   check_spe(spe)
@@ -77,43 +87,52 @@ GeneSetAnalysisGO <- function(
   return(seu)
 }
 
-#' @title Filter GO/Reactome genesets
-#' @description Filter GO/Reactome genesets IDs
-#' @param term GO/Reactome IDs, can be character or matrix (ID in rownames)
-#' @param spe Species (human or mouse), Default: getOption("spe")
-#' @param n.min Min number of genes in the geneset, Default: 1
-#' @param n.max Max number of genes in the geneset, Default: Inf
-#' @param only.end.terms If only the end-level pathways/genesets are used for calculation, Default: F
-#' @param change.name If to change names, Default: F
-#' @param parent ID or name of parent (top-level) geneset in GO/Reactome database, Default: NULL
-#' @return character or matrix, depends on the input
+#' @title Filter GO/Reactome Gene Sets
+#' @description Subset gene sets based on GO/Reactome IDs.
+#' @param term GO/Reactome IDs, either as a character vector or matrix (with IDs in rownames). If NULL, the function will filter from the entire database.
+#' @param spe Species, either 'human' or 'mouse'. Default: getOption("spe").
+#' @param n.min Minimum number of genes in the gene set. Default: 1.
+#' @param n.max Maximum number of genes in the gene set. Default: Inf.
+#' @param only.end.terms Boolean indicating whether only return the end-level pathways or gene sets. Default: FALSE.
+#' @param change.name Boolean indicating whether to change the gene set names. Default: FALSE.
+#' @param parent ID or name of the parent (top-level) gene set in the GO/Reactome database. Default: NULL.
+#' @return Returns a character vector or matrix, depending on the input.
 #' @examples
-#' options(max.print = 100, spe = "human")
+#' library(SeuratExtend)
+#' options(max.print = 10, spe = "human")
 #'
-#' # Filter GO terms
-#' terms <- names(SeuratExtendData::GO_Data$human$GO2Gene)
-#' terms
-#' terms <- FilterGOTerms(terms, n.max = 1000, n.min = 10, only.end.terms = T, parent = "GO:0002376")
+#' # Filter GO terms. For instance, select pathways under the category GO:0002376 (immune system process).
+#' terms <- FilterGOTerms(parent = "GO:0002376")
 #' RenameGO(terms)
 #'
-#' # Filter Reactome terms
-#' terms <- names(SeuratExtendData::Reactome_Data$human$Path2Gene)
-#' terms
-#' terms <- FilterReactomeTerms(terms, n.max = 1000, n.min = 10, only.end.terms = T, parent = "R-HSA-168256")
+#' # If you want to further restrict the number of genes in a pathway to be between 10 and 1000,
+#' # you can adjust the n.min and n.max parameters.
+#' terms2 <- FilterGOTerms(term = terms, n.min = 10, n.max = 1000)
+#' RenameGO(terms2)
+#'
+#' # To only return the end-level pathways, set the only.end.terms parameter to TRUE.
+#' terms3 <- FilterGOTerms(term = terms, only.end.terms = TRUE)
+#' RenameGO(terms3)
+#'
+#' # Filter Reactome terms. For example, select pathways under the category R-HSA-168256 (Immune System).
+#' terms <- FilterReactomeTerms(parent = "R-HSA-168256")
 #' RenameReactome(terms)
 #' @rdname FilterGOTerms
 #' @export
 
 FilterGOTerms <- function(
-    term,
+    term = NULL,
     spe = getOption("spe"),
     n.min = 1,
     n.max = Inf,
     only.end.terms = F,
     change.name = F,
-    parent = NULL){
+    parent = NULL
+){
   check_spe(spe)
   library(SeuratExtendData)
+  library(dplyr)
+  if(is.null(term)) term <- names(GO_Data[[spe]]$GO2Gene)
   if(is.vector(term)){
     filter <-
       SeuratExtendData::GO_Data[[spe]]$GO2Gene[term] %>%
@@ -140,15 +159,17 @@ FilterGOTerms <- function(
   return(term)
 }
 
-#' @title Add full name to GO/Reactome pathway ID
-#' @description Rename GO/Reactome ID to full geneset/pathway name
-#' @param term GO/Reactome IDs, can be character or matrix (ID in rownames)
-#' @param add_id If show IDs, Default: T
-#' @param add_n_gene If show how many genes in each geneset, Default: T
-#' @param spe Species (human or mouse), Default: getOption("spe")
-#' @return character or matrix, depends on the input
-#' @details Also see examples in \code{\link[SeuratExtend:GeneSetAnalysis]{GeneSetAnalysis()}}
+#' @title Convert GO/Reactome Pathway IDs to Full Names
+#' @description Converts GO or Reactome IDs to their respective full geneset or pathway names.
+#' @param term GO/Reactome IDs, which can be either a character vector or a matrix (with IDs in rownames).
+#' @param add_id Logical: Should the IDs be displayed? Default: TRUE.
+#' @param add_n_gene Logical: Should the number of genes in each geneset be displayed? Default: TRUE.
+#' @param spe Species, either 'human' or 'mouse'. Default: getOption("spe").
+#' @return Returns either a character vector or a matrix, depending on the input.
+#' @details For more examples, see \code{\link[SeuratExtend:GeneSetAnalysis]{GeneSetAnalysis()}}.
 #' @examples
+#' library(SeuratExtend)
+#'
 #' RenameGO(c("GO:0002376","GO:0050896"), spe = "human")
 #'
 #' RenameReactome(c("R-HSA-109582","R-HSA-112316"), spe = "human")
@@ -159,20 +180,22 @@ RenameGO <- function(
     term,
     add_id = T,
     add_n_gene = T,
-    spe = getOption("spe")){
+    spe = getOption("spe")
+) {
   if(is.vector(term)){
     check_spe(spe)
     library(SeuratExtendData)
-    renamed <- SeuratExtendData::GO_Data[[spe]]$GO_ontology$name[term]
-    if(add_id) renamed <- paste(term, renamed)
+    filter <- (term %in% GO_Data[[spe]]$GO_ontology$id)
+    term2 <- term[filter]
+    renamed <- GO_Data[[spe]]$GO_ontology$name[term2]
+    if(add_id) renamed <- paste(term2, renamed)
     if(add_n_gene) renamed <- paste0(
       renamed, " (",
-      sapply(SeuratExtendData::GO_Data[[spe]]$GO2Gene[term], length), "g)")
-    return(renamed)
+      sapply(GO_Data[[spe]]$GO2Gene[term2], length), "g)")
+    term[filter] <- renamed
+    return(term)
   }else{
-    library(magrittr)
-    library(dplyr)
-    term <- term %>% set_rownames(RenameGO(rownames(.), add_id = add_id, add_n_gene = add_n_gene))
+    rownames(term) <- RenameGO(rownames(term), add_id = add_id, add_n_gene = add_n_gene, spe = spe)
     return(term)
   }
 }

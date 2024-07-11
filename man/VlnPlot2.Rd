@@ -13,11 +13,13 @@ VlnPlot2(object, ...)
   features,
   group.by = NULL,
   split.by = NULL,
-  cell = NULL,
+  cells = NULL,
   slot = "data",
   assay = NULL,
   priority = c("expr", "none"),
-  ncol = 1,
+  cols = "auto",
+  load.cols = TRUE,
+  ncol = NULL,
   lab_fill = "group",
   scales = "free_y",
   violin = T,
@@ -45,7 +47,8 @@ VlnPlot2(object, ...)
   f2 = NULL,
   features = NULL,
   t = F,
-  ncol = 1,
+  cols = "pro_default",
+  ncol = NULL,
   lab_fill = "group",
   scales = "free_y",
   violin = T,
@@ -80,13 +83,27 @@ VlnPlot2(object, ...)
 
 \item{split.by}{A variable from `meta.data` to bifurcate the violin plots. Only applicable for the Seurat method.}
 
+\item{cells}{Cell identifiers for use. Defaults to all cells. Only applicable for the Seurat method.}
+
 \item{slot}{Slot to retrieve feature data from. Only applicable for the Seurat method.}
 
 \item{assay}{Name of the assay to employ. Defaults to the active assay. Only applicable for the Seurat method.}
 
 \item{priority}{If set to "expr", extracts data from the expression matrix over `meta.data`. Only applicable for the Seurat method.}
 
-\item{ncol}{Specifies the number of columns for display if multiple plots are shown. Default: 1.}
+\item{cols}{Flexible color settings for the plot, accepting a variety of inputs:
+
+    - Seven color_pro styles: "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple".
+
+    - Five color_iwh styles: "iwh_default", "iwh_intense", "iwh_pastel", "iwh_all", "iwh_all_hard".
+
+    - Brewer color scales as specified by `brewer.pal.info`.
+
+    - Any manually specified colors.}
+
+\item{load.cols}{When TRUE, automatically loads pre-stored color information for variables from `seu@misc[["var_colors"]]`.}
+
+\item{ncol}{Specifies the number of columns for display if multiple plots are shown. Default: NULL.}
 
 \item{lab_fill}{Label for the figure legend. Default: 'group'.}
 
@@ -112,6 +129,8 @@ VlnPlot2(object, ...)
 
 \item{stat.method}{Determines if pairwise statistics are added to the plot. Either "wilcox.test" or "t.test". Default: "none".}
 
+\item{p.adjust.method}{Method for adjusting p-values, especially when conducting multiple pairwise tests or dealing with multiple grouping variables. Options include "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", and "none". Note: Adjustments are independently conducted for each variable in formulas containing multiple variables. Default: 'holm'.}
+
 \item{label}{Specifies label type. Options include "p.signif" (showing significance levels), "p.format" (formatted p value), or "p", "p.adj". Default: "p.signif".}
 
 \item{comparisons}{List of length-2 vectors, each containing either names of two x-axis values or two integers pointing to groups of interest for comparison. Default: all groups.}
@@ -129,10 +148,6 @@ VlnPlot2(object, ...)
 \item{f2}{A factor or vector akin to `f` for splitting the violin plots. Default: NULL.}
 
 \item{t}{If the matrix has features in columns and cells in rows, transpose the matrix first. Default: FALSE.}
-
-\item{cells}{Cell identifiers for use. Defaults to all cells. Only applicable for the Seurat method.}
-
-\item{method}{Method for adjusting p-values, especially when conducting multiple pairwise tests or dealing with multiple grouping variables. Options include "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", and "none". Note: Adjustments are independently conducted for each variable in formulas containing multiple variables. Default: 'holm'.}
 }
 \value{
 ggplot object
@@ -153,31 +168,31 @@ library(SeuratExtend)
 
 # Basic violin plot with box plot and points:
 genes <- c("CD3D","CD14","CD79A")
-VlnPlot2(pbmc, features = genes)
+VlnPlot2(pbmc, features = genes, ncol = 1)
 
 # Without violin plot, only box plot, and use quasirandom style for point position adjustment:
-VlnPlot2(pbmc, features = genes, violin = F, pt.style = "quasirandom")
+VlnPlot2(pbmc, features = genes, violin = F, pt.style = "quasirandom", ncol = 1)
 
 # Hide points but display outlier points of the box plot:
-VlnPlot2(pbmc, features = genes, pt = FALSE)
+VlnPlot2(pbmc, features = genes, pt = FALSE, ncol = 1)
 
 # When hiding points, outliers are shown by default (recommended). However, outliers can be hidden for a cleaner appearance:
-VlnPlot2(pbmc, features = genes, pt = FALSE, hide.outlier = T)
+VlnPlot2(pbmc, features = genes, pt = FALSE, hide.outlier = T, ncol = 1)
 
 # Group by cluster and split each cluster by samples:
 VlnPlot2(pbmc, features = genes, group.by = "cluster", split.by = "orig.ident")
 
 # Display only cells from certain subtypes (e.g. B cell, CD14+ Mono, and CD8 T cell), and arrange plots in 3 columns:
-cells <- colnames(pbmc)[pbmc$cluster \%in\% c("B", "CD14+ Mono", "CD8 T")]
-VlnPlot2(pbmc, features = genes, group.by = "cluster", cell = cells, ncol = 3)
+cells <- colnames(pbmc)[pbmc$cluster \%in\% c("B cell", "Mono CD14", "CD8 T cell")]
+VlnPlot2(pbmc, features = genes, group.by = "cluster", cells = cells)
 
 # Add statistical annotations using the Wilcoxon test for pairwise comparisons and hide non-significant results:
-VlnPlot2(pbmc, features = genes, group.by = "cluster", cell = cells, ncol = 3,
+VlnPlot2(pbmc, features = genes, group.by = "cluster", cell = cells,
          stat.method = "wilcox.test", hide.ns = TRUE)
 
-# Display statistics comparing only the first 2 clusters using a t-test:
-VlnPlot2(pbmc, features = genes, group.by = "cluster", cell = cells, ncol = 3,
-         stat.method = "t.test", comparisons = list(c(1:2)), hide.ns = FALSE)
+# Display statistics comparing only the specified clusters using a t-test:
+VlnPlot2(pbmc, features = genes, group.by = "cluster", cell = cells,
+         stat.method = "t.test", comparisons = list(c(1,2), c(1,3)), hide.ns = FALSE)
 
 # Using a matrix as input:
 # For instance, after performing Geneset Enrichment Analysis (GSEA) using the Hallmark 50 geneset to obtain the AUCell matrix:
@@ -185,5 +200,5 @@ pbmc <- GeneSetAnalysis(pbmc, genesets = hall50$human)
 matr <- pbmc@misc$AUCell$genesets
 
 # Create violin plots for the first three pathways:
-VlnPlot2(matr[1:3,], f = pbmc$cluster)
+VlnPlot2(matr[1:3,], f = pbmc$cluster, ncol = 1)
 }

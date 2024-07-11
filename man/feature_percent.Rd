@@ -57,7 +57,7 @@ feature_percent(pbmc, feature = genes)
 feature_percent(pbmc, feature = genes, above = 2)
 
 # Only check subset of clusters
-feature_percent(pbmc, feature = genes, ident = c("B","CD8 T"))
+feature_percent(pbmc, feature = genes, ident = c("B cell", "CD8 T cell"))
 
 # Group by a different variable
 feature_percent(pbmc, feature = genes, group.by = "orig.ident")

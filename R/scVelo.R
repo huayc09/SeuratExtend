@@ -1,17 +1,304 @@
-#' @title Export loom for scVelo
-#' @description Export Seurat object to loom for scVelo run, and merge
-#' velocyto output (spliced/unspliced matrix) into the the loom
-#' @param seu Seurat object
-#' @param export.name Name of loom file
-#' @param velocyto.loom.path Directory to velocyto output (loom file), Default: getwd()
-#' @param velocyto.loom.filenames File names of velocyto output (loom file)
-#' @param fxn.convert.loomtoseurat.cellname (Experimental) function to convert velocyto
-#' cell names to Seurat cell names
-#' @param prefix Seurat cell id prefix to barcode (usually sample name)
-#' @param postfix Seurat cell id postfix to barcode (usually '-1')
-#' @return a loom file
-#' @details See above
-#' @rdname scVelo.SeuratToLoom
+#' @title Convert Seurat Object to AnnData and Generate scVelo Plots for Single-Cell RNA Velocity Analysis
+#' @description This set of functions converts a Seurat object and associated Velocyto loom file(s) into an AnnData object and generates visualization plots for RNA velocity analysis using scVelo. The AnnData object can be directly read from a file or accessed from memory to produce various styles of plots. This integrated approach facilitates the use of scVelo for trajectory analysis in Python's Scanpy library, allowing seamless transition between data processing in R and trajectory analysis in Python.
+#' @param seu The Seurat object containing single-cell RNA sequencing data that needs to be analyzed using scVelo.
+#' @param filename Path where the resulting AnnData object will be saved. This should be a path to an h5ad file.
+#' @param velocyto.loompath Path(s) to the Velocyto-generated loom file which contains RNA velocity data.
+#' @param cell.id.match.table An optional data frame for advanced users that maps cell IDs between the Seurat object and Velocyto loom file across multiple samples. It requires a strict format with three columns: cellid.seurat, cellid.velocyto, and velocyto.loompath, indicating the cell ID in the Seurat object, the corresponding cell ID in the Velocyto loom, and the loom file path for that sample, respectively. Default: NULL
+#' @param prefix Prefix used to prepend to cell IDs in the Seurat object to match the corresponding IDs in the Velocyto loom file, reflecting sample or batch identifiers. Default: NULL
+#' @param postfix Postfix appended to cell IDs in the Seurat object to match the corresponding IDs in the Velocyto loom file. Default: '-1'
+#' @param conda_env Name of the Conda environment where the Python dependencies for scVelo and Scanpy are installed. This environment is used to run Python code from R. Default: 'seuratextend'
+#' @return These functions do not return any object within R; instead, they prepare and store an AnnData object `adata` in the Python environment accessible via `reticulate`, and generate plots which can be viewed directly or saved to a file. The plots reflect the dynamics of RNA velocity in single-cell datasets.
+#' @details This integrated functionality facilitates a seamless transition between converting Seurat objects to AnnData objects and plotting with scVelo. The primary metadata and dimension reduction data from the Seurat object are used to prepare the AnnData object, which is then utilized for generating plots. `SeuratExtend` enhances scVelo plotting capabilities in R, supporting a variety of customization options for visualizing single-cell RNA velocity data. Users can manipulate plot styles, color schemes, group highlights, and more, making it an essential tool for advanced single-cell analysis without the need for direct interaction with Python code.
+#' @examples
+#' library(Seurat)
+#' library(SeuratExtend)
+#'
+#' # Download the example Seurat Object
+#' mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds", "rb"))
+#'
+#' # Download the example velocyto loom file to tmp folder
+#' loom_path <- file.path(tempdir(), "pbmc10k_mye_small.loom")
+#' download.file("https://zenodo.org/records/10944066/files/pbmc10k_mye_small.loom", loom_path)
+#'
+#' # Set up the path for saving the AnnData object in the HDF5 (h5ad) format
+#' adata_path <- file.path(tempdir(), "mye_small.h5ad")
+#'
+#' # Integrate Seurat Object and velocyto loom information into one AnnData object, which will be stored at the specified path.
+#' scVelo.SeuratToAnndata(
+#'   mye_small, # The downloaded example Seurat object
+#'   filename = adata_path, # Path where the AnnData object will be saved
+#'   velocyto.loompath = loom_path, # Path to the loom file
+#'   prefix = "sample1_", # Prefix for cell IDs in the Seurat object
+#'   postfix = "-1" # Postfix for cell IDs in the Seurat object
+#' )
+#'
+#' # Generate a default UMAP plot colored by 'cluster' and save it as a PNG file
+#' scVelo.Plot(color = "cluster", save = "umap1.png", figsize = c(5,4))
+#'
+#' # Generate a scatter style plot highlighting specific groups, using a custom color palette, with specified axis limits, and save it to a file
+#' scVelo.Plot(
+#'   style = "scatter",
+#'   color = "cluster",
+#'   groups = c("DC", "Mono CD14"),
+#'   palette = color_pro(3, "light"),
+#'   xlim = c(0, 10), ylim = c(0, 10),
+#'   save = "umap2_specified_area.png"
+#' )
+#' @rdname scVelo.SeuratToAnndata
+#' @export
+
+scVelo.SeuratToAnndata <- function(
+    seu,
+    filename,
+    velocyto.loompath,
+    cell.id.match.table = NULL,
+    prefix = NULL,
+    postfix = "-1",
+    conda_env = "seuratextend"
+) {
+  library(Seurat)
+  import("hdf5r")
+  library(glue)
+  library(reticulate)
+
+  load_condaenv(conda_env = conda_env)
+
+  if(!is.character(velocyto.loompath)) {
+    stop("velocyto.loompath must be a character vector of file paths.")
+  }
+  if(length(velocyto.loompath) == 0) {
+    stop("No valid loom file paths provided in velocyto.loompath.")
+  }
+  if(any(!file.exists(velocyto.loompath))) {
+    stop("Loom file(s) not found: ",
+         paste(velocyto.loompath[!file.exists(velocyto.loompath)], collapse = ", "))
+  }
+
+  # Initialize lists to store spliced and unspliced matrices
+  spliced_list <- list()
+  unspliced_list <- list()
+
+  # Loop over each loom file
+  for (file in velocyto.loompath) {
+    # Open the loom file
+    loom <- H5File$new(file, mode = "r")
+
+    # Check if the required datasets and attributes exist in the loom file
+    if (!loom$exists("layers/spliced") || !loom$exists("layers/unspliced") ||
+        !loom$exists("col_attrs/CellID") || !loom$exists("row_attrs/Gene")) {
+      warning(paste("Missing spliced/unspliced data or attributes in loom file:", file))
+      next
+    }
+
+    # Read spliced and unspliced matrices
+    spliced <- loom[["layers/spliced"]][,]
+    unspliced <- loom[["layers/unspliced"]][,]
+
+    # Assign row names and column names to the matrices
+    cell_ids <- loom[["col_attrs/CellID"]][]
+    if(is.null(cell.id.match.table)) {
+      # Extract the barcode from the cell IDs
+      cell_ids <- sub(".*:", "", cell_ids) # Remove everything before ":"
+      cell_ids <- sub("x$", "", cell_ids) # Remove the trailing "x"
+    }
+    # Modify duplicated genes
+    gene_ids <- make.unique(loom[["row_attrs/Gene"]][])
+
+    rownames(spliced) <- cell_ids
+    colnames(spliced) <- gene_ids
+    rownames(unspliced) <- cell_ids
+    colnames(unspliced) <- gene_ids
+
+    spliced_list[[file]] <- spliced
+    unspliced_list[[file]] <- unspliced
+
+    # Close the loom file
+    loom$close_all()
+  }
+
+  # Check if cell.id.match.table is not NULL
+  if(!is.null(cell.id.match.table)) {
+    # Validate the cell.id.match.table
+    if(!all(c("cellid.seurat", "cellid.velocyto", "velocyto.loompath") %in% names(cell.id.match.table)))
+      stop("cell.id.match.table must have columns: cellid.seurat, cellid.velocyto, and velocyto.loompath.")
+
+    # Initialize merged spliced and unspliced list
+    merged_spliced <- list()
+    merged_unspliced <- list()
+
+    # Loop over each loom file
+    for(file in unique(cell.id.match.table$velocyto.loompath)) {
+      spliced <- spliced_list[[file]]
+      unspliced <- unspliced_list[[file]]
+
+      # Get the subset of cell.id.match.table for this file
+      subset_table <- subset(cell.id.match.table, velocyto.loompath == file)
+
+      # Create a named vector for renaming: names are cellid.velocyto and values are cellid.seurat
+      renaming_vector <- setNames(subset_table$cellid.seurat, subset_table$cellid.velocyto)
+
+      # Filter rows of spliced and unspliced matrices that are in renaming_vector
+      spliced <- spliced[rownames(spliced) %in% names(renaming_vector), , drop = FALSE]
+      unspliced <- unspliced[rownames(unspliced) %in% names(renaming_vector), , drop = FALSE]
+
+      # Rename the row names of spliced and unspliced matrices
+      rownames(spliced) <- renaming_vector[rownames(spliced)]
+      rownames(unspliced) <- renaming_vector[rownames(unspliced)]
+
+      # Merge matrices
+      merged_spliced[[file]] <- spliced
+      merged_unspliced[[file]] <- unspliced
+    }
+  } else {
+    # Validate and replicate prefix and postfix if needed
+    if(length(prefix) != length(velocyto.loompath) && length(prefix) != 1)
+      stop("Invalid length of prefix. It should be either the same length as velocyto.loompath or 1.")
+    if(length(postfix) != length(velocyto.loompath) && length(postfix) != 1)
+      stop("Invalid length of postfix. It should be either the same length as velocyto.loompath or 1.")
+
+    if(length(prefix) == 1) prefix <- rep(prefix, length(velocyto.loompath))
+    if(length(postfix) == 1) postfix <- rep(postfix, length(velocyto.loompath))
+
+    # Initialize merged spliced and unspliced list
+    merged_spliced <- list()
+    merged_unspliced <- list()
+
+    # Loop over each loom file
+    for(i in seq_along(velocyto.loompath)) {
+      spliced <- spliced_list[[i]]
+      unspliced <- unspliced_list[[i]]
+
+      # Modify row names using prefix and postfix
+      rownames(spliced) <- paste0(prefix[i], rownames(spliced), postfix[i])
+      rownames(unspliced) <- paste0(prefix[i], rownames(unspliced), postfix[i])
+
+      # Filter rows based on colnames of Seurat object
+      common_cells <- intersect(rownames(spliced), colnames(seu))
+
+      # Check if common_cells is empty or significantly smaller
+      if(length(common_cells) == 0)
+        stop("No common cells found between the spliced/unspliced matrix and the Seurat object. Please double-check the prefix and postfix.")
+
+      spliced <- spliced[common_cells, , drop = FALSE]
+      unspliced <- unspliced[common_cells, , drop = FALSE]
+
+      # Merge matrices
+      merged_spliced[[i]] <- spliced
+      merged_unspliced[[i]] <- unspliced
+    }
+  }
+
+  # Identify common genes
+  common_genes <- Reduce(intersect, lapply(merged_unspliced, colnames))
+
+  # Subset each matrix to only include the common genes
+  merged_unspliced <- lapply(merged_unspliced, function(mat) mat[, common_genes, drop = FALSE])
+  merged_spliced <- lapply(merged_spliced, function(mat) mat[, common_genes, drop = FALSE])
+
+  merged_spliced <- rlist::list.rbind(merged_spliced)
+  merged_unspliced <- rlist::list.rbind(merged_unspliced)
+
+  # Identify common cells and genes between merged matrices and Seurat object
+  common_cells <- intersect(colnames(seu), rownames(merged_spliced))
+  common_genes <- intersect(rownames(seu), colnames(merged_spliced))
+
+  # Check if the number of common cells is less than the number of cells in Seurat object
+  if(length(common_cells) < length(colnames(seu))) {
+    warning(paste0("The number of common cells in the merged matrices (", length(common_cells),
+                   ") is less than the number of cells in the Seurat object (", length(colnames(seu)),
+                   "). Please double-check the input, including the order of the samples."))
+    seu <- subset(seu, cells = common_cells)
+  }
+
+  # Check if the number of common genes is less than the number of genes in Seurat object
+  if(length(common_genes) < length(rownames(seu))) {
+    warning(paste0(length(rownames(seu)) - length(common_genes), " genes in the Seurat object not detected in the Velocyto matrix. Please double-check if the Seurat gene count matrix and Velocyto use the same reference genome."))
+    seu <- subset(seu, features = common_genes)
+  }
+
+  # Reorder the rows and columns of merged_spliced and merged_unspliced
+  merged_spliced <- merged_spliced[common_cells, common_genes]
+  merged_unspliced <- merged_unspliced[common_cells, common_genes]
+
+  # Create a temporary directory with a timestamp
+  subfolder <- create_temp_dir()
+
+  # Export loom to tmp folder
+  tmp.loom.path <- file.path(subfolder, "scvelo.loom")
+  Seu2Loom(
+    seu, filename = tmp.loom.path,
+    layers = list(spliced = merged_spliced, unspliced = merged_unspliced))
+
+  python_code <- glue('
+import scvelo as scv
+import scanpy as sc
+import numpy as np
+import matplotlib.cm as cm
+
+# Set scVelo settings
+scv.logging.print_version()
+scv.settings.verbosity = 3
+scv.settings.presenter_view = True
+scv.set_figure_params("scvelo")
+
+# Read the loom file
+adata = scv.read("{tmp.loom.path}")
+
+# Pre-process the data
+scv.pp.filter_and_normalize(adata, min_shared_counts=20, n_top_genes=2000)
+scv.pp.moments(adata, n_pcs=30, n_neighbors=30)
+')
+
+  py_run_string(python_code)
+
+  # Get the list of dimension reductions
+  dr_list <- Reductions(seu)
+
+  # Check if dr_list is not empty
+  if (length(dr_list) > 0) {
+    # Loop over each dimension reduction and add to Anndata object
+    for (i in dr_list) {
+      # Get the embeddings and write to a temporary CSV file
+      embeddings <- Embeddings(seu, reduction = i)
+      tmp_dr_path <- file.path(subfolder, paste0(i, "_dr.csv"))
+      write.csv(embeddings, file = tmp_dr_path, quote = F, row.names = F)
+
+      # Construct the Python code string using glue
+      python_code <- glue('
+import numpy as np
+adata.obsm["{i}_cell_embeddings"] = np.genfromtxt("{tmp_dr_path}", delimiter=",", skip_header=1)
+    ')
+
+      # Run the Python code
+      py_run_string(python_code)
+    }
+  }
+
+  # Construct the Python code string to run scVelo and save the Anndata object
+  python_code <- glue('
+# Compute velocity and velocity graph
+scv.tl.velocity(adata)
+scv.tl.velocity_graph(adata)
+adata.write("{filename}")
+')
+
+  # Run the Python code
+  reticulate::py_run_string(python_code)
+}
+
+#' @title (Deprecated) Export Seurat Object and Velocyto Data to Loom for scVelo Analysis
+#' @description This function converts a Seurat object and associated Velocyto loom files into a single loom file that integrates both spliced and unspliced RNA matrices. It is part of an older workflow and is soft deprecated in favor of `scVelo.SeuratToAnndata`. However, it is preserved for reproducibility of earlier work that cited its use.
+#' @param seu Seurat object containing single-cell RNA sequencing data.
+#' @param export.name Name of the resulting loom file to be created.
+#' @param velocyto.loom.path Directory containing the Velocyto loom files; defaults to the current working directory. Default: getwd()
+#' @param velocyto.loom.filenames Filenames of Velocyto output (loom files) that contain spliced and unspliced RNA data.
+#' @param fxn.convert.loomtoseurat.cellname (Experimental) Function to convert cell names in Velocyto loom files to Seurat object cell names, if they differ.
+#' @param prefix Optional prefix added to Seurat cell IDs, typically used to include sample names. Default: NULL
+#' @param postfix Optional postfix added to Seurat cell IDs, typically used to denote unique identifiers such as '-1'. Default: NULL
+#' @return Generates a loom file that integrates Seurat and Velocyto data, stored in the specified export path.
+#' @details This set of functions supports the transition from Seurat objects to an integrated loom file via `scVelo.SeuratToLoom`, and from loom files to AnnData objects via `scVelo.RunBasic`, ready for basic to advanced scVelo analysis in Python. This older method is preserved for compatibility with previous studies and publications, ensuring reproducibility of earlier work. This older method is preserved for compatibility with previous studies and publications, but users are encouraged to transition to `scVelo.SeuratToAnndata` for a more streamlined and updated approach that directly integrates Seurat objects with scVelo analysis in Python's Scanpy library.
+#' @seealso \code{\link[SeuratExtend:scVelo.SeuratToAnndata]{scVelo.SeuratToAnndata}} for the recommended method of preparing data for scVelo analysis.
+#' @rdname scVelo-SeuratToLoom-and-RunBasic
 #' @export
 
 scVelo.SeuratToLoom <- function(
@@ -143,19 +430,9 @@ scVelo.SeuratToLoom <- function(
   pfile$close_all()
 }
 
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param loom PARAM_DESCRIPTION
-#' @param save.adata PARAM_DESCRIPTION, Default: 'adata.obj'
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
-#' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @rdname scVelo.RunBasic
+#' @param loom Path to the loom file created by `scVelo.SeuratToLoom`.
+#' @param save.adata Name and path where the AnnData object should be saved, typically ending in '.h5ad'. Default: 'adata.obj'
+#' @rdname scVelo-SeuratToLoom-and-RunBasic
 #' @export
 
 scVelo.RunBasic <- function(loom, save.adata = "adata.obj"){
@@ -186,51 +463,93 @@ scVelo.RunBasic <- function(loom, save.adata = "adata.obj"){
   py_run_string(code)
 }
 
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param adata PARAM_DESCRIPTION
-#' @param seu PARAM_DESCRIPTION
-#' @param dr PARAM_DESCRIPTION, Default: NULL
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
-#' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @rdname scVelo.AddDimReduc
+#' @param load.adata Path to a previously saved AnnData object (in h5ad format) which can be directly loaded to avoid re-running preprocessing. If NULL, reticulate will automatically use the existing AnnData object `adata` in the Python environment for plotting. Default: NULL.
+#' @param style Style of the velocity plot, allowing for different visual representations such as 'stream', 'grid', or 'scatter'. Default: c("stream", "grid", "scatter").
+#' @param basis The embedding to be used for plotting, typically 'umap_cell_embeddings' to represent UMAP reductions. Default: 'umap_cell_embeddings'.
+#' @param color The variable by which to color the plot, usually a categorical variable like cluster identifiers or a continuous variable reflecting gene expression levels. Default: NULL.
+#' @param groups Groups or clusters to highlight in the plot, useful for focusing on specific cell types or conditions within the dataset. Default: NULL.
+#' @param palette Color palette to use for differentiating between groups or clusters within the plot. Allows customization of aesthetic presentation. Default: NULL.
+#' @param alpha Opacity of the points in the plot, which can be adjusted to enhance visualization when dealing with densely packed points. Default: 0.15.
+#' @param arrow_size Size of the arrows representing RNA velocity vectors in the plot, relevant only when `style` is set to 'scatter'. This can be adjusted to make the arrows more or less prominent based on visualization needs. Default: 3.
+#' @param arrow_length Length of the arrows, which affects how far the arrows extend from their origin points. Relevant only when style is 'scatter', helping in interpreting the directionality and magnitude of cellular transitions. Default: 2.
+#' @param dpi Resolution of the saved plot, useful when preparing figures for publication or presentations. Default: 300.
+#' @param legend_fontsize Size of the font used in the plot legend, allowing for customization based on the figure's intended use or audience. Default: 9.
+#' @param figsize Dimensions of the plot in inches, providing control over the size of the output figure to accommodate different analysis contexts. Default: c(7, 5).
+#' @param xlim Limits for the x-axis, which can be set to focus on specific areas of the plot or to standardize across multiple plots. Default: NULL.
+#' @param ylim Limits for the y-axis, similar in use to `xlim` for focusing or standardizing the y-axis view. Default: NULL.
+#' @param save Path where the plot should be saved. If specified, the plot will be saved to the given location. Supports various file formats like PNG, PDF, SVG, etc. Default: NULL.
+#' @rdname scVelo.SeuratToAnndata
 #' @export
 
-scVelo.AddDimReduc <- function(adata, seu, dr = NULL) {
+scVelo.Plot <- function(
+    load.adata = NULL,
+    style = c("stream", "grid", "scatter"),
+    basis = "umap_cell_embeddings",
+    color = NULL,
+    groups = NULL,
+    palette = NULL,
+    alpha = 0.15,
+    arrow_size = 3,
+    arrow_length = 2,
+    dpi = 300,
+    legend_fontsize = 9,
+    figsize = c(7, 5),
+    xlim = NULL,
+    ylim = NULL,
+    save = NULL,
+    conda_env = "seuratextend"
+) {
   library(reticulate)
-  library(rlang)
-  dr_list <- Reductions(seu)
-  dr <- dr %||% dr_list
-  if(!all(dr %in% dr_list)){
-    stop("Dimention reduction '", dr, "' not found.\n",
-         "Available option(s): ", paste0(dr_list, collapse = ", "))
+  library(glue)
+
+  load_condaenv(conda_env = conda_env)
+
+  # Load adata if load.adata is provided
+  if (!is.null(load.adata)) {
+    adata.Load(load.adata)
   }
-  code <- paste0("import pickle\n",
-                 'pickle_in = open("',adata,'","rb")\n',
-                 "adata = pickle.load(pickle_in)\n",
-                 "from numpy import genfromtxt")
-  py_run_string(code)
-  for (i in dr) {
-    nc <- ncol(Embeddings(seu, reduction = i))
-    export.dr(seu, i)
-    code <- paste0(
-      "adata.obsm['",i,"_cell_embeddings'] = genfromtxt('tmp/dr.csv', ",
-      "delimiter=',', skip_header=1, usecols=range(1,", nc + 1 ,"))"
-    )
-    py_run_string(code)
-  }
-  code <- paste0(
-    "import scvelo as scv\n",
-    "scv.tl.velocity_graph(adata)\n",
-    'pickle_out = open("', adata, '","wb")\n',
-    "pickle.dump(adata, pickle_out)\n",
-    "pickle_out.close()\n"
+
+  # Determine the scv plotting function
+  plot_function <- switch(
+    style[1],
+    "stream" = "scv.pl.velocity_embedding_stream",
+    "grid" = "scv.pl.velocity_embedding_grid",
+    "scatter" = "scv.pl.velocity_embedding",
+    stop("Invalid style provided.")
   )
-  py_run_string(code)
+
+  # Construct the function call
+  args_list <- list(
+    basis = shQuote(basis, type = "sh"),
+    color = if (!is.null(color)) shQuote(color, type = "sh") else NULL,
+    groups = r_vector_to_py(groups),
+    palette = r_vector_to_py(palette),
+    alpha = alpha,
+    dpi = dpi,
+    legend_fontsize = legend_fontsize,
+    save = if (!is.null(save)) shQuote(save, type = "sh") else NULL,
+    figsize = r_vector_to_py(figsize, type = "tuple"),
+    xlim = r_vector_to_py(xlim, type = "tuple"),
+    ylim = r_vector_to_py(ylim, type = "tuple")
+  )
+
+  if (style[1] == "scatter") {
+    args_list$arrow_size <- arrow_size
+    args_list$arrow_length <- arrow_length
+  }
+
+  # Filter out NULL arguments
+  args_list <- args_list[!sapply(args_list, is.null)]
+
+  # Convert to Python function call string
+  args_string <- paste(paste(names(args_list), "=", args_list, sep = ""), collapse = ", ")
+  py_command <- glue("{plot_function}(adata, {args_string})")
+
+  # Execute the Python command
+  reticulate::py_run_string("import scvelo as scv")
+  reticulate::py_run_string(py_command)
+
+  invisible(NULL)
 }
+
+

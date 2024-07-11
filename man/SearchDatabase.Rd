@@ -2,7 +2,7 @@
 % Please edit documentation in R/SearchDatabase.R
 \name{SearchDatabase}
 \alias{SearchDatabase}
-\title{FUNCTION_TITLE}
+\title{Search Pathways in GO/Reactome Database}
 \usage{
 SearchDatabase(
   item,
@@ -12,39 +12,83 @@ SearchDatabase(
   export.to.data.frame = F,
   n.min = 1,
   n.max = Inf,
-  only.end.terms = F
+  only.end.terms = F,
+  return = c("all", "ID", "genelist")
 )
 }
 \arguments{
-\item{item}{PARAM_DESCRIPTION}
+\item{item}{A gene name, pathway ID, or pathway name.}
 
-\item{type}{PARAM_DESCRIPTION, Default: c("gene", "SetID", "SetName")}
+\item{type}{Types of search criteria. Can be one or a combination of "gene", "SetID", "SetName". Default: c("gene", "SetID", "SetName").}
 
-\item{database}{PARAM_DESCRIPTION, Default: c("GO", "Reactome")}
+\item{database}{The database to search in: "GO", "Reactome", or both. Default: c("GO", "Reactome").}
 
-\item{spe}{PARAM_DESCRIPTION, Default: getOption("spe")}
+\item{spe}{Species, either 'human' or 'mouse'. Default: getOption("spe").}
 
-\item{export.to.data.frame}{PARAM_DESCRIPTION, Default: F}
+\item{export.to.data.frame}{If TRUE, the results will be returned as a data frame, which can be easily exported to csv or xlsx formats. Default: FALSE.}
 
-\item{n.min}{PARAM_DESCRIPTION, Default: 1}
+\item{n.min}{Minimum number of genes required in the gene set. Default: 1.}
 
-\item{n.max}{PARAM_DESCRIPTION, Default: Inf}
+\item{n.max}{Maximum number of genes allowed in the gene set. Default: Inf.}
 
-\item{only.end.terms}{PARAM_DESCRIPTION, Default: F}
+\item{only.end.terms}{If TRUE, only the end-level pathways or gene sets will be returned. Default: FALSE.}
+
+\item{return}{Specifies the format of the result. If set to "all" (default), the result will include all information (pathway ID, pathway name, genes). If set to "ID", it will only return a vector of pathway IDs. If set to "genelist", it will return a list where the names are pathway IDs and the contents are the corresponding genes.}
 }
 \value{
-OUTPUT_DESCRIPTION
+Depending on the specified parameters, the function returns:
+\itemize{
+ \item A full list (with pathway ID, pathway name, and genes) if \code{return = "all"}.
+ \item A vector of pathway IDs if \code{return = "ID"}.
+ \item A named list of genes with pathway IDs as the list names if \code{return = "genelist"}.
+ \item A data frame if \code{export.to.data.frame = TRUE}.
+}
 }
 \description{
-FUNCTION_DESCRIPTION
+Search for pathways in the GO or Reactome database using a gene name, pathway ID (SetID), or pathway name (SetName).
 }
 \details{
-DETAILS
+Further details and usage can be seen in the provided examples.
 }
 \examples{
-\dontrun{
-if(interactive()){
- #EXAMPLE1
- }
-}
+library(SeuratExtend)
+library(dplyr)
+options(max.print = 10)
+
+# Set the default database search to 'human'
+options(spe = "human")
+
+# The 'item' parameter can be anything like a gene, pathway ID, or pathway name.
+# For example, search in the GO/Reactome database for pathways that contain the "CD3D" gene
+# or pathway names that include "metabolic".
+result <- SearchDatabase(c("CD3D","metabolic"))
+names(result)
+glimpse(head(result, 5))
+
+# If you only want to search based on gene names, you can specify this in the 'type' parameter.
+result <- SearchDatabase("CD3D", type = "gene")
+names(result)
+
+# If you want to search in a specific database, you can specify it using the 'database' parameter.
+result <- SearchDatabase("CD3D", database = "Reactome")
+names(result)
+
+# You can specify the database to be either 'human' or 'mouse' using the 'spe' parameter.
+result <- SearchDatabase("Cd3d", spe = "mouse")
+glimpse(head(result, 5))
+
+# If you only want the result to be a list of pathway IDs, which could be useful for subsequent analysis,
+# you can set the 'return' parameter accordingly.
+result <- SearchDatabase("CD3D", return = "ID")
+result
+
+# If you want the output as a gene list, with the IDs as names, suitable for inputs like GeneSetAnalysis,
+# you can adjust the 'return' parameter.
+result <- SearchDatabase("CD3D", return = "genelist")
+glimpse(head(result, 5))
+
+# If you prefer the output to be a data frame, which is suitable for exporting to Excel or CSV formats,
+# you can set 'export.to.data.frame' to TRUE.
+result <- SearchDatabase("CD3D", export.to.data.frame = TRUE)
+glimpse(result)
 }

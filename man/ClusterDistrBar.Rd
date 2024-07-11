@@ -13,7 +13,9 @@ ClusterDistrBar(
   plot = T,
   flip = T,
   width = 0.9,
-  border = NA
+  stack = T,
+  cols = "pro_default",
+  border = "white"
 )
 }
 \arguments{
@@ -33,7 +35,11 @@ ClusterDistrBar(
 
 \item{width}{Width of bars, Default: 0.9}
 
-\item{border}{Border color, Default: NA}
+\item{stack}{If TRUE, plot stacked bars, Default: T}
+
+\item{cols}{Colors to use for plotting. Default: "pro_default"}
+
+\item{border}{Border color, Default: "white"}
 }
 \value{
 ggplot object or matrix
@@ -45,21 +51,23 @@ Plot the percentage/absolute cell count of each cluster in each sample
 See example
 }
 \examples{
-ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc)) +
-  scale_fill_manual(values = color_iwh(9,3))
+ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster)
 
 # absolute cell count
-ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc), percent = F)
+ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, percent = F)
 
 # reverse x and y axis, normalized by sample size
-ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc), rev = T, normalize = T)
+ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, rev = T, normalize = T)
 
 # reverse x and y axis, not normalized by sample size
-ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc), rev = T, normalize = F)
+ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, rev = T, normalize = F)
 
 # vertical bar plot
-ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc), flip = F)
+ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, flip = F)
+
+# not stacking bars
+ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, flip = FALSE, stack = FALSE)
 
 # export matrix
-ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc), plot = F)
+ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, plot = F)
 }

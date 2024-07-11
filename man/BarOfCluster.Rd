@@ -23,12 +23,6 @@ ggplot object or matrix
 \description{
 deprecated function of \code{\link[SeuratExtend:ClusterDistrBar]{ClusterDistrBar()}}
 }
-\examples{
-meta <- seu@meta.data
-origin <- meta$orig.ident
-cluster <- meta$cluster
-BarOfCluster(meta, "cluster", "orig.ident", method = "percent", do.heatmap = T)
-}
 \seealso{
 \code{\link[SeuratExtend:ClusterDistrBar]{ClusterDistrBar()}}
 }

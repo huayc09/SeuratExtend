@@ -24,6 +24,7 @@ WaterfallPlot(object, ...)
   color = "p",
   len.threshold = 0,
   col.threshold = 0,
+  color_theme = c(low = muted("blue"), mid = "white", high = muted("red")),
   top.n = NULL,
   flip = FALSE,
   y.label = length,
@@ -44,9 +45,10 @@ WaterfallPlot(object, ...)
   color = "tscore",
   len.threshold = 0,
   col.threshold = 0,
+  color_theme = c(low = muted("blue"), mid = "white", high = muted("red")),
   top.n = NULL,
   flip = TRUE,
-  y.label = length,
+  y.label = NULL,
   angle = NULL,
   hjust = NULL,
   vjust = NULL,
@@ -105,6 +107,18 @@ WaterfallPlot(object, ...)
 \item{matr}{A matrix or data frame where rows represent features and columns represent cells.}
 
 \item{f}{A factor or vector indicating the identity of each cell. The length should match the number of columns in `matr`.}
+
+\item{color_scheme}{Specifies the color gradient for the heatmap visualization.
+  This parameter accepts multiple input formats to provide flexibility in defining color schemes:
+
+  - Predefined color schemes: Users can specify "A", "B", "C", "D", or "E" to use color schemes from the `viridis` package.
+
+  - Named vector for three-point gradients: Provide a named vector with keys "low", "mid", and "high" to define colors at these specific data points. The "mid" value is typically centered at zero, allowing for a diverging color scheme.
+    Example: `c(low = "blue", mid = "white", high = "red")`
+
+  - Two-point gradient: Provide a named vector with keys "low" and "high" to create a simple two-color gradient. Example: `c(low = "blue", high = "red")`
+
+  - Custom color gradient: Users can provide a vector of colors to generate a custom gradient across multiple values. This is suitable for more complex data ranges and visual preferences.}
 }
 \value{
 A ggplot object.
@@ -122,20 +136,20 @@ pbmc <- GeneSetAnalysis(pbmc, genesets = hall50$human)
 matr <- pbmc@misc$AUCell$genesets
 
 # Generate a waterfall plot comparing CD14+ Mono with CD8 T cells.
-WaterfallPlot(matr, f = pbmc$cluster, ident.1 = "CD14+ Mono", ident.2 = "CD8 T")
+WaterfallPlot(matr, f = pbmc$cluster, ident.1 = "Mono CD14", ident.2 = "CD8 T cell")
 
 # Keep only bars with a length (tscore, in this instance) greater than 1.
-WaterfallPlot(matr, f = pbmc$cluster, ident.1 = "CD14+ Mono", ident.2 = "CD8 T", len.threshold = 1)
+WaterfallPlot(matr, f = pbmc$cluster, ident.1 = "Mono CD14", ident.2 = "CD8 T cell", len.threshold = 1)
 
 # Use a Seurat object as input and compare 100 genes, using LogFC as bar length.
-genes <- VariableFeatures(pbmc)[1:100]
+genes <- VariableFeatures(pbmc)[1:80]
 WaterfallPlot(
   pbmc, group.by = "cluster", features = genes,
-  ident.1 = "CD14+ Mono", ident.2 = "CD8 T", length = "logFC")
+  ident.1 = "Mono CD14", ident.2 = "CD8 T cell", length = "logFC")
 
 # Keep only the top and bottom 20 genes.
 WaterfallPlot(
   pbmc, group.by = "cluster", features = genes,
-  ident.1 = "CD14+ Mono", ident.2 = "CD8 T", length = "logFC",
+  ident.1 = "Mono CD14", ident.2 = "CD8 T cell", length = "logFC",
   top.n = 20)
 }

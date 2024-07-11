@@ -16,3 +16,6 @@ for (i in 1:5) {
 }
 
 usethis::use_data(color_presets, overwrite = TRUE)
+# rename
+presets_color_iwh <- color_presets
+usethis::use_data(presets_color_iwh, overwrite = TRUE)

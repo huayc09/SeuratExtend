@@ -20,6 +20,7 @@ WaterfallPlot_v3(
   color = "p",
   len.threshold = 0,
   col.threshold = 0,
+  color_theme = c(low = muted("blue"), mid = "white", high = muted("red")),
   top.n = NULL,
   flip = FALSE,
   y.label = length,

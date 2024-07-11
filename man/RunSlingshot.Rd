@@ -2,34 +2,50 @@
 % Please edit documentation in R/RunSlingshot.R
 \name{RunSlingshot}
 \alias{RunSlingshot}
-\title{FUNCTION_TITLE}
+\title{Calculate Pseudotime and Map Trajectories Using Slingshot}
 \usage{
-RunSlingshot(Seu, group.by, reducedDim = "DM", assay = NULL, start.clus = NULL)
+RunSlingshot(
+  Seu,
+  group.by,
+  reducedDim = "PCA",
+  assay = NULL,
+  start.clus = NULL
+)
 }
 \arguments{
-\item{Seu}{PARAM_DESCRIPTION}
+\item{Seu}{A Seurat object containing single-cell RNA-seq data with precomputed clusters and necessary dimensional reductions.}
 
-\item{group.by}{PARAM_DESCRIPTION}
+\item{group.by}{Specifies the metadata column in the Seurat object used to define groups or clusters for trajectory analysis.}
 
-\item{reducedDim}{PARAM_DESCRIPTION, Default: 'DM'}
+\item{reducedDim}{The name of the dimensionality reduction to use for trajectory inference. Default: 'PCA'.}
 
-\item{assay}{PARAM_DESCRIPTION, Default: NULL}
+\item{assay}{Name of the assay to employ. Defaults to the active assay.}
 
-\item{start.clus}{PARAM_DESCRIPTION, Default: NULL}
+\item{start.clus}{Optional; specifies the starting cluster to initiate trajectory inference, which can be crucial for directing the trajectory analysis in a biologically meaningful way. Default: NULL.}
 }
 \value{
-OUTPUT_DESCRIPTION
+Modifies the Seurat object by adding Slingshot-derived pseudotime and trajectory data to the `@misc$slingshot` slot.
 }
 \description{
-FUNCTION_DESCRIPTION
+This function integrates Slingshot for pseudotime analysis directly within a Seurat workflow, enabling the mapping of cellular trajectories based on user-defined cluster assignments and starting clusters.
 }
 \details{
-DETAILS
+Slingshot is a flexible tool for trajectory analysis that uses cluster-based minimum spanning trees to infer developmental pathways. This function facilitates the integration of Slingshot with Seurat objects, allowing for pseudotime calculations that are sensitive to the underlying data structure and cluster dynamics. It is especially useful for complex datasets where multiple trajectories might exist, helping to uncover hidden patterns in cellular development.
 }
 \examples{
-\dontrun{
-if(interactive()){
- #EXAMPLE1
- }
-}
+library(Seurat)
+library(SeuratExtend)
+
+# Load an example Seurat Object
+mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds", "rb"))
+
+# Run Slingshot
+mye_small <- RunSlingshot(mye_small, group.by = "cluster", start.clus = "Mono CD14")
+
+# Access and visualize the Slingshot output
+sling <- mye_small@misc$slingshot$PCA$SlingPseudotime
+print(head(sling))
+mye_small@meta.data[,colnames(sling)] <- as.data.frame(sling)
+DimPlot2(mye_small, features = colnames(sling), cols = "C")
+
 }

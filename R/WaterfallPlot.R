@@ -28,9 +28,10 @@ WaterfallPlot.Seurat <- function(
     color = "p",
     len.threshold = 0,
     col.threshold = 0,
+    color_theme = c(low = muted("blue"), mid = "white", high = muted("red")),
     top.n = NULL,
     flip = FALSE,
-    y.label = length,
+    y.label = NULL,
     angle = NULL,
     hjust = NULL,
     vjust = NULL,
@@ -58,6 +59,7 @@ WaterfallPlot.Seurat <- function(
     color = color,
     len.threshold = len.threshold,
     col.threshold = col.threshold,
+    color_theme = color_theme,
     top.n = top.n,
     flip = flip,
     y.label = y.label,
@@ -80,6 +82,17 @@ WaterfallPlot.Seurat <- function(
 #' @param color Specifies the statistic to determine the color of the bar. Possible values are "tscore" (default), "p" (default for Seurat object input), or "logFC".
 #' @param len.threshold Excludes features with a value for the `length` parameter below this threshold. Defaults to 0.
 #' @param col.threshold Excludes features with a value for the `color` parameter below this threshold. Defaults to 0.
+#' @param color_scheme Specifies the color gradient for the heatmap visualization.
+#'   This parameter accepts multiple input formats to provide flexibility in defining color schemes:
+#'
+#'   - Predefined color schemes: Users can specify "A", "B", "C", "D", or "E" to use color schemes from the `viridis` package.
+#'
+#'   - Named vector for three-point gradients: Provide a named vector with keys "low", "mid", and "high" to define colors at these specific data points. The "mid" value is typically centered at zero, allowing for a diverging color scheme.
+#'     Example: `c(low = "blue", mid = "white", high = "red")`
+#'
+#'   - Two-point gradient: Provide a named vector with keys "low" and "high" to create a simple two-color gradient. Example: `c(low = "blue", high = "red")`
+#'
+#'   - Custom color gradient: Users can provide a vector of colors to generate a custom gradient across multiple values. This is suitable for more complex data ranges and visual preferences.
 #' @param top.n Retains only the top `n` bars in both positive and negative directions. If `length(top.n)` is 1, the function retains `top.n` bars for both positive and negative directions. If `length(top.n)` is 2, it retains `top.n[1]` positive bars and `top.n[2]` negative bars. Defaults to NULL.
 #' @param flip Determines whether the plot should be flipped. Defaults to TRUE for matrix input and FALSE for Seurat object input.
 #' @param y.label Label for the y-axis. Defaults to "length".
@@ -101,15 +114,15 @@ WaterfallPlot.default <- function(
     color = "tscore",
     len.threshold = 0,
     col.threshold = 0,
+    color_theme = c(low = muted("blue"), mid = "white", high = muted("red")),
     top.n = NULL,
     flip = TRUE,
-    y.label = length,
+    y.label = NULL,
     angle = NULL,
     hjust = NULL,
     vjust = NULL,
     title = NULL
 ){
-
   scores <- WaterfallPlot_Calc(
     matr = matr,
     f = f,
@@ -124,22 +137,25 @@ WaterfallPlot.default <- function(
     top.n = top.n
   )
 
-  if(is.null(title)) {
-    title <- WaterfallPlot_Title(
-      f = f,
-      ident.1 = ident.1,
-      ident.2 = ident.2)
-  }
+  titles <- WaterfallPlot_Title(
+    f = f,
+    ident.1 = ident.1,
+    ident.2 = ident.2,
+    title = title,
+    length_label = length,
+    y.label = y.label,
+    flip = flip)
 
   p <- WaterfallPlot_Plot(
     scores = scores,
     color = color,
+    color_theme = color_theme,
     flip = flip,
-    y.label = y.label,
+    y.label = titles[[2]],
     angle = angle,
     hjust = hjust,
     vjust = vjust,
-    title = title
+    title = titles[[1]]
   )
 
   return(p)
@@ -218,6 +234,7 @@ WaterfallPlot_Calc <- function(
 WaterfallPlot_Plot <- function(
     scores,
     color,
+    color_theme,
     flip,
     y.label,
     angle,
@@ -230,8 +247,8 @@ WaterfallPlot_Plot <- function(
   if(flip){
     scores <- scores[nrow(scores):1, ]
     angle <- angle %||% 0
-    hjust <- hjust %||% 0
-    vjust <- vjust %||% 0.5
+    hjust <- hjust %||% 0.5
+    vjust <- vjust %||% 1
   }else{
     angle <- angle %||% -90
     hjust <- hjust %||% 0
@@ -243,17 +260,23 @@ WaterfallPlot_Plot <- function(
     geom_bar(stat = "identity") +
     theme_classic() +
     labs(fill = lab_fill, x = element_blank(), y = y.label, title = title) +
-    scale_fill_gradient2(low = muted("blue"), high = muted("red")) +
     theme(axis.text.x=element_text(angle = angle, hjust = hjust, vjust = vjust),
           plot.title = element_text(hjust = 0.5, face = "bold"))
+  p <- p + scale_fill_cont_auto(color_theme)
   if(flip) p <- p + scale_x_discrete(position = "top") + coord_flip()
   return(p)
 }
 
-WaterfallPlot_Title <- function(f, ident.1, ident.2) {
+WaterfallPlot_Title <- function(f, ident.1, ident.2, title, length_label, y.label, flip) {
   f <- factor(f)
   ident.1 <- ident.1 %||% levels(f)[1]
   ident.2 <- ident.2 %||% paste0("non-", ident.1)
-  title <- paste0(ident.1, " vs. ", ident.2)
-  return(title)
+  title <- title %||% paste0(ident.1, " vs. ", ident.2)
+  if(is.null(y.label)) {
+    y.label <- length_label
+    if(isTRUE(flip)) {
+      y.label <- paste0(ident.2," ← ",y.label," → ",ident.1)
+    }
+  }
+  return(list(title, y.label))
 }

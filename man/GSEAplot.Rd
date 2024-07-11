@@ -57,6 +57,6 @@ P value is calculated using Kolmogorov-Smirnov Tests
 }
 \examples{
 GSEAplot(
-  pbmc, ident.1 = "Naive CD4 T", title = "INTERFERON_GAMMA_RESPONSE",
+  pbmc, ident.1 = "CD4 T Naive", title = "INTERFERON_GAMMA_RESPONSE",
   geneset = hall50$human$HALLMARK_INTERFERON_GAMMA_RESPONSE)
 }

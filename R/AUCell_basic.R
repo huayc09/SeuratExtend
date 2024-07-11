@@ -59,8 +59,11 @@
 #' @return Seurat object.
 #' @details AUCell ranking matrix is saved in seu@misc$AUCell[["cells_rankings"]]
 #' @examples
+#' library(SeuratExtend)
+#' options(max.print = 20)
+#'
 #' pbmc <- BuildAUCRank(pbmc)
-#' pbmc@misc$AUCell[["cells_rankings"]]
+#' pbmc@misc$AUCell[["cells_rankings"]][3,4]
 #' @rdname BuildAUCRank
 #' @export
 

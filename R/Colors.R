@@ -1,4 +1,4 @@
-#' @title Discrete color presets
+#' @title Default discrete color presets by 'I want hue'
 #' @description Generate color presets from 'I want hue' online tool
 #' @param n How many colors to generate
 #' @param col.space Color space, Options: "default", "intense", "pastel",
@@ -17,11 +17,7 @@ color_iwh <- function(
   col.space = c("default","intense","pastel","all","all_hard"),
   set = 1
 ) {
-  if(getOption("color_iwh.warning",TRUE)) {
-    message("The 'I want hue' color presets were generated from: https://medialab.github.io/iwanthue/\n",
-            "This message is shown once per session")
-    options("color_iwh.warning"=FALSE)
-  }
+  message_only_once("color_iwh","The 'I want hue' color presets were generated from: https://medialab.github.io/iwanthue/")
 
   if(!col.space[1] %in% c("default","intense","pastel","all","all_hard", 1:5)) {
     message('"col.space" should be "default", "intense", "pastel", "all" or "all_hard"\n',
@@ -39,17 +35,69 @@ color_iwh <- function(
   }else if(n > 50 & col.space %in% c("default",1)) {
     stop("Input color number is ", n, ". Too many colors (n > 50).")
   }
-  n.range <- names(color_presets[[col.space]])
+  n.range <- names(presets_color_iwh[[col.space]])
   if(!n %in% n.range){
     stop('"n" should be integer and in range (',
          n.range[1],'~',tail(n.range, 1),') for preset "',col.space,'".')
   }
-  set.range <- names(color_presets[[col.space]][[as.character(n)]])
+  set.range <- names(presets_color_iwh[[col.space]][[as.character(n)]])
   if(!set %in% set.range){
     stop('"set" should be in range (',set.range[1],'~',tail(set.range, 1),') for ',
          n,' colors in preset "', col.space,'".')
   }
-  cols <- color_presets[[col.space]][[as.character(n)]][[set]]
+  cols <- presets_color_iwh[[col.space]][[as.character(n)]][[set]]
+  return(cols)
+}
+
+#' @title Professional discrete color presets by 'I want hue'
+#' @description Generate professional color presets from 'I want hue' color tool
+#' @param n How many colors to generate
+#' @param col.space Color space, Options: "default", "light", "red", "yellow", "green", "blue", or "purple"
+#' @param sort Sort colors by hue (default) or differentiation, Options: "hue", "diff"
+#' @param set Several random presets, Default: 1
+#' @return Vector of colors
+#' @details
+#' Random color presets generated from: https://medialab.github.io/iwanthue/
+#' @examples
+#' color_pro(10)
+#' @rdname color_pro
+#' @export
+
+color_pro <- function(
+    n,
+    col.space = c("default","light","red","yellow","green","blue","purple"),
+    sort = c("hue","diff"),
+    set = 1
+) {
+  message_only_once("color_iwh","The 'I want hue' color presets were generated from: https://medialab.github.io/iwanthue/")
+
+  if(!col.space[1] %in% c("default","light","red","yellow","green","blue","purple", 1:7)) {
+    message('"col.space" should be "default", "light", "red", "yellow", "green", "blue", or "purple"\nUsing "default" preset.')
+    col.space <- "default"
+  }
+  col.space <- col.space[1]
+
+  if(!sort[1] %in% c("hue","diff", 1:2)) {
+    message('"sort" should be "hue" or "diff". Sorting by "hue"')
+    sort <- "hue"
+  }
+  sort <- sort[1]
+
+  cols_set <- presets_color_pro[[col.space]][[sort]]
+
+  n.range <- names(cols_set)
+  if(!n %in% n.range | !is.numeric(n)){
+    stop('"n" should be integer and in range (',
+         n.range[1],'~',tail(n.range, 1),') for preset "',col.space,'".')
+  }
+  cols_set <- cols_set[[as.character(n)]]
+
+  set.range <- length(cols_set)
+  if(!set %in% 1:set.range){
+    stop('"set" should be in range (1~',set.range,') for ',
+         n,' colors in preset "', col.space,'".')
+  }
+  cols <- cols_set[[set]]
   return(cols)
 }
 
@@ -136,3 +184,133 @@ ang <- function(ryb = c(0,0.5,1)){
   return(x)
 }
 
+# internal functions for fill/color themes
+
+scale_fill_cont_auto <- function(color_scheme) {
+  if(is.null(color_scheme)) return(NULL)
+  library(ggplot2)
+  if(any(color_scheme %in% c("A","B","C","D","E"))) {
+    import("viridis")
+    cols <- scale_fill_viridis(option = color_scheme)
+  }else if(!is.na(color_scheme["mid"])) {
+    cols <- scale_fill_gradient2(low = color_scheme["low"],
+                                 mid = color_scheme["mid"],
+                                 high = color_scheme["high"])
+  }else if(all(!is.na(color_scheme[c("low","high")]))) {
+    cols <- scale_fill_gradient(low = color_scheme["low"],
+                                high = color_scheme["high"])
+  }else{
+    cols <- scale_fill_gradientn(colors = color_scheme)
+  }
+  return(cols)
+}
+
+scale_color_cont_auto <- function(color_scheme) {
+  if(is.null(color_scheme)) return(NULL)
+  library(ggplot2)
+  if(any(color_scheme %in% c("A","B","C","D","E"))) {
+    import("viridis")
+    cols <- scale_color_viridis(option = color_scheme)
+  }else if(!is.na(color_scheme["mid"])) {
+    cols <- scale_color_gradient2(low = color_scheme["low"],
+                                  mid = color_scheme["mid"],
+                                  high = color_scheme["high"])
+  }else if(all(!is.na(color_scheme[c("low","high")]))) {
+    cols <- scale_color_gradient(low = color_scheme["low"],
+                                 high = color_scheme["high"])
+  }else{
+    cols <- scale_color_gradientn(colors = color_scheme)
+  }
+  return(cols)
+}
+
+scale_color_disc_auto <- function(color_scheme, n, labels = waiver()) {
+  if(is.null(color_scheme)) return(NULL)
+  library(ggplot2)
+  pro_theme <- c("default","light","red","yellow","green","blue","purple")
+  iwh_theme <- c("default","intense","pastel","all","all_hard")
+  if(length(color_scheme) == 1 & n <= 50) {
+    if(color_scheme %in% c("default","light",paste0("pro_",pro_theme))) {
+      color_scheme <- sub("pro_","",color_scheme)
+      if(n == 1 && color_scheme == "default") return(NULL)
+      cols <- color_pro(n, col.space = color_scheme)
+      cols <- scale_color_manual(values = cols, labels = labels)
+    } else if(color_scheme %in% paste0("iwh_",iwh_theme)) {
+      color_scheme <- sub("iwh_","",color_scheme)
+      cols <- color_iwh(n, col.space = color_scheme)
+      cols <- scale_color_manual(values = cols, labels = labels)
+    } else {
+      cols <- scale_color_brewer(palette = color_scheme, labels = labels)
+    }
+  } else {
+    cols <- scale_color_manual(values = color_scheme, labels = labels)
+  }
+  return(cols)
+}
+
+scale_fill_disc_auto <- function(color_scheme, n) {
+  if(is.null(color_scheme)) return(NULL)
+  library(ggplot2)
+  pro_theme <- c("default","light","red","yellow","green","blue","purple")
+  iwh_theme <- c("default","intense","pastel","all","all_hard")
+  if(length(color_scheme) == 1 & n <= 50) {
+    if(color_scheme %in% c("default","light",paste0("pro_",pro_theme))) {
+      color_scheme <- sub("pro_","",color_scheme)
+      if(n == 1 && color_scheme == "default") return(NULL)
+      cols <- color_pro(n, col.space = color_scheme)
+      cols <- scale_fill_manual(values = cols)
+    } else if(color_scheme %in% paste0("iwh_",iwh_theme)) {
+      color_scheme <- sub("iwh_","",color_scheme)
+      cols <- color_iwh(n, col.space = color_scheme)
+      cols <- scale_fill_manual(values = cols)
+    } else {
+      cols <- scale_fill_brewer(palette = color_scheme)
+    }
+  } else {
+    cols <- scale_fill_manual(values = color_scheme)
+  }
+  return(cols)
+}
+
+#' @title Save Custom Color Settings to a Seurat Object
+#' @description This function stores custom color settings within a Seurat object, allowing these settings to be reused across various visualization functions within the Seurat environment.
+#' @param seu A Seurat object to which the color settings will be saved.
+#' @param col_list A list of color settings where names correspond to variable names and values are the colors to be associated with each variable.
+#' @return The modified Seurat object with updated color settings in the `misc` slot.
+#' @details `save_colors` enhances workflow efficiency by centralizing color management within the Seurat object. This enables consistent and coherent visualizations across multiple plots, reducing the need for repeated color specifications and ensuring that plots are both aesthetically pleasing and informative.
+#' @examples
+#' library(SeuratExtend)
+#'
+#' # Define custom colors for different clusters and genes
+#' custom_colors <- list(
+#'   "cluster" = "pro_blue",
+#'   "CD14" = "D",
+#'   "CD3D" = c("#EEEEEE", "black")
+#' )
+#' # Save these colors to the Seurat object
+#' pbmc <- save_colors(pbmc, custom_colors)
+#' # Use the colors in DimPlot2
+#' DimPlot2(pbmc, features = c("cluster", "CD14", "CD3D"))
+#'
+#' @rdname save_colors
+#' @export
+
+save_colors <- function(seu, col_list) {
+  # Ensure that col_list is a list before proceeding
+  if (!is.list(col_list)) {
+    stop("The 'col_list' parameter must be a list. Example format:\n",
+         "list(cluster = 'pro_blue', CD14 = 'D', CD3D = c('#EEEEEE', 'black'))")
+  }
+
+  # Check if 'var_colors' slot exists and is not NULL; if not, initialize as an empty list
+  if (is.null(seu@misc[["var_colors"]])) {
+    seu@misc[["var_colors"]] <- list()
+  }
+
+  # Update 'var_colors' with new colors without overwriting existing entries
+  # Only update the entries provided in col_list
+  seu@misc[["var_colors"]][names(col_list)] <- col_list
+
+  # Optionally return the Seurat object if you want to check the updated list
+  return(seu)
+}

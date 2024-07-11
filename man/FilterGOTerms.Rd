@@ -4,10 +4,10 @@
 \name{FilterGOTerms}
 \alias{FilterGOTerms}
 \alias{FilterReactomeTerms}
-\title{Filter GO/Reactome genesets}
+\title{Filter GO/Reactome Gene Sets}
 \usage{
 FilterGOTerms(
-  term,
+  term = NULL,
   spe = getOption("spe"),
   n.min = 1,
   n.max = Inf,
@@ -17,7 +17,7 @@ FilterGOTerms(
 )
 
 FilterReactomeTerms(
-  term,
+  term = NULL,
   spe = getOption("spe"),
   n.min = 1,
   n.max = Inf,
@@ -27,38 +27,44 @@ FilterReactomeTerms(
 )
 }
 \arguments{
-\item{term}{GO/Reactome IDs, can be character or matrix (ID in rownames)}
+\item{term}{GO/Reactome IDs, either as a character vector or matrix (with IDs in rownames). If NULL, the function will filter from the entire database.}
 
-\item{spe}{Species (human or mouse), Default: getOption("spe")}
+\item{spe}{Species, either 'human' or 'mouse'. Default: getOption("spe").}
 
-\item{n.min}{Min number of genes in the geneset, Default: 1}
+\item{n.min}{Minimum number of genes in the gene set. Default: 1.}
 
-\item{n.max}{Max number of genes in the geneset, Default: Inf}
+\item{n.max}{Maximum number of genes in the gene set. Default: Inf.}
 
-\item{only.end.terms}{If only the end-level pathways/genesets are used for calculation, Default: F}
+\item{only.end.terms}{Boolean indicating whether only return the end-level pathways or gene sets. Default: FALSE.}
 
-\item{change.name}{If to change names, Default: F}
+\item{change.name}{Boolean indicating whether to change the gene set names. Default: FALSE.}
 
-\item{parent}{ID or name of parent (top-level) geneset in GO/Reactome database, Default: NULL}
+\item{parent}{ID or name of the parent (top-level) gene set in the GO/Reactome database. Default: NULL.}
 }
 \value{
-character or matrix, depends on the input
+Returns a character vector or matrix, depending on the input.
 }
 \description{
-Filter GO/Reactome genesets IDs
+Subset gene sets based on GO/Reactome IDs.
 }
 \examples{
-options(max.print = 100, spe = "human")
+library(SeuratExtend)
+options(max.print = 10, spe = "human")
 
-# Filter GO terms
-terms <- names(SeuratExtendData::GO_Data$human$GO2Gene)
-terms
-terms <- FilterGOTerms(terms, n.max = 1000, n.min = 10, only.end.terms = T, parent = "GO:0002376")
+# Filter GO terms. For instance, select pathways under the category GO:0002376 (immune system process).
+terms <- FilterGOTerms(parent = "GO:0002376")
 RenameGO(terms)
 
-# Filter Reactome terms
-terms <- names(SeuratExtendData::Reactome_Data$human$Path2Gene)
-terms
-terms <- FilterReactomeTerms(terms, n.max = 1000, n.min = 10, only.end.terms = T, parent = "R-HSA-168256")
+# If you want to further restrict the number of genes in a pathway to be between 10 and 1000,
+# you can adjust the n.min and n.max parameters.
+terms2 <- FilterGOTerms(term = terms, n.min = 10, n.max = 1000)
+RenameGO(terms2)
+
+# To only return the end-level pathways, set the only.end.terms parameter to TRUE.
+terms3 <- FilterGOTerms(term = terms, only.end.terms = TRUE)
+RenameGO(terms3)
+
+# Filter Reactome terms. For example, select pathways under the category R-HSA-168256 (Immune System).
+terms <- FilterReactomeTerms(parent = "R-HSA-168256")
 RenameReactome(terms)
 }

@@ -13,12 +13,14 @@ Heatmap(
   hjust = 1,
   vjust = 1,
   legend_position = "right",
+  y_text_position = "right",
   feature_text_subset = NULL,
   segment.width = c(1, 2.5, 1),
   segment.size = 0.2,
   text.spacing = 2,
   text.size = 2.5,
   hide_axis_line = TRUE,
+  plot.margin = margin(t = 5.5, r = 5.5, b = 5.5, l = 5.5),
   expand_limits_x = NULL,
   facet_col = NULL,
   facet_row = NULL,
@@ -32,7 +34,17 @@ Heatmap(
 \arguments{
 \item{score}{A matrix for input, for instance, one generated using the CalcStats function.}
 
-\item{color_scheme}{Color scheme for the heatmap. Default: c(low = muted("blue"), mid = "white", high = muted("red")).}
+\item{color_scheme}{Specifies the color gradient for the heatmap visualization.
+  This parameter accepts multiple input formats to provide flexibility in defining color schemes:
+
+  - Predefined color schemes: Users can specify "A", "B", "C", "D", or "E" to use color schemes from the `viridis` package.
+
+  - Named vector for three-point gradients: Provide a named vector with keys "low", "mid", and "high" to define colors at these specific data points. The "mid" value is typically centered at zero, allowing for a diverging color scheme.
+    Example: `c(low = "blue", mid = "white", high = "red")`
+
+  - Two-point gradient: Provide a named vector with keys "low" and "high" to create a simple two-color gradient. Example: `c(low = "blue", high = "red")`
+
+  - Custom color gradient: Users can provide a vector of colors to generate a custom gradient across multiple values. This is suitable for more complex data ranges and visual preferences.}
 
 \item{border_color}{Color for the tile borders. Default: NULL.}
 
@@ -46,6 +58,8 @@ Heatmap(
 
 \item{legend_position}{Position of the figure legend. Default: 'right'.}
 
+\item{y_text_position}{Position of the row name text. Default: 'right'}
+
 \item{feature_text_subset}{A subset of feature names to be shown. Useful when there are many features. Default: NULL.}
 
 \item{segment.width}{Adjust the width ratio of the line connecting heatmap rows and feature text. Only effective when `feature_text_subset` is set. Default: c(1, 2.5, 1).}
@@ -58,7 +72,11 @@ Heatmap(
 
 \item{hide_axis_line}{Whether to hide the axis line or not. Default: TRUE.}
 
-\item{expand_limits_x}{Sometimes the first name on the x-axis (e.g., cluster name) might be too long and surpass the left boundary of the plot. Expand the x-axis's left boundary to display the entire cluster name. Default: NULL.}
+\item{plot.margin}{Adjusts the space around the plot to prevent text labels from being cut off. This is particularly useful when axis names are too long and may extend beyond the plot boundaries. The margin is defined for top (t), right (r), bottom (b), and left (l) edges of the plot area.
+To increase the left margin and provide more space for the first name on the x-axis, increase the `l` value. Default: `margin(t = 5.5, r = 5.5, b = 5.5, l = 5.5)` in grid units.}
+
+\item{expand_limits_x}{This parameter is softly deprecated in favor of using `plot.margin`.
+Previously used to increase the space on the left side of the plot by adjusting the x-axis limits. It is still available for backward compatibility but its use is not recommended. Default: NULL.}
 
 \item{facet_col}{Vector or factor to split the heatmap columns. Default: NULL.}
 
@@ -104,8 +122,8 @@ Heatmap(toplot, lab_fill = "zscore", color_scheme = c(
 # Employ the viridis color theme, options include A, B, C, D, or E.
 Heatmap(toplot, lab_fill = "zscore", color_scheme = "A")
 
-# Expand the x-axis left boundary to ensure the full name of the first cluster is visible.
-Heatmap(toplot, lab_fill = "zscore", expand_limits_x = -0.5)
+# Adjust the left margin to ensure the x-axis labels fit within the plot boundaries
+Heatmap(toplot, lab_fill = "zscore", plot.margin = margin(l = 30))
 
 # Construct a dense matrix with data for 500 genes.
 toplot2 <- CalcStats(pbmc, features = genes[1:500], method = "zscore", order = "p")

@@ -2,7 +2,7 @@
 % Please edit documentation in R/FeaturePlot.R
 \name{FeaturePlot3}
 \alias{FeaturePlot3}
-\title{FUNCTION_TITLE}
+\title{Simultaneous Visualization of Three Features in a Single Plot}
 \usage{
 FeaturePlot3(
   seu,
@@ -12,39 +12,48 @@ FeaturePlot3(
   color = c("ryb", "rgb"),
   color.range = c(0.1, 0.9),
   reduction = "umap",
-  order = T
+  order = T,
+  pt.size = 0.1
 )
 }
 \arguments{
-\item{seu}{PARAM_DESCRIPTION}
+\item{seu}{A Seurat object that contains the data for plotting. This object should have precomputed dimensionality reduction coordinates.}
 
-\item{feature.1}{PARAM_DESCRIPTION, Default: NA}
+\item{feature.1}{The name of the first feature (gene or other variable) to be plotted. Default: NA.}
 
-\item{feature.2}{PARAM_DESCRIPTION, Default: NA}
+\item{feature.2}{The name of the second feature. Default: NA.}
 
-\item{feature.3}{PARAM_DESCRIPTION, Default: NA}
+\item{feature.3}{The name of the third feature. Default: NA.}
 
-\item{color}{PARAM_DESCRIPTION, Default: c("ryb", "rgb")}
+\item{color}{The color model used to blend the expression data of the three features. Options include "ryb" (red-yellow-blue) and "rgb" (red-green-blue), affecting how expression intensities are represented through color. Default: c("ryb", "rgb").}
 
-\item{color.range}{PARAM_DESCRIPTION, Default: c(0.1, 0.9)}
+\item{color.range}{The range of expression intensity that is represented by the color spectrum in the plot, helping to enhance visibility of lower expressions and prevent oversaturation at high expression levels. Default: c(0.1, 0.9).}
 
-\item{reduction}{PARAM_DESCRIPTION, Default: 'umap'}
+\item{reduction}{The type of dimension reduction used to display the data, such as 'umap' or 'tsne'. This choice determines the underlying plot layout. Default: 'umap'.}
 
-\item{order}{PARAM_DESCRIPTION, Default: T}
+\item{order}{A logical value indicating whether to plot cells with higher expressions on top of those with lower expressions, which can help prevent significant data points from being obscured in dense areas of the plot. Default: TRUE.}
+
+\item{pt.size}{Point size for plotting individual cells in the grid. Smaller values are typically used for large datasets or dense plots, whereas larger values enhance visibility for plots with fewer cells or less overlap. Default: 0.1.}
 }
 \value{
-OUTPUT_DESCRIPTION
+A ggplot object that represents a dimension reduction plot incorporating three features with color blending, showing how each feature contributes to the overall expression patterns observed.
 }
 \description{
-FUNCTION_DESCRIPTION
+This function visualizes three distinct features on a single dimension reduction plot using a color blending system. It allows for the quantitative display of gene expressions or other continuous variables by mixing colors according to the RYB or RGB color models, providing a unique perspective on feature interactions and expression levels within individual cells.
 }
 \details{
-DETAILS
+`FeaturePlot3` is designed for detailed exploratory analysis where understanding the interplay between multiple variables is crucial. This function is particularly useful for researchers looking to explore gene expressions in complex datasets, such as those involving interactions between different cell types or conditions.
 }
 \examples{
-\dontrun{
-if(interactive()){
- #EXAMPLE1
- }
-}
+library(Seurat)
+library(SeuratExtend)
+
+FeaturePlot3(
+  pbmc,
+  feature.1 = "CD3D",
+  feature.2 = "CD14",
+  feature.3 = "CD79A",
+  color = "ryb"
+)
+
 }

@@ -1,15 +1,25 @@
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param loom.path PARAM_DESCRIPTION
-#' @param seu PARAM_DESCRIPTION, Default: NULL
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
+#' @title Import SCENIC Loom Files into Seurat
+#' @description Imports SCENIC-generated loom files into Seurat objects for further analysis. This function allows the integration of gene regulatory network insights directly into the Seurat environment. If a Seurat object is specified, results are stored in `seu@misc$SCENIC` and a new 'TF' assay is created; if not, a list containing Regulons and RegulonsAUC is returned.
+#' @param loom.path Path to the SCENIC-generated loom file.
+#' @param seu Optional Seurat object. If specified, the SCENIC data (regulons and their activities) are imported directly into the object, facilitating further analyses. If not provided, the function returns a list containing the regulons and their activity matrices. Default: NULL.
+#' @return If a Seurat object is provided, the function returns the modified Seurat object with SCENIC data integrated. If no Seurat object is provided, a list with two elements is returned: `Regulons` containing the regulons and their gene lists, and `RegulonsAUC` containing the activity matrix of these regulons.
+#' @details This function is designed to ease the integration of SCENIC analysis into Seurat workflows, allowing users to explore and visualize transcription factor activities and their regulatory impacts on gene expression within their familiar Seurat analysis pipeline. The integration involves adding a new 'TF' assay for the regulon activity and storing detailed regulon information in the object's `misc` slot.
 #' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
+#' # Example of importing a SCENIC loom file with an existing Seurat object
+#' library(SeuratExtend)
+#' scenic_loom_path <- file.path(tempdir(), "pyscenic_integrated-output.loom")
+#' download.file("https://zenodo.org/records/10944066/files/pbmc3k_small_pyscenic_integrated-output.loom", scenic_loom_path)
+#' pbmc <- ImportPyscenicLoom(scenic_loom_path, seu = pbmc)
+#'
+#' # Example without an existing Seurat object
+#' scenic_output <- ImportPyscenicLoom(scenic_loom_path)
+#'
+#' # Accessing the SCENIC data in a Seurat object
+#' tf_auc <- pbmc@misc$SCENIC$RegulonsAUC
+#' head(tf_auc, 3:4)
+#' tf_gene_list <- pbmc@misc$SCENIC$Regulons
+#' head(tf_gene_list, 5)
+#'
 #' @rdname ImportPyscenicLoom
 #' @export
 

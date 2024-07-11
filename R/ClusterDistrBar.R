@@ -8,32 +8,47 @@
 #' @param plot Generate plot (TRUE) or matrix (FALSE), Default: T
 #' @param flip If plot bars horizontally, Default: T
 #' @param width Width of bars, Default: 0.9
-#' @param border Border color, Default: NA
+#' @param stack If TRUE, plot stacked bars, Default: T
+#' @param cols Colors to use for plotting. Default: "pro_default"
+#' @param border Border color, Default: "white"
 #' @return ggplot object or matrix
 #' @details See example
 #' @examples
-#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc)) +
-#'   scale_fill_manual(values = color_iwh(9,3))
+#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster)
 #'
 #' # absolute cell count
-#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc), percent = F)
+#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, percent = F)
 #'
 #' # reverse x and y axis, normalized by sample size
-#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc), rev = T, normalize = T)
+#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, rev = T, normalize = T)
 #'
 #' # reverse x and y axis, not normalized by sample size
-#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc), rev = T, normalize = F)
+#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, rev = T, normalize = F)
 #'
 #' # vertical bar plot
-#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc), flip = F)
+#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, flip = F)
+#'
+#' # not stacking bars
+#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, flip = FALSE, stack = FALSE)
 #'
 #' # export matrix
-#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = Idents(pbmc), plot = F)
+#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, plot = F)
 #' @rdname ClusterDistrBar
 #' @export
 
-ClusterDistrBar <- function(origin, cluster, rev = F, normalize = rev, percent = T,
-                            plot = T, flip = T, width = 0.9, border = NA){
+ClusterDistrBar <- function(
+    origin,
+    cluster,
+    rev = F,
+    normalize = rev,
+    percent = T,
+    plot = T,
+    flip = T,
+    width = 0.9,
+    stack = T,
+    cols = "pro_default",
+    border = "white"
+    ){
   library(dplyr)
   library(rlist)
   library(ggplot2)
@@ -58,13 +73,15 @@ ClusterDistrBar <- function(origin, cluster, rev = F, normalize = rev, percent =
   y.label <- ifelse(percent, paste("Percentage of", tolower(y.label)), y.label)
 
   if(flip) ToPlot$Var2 <- ToPlot$Var2 %>% factor(levels = rev(levels(.)))
+  if(stack) position <- position_stack(reverse = TRUE) else position <- "dodge"
   p <-
     ggplot(ToPlot, aes(x = Var2, y = value, fill = factor(Var1))) +
-    geom_bar(stat="identity", position = position_stack(reverse = TRUE), width = width, color = border) +
+    geom_bar(stat="identity", position = position, width = width, color = border) +
     theme_classic() +
     labs(x = x.label, y = y.label, fill = fill.label) +
     scale_y_continuous(expand = c(0, 0)) +
     if(flip) coord_flip()
+  p <- p + scale_fill_disc_auto(cols, nlevels(factor(ToPlot$Var1)))
   return(p)
 }
 
@@ -77,11 +94,6 @@ ClusterDistrBar <- function(origin, cluster, rev = F, normalize = rev, percent =
 #' @param do.heatmap Generate plot (TRUE) or matrix (FALSE), Default: T
 #' @return ggplot object or matrix
 #' @seealso \code{\link[SeuratExtend:ClusterDistrBar]{ClusterDistrBar()}}
-#' @examples
-#' meta <- seu@meta.data
-#' origin <- meta$orig.ident
-#' cluster <- meta$cluster
-#' BarOfCluster(meta, "cluster", "orig.ident", method = "percent", do.heatmap = T)
 #' @rdname BarOfCluster
 #' @export
 

@@ -1,21 +1,28 @@
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param seu PARAM_DESCRIPTION
-#' @param feature.1 PARAM_DESCRIPTION, Default: NA
-#' @param feature.2 PARAM_DESCRIPTION, Default: NA
-#' @param feature.3 PARAM_DESCRIPTION, Default: NA
-#' @param color PARAM_DESCRIPTION, Default: c("ryb", "rgb")
-#' @param color.range PARAM_DESCRIPTION, Default: c(0.1, 0.9)
-#' @param reduction PARAM_DESCRIPTION, Default: 'umap'
-#' @param order PARAM_DESCRIPTION, Default: T
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
+#' @title Simultaneous Visualization of Three Features in a Single Plot
+#' @description This function visualizes three distinct features on a single dimension reduction plot using a color blending system. It allows for the quantitative display of gene expressions or other continuous variables by mixing colors according to the RYB or RGB color models, providing a unique perspective on feature interactions and expression levels within individual cells.
+#' @param seu A Seurat object that contains the data for plotting. This object should have precomputed dimensionality reduction coordinates.
+#' @param feature.1 The name of the first feature (gene or other variable) to be plotted. Default: NA.
+#' @param feature.2 The name of the second feature. Default: NA.
+#' @param feature.3 The name of the third feature. Default: NA.
+#' @param color The color model used to blend the expression data of the three features. Options include "ryb" (red-yellow-blue) and "rgb" (red-green-blue), affecting how expression intensities are represented through color. Default: c("ryb", "rgb").
+#' @param color.range The range of expression intensity that is represented by the color spectrum in the plot, helping to enhance visibility of lower expressions and prevent oversaturation at high expression levels. Default: c(0.1, 0.9).
+#' @param reduction The type of dimension reduction used to display the data, such as 'umap' or 'tsne'. This choice determines the underlying plot layout. Default: 'umap'.
+#' @param order A logical value indicating whether to plot cells with higher expressions on top of those with lower expressions, which can help prevent significant data points from being obscured in dense areas of the plot. Default: TRUE.
+#' @param pt.size Point size for plotting individual cells in the grid. Smaller values are typically used for large datasets or dense plots, whereas larger values enhance visibility for plots with fewer cells or less overlap. Default: 0.1.
+#' @return A ggplot object that represents a dimension reduction plot incorporating three features with color blending, showing how each feature contributes to the overall expression patterns observed.
+#' @details `FeaturePlot3` is designed for detailed exploratory analysis where understanding the interplay between multiple variables is crucial. This function is particularly useful for researchers looking to explore gene expressions in complex datasets, such as those involving interactions between different cell types or conditions.
 #' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
+#' library(Seurat)
+#' library(SeuratExtend)
+#'
+#' FeaturePlot3(
+#'   pbmc,
+#'   feature.1 = "CD3D",
+#'   feature.2 = "CD14",
+#'   feature.3 = "CD79A",
+#'   color = "ryb"
+#' )
+#'
 #' @rdname FeaturePlot3
 #' @export
 
@@ -27,7 +34,8 @@ FeaturePlot3 <- function(
   color = c("ryb","rgb"),
   color.range = c(0.1,0.9),
   reduction = "umap",
-  order = T
+  order = T,
+  pt.size = 0.1
 ){
   library(Seurat)
   library(reshape2)
@@ -97,7 +105,7 @@ FeaturePlot3 <- function(
     ggplot(tp.c, aes_string(
     x = colnames(tp.c)[1],
     y = colnames(tp.c)[2])) +
-    geom_point(color = tp.c$color) +
+    geom_point(color = tp.c$color, size = pt.size) +
     theme_classic()
   p <- ggarrange(
     p, ggarrange(plotlist = p.leg, ncol = 1),
@@ -106,26 +114,32 @@ FeaturePlot3 <- function(
   return(p)
 }
 
-#' @title FUNCTION_TITLE
-#' @description FUNCTION_DESCRIPTION
-#' @param seu PARAM_DESCRIPTION
-#' @param features PARAM_DESCRIPTION
-#' @param color PARAM_DESCRIPTION, Default: c("ryb", "rgb")
-#' @param color.range PARAM_DESCRIPTION, Default: c(0.1, 0.95)
-#' @param reduction PARAM_DESCRIPTION, Default: 'umap'
-#' @param order PARAM_DESCRIPTION, Default: T
-#' @param pt.size PARAM_DESCRIPTION, Default: 0.1
-#' @param legend PARAM_DESCRIPTION, Default: F
-#' @return OUTPUT_DESCRIPTION
-#' @details DETAILS
+#' @title Simultaneous Visualization of Three Features on a Grid of Plots
+#' @description This function allows for the simultaneous visualization of three features across multiple plots, utilizing a grid layout. It supports two color blending systems (RYB or RGB) to represent the intensity of each feature within a single plot, providing a comprehensive overview of expression patterns across a dataset.
+#' @param seu A Seurat object containing single-cell RNA sequencing data.
+#' @param features A vector of feature names (genes or other continuous variables) to be displayed. This vector should be divisible by three, with each triplet of features being plotted in a separate subplot within the grid. If a triplet includes `NA`, that position will not display a feature, allowing for flexibility in visualization.
+#' @param color Specifies the color blending system used to display the features. The available options are "ryb" for red-yellow-blue and "rgb" for red-green-blue. This parameter controls how the three features are visually represented based on their expression levels.
+#' @param color.range Adjusts the luminance range used for feature visualization to ensure that low expressions are visible and not obscured by the background color. Default: c(0.1, 0.95), where 0.1 prevents the lowest expressions from being pure white and 0.95 keeps the highest expressions from saturating to pure color.
+#' @param reduction The dimensionality reduction technique to use for the plot layout. Typically 'umap' or 'tsne' are used, with 'umap' being the default.
+#' @param order Controls whether cells with higher feature expressions are plotted above those with lower expressions. This is useful for ensuring that cells with significant expression levels are visible and not obscured by those with lower levels. Default: TRUE.
+#' @param pt.size Point size for plotting individual cells in the grid. Smaller values are typically used for large datasets or dense plots, whereas larger values enhance visibility for plots with fewer cells or less overlap. Default: 0.1.
+#' @param legend Determines whether to display a legend describing the features and color scales. Default: FALSE.
+#' @return A ggplot object displaying a grid of dimension reduction plots, each illustrating the expression patterns of three features using the specified color blending system.
+#' @details The `FeaturePlot3.grid` function is particularly useful for exploratory data analysis where visualization of multiple gene interactions or expression patterns across different cell populations is required. It effectively combines data from multiple features into a single coherent visual representation.
 #' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @rdname FeaturePlot3.grid
+#' library(Seurat)
+#' library(SeuratExtend)
+#'
+#' FeaturePlot3.grid(
+#'   pbmc,
+#'   features = c("CD3D", "CD14", "CD79A", "FCGR3A", NA, "LYZ"),
+#'   color = "ryb",
+#'   pt.size = 0.5
+#' )
+#'
+#' @rdname FeaturePlot3-grid
 #' @export
+
 FeaturePlot3.grid <- function(
   seu,
   features,

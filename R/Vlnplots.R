@@ -9,6 +9,7 @@ NULL
 #' @param slot Slot to retrieve feature data from. Only applicable for the Seurat method.
 #' @param assay Name of the assay to employ. Defaults to the active assay. Only applicable for the Seurat method.
 #' @param priority If set to "expr", extracts data from the expression matrix over `meta.data`. Only applicable for the Seurat method.
+#' @param load.cols When TRUE, automatically loads pre-stored color information for variables from `seu@misc[["var_colors"]]`.
 #' @rdname VlnPlot2
 #' @export
 
@@ -17,11 +18,13 @@ VlnPlot2.Seurat <- function(
   features,
   group.by = NULL,
   split.by = NULL,
-  cell = NULL,
+  cells = NULL,
   slot = "data",
   assay = NULL,
   priority = c("expr","none"),
-  ncol = 1,
+  cols = "auto",
+  load.cols = TRUE,
+  ncol = NULL,
   lab_fill = "group",
   scales = "free_y",
   violin = T,
@@ -47,10 +50,18 @@ VlnPlot2.Seurat <- function(
     features = features,
     group.by = group.by,
     split.by = split.by,
-    cells = cell,
+    cells = cells,
     slot = slot,
     assay = assay,
     priority = priority
+  )
+
+  cols <- VlnPlot2_SelColDisc(
+    seu = seu,
+    group.by = group.by,
+    split.by = split.by,
+    cols = cols,
+    load.cols = load.cols
   )
 
   p <- VlnPlot2.default(
@@ -58,6 +69,7 @@ VlnPlot2.Seurat <- function(
     f = Std.matr$f,
     f2 = Std.matr$f2,
     t = T,
+    cols = cols,
     ncol = ncol,
     lab_fill = lab_fill,
     scales = scales,
@@ -86,7 +98,16 @@ VlnPlot2.Seurat <- function(
 #' @param f2 A factor or vector akin to `f` for splitting the violin plots. Default: NULL.
 #' @param features Features to depict, such as gene expression, metrics, PC scores, or any data obtainable via `FetchData()`. Default: NULL (all features in matrix).
 #' @param t If the matrix has features in columns and cells in rows, transpose the matrix first. Default: FALSE.
-#' @param ncol Specifies the number of columns for display if multiple plots are shown. Default: 1.
+#' @param cols Flexible color settings for the plot, accepting a variety of inputs:
+#'
+#'     - Seven color_pro styles: "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple".
+#'
+#'     - Five color_iwh styles: "iwh_default", "iwh_intense", "iwh_pastel", "iwh_all", "iwh_all_hard".
+#'
+#'     - Brewer color scales as specified by `brewer.pal.info`.
+#'
+#'     - Any manually specified colors.
+#' @param ncol Specifies the number of columns for display if multiple plots are shown. Default: NULL.
 #' @param lab_fill Label for the figure legend. Default: 'group'.
 #' @param scales Scales parameter passed to \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}. Default: 'free_y'.
 #' @param violin Indicates whether to generate a violin plot. Default: TRUE.
@@ -99,7 +120,7 @@ VlnPlot2.Seurat <- function(
 #' @param pt.alpha Adjusts the transparency of points. Default: 1.
 #' @param strip.position Positions the strip ("top" (default), "bottom", "left", or "right"). Only used when `f2 = NULL`.
 #' @param stat.method Determines if pairwise statistics are added to the plot. Either "wilcox.test" or "t.test". Default: "none".
-#' @param method Method for adjusting p-values, especially when conducting multiple pairwise tests or dealing with multiple grouping variables. Options include "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", and "none". Note: Adjustments are independently conducted for each variable in formulas containing multiple variables. Default: 'holm'.
+#' @param p.adjust.method Method for adjusting p-values, especially when conducting multiple pairwise tests or dealing with multiple grouping variables. Options include "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", and "none". Note: Adjustments are independently conducted for each variable in formulas containing multiple variables. Default: 'holm'.
 #' @param label Specifies label type. Options include "p.signif" (showing significance levels), "p.format" (formatted p value), or "p", "p.adj". Default: "p.signif".
 #' @param comparisons List of length-2 vectors, each containing either names of two x-axis values or two integers pointing to groups of interest for comparison. Default: all groups.
 #' @param hide.ns If TRUE, the 'ns' symbol is concealed when displaying significance levels. Default: TRUE.
@@ -113,7 +134,8 @@ VlnPlot2.default <- function(
   matr, f, f2 = NULL,
   features = NULL,
   t = F,
-  ncol = 1,
+  cols = "pro_default",
+  ncol = NULL,
   lab_fill = "group",
   scales = "free_y",
   violin = T,
@@ -145,6 +167,7 @@ VlnPlot2.default <- function(
 
   p <- VlnPlot2_Plot(
     scores = scores,
+    cols = cols,
     ncol = ncol,
     lab_fill = lab_fill,
     scales = scales,
@@ -204,6 +227,7 @@ VlnPlot2_Calc <- function(
     message(paste0(setdiff(features, colnames(matr)), collapse = ", "), " not found")
     features <- intersect(features, colnames(matr))
   }
+  f <- factor(f)
   f2 <- f2 %||% data.frame(row.names = rownames(matr))
   scores <- cbind(f, f2, as.data.frame(matr[,features,drop = F]))
   scores <- melt(scores, measure.vars = features, variable.name = "feature")
@@ -212,6 +236,7 @@ VlnPlot2_Calc <- function(
 
 VlnPlot2_Plot <- function(
     scores,
+    cols,
     ncol,
     lab_fill,
     scales,
@@ -228,6 +253,7 @@ VlnPlot2_Plot <- function(
   library(ggplot2)
   x <- ifelse(!"f2" %in% colnames(scores), "f", "f2")
   p <- ggplot(scores, aes(x = .data[[x]], y = value))
+  n <- nlevels(factor(scores[[x]]))
 
   if(violin) {
     p <- p + geom_violin(mapping = aes(fill = .data[[x]]), scale = "width", width = width)
@@ -250,11 +276,14 @@ VlnPlot2_Plot <- function(
   }
   if(box & violin) {
     if(pt | hide.outlier) {
-      p <- p + geom_boxplot(outlier.shape = NA, width = 0.1, fill = "white")
+      p <- p + geom_boxplot(outlier.shape = NA, width = 0.12, fill = "white")
     } else {
-      p <- p + geom_boxplot(fill = "white", outlier.size = pt.size, width = 0.1, outlier.alpha = pt.alpha)
+      p <- p + geom_boxplot(fill = "white", outlier.size = pt.size, width = 0.12, outlier.alpha = pt.alpha)
     }
   }
+
+  p <- p + scale_fill_disc_auto(color_scheme = cols, n = n)
+
   if(x == "f"){
     p <- p +
       facet_wrap(vars(feature), ncol = ncol, strip.position=strip.position, scales = scales)+
@@ -319,6 +348,10 @@ vlnplot2_Stat <- function(
 
     if(hide.ns == TRUE) {
       stat.test <- filter(stat.test, p.signif != "ns")
+      if(nrow(stat.test) == 0) {
+        message("No statistical significance.")
+        return(p)
+      }
     }
     stat.test$groups <- apply(stat.test, 1, function(x) c(x[["group1"]], x[["group2"]]), simplify = F)
     if(!is.null(comparisons)) {
@@ -351,12 +384,12 @@ vlnplot2_Stat <- function(
 vlnplot2_Stat_add_y <- function(stat.test, scores, step.increase) {
   summary_data <- scores %>%
     group_by(feature) %>%
-    summarize(
+    dplyr::summarize(
       min_value = min(value, na.rm = TRUE),
       max_value = max(value, na.rm = TRUE)
     )
   summary_data <- summary_data %>%
-    mutate(
+    dplyr::mutate(
       step = (max_value - min_value) * step.increase,
       start = (max_value - min_value) * 0.1 + max_value
     )
@@ -364,8 +397,34 @@ vlnplot2_Stat_add_y <- function(stat.test, scores, step.increase) {
   stat.test <- stat.test %>%
     left_join(summary_data, by = "feature") %>%
     group_by(across(all_of(grouping_cols))) %>%
-    mutate(y.position = start + step * (row_number() - 1)) %>%
+    dplyr::mutate(y.position = start + step * (row_number() - 1)) %>%
     select(-min_value, -max_value, -step, -start) %>%
     ungroup()
   return(stat.test)
+}
+
+VlnPlot2_SelColDisc <- function(
+    seu,
+    group.by,
+    split.by,
+    cols,
+    load.cols
+) {
+  if(is.null(cols)) return(NULL)
+  if(cols[1] != "auto") return(cols)
+  if(is.null(group.by)) group.by <- "ident"
+  if(!is.null(split.by)) {
+    var <- split.by
+  } else {
+    var <- group.by
+  }
+  if(length(var) == 1) {
+    load_var <- seu@misc[["var_colors"]][[var]]
+    if(!is.null(load_var)) {
+      cols <- load_var
+    } else {
+      cols <- "pro_default"
+    }
+  }
+  return(cols)
 }

@@ -4,31 +4,33 @@
 \name{RenameGO}
 \alias{RenameGO}
 \alias{RenameReactome}
-\title{Add full name to GO/Reactome pathway ID}
+\title{Convert GO/Reactome Pathway IDs to Full Names}
 \usage{
 RenameGO(term, add_id = T, add_n_gene = T, spe = getOption("spe"))
 
 RenameReactome(term, add_id = T, add_n_gene = T, spe = getOption("spe"))
 }
 \arguments{
-\item{term}{GO/Reactome IDs, can be character or matrix (ID in rownames)}
+\item{term}{GO/Reactome IDs, which can be either a character vector or a matrix (with IDs in rownames).}
 
-\item{add_id}{If show IDs, Default: T}
+\item{add_id}{Logical: Should the IDs be displayed? Default: TRUE.}
 
-\item{add_n_gene}{If show how many genes in each geneset, Default: T}
+\item{add_n_gene}{Logical: Should the number of genes in each geneset be displayed? Default: TRUE.}
 
-\item{spe}{Species (human or mouse), Default: getOption("spe")}
+\item{spe}{Species, either 'human' or 'mouse'. Default: getOption("spe").}
 }
 \value{
-character or matrix, depends on the input
+Returns either a character vector or a matrix, depending on the input.
 }
 \description{
-Rename GO/Reactome ID to full geneset/pathway name
+Converts GO or Reactome IDs to their respective full geneset or pathway names.
 }
 \details{
-Also see examples in \code{\link[SeuratExtend:GeneSetAnalysis]{GeneSetAnalysis()}}
+For more examples, see \code{\link[SeuratExtend:GeneSetAnalysis]{GeneSetAnalysis()}}.
 }
 \examples{
+library(SeuratExtend)
+
 RenameGO(c("GO:0002376","GO:0050896"), spe = "human")
 
 RenameReactome(c("R-HSA-109582","R-HSA-112316"), spe = "human")
