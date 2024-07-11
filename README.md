@@ -11,6 +11,12 @@
 - **Python Tool Integration**: Easily apply tools like scVelo, SCENIC, and Palantir within R using the Seurat object.
 - **Utility Functions**: Assorted functions for calculations and color selections to streamline your scRNA-seq analysis.
 
+## Resources
+
+- **GitHub Repository**: Access the source code and contribute to SeuratExtend on [GitHub](https://github.com/huayc09/SeuratExtend).
+- **Online Tutorial**: For a comprehensive guide on using SeuratExtend, visit our [tutorial website](https://huayc09.github.io/SeuratExtend/).
+- **SeuratExtend Chatbot**: Try our AI-powered assistant (beta version, powered by ChatGPT) for help with scRNA-seq analysis: [scRNA-seq Assistant](https://chatgpt.com/g/g-8scQjmzkd-scrna-seq-assistant).
+
 ## Installation
 
 Install `SeuratExtend` directly from GitHub:
