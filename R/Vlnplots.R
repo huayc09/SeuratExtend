@@ -395,10 +395,10 @@ vlnplot2_Stat_add_y <- function(stat.test, scores, step.increase) {
     )
   grouping_cols <- if ("f2" %in% colnames(scores)) c("feature", "f") else "feature"
   stat.test <- stat.test %>%
-    left_join(summary_data, by = "feature") %>%
-    group_by(across(all_of(grouping_cols))) %>%
+    dplyr::left_join(summary_data, by = "feature") %>%
+    dplyr::group_by(across(all_of(grouping_cols))) %>%
     dplyr::mutate(y.position = start + step * (row_number() - 1)) %>%
-    select(-min_value, -max_value, -step, -start) %>%
+    dplyr::select(-min_value, -max_value, -step, -start) %>%
     ungroup()
   return(stat.test)
 }
