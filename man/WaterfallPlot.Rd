@@ -27,7 +27,7 @@ WaterfallPlot(object, ...)
   color_theme = c(low = muted("blue"), mid = "white", high = muted("red")),
   top.n = NULL,
   flip = FALSE,
-  y.label = length,
+  y.label = NULL,
   angle = NULL,
   hjust = NULL,
   vjust = NULL,

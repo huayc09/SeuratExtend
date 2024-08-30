@@ -12,6 +12,7 @@ ClusterDistrBar(
   percent = T,
   plot = T,
   flip = T,
+  reverse_order = T,
   width = 0.9,
   stack = T,
   cols = "pro_default",
@@ -32,6 +33,8 @@ ClusterDistrBar(
 \item{plot}{Generate plot (TRUE) or matrix (FALSE), Default: T}
 
 \item{flip}{If plot bars horizontally, Default: T}
+
+\item{reverse_order}{If TRUE, will reverse the default stacking order. Default: T}
 
 \item{width}{Width of bars, Default: 0.9}
 
