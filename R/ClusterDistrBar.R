@@ -7,6 +7,7 @@
 #' @param percent If FALSE, plot absolute cell number instead of percentage, Default: T
 #' @param plot Generate plot (TRUE) or matrix (FALSE), Default: T
 #' @param flip If plot bars horizontally, Default: T
+#' @param reverse_order If TRUE, will reverse the default stacking order. Default: T
 #' @param width Width of bars, Default: 0.9
 #' @param stack If TRUE, plot stacked bars, Default: T
 #' @param cols Colors to use for plotting. Default: "pro_default"
@@ -44,6 +45,7 @@ ClusterDistrBar <- function(
     percent = T,
     plot = T,
     flip = T,
+    reverse_order = T,
     width = 0.9,
     stack = T,
     cols = "pro_default",
@@ -73,7 +75,7 @@ ClusterDistrBar <- function(
   y.label <- ifelse(percent, paste("Percentage of", tolower(y.label)), y.label)
 
   if(flip) ToPlot$Var2 <- ToPlot$Var2 %>% factor(levels = rev(levels(.)))
-  if(stack) position <- position_stack(reverse = TRUE) else position <- "dodge"
+  if(stack) position <- position_stack(reverse = reverse_order) else position <- "dodge"
   p <-
     ggplot(ToPlot, aes(x = Var2, y = value, fill = factor(Var1))) +
     geom_bar(stat="identity", position = position, width = width, color = border) +
