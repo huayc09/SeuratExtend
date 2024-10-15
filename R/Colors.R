@@ -86,11 +86,13 @@ color_pro <- function(
   cols_set <- presets_color_pro[[col.space]][[sort]]
 
   n.range <- names(cols_set)
-  if(!n %in% n.range | !is.numeric(n)){
+  if(!n %in% c(1, n.range) | !is.numeric(n)){
     stop('"n" should be integer and in range (',
          n.range[1],'~',tail(n.range, 1),') for preset "',col.space,'".')
   }
-  cols_set <- cols_set[[as.character(n)]]
+  cols_set <- if(n == 1) {
+    cols_set[["2"]]
+  } else cols_set[[as.character(n)]]
 
   set.range <- length(cols_set)
   if(!set %in% 1:set.range){
@@ -98,6 +100,7 @@ color_pro <- function(
          n,' colors in preset "', col.space,'".')
   }
   cols <- cols_set[[set]]
+  if(n == 1) cols <- cols[1]
   return(cols)
 }
 
@@ -186,90 +189,189 @@ ang <- function(ryb = c(0,0.5,1)){
 
 # internal functions for fill/color themes
 
-scale_fill_cont_auto <- function(color_scheme) {
-  if(is.null(color_scheme)) return(NULL)
-  library(ggplot2)
-  if(any(color_scheme %in% c("A","B","C","D","E"))) {
-    import("viridis")
-    cols <- scale_fill_viridis(option = color_scheme)
-  }else if(!is.na(color_scheme["mid"])) {
-    cols <- scale_fill_gradient2(low = color_scheme["low"],
-                                 mid = color_scheme["mid"],
-                                 high = color_scheme["high"])
-  }else if(all(!is.na(color_scheme[c("low","high")]))) {
-    cols <- scale_fill_gradient(low = color_scheme["low"],
-                                high = color_scheme["high"])
-  }else{
-    cols <- scale_fill_gradientn(colors = color_scheme)
+# Helper function to handle color schemes
+handle_color_scheme <- function(color_scheme) {
+  if (length(color_scheme) > 1) {
+    # If color_scheme is a vector of colors, return it directly
+    return(list(type = "custom", colors = color_scheme, is_diverging = FALSE))
   }
-  return(cols)
+
+  # Handle custom diverging palettes
+  library(RColorBrewer)
+  custom_diverging <- c("GnYlRd", "BuYlRd", "GyRd", "BuRd", "PuOr")
+  if (color_scheme %in% custom_diverging) {
+    color_scheme <- switch(
+      color_scheme,
+      "GnYlRd" = "RdYlGn-rev",
+      "BuYlRd" = "RdYlBu-rev",
+      "GyRd" = "RdGy-rev",
+      "BuRd" = "RdBu-rev",
+      "PuOr" = "PuOr-rev"
+    )
+  }
+
+  # Handle RColorBrewer palettes
+  is_reversed <- grepl("-rev$", color_scheme)
+  palette_name <- sub("-rev$", "", color_scheme)
+
+  if (palette_name %in% rownames(brewer.pal.info)) {
+    palette_type <- brewer.pal.info[palette_name, "category"]
+
+    # Check if the palette is Sequential or Diverging
+    if (palette_type %in% c("seq", "div")) {
+      max_colors <- brewer.pal.info[palette_name, "maxcolors"]
+      colors <- brewer.pal(max_colors, palette_name)
+      if (is_reversed) colors <- rev(colors)
+      is_diverging <- palette_type == "div"
+      return(list(type = "brewer", colors = colors, is_diverging = is_diverging))
+    } else {
+      warning(paste("The RColorBrewer palette", palette_name, "is Qualitative and not suitable for continuous data. Using default continuous color scheme instead."))
+      return(list(type = "default", colors = NULL, is_diverging = FALSE))
+    }
+  }
+
+  # If it's not a recognized palette name, it might be a single color name or code
+  return(list(type = "single", colors = color_scheme, is_diverging = FALSE))
+}
+
+scale_cont_auto <- function(
+    color_scheme,
+    type = c("fill", "color"),
+    center_color = NULL,
+    value_range = NULL
+) {
+  type <- match.arg(type)
+  if (is.null(color_scheme)) return(NULL)
+  library(ggplot2)
+  import("viridis")
+
+  scale_func <- if(type == "fill") {
+    list(
+      viridis = scale_fill_viridis,
+      gradient2 = scale_fill_gradient2,
+      gradient = scale_fill_gradient,
+      gradientn = scale_fill_gradientn
+    )
+  } else {
+    list(
+      viridis = scale_color_viridis,
+      gradient2 = scale_color_gradient2,
+      gradient = scale_color_gradient,
+      gradientn = scale_color_gradientn
+    )
+  }
+
+  if (any(color_scheme %in% LETTERS[1:8])) {
+    return(scale_func$viridis(option = color_scheme))
+  }
+
+  if (!is.na(color_scheme["mid"])) {
+    return(scale_func$gradient2(low = color_scheme["low"],
+                                mid = color_scheme["mid"],
+                                high = color_scheme["high"]))
+  }
+
+  if (all(!is.na(color_scheme[c("low","high")]))) {
+    return(scale_func$gradient(low = color_scheme["low"],
+                               high = color_scheme["high"]))
+  }
+
+  result <- handle_color_scheme(color_scheme)
+
+  if (is.null(center_color)) {
+    center_color <- result$is_diverging
+  }
+
+  default_colors <- if(type == "fill") {
+    rev(brewer.pal(11,"RdBu"))
+  } else {
+    brewer.pal(9,"GnBu")
+  }
+
+  create_scale <- function(scale_type, colors, limits = NULL) {
+    args <- list(colors = colors)
+    if (!is.null(limits)) {
+      args$limits <- limits
+    }
+    do.call(scale_func[[scale_type]], args)
+  }
+
+  if (center_color && !is.null(value_range)) {
+    max_abs_value <- max(abs(value_range))
+    limits <- c(-max_abs_value, max_abs_value)
+  } else {
+    limits <- NULL
+  }
+
+  switch(result$type,
+         "brewer" = create_scale("gradientn", result$colors, limits),
+         "default" = create_scale("gradientn", default_colors, limits),
+         "custom" = create_scale("gradientn", result$colors, limits),
+         "single" = create_scale("gradient", c("white", result$colors), limits)
+  )
+}
+
+scale_fill_cont_auto <- function(color_scheme, center_color = NULL, value_range = NULL) {
+  scale_cont_auto(
+    color_scheme,
+    type = "fill",
+    center_color = center_color,
+    value_range = value_range)
 }
 
 scale_color_cont_auto <- function(color_scheme) {
+  scale_cont_auto(color_scheme, type = "color", center_color = FALSE)
+}
+
+scale_disc_auto <- function(color_scheme, n, type = c("color", "fill"), labels = waiver()) {
+  type <- match.arg(type)
   if(is.null(color_scheme)) return(NULL)
   library(ggplot2)
-  if(any(color_scheme %in% c("A","B","C","D","E"))) {
-    import("viridis")
-    cols <- scale_color_viridis(option = color_scheme)
-  }else if(!is.na(color_scheme["mid"])) {
-    cols <- scale_color_gradient2(low = color_scheme["low"],
-                                  mid = color_scheme["mid"],
-                                  high = color_scheme["high"])
-  }else if(all(!is.na(color_scheme[c("low","high")]))) {
-    cols <- scale_color_gradient(low = color_scheme["low"],
-                                 high = color_scheme["high"])
-  }else{
-    cols <- scale_color_gradientn(colors = color_scheme)
+  library(RColorBrewer)
+
+  scale_func <- if(type == "color") {
+    list(
+      manual = scale_color_manual,
+      brewer = scale_color_brewer
+    )
+  } else {
+    list(
+      manual = scale_fill_manual,
+      brewer = scale_fill_brewer
+    )
+  }
+
+  pro_theme <- c("default","light","red","yellow","green","blue","purple")
+  iwh_theme <- c("default","intense","pastel","all","all_hard")
+
+  if(length(color_scheme) == 1 & n <= 50) {
+    if(color_scheme %in% c("default","light",paste0("pro_",pro_theme))) {
+      color_scheme <- sub("pro_","",color_scheme)
+      if(n == 1 && color_scheme == "default" && type == "fill") return(NULL)
+      cols <- color_pro(n, col.space = color_scheme)
+      cols <- scale_func$manual(values = cols, labels = if(type == "color") labels else waiver())
+    } else if(color_scheme %in% paste0("iwh_",iwh_theme)) {
+      color_scheme <- sub("iwh_","",color_scheme)
+      cols <- color_iwh(n, col.space = color_scheme)
+      cols <- scale_func$manual(values = cols, labels = if(type == "color") labels else waiver())
+    } else if(color_scheme %in% rownames(brewer.pal.info)) {
+      return(scale_func$brewer(palette = color_scheme, labels = if(type == "color") labels else waiver()))
+    } else {
+      # Handle single color or non-standard color name
+      return(scale_func$manual(values = c(color_scheme), labels = if(type == "color") labels else waiver()))
+    }
+  } else {
+    cols <- scale_func$manual(values = color_scheme, labels = if(type == "color") labels else waiver())
   }
   return(cols)
 }
 
 scale_color_disc_auto <- function(color_scheme, n, labels = waiver()) {
-  if(is.null(color_scheme)) return(NULL)
-  library(ggplot2)
-  pro_theme <- c("default","light","red","yellow","green","blue","purple")
-  iwh_theme <- c("default","intense","pastel","all","all_hard")
-  if(length(color_scheme) == 1 & n <= 50) {
-    if(color_scheme %in% c("default","light",paste0("pro_",pro_theme))) {
-      color_scheme <- sub("pro_","",color_scheme)
-      if(n == 1 && color_scheme == "default") return(NULL)
-      cols <- color_pro(n, col.space = color_scheme)
-      cols <- scale_color_manual(values = cols, labels = labels)
-    } else if(color_scheme %in% paste0("iwh_",iwh_theme)) {
-      color_scheme <- sub("iwh_","",color_scheme)
-      cols <- color_iwh(n, col.space = color_scheme)
-      cols <- scale_color_manual(values = cols, labels = labels)
-    } else {
-      cols <- scale_color_brewer(palette = color_scheme, labels = labels)
-    }
-  } else {
-    cols <- scale_color_manual(values = color_scheme, labels = labels)
-  }
-  return(cols)
+  scale_disc_auto(color_scheme, n, type = "color", labels = labels)
 }
 
 scale_fill_disc_auto <- function(color_scheme, n) {
-  if(is.null(color_scheme)) return(NULL)
-  library(ggplot2)
-  pro_theme <- c("default","light","red","yellow","green","blue","purple")
-  iwh_theme <- c("default","intense","pastel","all","all_hard")
-  if(length(color_scheme) == 1 & n <= 50) {
-    if(color_scheme %in% c("default","light",paste0("pro_",pro_theme))) {
-      color_scheme <- sub("pro_","",color_scheme)
-      if(n == 1 && color_scheme == "default") return(NULL)
-      cols <- color_pro(n, col.space = color_scheme)
-      cols <- scale_fill_manual(values = cols)
-    } else if(color_scheme %in% paste0("iwh_",iwh_theme)) {
-      color_scheme <- sub("iwh_","",color_scheme)
-      cols <- color_iwh(n, col.space = color_scheme)
-      cols <- scale_fill_manual(values = cols)
-    } else {
-      cols <- scale_fill_brewer(palette = color_scheme)
-    }
-  } else {
-    cols <- scale_fill_manual(values = color_scheme)
-  }
-  return(cols)
+  scale_disc_auto(color_scheme, n, type = "fill")
 }
 
 #' @title Save Custom Color Settings to a Seurat Object

@@ -27,15 +27,23 @@
 #'
 #'   - A vector specifying a global color setting similar to Seurat's `DimPlot`/`FeaturePlot`.
 #'
-#'   - A list specifying colors for each variable type (discrete/continuous) or for each individual variable. For example, `list(discrete = "auto", continuous = "A")` applies automatic styling from `color_pro()` for discrete variables and `viridis` "A" style for continuous variables. More detailed setups can include `list("cluster" = "pro_blue", "CD14" = c("#EEEEEE", "black"))`.
+#'   - A list specifying colors for each variable type (discrete/continuous) or for each individual variable. For example, `list(discrete = "auto", continuous = "A")` applies automatic styling from `color_pro()` for discrete variables and `viridis` "A" style for continuous variables. More detailed setups can be included. For example, `list("cluster" = "light", "CD14" = "Reds")`.
 #'
 #'   For continuous variables:
 #'
-#'     - Predefined color schemes from the `viridis` package ("A", "B", "C", "D", "E").
+#'     - Predefined color schemes from the `viridis` package ("A" to "H").
 #'
-#'     - Named vector with keys "low", "mid", and "high" for three-point gradients. Example: `c(low = "blue", mid = "white", high = "red")`.
+#'     - Named vector with keys "low", "mid", and "high" for three-point gradients. Example: `c(low = muted("blue"), mid = "white", high = muted("red"))`.
 #'
 #'     - Two-point gradient with keys "low" and "high". Example: `c(low = "blue", high = "red")`.
+#'
+#'     - RColorBrewer sequential palettes: "Blues", "BuGn", "BuPu", "GnBu", "Greens", "Greys", "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd".
+#'
+#'     - RColorBrewer diverging palettes: "BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral".
+#'
+#'     - Custom diverging palettes: "GnYlRd", "BuYlRd", "GyRd", "BuRd", "PuOr".
+#'
+#'     - Append "-rev" to any RColorBrewer palette name to reverse the color order. Example: "Spectral-rev".
 #'
 #'     - Custom color gradient using a vector of colors.
 #'

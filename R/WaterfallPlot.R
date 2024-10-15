@@ -28,7 +28,8 @@ WaterfallPlot.Seurat <- function(
     color = "p",
     len.threshold = 0,
     col.threshold = 0,
-    color_theme = c(low = muted("blue"), mid = "white", high = muted("red")),
+    color_theme = "BuRd",
+    center_color = NULL,
     top.n = NULL,
     flip = FALSE,
     y.label = NULL,
@@ -60,6 +61,7 @@ WaterfallPlot.Seurat <- function(
     len.threshold = len.threshold,
     col.threshold = col.threshold,
     color_theme = color_theme,
+    center_color = center_color,
     top.n = top.n,
     flip = flip,
     y.label = y.label,
@@ -85,14 +87,29 @@ WaterfallPlot.Seurat <- function(
 #' @param color_scheme Specifies the color gradient for the heatmap visualization.
 #'   This parameter accepts multiple input formats to provide flexibility in defining color schemes:
 #'
-#'   - Predefined color schemes: Users can specify "A", "B", "C", "D", or "E" to use color schemes from the `viridis` package.
+#'     - Predefined color schemes from the `viridis` package ("A" to "H").
 #'
-#'   - Named vector for three-point gradients: Provide a named vector with keys "low", "mid", and "high" to define colors at these specific data points. The "mid" value is typically centered at zero, allowing for a diverging color scheme.
-#'     Example: `c(low = "blue", mid = "white", high = "red")`
+#'     - Named vector with keys "low", "mid", and "high" for three-point gradients. Example: `c(low = muted("blue"), mid = "white", high = muted("red"))`.
 #'
-#'   - Two-point gradient: Provide a named vector with keys "low" and "high" to create a simple two-color gradient. Example: `c(low = "blue", high = "red")`
+#'     - Two-point gradient with keys "low" and "high". Example: `c(low = "blue", high = "red")`.
 #'
-#'   - Custom color gradient: Users can provide a vector of colors to generate a custom gradient across multiple values. This is suitable for more complex data ranges and visual preferences.
+#'     - RColorBrewer sequential palettes: "Blues", "BuGn", "BuPu", "GnBu", "Greens", "Greys", "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd".
+#'
+#'     - RColorBrewer diverging palettes: "BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral".
+#'
+#'     - Custom diverging palettes: "GnYlRd", "BuYlRd", "GyRd", "BuRd", "PuOr".
+#'
+#'     - Append "-rev" to any RColorBrewer palette name to reverse the color order. Example: "RdBu-rev".
+#'
+#'     - Custom color gradient using a vector of colors.
+#'
+#' @param center_color Logical or NULL. Determines whether the color scale should be centered at zero.
+#'   If TRUE, the color scale will be centered at zero, with the midpoint color representing zero.
+#'   If FALSE, the color scale will span the full range of the data without centering.
+#'   If NULL (default), it will automatically determine based on the color scheme:
+#'   TRUE for diverging color palettes, FALSE for sequential palettes or custom color schemes.
+#'   This is particularly useful for visualizing data with both positive and negative values,
+#'   such as z-scores or log fold changes.
 #' @param top.n Retains only the top `n` bars in both positive and negative directions. If `length(top.n)` is 1, the function retains `top.n` bars for both positive and negative directions. If `length(top.n)` is 2, it retains `top.n[1]` positive bars and `top.n[2]` negative bars. Defaults to NULL.
 #' @param flip Determines whether the plot should be flipped. Defaults to TRUE for matrix input and FALSE for Seurat object input.
 #' @param y.label Label for the y-axis. Defaults to "length".
@@ -114,7 +131,8 @@ WaterfallPlot.default <- function(
     color = "tscore",
     len.threshold = 0,
     col.threshold = 0,
-    color_theme = c(low = muted("blue"), mid = "white", high = muted("red")),
+    color_theme = "BuRd",
+    center_color = NULL,
     top.n = NULL,
     flip = TRUE,
     y.label = NULL,
@@ -150,6 +168,7 @@ WaterfallPlot.default <- function(
     scores = scores,
     color = color,
     color_theme = color_theme,
+    center_color = center_color,
     flip = flip,
     y.label = titles[[2]],
     angle = angle,
@@ -235,6 +254,7 @@ WaterfallPlot_Plot <- function(
     scores,
     color,
     color_theme,
+    center_color,
     flip,
     y.label,
     angle,
@@ -262,7 +282,8 @@ WaterfallPlot_Plot <- function(
     labs(fill = lab_fill, x = element_blank(), y = y.label, title = title) +
     theme(axis.text.x=element_text(angle = angle, hjust = hjust, vjust = vjust),
           plot.title = element_text(hjust = 0.5, face = "bold"))
-  p <- p + scale_fill_cont_auto(color_theme)
+  value_range <- range(scores$color)
+  p <- p + scale_fill_cont_auto(color_theme, center_color = center_color, value_range = value_range)
   if(flip) p <- p + scale_x_discrete(position = "top") + coord_flip()
   return(p)
 }

@@ -4,14 +4,29 @@
 #' @param color_scheme Specifies the color gradient for the heatmap visualization.
 #'   This parameter accepts multiple input formats to provide flexibility in defining color schemes:
 #'
-#'   - Predefined color schemes: Users can specify "A", "B", "C", "D", or "E" to use color schemes from the `viridis` package.
+#'     - Predefined color schemes from the `viridis` package ("A" to "H").
 #'
-#'   - Named vector for three-point gradients: Provide a named vector with keys "low", "mid", and "high" to define colors at these specific data points. The "mid" value is typically centered at zero, allowing for a diverging color scheme.
-#'     Example: `c(low = "blue", mid = "white", high = "red")`
+#'     - Named vector with keys "low", "mid", and "high" for three-point gradients. Example: `c(low = muted("blue"), mid = "white", high = muted("red"))`.
 #'
-#'   - Two-point gradient: Provide a named vector with keys "low" and "high" to create a simple two-color gradient. Example: `c(low = "blue", high = "red")`
+#'     - Two-point gradient with keys "low" and "high". Example: `c(low = "blue", high = "red")`.
 #'
-#'   - Custom color gradient: Users can provide a vector of colors to generate a custom gradient across multiple values. This is suitable for more complex data ranges and visual preferences.
+#'     - RColorBrewer sequential palettes: "Blues", "BuGn", "BuPu", "GnBu", "Greens", "Greys", "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd".
+#'
+#'     - RColorBrewer diverging palettes: "BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral".
+#'
+#'     - Custom diverging palettes: "GnYlRd", "BuYlRd", "GyRd", "BuRd", "PuOr".
+#'
+#'     - Append "-rev" to any RColorBrewer palette name to reverse the color order. Example: "RdBu-rev".
+#'
+#'     - Custom color gradient using a vector of colors.
+#'
+#' @param center_color Logical or NULL. Determines whether the color scale should be centered at zero.
+#'   If TRUE, the color scale will be centered at zero, with the midpoint color representing zero.
+#'   If FALSE, the color scale will span the full range of the data without centering.
+#'   If NULL (default), it will automatically determine based on the color scheme:
+#'   TRUE for diverging color palettes, FALSE for sequential palettes or custom color schemes.
+#'   This is particularly useful for visualizing data with both positive and negative values,
+#'   such as z-scores or log fold changes.
 #' @param border_color Color for the tile borders. Default: NULL.
 #' @param lab_fill Label for the color. Default: 'score'.
 #' @param angle Angle of the x-axis text. Passed to element_text(). Default: 45.
@@ -78,7 +93,8 @@
 
 Heatmap <- function(
     score,
-    color_scheme = c(low = muted("blue"), mid = "white", high = muted("red")),
+    color_scheme = "BuRd",
+    center_color = NULL,
     border_color = NULL,
     lab_fill = "score",
     angle = 45,
@@ -111,6 +127,7 @@ Heatmap <- function(
   ToPlot <-
     data.frame(score, id = factor(rownames(score), levels=unique(rev(rownames(score))))) %>%
     melt()
+  value_range <- range(ToPlot$value)
   ToPlot$variable <- colnames(score)[ToPlot$variable] %>% factor(levels = unique(.))
   if(!is.null(facet_col)){
     if(length(facet_col)==ncol(score)){
@@ -141,7 +158,7 @@ Heatmap <- function(
           plot.margin = plot.margin) +
     theme(...)
 
-  p <- p + scale_fill_cont_auto(color_scheme)
+  p <- p + scale_fill_cont_auto(color_scheme, center_color = center_color, value_range = value_range)
 
   if(hide_axis_line) {
     p <- p + theme(axis.line = element_blank(),
@@ -186,7 +203,6 @@ Heatmap <- function(
     text_table$x2 <- text_table$x1 + ncol(score) * segment.width[1] / 100
     text_table$x3 <- text_table$x2 + ncol(score) * segment.width[2] / 100
     text_table$x4 <- text_table$x3 + ncol(score) * segment.width[3] / 100
-
 
     p <- p +
       theme(axis.line.y = element_blank(),
