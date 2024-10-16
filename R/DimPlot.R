@@ -27,7 +27,7 @@
 #'
 #'   - A vector specifying a global color setting similar to Seurat's `DimPlot`/`FeaturePlot`.
 #'
-#'   - A list specifying colors for each variable type (discrete/continuous) or for each individual variable. For example, `list(discrete = "auto", continuous = "A")` applies automatic styling from `color_pro()` for discrete variables and `viridis` "A" style for continuous variables. More detailed setups can be included. For example, `list("cluster" = "light", "CD14" = "Reds")`.
+#'   - A list specifying colors for each variable type (discrete/continuous) or for each individual variable. For example, `list(discrete = "auto", continuous = "A")` applies automatic styling from `color_pro()` for discrete variables and `viridis` "A" style for continuous variables. More detailed setups can be included. For example, `list("cluster" = "light", "CD14" = "OrRd")`.
 #'
 #'   For continuous variables:
 #'
@@ -35,7 +35,7 @@
 #'
 #'     - Named vector with keys "low", "mid", and "high" for three-point gradients. Example: `c(low = muted("blue"), mid = "white", high = muted("red"))`.
 #'
-#'     - Two-point gradient with keys "low" and "high". Example: `c(low = "blue", high = "red")`.
+#'     - Two-point gradient with keys "low" and "high". Example: `c(low = "lightblue", high = "red")`.
 #'
 #'     - RColorBrewer sequential palettes: "Blues", "BuGn", "BuPu", "GnBu", "Greens", "Greys", "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd".
 #'
@@ -57,7 +57,7 @@
 #'
 #'     - Any manually specified colors.
 #'
-#'   Default: list(discrete = "auto", continuous = "A").
+#'   Default: list(discrete = "auto", continuous = "Blues").
 #' @param load.cols When TRUE, automatically loads pre-stored color information for variables from `seu@misc[["var_colors"]]`.
 #'   Default: TRUE.#' @param pt.size Point size for plotting, adjusts the size of each cell in the plot.
 #'   Default: NULL.
@@ -152,7 +152,7 @@ DimPlot2 <- function(
     nrow = NULL,
     nrow.each = NULL,
     ncol.legend = NULL,
-    cols = list(discrete = "auto", continuous = "A"),
+    cols = list(discrete = "auto", continuous = "Blues"),
     load.cols = TRUE,
     pt.size = NULL,
     shape.by = NULL,
@@ -724,4 +724,177 @@ CenterTitle <- function () {
   return(theme(plot.title = element_text(hjust = 0.5), validate = TRUE))
 }
 
+#' @title Add Simplified Axis Indicators to ggplot
+#' @description Adds simplified axis indicators (arrows and labels) to a ggplot object, typically used for dimension reduction plots like UMAP or t-SNE.
+#' @param anchor_x X-coordinate for the anchor point of the arrows, Default: unit(6, "mm")
+#' @param anchor_y Y-coordinate for the anchor point of the arrows, Default: unit(6, "mm")
+#' @param line_length Length of the arrow lines, Default: unit(12, "mm")
+#' @param arrow_length Length of the arrow heads, Default: unit(2.5, "mm")
+#' @param text_offset_x X-offset for the axis labels, Default: unit(2.5, "mm")
+#' @param text_offset_y Y-offset for the axis labels, Default: unit(2.5, "mm")
+#' @param text_size Font size for the axis labels, Default: 10
+#' @param line_width Width of the arrow lines, Default: 1
+#' @param x_label Custom label for the x-axis, Default: NULL (auto-detected)
+#' @param y_label Custom label for the y-axis, Default: NULL (auto-detected)
+#' @return A ggplot theme object that can be added to an existing ggplot
+#' @details This function creates a theme that adds simplified axis indicators to the bottom-left corner of a ggplot.
+#' It consists of two perpendicular arrows representing the x and y axes, along with their respective labels.
+#' This approach is particularly useful for dimension reduction plots like UMAP or t-SNE where traditional axes are often removed to reduce visual clutter.
+#' The function attempts to auto-detect axis labels, but custom labels can be provided.
+#' @examples
+#' library(Seurat)
+#' library(SeuratExtend)
+#'
+#' features <- c("cluster", "orig.ident", "CD3D", "CD14")
+#'
+#' # Add arrows to the overall plot
+#' DimPlot2(pbmc, features = features, theme = NoAxes()) +
+#'   theme_umap_arrows()
+#'
+#' # Add arrows to each subplot
+#' DimPlot2(pbmc, features = features, theme = theme_umap_arrows())
+#' @rdname theme_umap_arrows
+#' @export
 
+theme_umap_arrows <- function(
+    anchor_x = unit(6, "mm"),
+    anchor_y = unit(6, "mm"),
+    line_length = unit(12, "mm"),
+    arrow_length = unit(2.5, "mm"),
+    text_offset_x = unit(2.5, "mm"),
+    text_offset_y = unit(2.5, "mm"),
+    text_size = 10,
+    line_width = 1,
+    x_label = NULL,
+    y_label = NULL
+) {
+
+  library(grid)
+  ensure_unit <- function(x, default_unit = "mm") {
+    if (!is(x, "unit")) {
+      x <- unit(x, default_unit)
+    }
+    x
+  }
+
+  anchor_x <- ensure_unit(anchor_x)
+  anchor_y <- ensure_unit(anchor_y)
+  line_length <- ensure_unit(line_length)
+  arrow_length <- ensure_unit(arrow_length)
+  text_offset_x <- ensure_unit(text_offset_x)
+  text_offset_y <- ensure_unit(text_offset_y)
+
+  no_axes <- theme(
+    axis.line = element_blank(),
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    axis.title = element_blank()
+  )
+
+  x_arrow <- arrow(length = arrow_length, ends = "last", type = "closed")
+  y_arrow <- arrow(length = arrow_length, ends = "last", type = "closed")
+
+  structure(
+    list(
+      no_axes = no_axes,
+      anchor_x = anchor_x,
+      anchor_y = anchor_y,
+      line_length = line_length,
+      x_arrow = x_arrow,
+      y_arrow = y_arrow,
+      text_offset_x = text_offset_x,
+      text_offset_y = text_offset_y,
+      text_size = text_size,
+      line_width = line_width,
+      x_label = x_label,
+      y_label = y_label
+    ),
+    class = "theme_umap_arrows"
+  )
+}
+
+#' @exportS3Method ggplot2::ggplot_add
+ggplot_add.theme_umap_arrows <- function(object, plot, object_name) {
+  x_label <- object$x_label %||% extract_label(plot, "x")
+  y_label <- object$y_label %||% extract_label(plot, "y")
+
+  plot +
+    object$no_axes +
+    annotation_custom(
+      grob = segmentsGrob(
+        x0 = object$anchor_x,
+        x1 = object$anchor_x + object$line_length,
+        y0 = object$anchor_y,
+        y1 = object$anchor_y,
+        arrow = object$x_arrow,
+        gp = gpar(col = "black", fill = "black", lwd = object$line_width)
+      )
+    ) +
+    annotation_custom(
+      grob = segmentsGrob(
+        x0 = object$anchor_x,
+        x1 = object$anchor_x,
+        y0 = object$anchor_y,
+        y1 = object$anchor_y + object$line_length,
+        arrow = object$y_arrow,
+        gp = gpar(col = "black", fill = "black", lwd = object$line_width)
+      )
+    ) +
+    annotation_custom(
+      grob = textGrob(
+        label = x_label,
+        x = object$anchor_x,
+        y = object$anchor_y - object$text_offset_y,
+        just = c(0, 1),
+        gp = gpar(fontsize = object$text_size)
+      )
+    ) +
+    annotation_custom(
+      grob = textGrob(
+        label = y_label,
+        x = object$anchor_x - object$text_offset_x,
+        y = object$anchor_y,
+        just = c(0, 0),
+        rot = 90,
+        gp = gpar(fontsize = object$text_size)
+      )
+    )
+}
+
+extract_label <- function(plot, axis) {
+  # First, try to extract from plot$labels
+  label <- plot$labels[[axis]]
+
+  # If the above fails, try to extract from the built plot
+  if (is.null(label)) {
+    # Force ggplot to compute the plot
+    built_plot <- ggplot2::ggplot_build(plot)
+
+    # Try to access grobs from the first layer
+    grobs <- tryCatch({
+      built_plot$plot$layers[[1]]$computed_geom_params$grob$grobs
+    }, error = function(e) NULL)
+
+    if (!is.null(grobs)) {
+      for (grob in grobs) {
+        if (grepl(paste0("axis.title.", axis), grob$name)) {
+          # Try to extract label, with error handling
+          label <- tryCatch({
+            if (is.null(grob$children)) {
+              grob$label
+            } else if (length(grob$children) > 0) {
+              grob$children[[1]]$label
+            } else {
+              NULL
+            }
+          }, error = function(e) NULL)
+
+          if (!is.null(label)) break
+        }
+      }
+    }
+  }
+
+  # If still not found, return the default value
+  return(label %||% ifelse(axis == "x", "UMAP_1", "UMAP_2"))
+}

@@ -19,7 +19,7 @@ DimPlot2(
   nrow = NULL,
   nrow.each = NULL,
   ncol.legend = NULL,
-  cols = list(discrete = "auto", continuous = "A"),
+  cols = list(discrete = "auto", continuous = "Blues"),
   load.cols = TRUE,
   pt.size = NULL,
   shape.by = NULL,
@@ -85,7 +85,7 @@ Default: NULL.}
 
   - A vector specifying a global color setting similar to Seurat's `DimPlot`/`FeaturePlot`.
 
-  - A list specifying colors for each variable type (discrete/continuous) or for each individual variable. For example, `list(discrete = "auto", continuous = "A")` applies automatic styling from `color_pro()` for discrete variables and `viridis` "A" style for continuous variables. More detailed setups can be included. For example, `list("cluster" = "light", "CD14" = "Reds")`.
+  - A list specifying colors for each variable type (discrete/continuous) or for each individual variable. For example, `list(discrete = "auto", continuous = "A")` applies automatic styling from `color_pro()` for discrete variables and `viridis` "A" style for continuous variables. More detailed setups can be included. For example, `list("cluster" = "light", "CD14" = "OrRd")`.
 
   For continuous variables:
 
@@ -93,7 +93,7 @@ Default: NULL.}
 
     - Named vector with keys "low", "mid", and "high" for three-point gradients. Example: `c(low = muted("blue"), mid = "white", high = muted("red"))`.
 
-    - Two-point gradient with keys "low" and "high". Example: `c(low = "blue", high = "red")`.
+    - Two-point gradient with keys "low" and "high". Example: `c(low = "lightblue", high = "red")`.
 
     - RColorBrewer sequential palettes: "Blues", "BuGn", "BuPu", "GnBu", "Greens", "Greys", "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd".
 
@@ -115,7 +115,7 @@ Default: NULL.}
 
     - Any manually specified colors.
 
-  Default: list(discrete = "auto", continuous = "A").}
+  Default: list(discrete = "auto", continuous = "Blues").}
 
 \item{load.cols}{When TRUE, automatically loads pre-stored color information for variables from `seu@misc[["var_colors"]]`.
 Default: TRUE.#' @param pt.size Point size for plotting, adjusts the size of each cell in the plot.

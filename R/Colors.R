@@ -285,7 +285,7 @@ scale_cont_auto <- function(
   default_colors <- if(type == "fill") {
     rev(brewer.pal(11,"RdBu"))
   } else {
-    brewer.pal(9,"GnBu")
+    brewer.pal(9,"Blues")
   }
 
   create_scale <- function(scale_type, colors, limits = NULL) {

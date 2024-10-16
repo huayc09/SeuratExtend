@@ -8,7 +8,7 @@
 #'
 #'     - Named vector with keys "low", "mid", and "high" for three-point gradients. Example: `c(low = muted("blue"), mid = "white", high = muted("red"))`.
 #'
-#'     - Two-point gradient with keys "low" and "high". Example: `c(low = "blue", high = "red")`.
+#'     - Two-point gradient with keys "low" and "high". Example: `c(low = "lightblue", high = "red")`.
 #'
 #'     - RColorBrewer sequential palettes: "Blues", "BuGn", "BuPu", "GnBu", "Greens", "Greys", "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd".
 #'
