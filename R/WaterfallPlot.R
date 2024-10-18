@@ -222,7 +222,9 @@ WaterfallPlot_Calc <- function(
   if("p" %in% c(length, color)){
     scores[["p"]] <-
       apply(matr, 1, function(x){
-        -log10(t.test(x[cell.1], x[cell.2])[["p.value"]]) * ifelse(mean(x[cell.1]) > mean(x[cell.2]), 1, -1)
+        p_value <- t.test(x[cell.1], x[cell.2])[["p.value"]]
+        log10p <- pmin(-log10(p_value), 325) * ifelse(mean(x[cell.1]) > mean(x[cell.2]), 1, -1)
+        return(log10p)
       }, simplify = TRUE)
   }
   if("logFC" %in% c(length, color)){

@@ -216,10 +216,18 @@ Heatmap <- function(
 
   if(!is.null(facet_col) | !is.null(facet_row)){
     if(!is.null(ncol) | !is.null(nrow)) {
-      p <- p +
-        facet_rep_wrap(
-          facets = vars(facet_col), ncol = ncol, nrow = nrow,
-          scales = "fixed")
+      import("lemon")
+      if(!is.null(facet_col)) {
+        p <- p +
+          facet_rep_wrap(
+            facets = vars(facet_col), ncol = ncol, nrow = nrow,
+            scales = "free")
+      } else {
+        p <- p +
+          facet_rep_wrap(
+            facets = vars(facet_row), ncol = ncol, nrow = nrow,
+            scales = "free")
+      }
     } else {
       p <- p +
         facet_grid(
