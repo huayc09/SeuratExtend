@@ -2,13 +2,17 @@
 % Please edit documentation in R/DotPlot.R
 \name{DotPlot2}
 \alias{DotPlot2}
-\title{Enhanced Dot Plot for Single-Cell Data Visualization (Under Development)}
+\title{Enhanced Dot Plot for Single-Cell Data Visualization}
 \usage{
 DotPlot2(
   seu,
   features,
   group.by = NULL,
+  split.by = NULL,
+  split.by.method = "border",
+  nudge_factor = 0.35,
   color_scheme = "A",
+  split.by.colors = "default",
   center_color = NULL,
   angle = NULL,
   hjust = NULL,
@@ -18,6 +22,7 @@ DotPlot2(
   panel.spacing = unit(5, "pt"),
   strip.placement = "outside",
   border = TRUE,
+  border.width = 0.6,
   flip = FALSE,
   free_space = TRUE,
   show_grid = TRUE,
@@ -25,13 +30,51 @@ DotPlot2(
 )
 }
 \arguments{
-\item{seu}{A Seurat object containing the single-cell data.}
+\item{seu}{A Seurat object.}
 
 \item{features}{A vector of gene names or a list of named vectors for grouped features.}
 
 \item{group.by}{Column name in seu@meta.data for grouping cells. Default: NULL (uses current Idents).}
 
-\item{color_scheme}{Color scheme for the plot. Default: 'A'.}
+\item{split.by}{Column name in seu@meta.data for splitting the groups. Default: NULL.}
+
+\item{split.by.method}{Method for visualizing the split groups. Options are "border" or "color". Default: "border".
+
+  - "border": Uses different border colors to represent different split groups, while the fill color represents the expression level.
+
+  - "color": Uses different dot colors to represent different split groups, while the transparency represents the expression level.}
+
+\item{nudge_factor}{Factor to adjust the spacing between split groups. Default: 0.35.}
+
+\item{color_scheme}{Color scheme for the plot. When split.by is NULL, or when split.by is specified and split.by.method is "border", this color scheme is used to represent the relative expression level (zscore). Default: 'A'.
+   This parameter accepts multiple input formats to provide flexibility in defining color schemes:
+
+    - Predefined color schemes from the `viridis` package ("A" to "H").
+
+    - Named vector with keys "low", "mid", and "high" for three-point gradients. Example: `c(low = muted("blue"), mid = "white", high = muted("red"))`.
+
+    - Two-point gradient with keys "low" and "high". Example: `c(low = "lightblue", high = "red")`.
+
+    - RColorBrewer sequential palettes: "Blues", "BuGn", "BuPu", "GnBu", "Greens", "Greys", "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd".
+
+    - RColorBrewer diverging palettes: "BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral".
+
+    - Custom diverging palettes: "GnYlRd", "BuYlRd", "GyRd", "BuRd", "PuOr".
+
+    - Append "-rev" to any RColorBrewer palette name to reverse the color order. Example: "RdBu-rev".
+
+    - Custom color gradient using a vector of colors.}
+
+\item{split.by.colors}{Colors for split groups. When split.by.method is "border", this sets the border colors; when split.by.method is "color", this sets the dot colors.
+Flexible color settings for the plot, accepting a variety of inputs:
+
+    - Seven color_pro styles: "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple".
+
+    - Five color_iwh styles: "iwh_default", "iwh_intense", "iwh_pastel", "iwh_all", "iwh_all_hard".
+
+    - Brewer color scales as specified by `brewer.pal.info`.
+
+    - Any manually specified colors.}
 
 \item{center_color}{Center color for diverging color schemes. Default: NULL.}
 
@@ -49,13 +92,15 @@ DotPlot2(
 
 \item{strip.placement}{Placement of facet labels. Default: 'outside'.}
 
-\item{border}{Whether to draw borders around points. Default: TRUE.}
+\item{border}{Whether to draw borders around points when split.by is NULL. Default: TRUE.}
+
+\item{border.width}{Width of the border around points. Default: 0.6.}
 
 \item{flip}{Whether to flip the coordinates of the plot. Default: FALSE.}
 
 \item{free_space}{Whether to allow free space in facets. Default: TRUE.}
 
-\item{show_grid}{Whether to show grid lines. Default: TRUE}
+\item{show_grid}{Whether to show grid lines. Default: TRUE.}
 
 \item{...}{Additional arguments passed to theme().}
 }
@@ -63,12 +108,20 @@ DotPlot2(
 A ggplot object representing the dot plot.
 }
 \description{
-Creates an enhanced dot plot for visualizing gene expression across different cell types or clusters in single-cell data. Note: This function is still under development and may change in future versions.
+Creates an enhanced dot plot for visualizing gene expression across different cell types or clusters in single-cell data, with support for split visualization.
 }
 \details{
 This function creates a dot plot where the size of each dot represents the percentage of cells
-expressing the gene, and the color represents the average expression level. It supports
-grouped features, coordinate flipping, and various customization options.
+expressing the gene, and the color represents the average expression level (corrected expression level, zscore). It supports
+grouped features, coordinate flipping, and various customization options. The function also
+allows for splitting the visualization by a specified variable, offering two methods of
+representation:
+1. Using border colors (split.by.method = "border"): In this method, the fill color of the dots represents
+   the expression level, while the border color represents the split group. This allows for easy
+   comparison of expression levels across different split groups.
+2. Using dot colors (split.by.method = "color"): In this method, the color of the dots represents
+   the split group, while the transparency represents the expression level. This can be useful when
+   the focus is on comparing the distribution of split groups across different cell types or genes.
 }
 \examples{
 # Basic usage
@@ -78,9 +131,12 @@ DotPlot2(pbmc, features = genes)
 # Grouped features
 DotPlot2(pbmc, features = list(group1 = genes[1:3], group2 = genes[4:10]))
 
-# Flipped coordinates
-DotPlot2(pbmc, features = genes, flip = TRUE)
+# Split visualization by sample
+DotPlot2(pbmc, features = genes, group.by = "cluster", split.by = "orig.ident", show_grid = FALSE)
 
-# Custom color scheme and grid
-DotPlot2(pbmc, features = genes, color_scheme = "D", show_grid = FALSE)
+# Split visualization using colors instead of borders
+DotPlot2(pbmc, features = genes, group.by = "cluster", split.by = "orig.ident", split.by.method = "color", show_grid = FALSE)
+
+# Custom settings
+DotPlot2(pbmc, features = genes, color_scheme = "OrRd", show_grid = FALSE, border = FALSE, flip = TRUE)
 }

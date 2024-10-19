@@ -29,9 +29,9 @@
 #'   such as z-scores or log fold changes.
 #' @param border_color Color for the tile borders. Default: NULL.
 #' @param lab_fill Label for the color. Default: 'score'.
-#' @param angle Angle of the x-axis text. Passed to element_text(). Default: 45.
-#' @param hjust Horizontal justification of x-axis text. Passed to element_text(). Default: 1.
-#' @param vjust Vertical justification of x-axis text. Passed to element_text(). Default: 1.
+#' @param angle Angle of x-axis labels. Default: NULL (auto-determined).
+#' @param hjust Horizontal justification of x-axis labels. Default: NULL (auto-determined).
+#' @param vjust Vertical justification of x-axis labels. Default: NULL (auto-determined).
 #' @param legend_position Position of the figure legend. Default: 'right'.
 #' @param y_text_position Position of the row name text. Default: 'right'
 #' @param feature_text_subset A subset of feature names to be shown. Useful when there are many features. Default: NULL.
@@ -97,9 +97,9 @@ Heatmap <- function(
     center_color = NULL,
     border_color = NULL,
     lab_fill = "score",
-    angle = 45,
-    hjust = 1,
-    vjust = 1,
+    angle = NULL,
+    hjust = NULL,
+    vjust = NULL,
     legend_position = "right",
     y_text_position = "right",
     feature_text_subset = NULL,
@@ -129,6 +129,35 @@ Heatmap <- function(
     melt()
   value_range <- range(ToPlot$value)
   ToPlot$variable <- colnames(score)[ToPlot$variable] %>% factor(levels = unique(.))
+
+  # Auto-determine angle, hjust, and vjust
+  if (is.null(angle)) {
+    max_label_length <- max(nchar(levels(ToPlot$variable)))
+    angle <- if (max_label_length <= 2) 0 else 45
+  }
+
+  if (abs(angle) > 90) {
+    warning("Angle should be between -90 and 90 degrees for optimal readability.")
+  }
+
+  if (is.null(hjust)) {
+    if (angle > 0) {
+      hjust <- 1  # Right align
+    } else if (angle < 0) {
+      hjust <- 0  # Left align
+    } else {
+      hjust <- 0.5  # Center align
+    }
+  }
+
+  if (is.null(vjust)) {
+    if (abs(angle) == 90) {
+      vjust <- 0.5
+    } else {
+      vjust <- 1
+    }
+  }
+
   if(!is.null(facet_col)){
     if(length(facet_col)==ncol(score)){
       if(!is.null(feature_text_subset)) facet_col <- factor(facet_col) %>% `levels<-`(c(levels(.),""))

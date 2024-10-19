@@ -10,9 +10,9 @@ Heatmap(
   center_color = NULL,
   border_color = NULL,
   lab_fill = "score",
-  angle = 45,
-  hjust = 1,
-  vjust = 1,
+  angle = NULL,
+  hjust = NULL,
+  vjust = NULL,
   legend_position = "right",
   y_text_position = "right",
   feature_text_subset = NULL,
@@ -66,11 +66,11 @@ such as z-scores or log fold changes.}
 
 \item{lab_fill}{Label for the color. Default: 'score'.}
 
-\item{angle}{Angle of the x-axis text. Passed to element_text(). Default: 45.}
+\item{angle}{Angle of x-axis labels. Default: NULL (auto-determined).}
 
-\item{hjust}{Horizontal justification of x-axis text. Passed to element_text(). Default: 1.}
+\item{hjust}{Horizontal justification of x-axis labels. Default: NULL (auto-determined).}
 
-\item{vjust}{Vertical justification of x-axis text. Passed to element_text(). Default: 1.}
+\item{vjust}{Vertical justification of x-axis labels. Default: NULL (auto-determined).}
 
 \item{legend_position}{Position of the figure legend. Default: 'right'.}
 

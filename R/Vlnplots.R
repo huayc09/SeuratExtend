@@ -255,6 +255,12 @@ VlnPlot2_Plot <- function(
   p <- ggplot(scores, aes(x = .data[[x]], y = value))
   n <- nlevels(factor(scores[[x]]))
 
+  # Automatically determine angle, hjust, and vjust
+  max_label_length <- max(nchar(levels(scores[[x]])))
+  angle <- if (max_label_length <= 2) 0 else 45
+  hjust <- if (angle > 0) 1 else 0.5
+  vjust <- if (angle == 0) 0.5 else 1
+
   if(violin) {
     p <- p + geom_violin(mapping = aes(fill = .data[[x]]), scale = "width", width = width)
   }
@@ -293,7 +299,7 @@ VlnPlot2_Plot <- function(
       theme(strip.background = element_blank(),
             strip.placement = "outside",
             legend.position = "none",
-            axis.text.x = element_text(angle = 45,hjust = 1),
+            axis.text.x = element_text(angle = angle, hjust = hjust, vjust = vjust),
             strip.text = element_text(face = "bold", size = 10)) +
       labs(fill = lab_fill) +
       scale_y_continuous(expand = expansion(mult = c(0,0.08)))

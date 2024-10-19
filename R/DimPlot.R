@@ -683,7 +683,7 @@ DimPlot2_SelColCont <- function(
   } else if (list_l) {
     cols <- "A"
   }
-  scale_color <- scale_color_cont_auto(cols)
+  scale_color <- scale_color_cont_auto(cols, center_color = FALSE, value_range = NULL)
   return(scale_color)
 }
 

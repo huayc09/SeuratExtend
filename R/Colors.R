@@ -319,8 +319,12 @@ scale_fill_cont_auto <- function(color_scheme, center_color = NULL, value_range 
     value_range = value_range)
 }
 
-scale_color_cont_auto <- function(color_scheme) {
-  scale_cont_auto(color_scheme, type = "color", center_color = FALSE)
+scale_color_cont_auto <- function(color_scheme, center_color = NULL, value_range = NULL) {
+  scale_cont_auto(
+    color_scheme,
+    type = "color",
+    center_color = center_color,
+    value_range = value_range)
 }
 
 scale_disc_auto <- function(color_scheme, n, type = c("color", "fill"), labels = waiver()) {
