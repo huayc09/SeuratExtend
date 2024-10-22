@@ -133,3 +133,80 @@ CalcStats <- function(object, ...) {
 WaterfallPlot <- function(object, ...) {
   UseMethod(generic = "WaterfallPlot", object = object)
 }
+
+
+#' @title Create a Volcano Plot Comparing Two Groups
+#' @description
+#' Creates a volcano plot to visualize differential expression or other comparative analyses
+#' between two groups. The plot displays a measure of change (typically log fold change)
+#' on the x-axis versus a measure of significance (typically -log10 p-value) on the y-axis.
+#' Points are colored based on their significance levels, and top features in both
+#' up- and down-regulated directions are labeled.
+#' @details
+#' The function supports both Seurat objects and raw matrices as input. For Seurat objects,
+#' it automatically handles data extraction and can work with any features available in the
+#' object. The plot uses automatic threshold detection based on data quantiles if thresholds
+#' are not manually specified.
+#'
+#' The visualization employs a three-color scheme:
+#' * Points below both thresholds are colored using the first specified color
+#' * Points passing either x or y threshold (but not both) use the second color
+#' * Points passing both thresholds use the third color
+#'
+#' The function automatically labels the top features in both directions (positive and
+#' negative changes) that pass both thresholds. The number of features to label can be
+#' controlled using the `top.n` parameter.
+#'
+#' When `y = "p"`, the y-axis displays -log10 transformed p-values.
+#' @examples
+#' # Basic usage with a Seurat object
+#' VolcanoPlot(pbmc)
+#'
+#' # Compare specific cell types with customized thresholds
+#' VolcanoPlot(
+#'   pbmc,
+#'   ident.1 = "B cell",
+#'   ident.2 = "CD8 T cell",
+#'   x.threshold = 1,
+#'   y.threshold = 5
+#' )
+#'
+#' # Customize appearance
+#' VolcanoPlot(
+#'   pbmc,
+#'   ident.1 = "B cell",
+#'   ident.2 = "CD8 T cell",
+#'   x.quantile = 0.99,    # Less stringent x threshold
+#'   y.quantile = 0.95,    # More stringent y threshold
+#'   top.n = 5,            # Label fewer genes
+#'   color = c("grey20", "grey70", "darkred")  # Custom colors
+#' )
+#'
+#' # Use t-score instead of p-value for y-axis
+#' VolcanoPlot(
+#'   pbmc,
+#'   ident.1 = "B cell",
+#'   ident.2 = "CD8 T cell",
+#'   y = "tscore"
+#' )
+#'
+#' # Direct usage with a matrix
+#' pbmc <- GeneSetAnalysisGO(pbmc, parent = "immune_system_process", spe = "human")
+#' matr <- pbmc@misc$AUCell$GO$immune_system_process
+#'
+#' # Generate a volcano plot comparing B cell with CD8 T cells.
+#' VolcanoPlot(
+#'   matr,
+#'   f = pbmc$cluster,
+#'   ident.1 = "B cell",
+#'   ident.2 = "CD8 T cell",
+#'   x.quantile = 0.8,
+#'   y.quantile = 0.8,
+#'   top.n = 5)
+#'
+#' @rdname VolcanoPlot
+#' @export
+
+VolcanoPlot <- function(object, ...) {
+  UseMethod(generic = "VolcanoPlot", object = object)
+}

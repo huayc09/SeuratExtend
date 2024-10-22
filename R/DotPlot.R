@@ -125,8 +125,11 @@ DotPlot2 <- function(
     feature_groups <- NULL
   }
 
+  group_levels <- levels(factor(seu@meta.data[[group.by]]))
+
   # Create combined group if split.by is provided
   if (!is.null(split.by)) {
+    split_levels <- levels(factor(seu@meta.data[[split.by]]))
     combined_group <- paste(seu@meta.data[[group.by]], seu@meta.data[[split.by]], sep = "___")
     seu[["__internal_combined_group__"]] <- combined_group
     calc_group.by <- "__internal_combined_group__"
@@ -142,13 +145,13 @@ DotPlot2 <- function(
   # Split combined group back into original groups
   if (!is.null(split.by)) {
     ToPlot <- ToPlot %>%
-      separate(Var2, c("group", "split"), sep = "___")
+      tidyr::separate(Var2, c("group", "split"), sep = "___")
+    ToPlot$group <- factor(ToPlot$group, levels = group_levels)
+    ToPlot$split <-  factor(ToPlot$split, levels = split_levels)
 
     # Calculate nudge values
-    split_levels <- unique(ToPlot$split)
     n_splits <- length(split_levels)
     nudge_values <- seq(-nudge_factor/2, nudge_factor/2, length.out = n_splits)
-    names(nudge_values) <- split_levels
     ToPlot$nudge <- nudge_values[ToPlot$split]
   } else {
     ToPlot$group <- ToPlot$Var2
