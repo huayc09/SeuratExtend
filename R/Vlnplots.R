@@ -30,6 +30,8 @@ VlnPlot2.Seurat <- function(
   violin = T,
   box = T,
   width = 0.9,
+  show.mean = FALSE,
+  mean_colors = c("red", "blue"),
   pt = T,
   hide.outlier = F,
   pt.style = c("jitter","quasirandom"),
@@ -76,6 +78,8 @@ VlnPlot2.Seurat <- function(
     violin = violin,
     box = box,
     width = width,
+    show.mean = show.mean,
+    mean_colors = mean_colors,
     pt = pt,
     hide.outlier = hide.outlier,
     pt.style = pt.style,
@@ -113,6 +117,8 @@ VlnPlot2.Seurat <- function(
 #' @param violin Indicates whether to generate a violin plot. Default: TRUE.
 #' @param box Indicates whether to depict a box plot. Default: TRUE.
 #' @param width Width of the box plot. Default: 0.9.
+#' @param show.mean Logical value indicating whether to show mean and median lines. This is particularly useful for genes with low expression levels where the median and box plot quartiles might overlap at zero, making it difficult to interpret differences between groups. Default is FALSE.
+#' @param mean_colors Vector of two colors for mean and median lines respectively. Default is c("red", "blue").
 #' @param pt Indicates if points should be plotted. Default: TRUE.
 #' @param hide.outlier Conceals outlier points from the box plot. Default: FALSE.
 #' @param pt.style Position adjustment. Default choices: "jitter", "quasirandom".
@@ -141,6 +147,8 @@ VlnPlot2.default <- function(
   violin = T,
   box = T,
   width = 0.9,
+  show.mean = FALSE,
+  mean_colors = c("red", "blue"),
   pt = T,
   hide.outlier = F,
   pt.style = c("jitter","quasirandom"),
@@ -174,6 +182,8 @@ VlnPlot2.default <- function(
     violin = violin,
     box = box,
     width = width,
+    show.mean = show.mean,
+    mean_colors = mean_colors,
     pt = pt,
     hide.outlier = hide.outlier,
     pt.style = pt.style,
@@ -243,6 +253,8 @@ VlnPlot2_Plot <- function(
     violin,
     box,
     width,
+    show.mean,
+    mean_colors,
     pt,
     hide.outlier,
     pt.style,
@@ -261,16 +273,41 @@ VlnPlot2_Plot <- function(
   hjust <- if (angle > 0) 1 else 0.5
   vjust <- if (angle == 0) 0.5 else 1
 
+  # Add violin plot if requested
   if(violin) {
     p <- p + geom_violin(mapping = aes(fill = .data[[x]]), scale = "width", width = width)
   }
+
+  # Add box plot without violin
   if(box & !violin) {
     if(pt | hide.outlier) {
       p <- p + geom_boxplot(mapping = aes(fill = .data[[x]]), outlier.shape = NA, width = width)
     } else {
       p <- p + geom_boxplot(mapping = aes(fill = .data[[x]]), outlier.size = pt.size, width = width)
     }
+
+    # Add mean/median lines for box without violin
+    if(show.mean) {
+      p <- p +
+        stat_summary(
+          fun = "mean",
+          geom = "crossbar",
+          aes(color = "Mean"),
+          width = width) +
+        stat_summary(
+          fun = "median",
+          geom = "crossbar",
+          aes(color = "Median"),
+          width = width) +
+        scale_colour_manual(
+          values = c(
+            Mean = mean_colors[1],
+            Median = mean_colors[2]),
+          name = "")
+    }
   }
+
+  # Add points if requested
   if(pt) {
     pt.style <- pt.style[1]
     if(!pt.style %in% c("quasirandom", "jitter")) stop('"pt.style" shoule be "quasirandom" or "jitter"')
@@ -280,11 +317,31 @@ VlnPlot2_Plot <- function(
       p <- p + geom_quasirandom(size = pt.size, width = width/2, alpha= pt.alpha)
     }
   }
+
+  # Add box plot with violin
   if(box & violin) {
+    box_width <- if(show.mean) 0.3 else 0.12
+
     if(pt | hide.outlier) {
-      p <- p + geom_boxplot(outlier.shape = NA, width = 0.12, fill = "white")
+      p <- p + geom_boxplot(outlier.shape = NA, width = box_width, fill = "white")
     } else {
-      p <- p + geom_boxplot(fill = "white", outlier.size = pt.size, width = 0.12, outlier.alpha = pt.alpha)
+      p <- p + geom_boxplot(fill = "white", outlier.size = pt.size, width = box_width, outlier.alpha = pt.alpha)
+    }
+
+    # Add mean/median lines for box with violin
+    if(show.mean) {
+      p <- p +
+        stat_summary(fun = "mean",
+                     geom = "crossbar",
+                     aes(color = "Mean"),
+                     width = box_width) +
+        stat_summary(fun = "median",
+                     geom = "crossbar",
+                     aes(color = "Median"),
+                     width = box_width) +
+        scale_colour_manual(values = c(Mean = mean_colors[1],
+                                       Median = mean_colors[2]),
+                            name = "")
     }
   }
 
@@ -298,7 +355,7 @@ VlnPlot2_Plot <- function(
       theme_classic() +
       theme(strip.background = element_blank(),
             strip.placement = "outside",
-            legend.position = "none",
+            legend.position = if(show.mean) "right" else "none",
             axis.text.x = element_text(angle = angle, hjust = hjust, vjust = vjust),
             strip.text = element_text(face = "bold", size = 10)) +
       labs(fill = lab_fill) +

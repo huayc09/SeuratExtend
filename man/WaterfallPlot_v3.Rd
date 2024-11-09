@@ -28,7 +28,8 @@ WaterfallPlot_v3(
   angle = NULL,
   hjust = NULL,
   vjust = NULL,
-  title = NULL
+  title = NULL,
+  style = c("bar", "segment")
 )
 }
 \description{

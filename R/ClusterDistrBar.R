@@ -26,8 +26,8 @@
 #' # reverse x and y axis, not normalized by sample size
 #' ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, rev = T, normalize = F)
 #'
-#' # vertical bar plot
-#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, flip = F)
+#' # vertical bar plot, and keep the default stacking order
+#' ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, flip = F, reverse_order = F)
 #'
 #' # not stacking bars
 #' ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, flip = FALSE, stack = FALSE)
@@ -68,13 +68,16 @@ ClusterDistrBar <- function(
   if(percent) ToPlot <- apply(ToPlot, 2, function(x) x * 100/sum(x))
   if(!plot) return(ToPlot)
 
+  levels_var1 <- rownames(ToPlot)
+  levels_var2 <- colnames(ToPlot)
   ToPlot <- melt(ToPlot)
   x.label <- ifelse(rev, "Cluster", "Origin")
   fill.label <- ifelse(rev, "Origin", "Cluster")
   y.label <- ifelse(normalize, "Normalized cell counts", "Cell counts")
   y.label <- ifelse(percent, paste("Percentage of", tolower(y.label)), y.label)
 
-  if(flip) ToPlot$Var2 <- ToPlot$Var2 %>% factor(levels = rev(levels(.)))
+  ToPlot$Var1 <- factor(ToPlot$Var1, levels = levels_var1)
+  if(flip) ToPlot$Var2 <- factor(ToPlot$Var2, levels = rev(levels_var2))
   if(stack) position <- position_stack(reverse = reverse_order) else position <- "dodge"
   p <-
     ggplot(ToPlot, aes(x = Var2, y = value, fill = factor(Var1))) +

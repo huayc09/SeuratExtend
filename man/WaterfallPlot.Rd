@@ -32,7 +32,8 @@ WaterfallPlot(object, ...)
   angle = NULL,
   hjust = NULL,
   vjust = NULL,
-  title = NULL
+  title = NULL,
+  style = c("bar", "segment")
 )
 
 \method{WaterfallPlot}{default}(
@@ -54,7 +55,8 @@ WaterfallPlot(object, ...)
   angle = NULL,
   hjust = NULL,
   vjust = NULL,
-  title = NULL
+  title = NULL,
+  style = c("bar", "segment")
 )
 }
 \arguments{
@@ -114,6 +116,9 @@ such as z-scores or log fold changes.}
 
 \item{title}{Title of the plot. Defaults to NULL.}
 
+\item{style}{Character string specifying the plot style. Either "bar" (default) for traditional bar plot style, or
+"segment" for thin segments with end points.}
+
 \item{matr}{A matrix or data frame where rows represent features and columns represent cells.}
 
 \item{f}{A factor or vector indicating the identity of each cell. The length should match the number of columns in `matr`.}
@@ -157,6 +162,16 @@ WaterfallPlot(matr, f = pbmc$cluster, ident.1 = "Mono CD14", ident.2 = "CD8 T ce
 
 # Keep only bars with a length (tscore, in this instance) greater than 1.
 WaterfallPlot(matr, f = pbmc$cluster, ident.1 = "Mono CD14", ident.2 = "CD8 T cell", len.threshold = 1)
+
+# Create a plot using the alternative segment style with points
+WaterfallPlot(
+  matr,
+  f = pbmc$cluster,
+  ident.1 = "Mono CD14",
+  ident.2 = "CD8 T cell",
+  style = "segment",
+  color_theme = "D"
+)
 
 # Use a Seurat object as input and compare 100 genes, using LogFC as bar length.
 genes <- VariableFeatures(pbmc)[1:80]

@@ -25,6 +25,8 @@ VlnPlot2(object, ...)
   violin = T,
   box = T,
   width = 0.9,
+  show.mean = FALSE,
+  mean_colors = c("red", "blue"),
   pt = T,
   hide.outlier = F,
   pt.style = c("jitter", "quasirandom"),
@@ -54,6 +56,8 @@ VlnPlot2(object, ...)
   violin = T,
   box = T,
   width = 0.9,
+  show.mean = FALSE,
+  mean_colors = c("red", "blue"),
   pt = T,
   hide.outlier = F,
   pt.style = c("jitter", "quasirandom"),
@@ -114,6 +118,10 @@ VlnPlot2(object, ...)
 \item{box}{Indicates whether to depict a box plot. Default: TRUE.}
 
 \item{width}{Width of the box plot. Default: 0.9.}
+
+\item{show.mean}{Logical value indicating whether to show mean and median lines. This is particularly useful for genes with low expression levels where the median and box plot quartiles might overlap at zero, making it difficult to interpret differences between groups. Default is FALSE.}
+
+\item{mean_colors}{Vector of two colors for mean and median lines respectively. Default is c("red", "blue").}
 
 \item{pt}{Indicates if points should be plotted. Default: TRUE.}
 
@@ -181,6 +189,12 @@ VlnPlot2(pbmc, features = genes, pt = FALSE, hide.outlier = T, ncol = 1)
 
 # Group by cluster and split each cluster by samples:
 VlnPlot2(pbmc, features = genes, group.by = "cluster", split.by = "orig.ident")
+
+# For genes with low expression where boxplot might be hard to interpret
+# (e.g., when median and quartiles overlap at zero),
+# you can add mean/median lines for better visualization:
+lowExprGenes <- c("CCR7", "IL7R", "TCF7")
+VlnPlot2(pbmc, features = lowExprGenes, show.mean = TRUE, cols = "light")
 
 # Display only cells from certain subtypes (e.g. B cell, CD14+ Mono, and CD8 T cell), and arrange plots in 3 columns:
 cells <- colnames(pbmc)[pbmc$cluster \%in\% c("B cell", "Mono CD14", "CD8 T cell")]

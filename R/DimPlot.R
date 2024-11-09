@@ -193,6 +193,23 @@ DimPlot2 <- function(
   data.dim <- plot_data$data.dim
   data.var <- plot_data$data.var
   vars <- colnames(data.var)
+  n_features <- length(vars)
+  raster <- raster %||% (nrow(x = data.dim) > 1e+05)
+  if ((nrow(x = data.dim) > 1e+05) & !isFALSE(raster)) {
+    message("Rasterizing points since number of points exceeds 100,000.",
+            "\nTo disable this behavior set `raster=FALSE`")
+  }
+
+  if (!is.null(x = raster.dpi)) {
+    if (!is.numeric(x = raster.dpi) || length(x = raster.dpi) != 2)
+      stop("'raster.dpi' must be a two-length numeric vector")
+  } else raster.dpi <- c(512, 512)
+
+  pt.size <- pt.size %||% DimPlot2_AutoPointSize(
+    data = data.dim,
+    raster = raster,
+    n_features = n_features
+  )
 
   get_disc_cont_par <- function(par, type, default) {
     if (is.vector(par) && is.logical(par) && type %in% names(par)) {
@@ -445,17 +462,7 @@ DimPlot2_PlotSingle <- function (
     ncol.legend = NULL)
 {
   library(ggplot2)
-  pt.size <- pt.size %||% DimPlot2_AutoPointSize(data = data.plot, raster = raster)
   dims <- colnames(data.plot)[1:2]
-  if ((nrow(x = data.plot) > 1e+05) & !isFALSE(raster)) {
-    message("Rasterizing points since number of points exceeds 100,000.",
-            "\nTo disable this behavior set `raster=FALSE`")
-  }
-  raster <- raster %||% (nrow(x = data.plot) > 1e+05)
-  if (!is.null(x = raster.dpi)) {
-    if (!is.numeric(x = raster.dpi) || length(x = raster.dpi) != 2)
-      stop("'raster.dpi' must be a two-length numeric vector")
-  } else raster.dpi <- c(512, 512)
 
   if (isTRUE(x = shuffle)) {
     data.plot <- data.plot[sample(x = 1:nrow(x = data.plot)), ]
@@ -506,8 +513,20 @@ DimPlot2_PlotSingle <- function (
   return(plot)
 }
 
-DimPlot2_AutoPointSize <- function (data, raster = NULL) {
-  return(ifelse(test = isTRUE(x = raster), yes = 1, no = min(1583/nrow(x = data), 1)))
+DimPlot2_AutoPointSize <- function(data, raster = NULL, n_features = 1) {
+  # When raster is TRUE, return 1
+  if (isTRUE(x = raster)) {
+    return(1)
+  }
+
+  # Calculate base point size
+  base_size <- min(1583/nrow(x = data), 1)
+
+  # Adjust size based on number of features
+  # Using square root of n_features to scale down point size
+  adjusted_size <- base_size / sqrt(n_features)
+
+  return(adjusted_size)
 }
 
 DimPlot2_LabelClusters <- function(

@@ -65,8 +65,8 @@ ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, rev = T, norma
 # reverse x and y axis, not normalized by sample size
 ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, rev = T, normalize = F)
 
-# vertical bar plot
-ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, flip = F)
+# vertical bar plot, and keep the default stacking order
+ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, flip = F, reverse_order = F)
 
 # not stacking bars
 ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, flip = FALSE, stack = FALSE)

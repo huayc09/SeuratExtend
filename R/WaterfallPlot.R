@@ -36,8 +36,10 @@ WaterfallPlot.Seurat <- function(
     angle = NULL,
     hjust = NULL,
     vjust = NULL,
-    title = NULL
+    title = NULL,
+    style = c("bar", "segment")
 ) {
+  style <- match.arg(style)
 
   Std.matr <- Seu2Matr(
     seu = seu,
@@ -68,7 +70,8 @@ WaterfallPlot.Seurat <- function(
     angle = angle,
     hjust = hjust,
     vjust = vjust,
-    title = title
+    title = title,
+    style = style
   )
 
   return(p)
@@ -117,6 +120,8 @@ WaterfallPlot.Seurat <- function(
 #' @param hjust Horizontal justification for the x-axis labels. This argument is passed to `element_text()`.
 #' @param vjust Vertical justification for the x-axis labels. This argument is passed to `element_text()`.
 #' @param title Title of the plot. Defaults to NULL.
+#' @param style Character string specifying the plot style. Either "bar" (default) for traditional bar plot style, or
+#'   "segment" for thin segments with end points.
 #' @rdname WaterfallPlot
 #' @export
 
@@ -139,8 +144,11 @@ WaterfallPlot.default <- function(
     angle = NULL,
     hjust = NULL,
     vjust = NULL,
-    title = NULL
+    title = NULL,
+    style = c("bar", "segment")
 ){
+  style <- match.arg(style)
+
   scores <- WaterfallPlot_Calc(
     matr = matr,
     f = f,
@@ -174,7 +182,8 @@ WaterfallPlot.default <- function(
     angle = angle,
     hjust = hjust,
     vjust = vjust,
-    title = titles[[1]]
+    title = titles[[1]],
+    style = style
   )
 
   return(p)
@@ -214,15 +223,29 @@ WaterfallPlot_Calc <- function(
   cell.2 <- if(is.null(ident.2)) f != ident.1 else f == ident.2
   if(exp.transform) matr <- expm1(matr)
 
+  # Helper function to handle t.test with zero variance
+  safe_ttest <- function(x, idx1, idx2) {
+    # Handle all-zero or constant value cases
+    if (all(x == 0) || length(unique(x)) == 1) {
+      return(list(statistic = 0, p.value = 1))
+    }
+    # Perform t.test
+    tryCatch({
+      t.test(x[idx1], x[idx2])
+    }, error = function(e) {
+      list(statistic = 0, p.value = 1)
+    })
+  }
+
   scores <- list()
   if("tscore" %in% c(length, color)){
     scores[["tscore"]] <-
-      apply(matr, 1, function(x) t.test(x[cell.1], x[cell.2])[["statistic"]], simplify = TRUE)
+      apply(matr, 1, function(x) safe_ttest(x, cell.1, cell.2)[["statistic"]], simplify = TRUE)
   }
   if("p" %in% c(length, color)){
     scores[["p"]] <-
       apply(matr, 1, function(x){
-        p_value <- t.test(x[cell.1], x[cell.2])[["p.value"]]
+        p_value <- safe_ttest(x, cell.1, cell.2)[["p.value"]]
         log10p <- pmin(-log10(p_value), 325) * ifelse(mean(x[cell.1]) > mean(x[cell.2]), 1, -1)
         return(log10p)
       }, simplify = TRUE)
@@ -231,6 +254,7 @@ WaterfallPlot_Calc <- function(
     scores[["logFC"]] <-
       apply(matr, 1, function(x) log(mean(x[cell.1]+1)/mean(x[cell.2]+1)), simplify = TRUE)
   }
+
   scores <- as.data.frame(list.cbind(scores))
   scores <- scores %>%
     mutate(rank = rownames(.),
@@ -262,7 +286,8 @@ WaterfallPlot_Plot <- function(
     angle,
     hjust,
     vjust,
-    title
+    title,
+    style
 ) {
   library(ggplot2)
   library(scales)
@@ -278,14 +303,32 @@ WaterfallPlot_Plot <- function(
   }
   scores$rank <- factor(scores$rank, levels = unique(scores$rank))
   if(color == "p") lab_fill <- "-log10(p)" else lab_fill <- color
-  p <- ggplot(scores, aes(x = rank, y = length, fill = color)) +
-    geom_bar(stat = "identity") +
-    theme_classic() +
-    labs(fill = lab_fill, x = element_blank(), y = y.label, title = title) +
-    theme(axis.text.x=element_text(angle = angle, hjust = hjust, vjust = vjust),
+
+  # Base plot with common elements
+  p <- ggplot(scores, aes(x = rank, y = length, colour = color)) +
+    labs(fill = lab_fill, color = lab_fill, x = element_blank(), y = y.label, title = title)
+
+  # Add style-specific elements
+  if (style == "bar") {
+    p <- p + geom_bar(stat = "identity", aes(fill = color), colour = NA) +
+      theme_classic()
+  } else {
+    p <- p +
+      geom_segment(aes(xend = rank, y = 0, yend = length), size = 0.8) +
+      geom_point(aes(y = length), size = 3) +
+      theme_minimal()
+  }
+  p <- p +
+    theme(axis.text.x = element_text(angle = angle, hjust = hjust, vjust = vjust),
           plot.title = element_text(hjust = 0.5, face = "bold"))
+
   value_range <- range(scores$color)
-  p <- p + scale_fill_cont_auto(color_theme, center_color = center_color, value_range = value_range)
+  if (style == "bar") {
+    p <- p + scale_fill_cont_auto(color_theme, center_color = center_color, value_range = value_range)
+  } else {
+    p <- p + scale_color_cont_auto(color_theme, center_color = center_color, value_range = value_range)
+  }
+
   if(flip) p <- p + scale_x_discrete(position = "top") + coord_flip()
   return(p)
 }

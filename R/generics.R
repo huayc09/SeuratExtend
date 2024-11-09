@@ -27,6 +27,12 @@
 #' # Group by cluster and split each cluster by samples:
 #' VlnPlot2(pbmc, features = genes, group.by = "cluster", split.by = "orig.ident")
 #'
+#' # For genes with low expression where boxplot might be hard to interpret
+#' # (e.g., when median and quartiles overlap at zero),
+#' # you can add mean/median lines for better visualization:
+#' lowExprGenes <- c("CCR7", "IL7R", "TCF7")
+#' VlnPlot2(pbmc, features = lowExprGenes, show.mean = TRUE, cols = "light")
+#'
 #' # Display only cells from certain subtypes (e.g. B cell, CD14+ Mono, and CD8 T cell), and arrange plots in 3 columns:
 #' cells <- colnames(pbmc)[pbmc$cluster %in% c("B cell", "Mono CD14", "CD8 T cell")]
 #' VlnPlot2(pbmc, features = genes, group.by = "cluster", cells = cells)
@@ -115,6 +121,16 @@ CalcStats <- function(object, ...) {
 #'
 #' # Keep only bars with a length (tscore, in this instance) greater than 1.
 #' WaterfallPlot(matr, f = pbmc$cluster, ident.1 = "Mono CD14", ident.2 = "CD8 T cell", len.threshold = 1)
+#'
+#' # Create a plot using the alternative segment style with points
+#' WaterfallPlot(
+#'   matr,
+#'   f = pbmc$cluster,
+#'   ident.1 = "Mono CD14",
+#'   ident.2 = "CD8 T cell",
+#'   style = "segment",
+#'   color_theme = "D"
+#' )
 #'
 #' # Use a Seurat object as input and compare 100 genes, using LogFC as bar length.
 #' genes <- VariableFeatures(pbmc)[1:80]
