@@ -23,7 +23,8 @@ As an example, we use a pre-computed SCENIC loom file which can be downloaded as
 ```{r, message=FALSE, warning=FALSE}
 library(SeuratExtend)
 scenic_loom_path <- file.path(tempdir(), "pyscenic_integrated-output.loom")
-download.file("https://zenodo.org/records/10944066/files/pbmc3k_small_pyscenic_integrated-output.loom", scenic_loom_path)
+download.file("https://zenodo.org/records/10944066/files/pbmc3k_small_pyscenic_integrated-output.loom",
+              scenic_loom_path, mode = "wb")  # Use binary mode for Windows compatibility
 
 # Importing SCENIC Loom Files into Seurat
 pbmc <- ImportPyscenicLoom(scenic_loom_path, seu = pbmc)
@@ -68,7 +69,8 @@ Since we have imported SCENIC results into the "TF" assay, we can easily access 
 DimPlot2(
   pbmc,
   features = c("ETS1", "ATF3", "tf_ETS1", "tf_ATF3"),
-  cols = list("tf_ETS1" = "D", "tf_ATF3" = "D")
+  cols = list("tf_ETS1" = "D", "tf_ATF3" = "D"),
+  theme = NoAxes()
 )
 ```
 

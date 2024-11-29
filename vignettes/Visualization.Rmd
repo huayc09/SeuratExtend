@@ -11,99 +11,29 @@ vignette: >
 
 ## Table of Contents
 
-1. [Generate a Heatmap Plot](#generate-a-heatmap-plot)
-2. [Create an Enhanced Dimensional Reduction Plot](#create-an-enhanced-dimensional-reduction-plot)
-3. [Create an Enhanced Violin Plot](#create-an-enhanced-violin-plot)
-4. [Visualize Cluster Distribution in Samples](#visualize-cluster-distribution-in-samples)
-5. [Generate a Waterfall Plot](#generate-a-waterfall-plot)
-6. [Explore Color Functions](#explore-color-functions)
-
-## Generate a Heatmap Plot {#generate-a-heatmap-plot}
-
-### Introduction
-
-The `Heatmap` function provides a flexible and comprehensive way to visualize matrices, especially those produced by the `CalcStats` function. This vignette provides a quick overview of how to utilize the various features and capabilities of the `Heatmap` function to generate customized visualizations.
-
-### Basic Usage
-
-First, let's generate a sample matrix using the `CalcStats` function:
-
-```{r, message=FALSE, warning=FALSE}
-library(Seurat)
-library(SeuratExtend)
-
-# Assuming pbmc data and VariableFeatures function are available
-genes <- VariableFeatures(pbmc)
-toplot <- CalcStats(pbmc, features = genes, method = "zscore", order = "p", n = 5)
-```
-
-Now, we can produce a basic heatmap:
-
-```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=7}
-Heatmap(toplot, lab_fill = "zscore")
-```
-
-### Customizing the Heatmap
-
-#### Adjusting Color Schemes
-
-The `color_scheme` parameter allows for flexibility in visualizing data. Here are some ways to change the color theme of your heatmap:
-
-```{r, fig.width=5, fig.height=7, message=FALSE, warning=FALSE}
-# White to dark green
-Heatmap(toplot, lab_fill = "zscore", color_scheme = c("white", muted("green")))
-
-# Dark blue to light yellow (centered at 0) to dark red
-Heatmap(toplot, lab_fill = "zscore", color_scheme = c(
-  low = muted("blue"),
-  mid = "lightyellow",
-  high = muted("red"))
-)
-```
-
-You can also use predefined color schemes, such as those from the viridis package:
-
-```{r, fig.width=5, fig.height=7, message=FALSE, warning=FALSE}
-Heatmap(toplot, lab_fill = "zscore", color_scheme = "A")
-```
-
-#### Modifying Axis and Labels
-
-Sometimes, the first name on the x-axis might be too long and exceed the left boundary of the plot. To prevent this issue and ensure all labels are fully visible, you can increase the space on the left side of the plot by adjusting the `plot.margin` parameter. For example, to add more space, you can specify a larger value for the left margin (`l`) like this:
-
-```{r, fig.width=5, fig.height=7, message=FALSE, warning=FALSE}
-Heatmap(toplot, lab_fill = "zscore", plot.margin = margin(l = 30))
-```
-
-For denser matrices, you may wish to only show a subset of gene names:
-
-```{r, fig.width=5, fig.height=7, message=FALSE, warning=FALSE}
-toplot2 <- CalcStats(pbmc, features = genes[1:500], method = "zscore", order = "p")
-Heatmap(toplot2, lab_fill = "zscore", feature_text_subset = genes[1:20], expand_limits_x = c(-0.5, 11))
-```
-
-#### Faceting the Heatmap
-
-You can also split the heatmap based on gene groups:
-
-```{r, fig.width=5, fig.height=7, message=FALSE, warning=FALSE}
-gene_groups <- sample(c("group1", "group2", "group3"), nrow(toplot2), replace = TRUE)
-Heatmap(toplot2, lab_fill = "zscore", facet_row = gene_groups) +
-  theme(axis.text.y = element_blank())
-```
+1. [Create an Enhanced Dimensional Reduction Plot](#create-an-enhanced-dimensional-reduction-plot)
+2. [Generate a Heatmap Plot](#generate-a-heatmap-plot)
+3. [Create Enhanced Dot Plots](#create-enhanced-dot-plots-new-in-v110) (New in v1.1.0)
+4. [Create an Enhanced Violin Plot](#create-an-enhanced-violin-plot)
+5. [Visualize Cluster Distribution in Samples](#visualize-cluster-distribution-in-samples)
+6. [Generate a Waterfall Plot](#generate-a-waterfall-plot)
+7. [Create Volcano Plots](#create-volcano-plots-new-in-v110) (New in v1.1.0)
+8. [Explore Color Functions](#explore-color-functions)
 
 ## Create an Enhanced Dimensional Reduction Plot {#create-an-enhanced-dimensional-reduction-plot}
 
 ### Introduction
 
-In Seurat, dimension reduction plots such as UMAP are typically created using `DimPlot` for discrete variables and `FeaturePlot` for continuous variables. `SeuratExtend` simplifies this process with `DimPlot2`, which does not require differentiation between variable types. This function automatically recognizes the type of input parameters, whether discrete or continuous. `DimPlot2` retains most of the usage conventions of both `DimPlot` and `FeaturePlot`, allowing for an easy transition if you are accustomed to the original Seurat functions. Additionally, `DimPlot2` introduces numerous extra parameters to enrich the customization of the plots.
+In Seurat, dimension reduction plots such as UMAP are typically created using `DimPlot` for discrete variables and `FeaturePlot` for continuous variables. `SeuratExtend` simplifies this process with `DimPlot2`, which automatically handles both types of variables without requiring different functions. The function retains most of the usage conventions of both `DimPlot` and `FeaturePlot` while introducing numerous additional parameters for enhanced customization.
 
 ### Basic Usage
 
 To generate a basic dimension reduction plot, simply call `DimPlot2` with your Seurat object:
 
 ```{r, fig.width=6.5, fig.height=5, message=FALSE, warning=FALSE}
+library(Seurat)
 library(SeuratExtend)
+
 DimPlot2(pbmc)
 ```
 
@@ -112,12 +42,18 @@ DimPlot2(pbmc)
 `DimPlot2` can handle both discrete and continuous variables seamlessly. Here's how to input different variables into the plot:
 
 ```{r, fig.width=9, fig.height=6, message=FALSE, warning=FALSE}
-DimPlot2(pbmc, features = c("cluster", "orig.ident", "CD14", "CD3D"))
+DimPlot2(pbmc, features = c("cluster", "orig.ident", "CD14", "CD3D"), theme = NoAxes())
+```
+
+**Note**: Starting from v1.1.0, the default color scheme for continuous variables has changed from viridis "A" to RColorBrewer "Blues". This change was made because the previous viridis-A series used black for low expression and red-yellow for high expression, which could be visually problematic - black tends to be too eye-catching while yellow can be hard to see against a white background. The new default uses light blue for low expression and deep blue for high expression, providing better visual clarity. If you prefer the previous color scheme, simply set `cols = "A"` in your function call.
+
+```{r, fig.width=8, fig.height=3.5, message=FALSE, warning=FALSE}
+DimPlot2(pbmc, features = c("CD14", "CD3D"), cols = "A")
 ```
 
 ### Splitting by Variable
 
-You can also split the visualization by a specific variable, which is particularly useful for comparative analysis across conditions or identities:
+You can split the visualization by a specific variable, which is particularly useful for comparative analysis across conditions or identities:
 
 ```{r, fig.width=7, fig.height=7, message=FALSE, warning=FALSE}
 DimPlot2(pbmc, features = c("cluster", "CD14"), split.by = "orig.ident", ncol = 1)
@@ -134,16 +70,16 @@ DimPlot2(pbmc, cells.highlight = b_cells)
 
 ### Advanced Customization
 
-For each variable, you can specify custom colors, adjust themes, and more. For detailed information on color customization, refer to the [Explore Color Functions](#explore-color-functions) section:
+For each variable, you can specify custom colors and adjust themes. For detailed information on color customization, refer to the [Explore Color Functions](#explore-color-functions) section:
 
 ```{r, fig.width=9, fig.height=6, message=FALSE, warning=FALSE}
 DimPlot2(
   pbmc,
   features = c("cluster", "orig.ident", "CD14", "CD3D"),
   cols = list(
-    "cluster" = "pro_blue",
+    "cluster" = "light",
     "CD14" = "D",
-    "CD3D" = c("#EEEEEE", "black")
+    "CD3D" = "OrRd"
   ),
   theme = NoAxes())
 ```
@@ -158,13 +94,47 @@ DimPlot2(pbmc, label = TRUE, box = TRUE, label.color = "black", repel = TRUE, th
 
 ### Simplifying Labels with Indices
 
-Sometimes, cluster names are too lengthy and can make the plot appear cluttered when displayed with labels. To address this, consider using indices to replace the cluster names in the plot, which helps make the visualization cleaner. For instance, you can label clusters as 'C1', 'C2', etc., on the plot itself, while detailing what each index stands for (e.g., 'C1: B cell', 'C2: CD4 T Memory') in the figure legend:
+For plots with lengthy cluster names, you can use indices to create cleaner visualizations:
 
 ```{r, fig.width=6.5, fig.height=5, message=FALSE, warning=FALSE}
 DimPlot2(pbmc, index.title = "C", box = TRUE, label.color = "black")
 ```
 
-This approach ensures that the plot remains legible and aesthetically pleasing, even when dealing with numerous or complex labels.
+### Adding UMAP Arrows (New in v1.1.0)
+
+Starting from v1.1.0, you can add simplified axis indicators to your dimension reduction plots using the `theme_umap_arrows` function. This is particularly useful for UMAP or t-SNE plots where traditional axes are often removed to reduce visual clutter:
+
+```{r, fig.width=9, fig.height=6, message=FALSE, warning=FALSE}
+# Add simplified axis indicators
+DimPlot2(
+  pbmc, 
+  features = c("cluster", "orig.ident", "CD14", "CD3D"),
+  theme = NoAxes()
+) + theme_umap_arrows()
+```
+
+The `theme_umap_arrows` function provides several parameters for customization:
+
+- `anchor_x/y`: Position of the arrow origin
+- `line_length`: Length of the arrow lines
+- `arrow_length`: Size of arrowheads
+- `text_offset_x/y`: Position of axis labels
+- `text_size`: Font size for labels
+- `line_width`: Width of arrow lines
+- `x_label/y_label`: Custom axis labels
+
+### Multiple Feature Visualization
+
+When visualizing multiple features simultaneously, you might want to add arrows to each subplot:
+
+```{r, fig.width=9, fig.height=6, message=FALSE, warning=FALSE}
+# Add arrows to each subplot
+DimPlot2(
+  pbmc, 
+  features = c("cluster", "orig.ident", "CD14", "CD3D"),
+  theme = theme_umap_arrows()
+)
+```
 
 ### Simultaneous Display of Three Features on a Dimension Reduction Plot
 
@@ -173,10 +143,10 @@ In `SeuratExtend`, a unique visualization method allows for the simultaneous dis
 #### RYB and RGB Color Systems
 
 In the RGB system, black represents no or low expression, and brighter colors indicate higher levels:
-![RGB System Example](Visualization_files/RGB_mixing.png)
+![RGB System Example](Visualization_files/RGB_mixing.png){width=500px}
 
 In the RYB system, white represents no expression, and deeper colors indicate higher expression levels:
-![RYB System Example](Visualization_files/RYB_mixing.png)
+![RYB System Example](Visualization_files/RYB_mixing.png){width=500px}
 
 #### Examples Using RYB and RGB Systems
 
@@ -208,22 +178,150 @@ FeaturePlot3.grid(pbmc, features = c("CD3D", "CD14", "CD79A", "FCGR3A", NA, "LYZ
 
 The background is usually white, so the choice of color system and point size can significantly affect visual perception. In the RYB system, where higher expression results in darker colors, a smaller `pt.size` is preferable to prevent overlapping points. In contrast, in the RGB system, higher expressions result in lighter colors, potentially leading to visibility issues for highly expressed cells that may blend into the white background. Here, a larger `pt.size` is recommended so that the darker, low-expression points can form a "background" to highlight the lighter, high-expression points.
 
+## Generate a Heatmap Plot {#generate-a-heatmap-plot}
+
+### Introduction
+
+The `Heatmap` function provides a flexible and comprehensive way to visualize matrices, especially those produced by the `CalcStats` function. While heatmaps are excellent for visualizing overall patterns across multiple groups and features, they represent average expression levels through color intensity.
+
+**Note:** Starting from v1.1.0, the default color scheme has changed from `c(low = muted("blue"), mid = "white", high = muted("red"))` to `"BuRd"`. This change was made to provide more vibrant visualization using RColorBrewer palettes. To revert to the previous color scheme, simply set `color_scheme = c(low = muted("blue"), mid = "white", high = muted("red"))`.
+
+### Basic Usage
+
+First, let's generate a sample matrix using the `CalcStats` function:
+
+```{r, message=FALSE, warning=FALSE}
+# Calculate z-scores for variable features
+genes <- VariableFeatures(pbmc)
+toplot <- CalcStats(pbmc, features = genes, method = "zscore", order = "p", n = 5)
+```
+
+Now, we can produce a basic heatmap:
+
+```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=7}
+# Create a basic heatmap
+Heatmap(toplot, lab_fill = "zscore")
+```
+
+### Adjusting Color Schemes
+
+The `color_scheme` parameter allows for flexibility in visualizing data. Here are some ways to change the color theme of your heatmap:
+
+```{r, fig.width=5, fig.height=7, message=FALSE, warning=FALSE}
+# Viridis-A theme
+Heatmap(toplot, lab_fill = "zscore", color_scheme = "A")
+
+# White - blue - dark green
+Heatmap(toplot, lab_fill = "zscore", color_scheme = "BuGn")
+```
+
+For detailed information on color customization, refer to the [Explore Color Functions](#explore-color-functions) section.
+
+### Modifying Axis and Labels
+
+Sometimes, the first name on the x-axis might be too long and exceed the left boundary of the plot. To prevent this issue and ensure all labels are fully visible, you can increase the space on the left side of the plot by adjusting the `plot.margin` parameter. For example, to add more space, you can specify a larger value for the left margin (`l`) like this:
+
+```{r, fig.width=5.5, fig.height=7, message=FALSE, warning=FALSE}
+Heatmap(toplot, lab_fill = "zscore", plot.margin = margin(l = 50))
+```
+
+For dense matrices with many features, you might want to show only a subset of gene names:
+
+```{r, fig.width=5, fig.height=7, message=FALSE, warning=FALSE}
+toplot2 <- CalcStats(pbmc, features = genes[1:500], method = "zscore", order = "p")
+Heatmap(toplot2, lab_fill = "zscore", feature_text_subset = genes[1:20], expand_limits_x = c(-0.5, 11))
+```
+
+### Faceting the Heatmap
+
+You can split the heatmap based on gene groups:
+
+```{r, fig.width=5, fig.height=7, message=FALSE, warning=FALSE}
+gene_groups <- sample(c("group1", "group2", "group3"), nrow(toplot2), replace = TRUE)
+Heatmap(toplot2, lab_fill = "zscore", facet_row = gene_groups) +
+  theme(axis.text.y = element_blank())
+```
+
+## Create Enhanced Dot Plots (New in v1.1.0) {#create-enhanced-dot-plots-new-in-v110} 
+
+### Introduction
+
+While heatmaps are excellent for visualizing overall patterns, dot plots offer a complementary visualization that combines two key pieces of information:
+1. The percentage of cells expressing each feature (represented by dot size)
+2. The average expression level in expressing cells (represented by color intensity)
+
+This dual representation can provide more detailed insights than a standard heatmap, particularly when expression patterns vary between cell populations.
+
+### Basic Usage
+
+Let's create a basic dot plot for some variable features:
+
+```{r, message=FALSE, warning=FALSE, fig.width=6, fig.height=4.5}
+# Select some variable features
+genes <- VariableFeatures(pbmc)[1:10]
+DotPlot2(pbmc, features = genes)
+```
+
+### Grouped Features
+
+You can organize features into groups for clearer visualization:
+
+```{r, message=FALSE, warning=FALSE, fig.width=6.5, fig.height=5}
+# Create grouped features
+grouped_features <- list(
+  "B_cell_markers" = c("MS4A1", "CD79A"),
+  "T_cell_markers" = c("CD3D", "CD8A", "IL7R"),
+  "Myeloid_markers" = c("CD14", "FCGR3A", "S100A8")
+)
+
+DotPlot2(pbmc, features = grouped_features)
+```
+
+### Split Visualization
+
+You can split the visualization by a metadata column to compare expression patterns across different conditions:
+
+```{r, message=FALSE, warning=FALSE, fig.width=8, fig.height=5.5}
+# Basic split visualization
+DotPlot2(pbmc, features = genes, group.by = "cluster", split.by = "orig.ident", show_grid = FALSE)
+```
+
+### Alternative Split Visualization
+
+The split groups can be represented either by border colors (default) or by dot colors:
+
+```{r, message=FALSE, warning=FALSE, fig.width=8, fig.height=5}
+# Using colors instead of borders for split groups
+DotPlot2(pbmc, 
+         features = genes, 
+         group.by = "cluster", 
+         split.by = "orig.ident", 
+         split.by.method = "color", 
+         show_grid = FALSE)
+```
+
+### Customizing Appearance
+
+You can customize various aspects of the plot, including color schemes, dot sizes, and grid lines:
+
+```{r, message=FALSE, warning=FALSE, fig.width=7, fig.height=5}
+DotPlot2(pbmc, 
+         features = grouped_features, 
+         color_scheme = "BuRd", 
+         border = FALSE,        # Remove dot borders
+         show_grid = FALSE,     # Remove grid lines
+         flip = TRUE)          # Flip coordinates
+```
+
 ## Create an Enhanced Violin Plot {#create-an-enhanced-violin-plot}
 
 ### Introduction
 
-The `VlnPlot2` function from the `SeuratExtend` package offers a revamped version of the traditional violin plot, designed to be more space-efficient while introducing a wide array of additional visualization features. Unlike the original `VlnPlot` in Seurat, the enhanced `VlnPlot2` integrates functionalities to superimpose boxplots, easily add statistical annotations, and offers greater flexibility in the plot presentation.
+The `VlnPlot2` function offers a revamped version of the traditional violin plot, designed to be more space-efficient while introducing additional visualization features. Unlike the original `VlnPlot` in Seurat, this enhanced version integrates boxplots, statistical annotations, and greater flexibility in plot presentation.
 
-This function has been optimized for visualizing multiple variables and can handle both Seurat objects and matrices.
+### Basic Usage
 
-### Usage
-
-Depending on your input, whether it's a Seurat object or a matrix, the method to employ `VlnPlot2` will differ.
-
-#### Using a Seurat Object
-
-**Basic violin plot with box plot and points:** 
-To begin with, select the genes you intend to analyze. Here's an example using three genes:
+Let's start with some common gene markers:
 
 ```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=6}
 library(Seurat)
@@ -233,60 +331,94 @@ genes <- c("CD3D","CD14","CD79A")
 VlnPlot2(pbmc, features = genes, ncol = 1)
 ```
 
-**Customizing plot elements:** The function allows for versatile visual alterations. For instance, one might want to omit the violin plot while retaining the box plot, using a quasirandom style for point adjustment.
+### Customizing Plot Elements
+
+You can create different variations of the plot by adjusting its components. For instance, you might want to show only the box plot with quasirandom point distribution:
 
 ```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=6}
-VlnPlot2(pbmc, features = genes, violin = F, pt.style = "quasirandom", ncol = 1)
+VlnPlot2(pbmc, features = genes, violin = FALSE, pt.style = "quasirandom", ncol = 1)
 ```
 
-**Hiding data points but retaining outliers:** 
+### Managing Point Display
+
+For cleaner visualization, you can hide individual points while still showing outliers:
 
 ```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=6}
 VlnPlot2(pbmc, features = genes, pt = FALSE, ncol = 1)
 ```
 
-**Hide points and outliers for a cleaner appearance:**
+Or hide both points and outliers for a minimal appearance:
 
 ```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=6}
-VlnPlot2(pbmc, features = genes, pt = FALSE, hide.outlier = T, ncol = 1)
+VlnPlot2(pbmc, features = genes, pt = FALSE, hide.outlier = TRUE, ncol = 1)
 ```
 
-**Grouping by cluster and splitting each cluster by samples:**
+### Adding Mean and Median Lines (New in v1.1.0)
+
+For genes with low expression where boxplot might be hard to interpret (e.g., when median and quartiles overlap at zero), you can add mean/median lines for better visualization:
+
+```{r, message=FALSE, warning=FALSE, fig.width=6, fig.height=6.5}
+lowExprGenes <- c("CCR7", "IL7R", "TCF7")
+VlnPlot2(pbmc, 
+         features = lowExprGenes, 
+         show.mean = TRUE,      # Show mean and median lines
+         mean_colors = c("red", "blue"),  # Colors for mean and median
+         cols = "light",        # Light color scheme for better visibility
+         ncol = 1)
+```
+
+### Split Visualization
+
+You can group by cluster and split each cluster by samples:
 
 ```{r, message=FALSE, warning=FALSE, fig.width=9, fig.height=7}
 VlnPlot2(pbmc, features = genes, group.by = "cluster", split.by = "orig.ident")
 ```
 
-**Filtering for certain subtypes and arranging plots in columns:**
+### Subset Analysis
 
-```{r, message=FALSE, warning=FALSE, fig.width=6, fig.height=3.5}
+You can focus on specific cell types and arrange plots in columns:
+
+```{r, message=FALSE, warning=FALSE, fig.width=6, fig.height=3}
 cells <- colnames(pbmc)[pbmc$cluster %in% c("B cell", "Mono CD14", "CD8 T cell")]
 VlnPlot2(pbmc, features = genes, group.by = "cluster", cells = cells)
 ```
 
-**Adding statistical annotations using the wilcoxon test:**
+### Statistical Analysis
 
-```{r, message=FALSE, warning=FALSE, fig.width=6, fig.height=4}
-VlnPlot2(pbmc, features = genes, group.by = "cluster", cell = cells, 
-         stat.method = "wilcox.test", hide.ns = TRUE)
+Add statistical annotations using the Wilcoxon test, hiding non-significant results:
+
+```{r, message=FALSE, warning=FALSE, fig.width=6, fig.height=3.5}
+VlnPlot2(pbmc, 
+         features = genes, 
+         group.by = "cluster", 
+         cells = cells,
+         stat.method = "wilcox.test", 
+         hide.ns = TRUE)
 ```
 
-**Restricting statistical comparisons and using t-test:**
+Or specify particular comparisons using t-test:
 
-```{r, message=FALSE, warning=FALSE, fig.width=6, fig.height=4}
-VlnPlot2(pbmc, features = genes, group.by = "cluster", cell = cells, 
-         stat.method = "t.test", comparisons = list(c(1,2), c(1,3)), hide.ns = FALSE)
+```{r, message=FALSE, warning=FALSE, fig.width=6, fig.height=3.5}
+VlnPlot2(pbmc, 
+         features = genes, 
+         group.by = "cluster", 
+         cells = cells,
+         stat.method = "t.test", 
+         comparisons = list(c(1,2), c(1,3)), 
+         hide.ns = FALSE)
 ```
 
-#### Using a Matrix
+### Using Matrix Input
 
-For an example employing a matrix input, let's consider you have performed a Geneset Enrichment Analysis (GSEA) using the Hallmark 50 geneset to get the AUCell matrix:
+You can also use `VlnPlot2` with matrices, such as AUCell scores from gene set enrichment analysis:
 
 ```{r, message=FALSE, warning=FALSE, fig.width=6, fig.height=7}
+# Perform gene set analysis
 pbmc <- GeneSetAnalysis(pbmc, genesets = hall50$human)
 matr <- pbmc@misc$AUCell$genesets
 
-# Plotting the first three pathways:
+# Plot the first three pathways
 VlnPlot2(matr[1:3,], f = pbmc$cluster, ncol = 1)
 ```
 
@@ -294,135 +426,339 @@ VlnPlot2(matr[1:3,], f = pbmc$cluster, ncol = 1)
 
 ### Introduction
 
-The `ClusterDistrBar` function is designed to visualize the distribution of clusters across different samples. It can show both absolute counts and proportions, and it allows for various customizations including axis reversal and normalization.
+The `ClusterDistrBar` function visualizes how clusters are distributed across different samples. It can show both absolute counts and proportions, with various customization options.
 
 ### Basic Usage
 
-To create a basic bar plot showing the distribution of clusters within samples, simply specify the origin (sample identifier) and cluster variables from your dataset:
+Create a basic bar plot showing cluster distribution within samples:
 
-```{r, fig.width=7, fig.height=3}
+```{r, fig.width=7, fig.height=2.8}
 ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster)
 ```
 
-### Displaying Absolute Cell Counts
+### Absolute Cell Counts
 
-If you prefer to visualize the absolute cell count rather than proportions, set the `percent` parameter to `FALSE`:
+To show absolute cell counts instead of proportions:
 
-```{r, fig.width=7, fig.height=3}
+```{r, fig.width=7, fig.height=2.8}
 ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, percent = FALSE)
 ```
 
 ### Normalized Proportions with Reversed Axes
 
-For a clearer view that normalizes the data by sample size and reverses the x and y axes, use the `rev` and `normalize` parameters:
+For normalized data with reversed axes:
 
-```{r, fig.width=7, fig.height=3}
+```{r, fig.width=6.5, fig.height=2.8}
 ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, rev = TRUE, normalize = TRUE)
 ```
 
-### Non-Normalized with Reversed Axes
+### Vertical Orientation
 
-To reverse the axes without normalizing by sample size:
+Create a vertical bar plot:
 
-```{r, fig.width=7, fig.height=3}
-ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, rev = TRUE, normalize = FALSE)
+```{r, fig.width=3.6, fig.height=4}
+ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, flip = FALSE, reverse_order = FALSE)
 ```
 
-### Vertical Bar Plot
+### Non-Stacked Display
 
-If a vertical orientation is preferred over the default horizontal bars, set the `flip` parameter to `FALSE`:
+Show bars side by side instead of stacked:
 
-```{r, fig.width=4, fig.height=5}
-ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, flip = FALSE)
-```
-
-### Non-Stacked Bar Plot
-
-If you prefer not to stack the bars, which can be useful for direct comparisons of cluster sizes across samples, set the `stack` parameter to `FALSE`:
-
-```{r, fig.width=7, fig.height=5}
-ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, flip = FALSE, stack = FALSE)
-```
-
-### Exporting Data Matrix
-
-In cases where a visual plot is not required and only the underlying data matrix is needed, set the `plot` parameter to `FALSE`:
-
-```{r, fig.width=7, fig.height=7}
-data_matrix <- ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, plot = FALSE)
-# View the matrix
-print(data_matrix)
+```{r, fig.width=7, fig.height=4}
+ClusterDistrBar(origin = pbmc$orig.ident, 
+                cluster = pbmc$cluster, 
+                flip = FALSE, 
+                stack = FALSE)
 ```
 
 ## Generate a Waterfall Plot {#generate-a-waterfall-plot}
 
 ### Introduction
 
-Waterfall plots are powerful visualization tools that can display differences between two conditions, showing gene expression, gene set enrichment, or other metrics. This function can handle inputs directly from Seurat objects or pre-processed matrices.
+Waterfall plots are powerful tools for visualizing differences between two conditions, effectively displaying metrics like gene expression differences or pathway enrichment scores. Note that starting from v1.1.0, similar to other visualization functions, the default color scheme has been updated to use more vibrant RColorBrewer palettes.
 
-### Preparing the Data
+### Basic Usage
 
-First, create a matrix to visualize using the `GeneSetAnalysis()` function. In this example, rows represent gene sets from the Hallmark 50, and columns represent individual cells. If you have already created this matrix in the violin plot section, you can skip this step.
+First, let's create a matrix using the `GeneSetAnalysis()` function:
 
 ```{r, fig.width=7, fig.height=7, message=FALSE}
-library(SeuratExtend)
 pbmc <- GeneSetAnalysis(pbmc, genesets = hall50$human)
 matr <- pbmc@misc$AUCell$genesets
 ```
 
-### Basic Waterfall Plot
+Generate a basic waterfall plot comparing two cell types:
 
-Generate a basic waterfall plot to compare two cell types, such as 'CD14+ Mono' with 'CD8 T cells':
-
-```{r, fig.width=7, fig.height=7}
+```{r, fig.width=7, fig.height=7, message=FALSE}
 WaterfallPlot(matr, f = pbmc$cluster, ident.1 = "Mono CD14", ident.2 = "CD8 T cell")
 ```
 
-### Filtering by Bar Length
+### WaterfallPlot Style: "segment" (New in v1.1.0)
 
-To focus on significant differences, you can filter the plot to include only bars exceeding a specific threshold. For instance, keeping only bars with a length (t-score in this instance) greater than 1:
+Added a new visualization style "segment" to WaterfallPlot, providing an alternative way to display differences between conditions:
 
-```{r, fig.width=7, fig.height=6}
-WaterfallPlot(matr, f = pbmc$cluster, ident.1 = "Mono CD14", ident.2 = "CD8 T cell", len.threshold = 1)
+```{r, message=FALSE, warning=FALSE, fig.width=7, fig.height=7.2}
+# Create a plot using the new segment style
+WaterfallPlot(
+  matr,
+  f = pbmc$cluster,
+  ident.1 = "Mono CD14",
+  ident.2 = "CD8 T cell",
+  style = "segment",
+  color_theme = "D"
+)
 ```
 
-### Comparing Gene Expression
+### Filtering by Significance
 
-You can also use the waterfall plot to compare expression levels of genes directly from a Seurat object, using LogFC to determine the bar length. Here's how to do it for the top 100 variable features:
+Focus on significant differences by setting a threshold:
+
+```{r, fig.width=7, fig.height=5.5}
+WaterfallPlot(
+  matr, 
+  f = pbmc$cluster, 
+  ident.1 = "Mono CD14", 
+  ident.2 = "CD8 T cell", 
+  len.threshold = 2)
+```
+
+### Gene Expression Comparison
+
+Compare expression levels directly from a Seurat object:
 
 ```{r, fig.width=10, fig.height=4}
 genes <- VariableFeatures(pbmc)[1:80]
 WaterfallPlot(
-  pbmc, group.by = "cluster", features = genes,
-  ident.1 = "Mono CD14", ident.2 = "CD8 T cell", length = "logFC")
+  pbmc, 
+  group.by = "cluster", 
+  features = genes,
+  ident.1 = "Mono CD14", 
+  ident.2 = "CD8 T cell", 
+  length = "logFC")
 ```
 
-### Focusing on Extremes
+### Focusing on Top Features
 
-To further hone in on the most differentially expressed genes, you might want to keep only the top and bottom 20 genes. This can highlight the most critical differences between the two cell types:
+Display only the most differentially expressed genes:
 
 ```{r, fig.width=7, fig.height=4}
 WaterfallPlot(
-  pbmc, group.by = "cluster", features = genes,
-  ident.1 = "Mono CD14", ident.2 = "CD8 T cell", length = "logFC",
+  pbmc, 
+  group.by = "cluster", 
+  features = genes,
+  ident.1 = "Mono CD14", 
+  ident.2 = "CD8 T cell", 
+  length = "logFC",
   top.n = 20)
 ```
 
+## Create Volcano Plots (New in v1.1.0) {#create-volcano-plots-new-in-v110}
+
+### Introduction
+
+The Volcano plot is a specialized variation of the scatter plot that combines statistical significance (-log10 p-value) with magnitude of change (typically log fold change). While Waterfall plots focus on ordered visualization of differences, Volcano plots provide a comprehensive view of both the magnitude and statistical significance of changes.
+
+### Basic Usage
+
+Create a basic volcano plot comparing two cell types:
+
+```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=5}
+VolcanoPlot(pbmc, 
+            ident.1 = "B cell",
+            ident.2 = "CD8 T cell")
+```
+
+### Customizing Thresholds
+
+You can set custom thresholds for both axes:
+
+```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=5}
+VolcanoPlot(
+  pbmc,
+  ident.1 = "B cell",
+  ident.2 = "CD8 T cell",
+  x.threshold = 0.5,    # Log fold change threshold
+  y.threshold = 2     # -log10(p-value) threshold
+)
+```
+
+### Fine-tuning Plot Parameters
+
+Adjust quantile thresholds and number of labeled genes:
+
+```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=5}
+VolcanoPlot(
+  pbmc,
+  ident.1 = "B cell",
+  ident.2 = "CD8 T cell",
+  x.quantile = 0.99,    # Less stringent x threshold
+  y.quantile = 0.95,    # More stringent y threshold
+  top.n = 5,            # Label fewer genes
+  color = c("grey20", "grey70", "darkred")  # Custom colors
+)
+```
+
+### Using Alternative Statistics
+
+Using t-score instead of p-value for the y-axis can be particularly useful in single-cell analysis. Due to the large number of cells in single-cell datasets, p-values often become extremely significant, causing many genes to cluster at the top of the y-axis when using -log10(p-value). This can make it difficult to distinguish between genes that are all technically highly significant. T-scores provide better spread and can help create more informative visualizations.
+
+```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=5}
+VolcanoPlot(
+  pbmc,
+  ident.1 = "B cell",
+  ident.2 = "CD8 T cell",
+  y = "tscore"
+)
+```
+
+### Matrix Input
+
+You can also use matrices, such as pathway enrichment scores:
+
+```{r, message=FALSE, warning=FALSE, fig.width=6, fig.height=5}
+# Using the previously calculated pathway enrichment scores
+VolcanoPlot(
+  matr,
+  f = pbmc$cluster,
+  ident.1 = "B cell",
+  ident.2 = "Mono CD14",
+  x.quantile = 0.8,
+  y.quantile = 0.8,
+  top.n = 5)
+```
+
+### Tips: Choosing the Right Visualization
+
+When visualizing gene expression or pathway activity data, different plot types serve different purposes. Here's a guide to help you choose:
+
+1. Overview Visualizations:
+   - **Heatmaps**:
+     * Best for: Comparing many features across multiple groups using color intensity
+     * Advantage: Compact visualization of large-scale patterns
+     * Limitation: Color intensity alone may not show detailed expression patterns
+   - **Dot Plots**:
+     * Best for: Similar to heatmaps but with additional information
+     * Advantage: Shows both expression level (color) and percent expressing cells (size)
+     * Limitation: Takes more space than heatmaps
+
+2. Two-Group Comparisons:
+   - **Waterfall Plots**:
+     * Best for: Ordered visualization of differences between two groups
+     * Advantage: Clear ranking of most differential features
+     * Limitation: Limited to two-group comparisons
+   - **Volcano Plots**:
+     * Best for: Combining fold change with statistical significance
+     * Advantage: Shows both effect size and significance
+     * Limitation: Also limited to two-group comparisons
+
+3. Detailed Expression Analysis:
+   - **Violin Plots**:
+     * Best for: Detailed view of expression distribution
+     * Advantage: Shows full distribution shape and statistical comparisons
+     * Limitation: Space-intensive, limiting the number of features that can be shown
+
 ## Explore Color Functions {#explore-color-functions}
 
-In this section, we will delve into the various color functions and their applications within the `SeuratExtend` package. The discussion is divided into three main parts:
+The `SeuratExtend` package provides comprehensive color management across all visualization functions. Each function type handles colors slightly differently depending on whether it's dealing with discrete or continuous variables.
 
-1. Introduction to the discrete color palette generation functions `color_pro` and `color_iwh`, which have presets for 2-50 colors in different styles.
-2. Usage of color-related parameters (such as `cols` or `col_theme`) in visualization functions like `DimPlot2`, `VlnPlot2`, `Heatmap`, and `WaterfallPlot`.
-3. Additional color-related functions, including a custom algorithm for blending RYB colors.
+### For Functions Handling Discrete Variables
 
-### Professional Discrete Color Presets with `color_pro`
+- **DimPlot2**, **VlnPlot2**, **ClusterDistrBar** (using `cols` parameter)
+  - Seven [color_pro styles](#professional-discrete-color-presets-with-color_pro): "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple"
+  - Five [color_iwh styles](#iwanthue-color-series-color_iwh): "iwh_default", "iwh_intense", "iwh_pastel", "iwh_all", "iwh_all_hard"
+  - All [RColorBrewer](#rcolorbrewer-palettes) qualitative palettes (e.g., "Set1", "Set2", "Set3", "Paired", "Dark2", "Accent", "Pastel1", "Pastel2")
+  - Custom colors as vector of hex codes or color names
+
+### For Functions Handling Continuous Variables
+
+- **DimPlot2** (using `cols` parameter for continuous features)
+- **Heatmap**, **DotPlot2**, **WaterfallPlot** (using `color_scheme` parameter)
+
+Available options for continuous variables:
+
+1. Viridis Color Schemes (see [viridis palettes](#viridis-options)
+   - Options "A" through "H" from the viridis package
+   - Example: `cols = "D"` for the 'viridis' option
+
+2. (New in v1.1.0) [RColorBrewer](#rcolorbrewer-palettes) Sequential Palettes
+   - Options include: "Blues", "BuGn", "BuPu", "GnBu", "Greens", "Greys", "Oranges", "OrRd", "PuBu", "PuBuGn", "PuRd", "Purples", "RdPu", "Reds", "YlGn", "YlGnBu", "YlOrBr", "YlOrRd"
+   - Add "-rev" suffix to reverse any palette (e.g., "Blues-rev")
+
+3. (New in v1.1.0) [RColorBrewer](#rcolorbrewer-palettes) Diverging Palettes
+   - Options include: "BrBG", "PiYG", "PRGn", "PuOr", "RdBu", "RdGy", "RdYlBu", "RdYlGn", "Spectral"
+   - Add "-rev" suffix to reverse any palette
+
+4. (New in v1.1.0) Custom Diverging Palettes
+   - Additional options: "GnYlRd", "BuYlRd", "GyRd", "BuRd", "PuOr"
+
+5. Custom Gradient Specifications
+   - Three-point gradient: `c(low = "blue", mid = "white", high = "red")`
+   - Two-point gradient: `c(low = "grey", high = "red")`
+   - Vector of colors for custom gradient
+
+### Recommended Color Schemes
+
+Here are some recommended color schemes for different visualization needs in single-cell analysis:
+
+#### For Discrete Variables (e.g., clusters, conditions)
+
+The "light" color scheme from SeuratExtend's `color_pro` is particularly effective for labeled visualizations:
+
+```{r, fig.width=7.5, fig.height=4, message=FALSE, warning=FALSE}
+library(cowplot)
+plot_grid(
+  DimPlot2(pbmc, cols = "light", theme = NoAxes() + NoLegend()),
+  ClusterDistrBar(pbmc$orig.ident, pbmc$cluster, cols = "light", flip = FALSE, border = "black") +
+    theme(axis.title.x = element_blank())
+)
+```
+
+#### For Continuous Variables (e.g., gene expression)
+
+the "A" or "D" color schemes from viridis:
+
+```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=6.5}
+Heatmap(toplot, lab_fill = "zscore", color_scheme = "A")
+```
+
+```{r, fig.width=7, fig.height=4}
+WaterfallPlot(
+  pbmc, group.by = "cluster", features = VariableFeatures(pbmc)[1:80],
+  ident.1 = "Mono CD14", ident.2 = "CD8 T cell", length = "logFC",
+  top.n = 20, color_theme = "D")
+```
+
+You can also use various color palettes from RColorBrewer (https://r-graph-gallery.com/38-rcolorbrewers-palettes.html):
+
+```{r, fig.width=8, fig.height=7, message=FALSE, warning=FALSE}
+library(RColorBrewer)
+markers_genes <- c(
+  "MS4A1", "GNLY", "CD3E",
+  "CD8A", "CCR7", "CD14",
+  "FCER1A", "FCGR3A", "PPBP")
+DimPlot2(
+  pbmc,
+  features = markers_genes,
+  cols = "OrRd",
+  theme = NoAxes())
+```
+
+```{r, fig.width=8, fig.height=7, message=FALSE, warning=FALSE}
+DimPlot2(
+  pbmc,
+  features = markers_genes,
+  cols = "Spectral-rev",
+  theme = NoAxes())
+```
+
+### Professional Discrete Color Presets with `color_pro` {#professional-discrete-color-presets-with-color_pro}
 
 The `color_pro` function is designed to generate professional discrete color presets, ideal for data science visualizations, particularly in fields like scRNA-seq analysis where aesthetics must not compromise the clarity and seriousness of scientific communication.
 
 #### The Philosophy Behind `color_pro`
 
-Choosing the right colors for scientific visualizations is crucial. Colors must be distinct enough to differentiate data points clearly but coordinated and subdued enough to maintain professionalism and avoid visual strain. Here are some examples of what to avoid in scientific plotting:
+Choosing the right colors for scientific visualizations is crucial. Colors must be distinct enough to differentiate data points clearly but coordinated and subdued enough to maintain professionalism and avoid visual strain. 
+
+##### What to AVOID in Scientific Plotting
 
 1. **Coordinated but Indistinct Colors:**
    Using monochromatic schemes can reduce visual distinction, which might cause data points to blend together.
@@ -538,17 +874,12 @@ plot_grid(
     theme(axis.title.x = element_blank())
 )
 ```
-#### Generating and Customizing Colors with `color_pro`
 
-After showcasing `color_pro` color schemes through practical plotting examples, let's explore how you can directly generate these color codes using the `color_pro` function. This allows for greater flexibility in applying these colors beyond the integrated visualization functions.
+#### Generating Color Codes
 
-##### Generating Color Codes
+The `color_pro` function can generate between 2 to 50 colors:
 
-You can generate between 2 to 50 colors using the `color_pro` function, which can be useful when you need a custom color palette for your visualizations.
-
-Example of generating different sets of colors:
 ```{r, eval=FALSE}
-library(SeuratExtend)
 color_pro(n = 2)   # Example output: "#a05d49" "#6181a7"
 color_pro(5)       # Example output: "#996742" "#5e824b" "#5d7880" "#7169a7" "#9f516c"
 color_pro(10)      # Generates 10 colors
@@ -556,9 +887,9 @@ color_pro(20)      # Generates 20 colors
 color_pro(50)      # Generates 50 colors
 ```
 
-The following plot demonstrates the visual impact of these palettes:
+Visual demonstration of different color sets:
+
 ```{r, echo=FALSE, fig.width=7.5, fig.height=4}
-library(hyc)
 palette_list <- list(
   "n=2" = color_pro(2),
   "n=5" = color_pro(5),
@@ -569,11 +900,10 @@ palette_list <- list(
 show_col2(palette_list, ncol = 10)
 ```
 
-##### Choosing Color Schemes
+#### Available Color Schemes
 
-`color_pro` allows the selection of up to seven different color styles: "default", "light", "red", "yellow", "green", "blue", "purple". You can specify these styles by name or by their corresponding numeric value.
+`color_pro` offers seven different styles: "default", "light", "red", "yellow", "green", "blue", "purple". Example generating 10 colors from each style:
 
-Example of generating 10 colors from each style:
 ```{r, eval=FALSE}
 color_pro(10, col.space = 1)  # default
 color_pro(10, 2)              # light
@@ -584,8 +914,9 @@ color_pro(10, 6)              # blue
 color_pro(10, 7)              # purple
 ```
 
-Visual comparison of these color schemes:
-```{r, echo=FALSE, fig.width=7.5, fig.height=3.6}
+Visual comparison:
+
+```{r, echo=FALSE, fig.width=7.5, fig.height=3.2}
 palette_list <- list(
   "default" = color_pro(10, 1),
   "light" = color_pro(10, 2),
@@ -598,18 +929,20 @@ palette_list <- list(
 show_col2(palette_list, ncol = 10)
 ```
 
-##### Sorting Options
+#### Sorting Options
 
 `color_pro` supports sorting by "hue" (default) or by "difference" for enhanced distinction among colors. This feature can be specified by name or by numbers 1 or 2.
 
 Example of sorting colors by hue and by difference:
+
 ```{r, eval=FALSE}
 color_pro(10, 1, sort = "hue")
 color_pro(10, 1, sort = "diff")
 ```
 
 Visualizing the effect of different sorting methods:
-```{r, echo=FALSE, fig.width=7.5, fig.height=1.2}
+
+```{r, echo=FALSE, fig.width=7.5, fig.height=1}
 palette_list <- list(
   "sort_hue" = color_pro(10, 1, sort = "hue"),
   "sort_diff" = color_pro(10, 1, sort = "diff")
@@ -617,11 +950,12 @@ palette_list <- list(
 show_col2(palette_list, ncol = 10)
 ```
 
-##### Random Sequence Options
+#### Random Sequence Options
 
 Each color scheme and number of colors have five different random sequences available, providing variations even within the same parameters.
 
 Example of generating different sets from the default color scheme:
+
 ```{r, eval=FALSE}
 color_pro(10, 1, 1, set = 1)
 color_pro(10, 1, 1, 2)
@@ -631,26 +965,26 @@ color_pro(10, 1, 1, 5)
 ```
 
 Visualizing different random sequences:
-```{r, echo=FALSE, fig.width=7.5, fig.height=2.6}
+
+```{r, echo=FALSE, fig.width=7.5, fig.height=2.2}
 palette_list <- list(
   "Set1" = color_pro(10, 1, 1, 1),
   "Set2" = color_pro(10, 1, 1, 2),
-  "Set3" = color_pro(10, 1,
-
- 1, 3),
+  "Set3" = color_pro(10, 1, 1, 3),
   "Set4" = color_pro(10, 1, 1, 4),
   "Set5" = color_pro(10, 1, 1, 5)
 )
 show_col2(palette_list, ncol = 10)
 ```
 
-### Exploring `color_iwh` Color Series
+### IWantHue Color Series (`color_iwh`) {#iwanthue-color-series-color_iwh}
 
 In addition to `color_pro`, `SeuratExtend` incorporates the `I Want Hue` algorithm to generate a series of color palettes. These palettes, known as `color_iwh`, include five default styles optimized for various visualization needs. Unlike `color_pro`, `color_iwh` does not support different sorting options and defaults to sorting by difference for maximum color distinction.
 
 #### `color_iwh` Color Series Overview
 
 The `color_iwh` function provides the following predefined color schemes:
+
 - **default**: Suitable for general use with subtle color variations, supporting 2 to 20 colors.
 - **intense**: Features vivid colors, supporting 2 to 30 colors, ideal for making impactful visual statements.
 - **pastel**: Offers soft, soothing colors, supporting 2 to 18 colors, perfect for light-themed visualizations.
@@ -662,6 +996,7 @@ The `color_iwh` function provides the following predefined color schemes:
 To generate colors using the `color_iwh` function, simply specify the number of colors and the style index. Here are examples of generating 10 colors from each predefined style:
 
 Example of generating colors from each `color_iwh` style:
+
 ```{r, eval=FALSE}
 color_iwh(10, 1)  # default
 color_iwh(10, 2)  # intense
@@ -671,7 +1006,8 @@ color_iwh(30, 5)  # all_hard
 ```
 
 Visual comparison of `color_iwh` palettes:
-```{r, echo=FALSE, fig.width=7.5, fig.height=3.5}
+
+```{r, echo=FALSE, fig.width=7.5, fig.height=3}
 library(hyc)
 palette_list <- list(
   "default" = color_iwh(10, 1),
@@ -683,59 +1019,42 @@ palette_list <- list(
 show_col2(palette_list, ncol = 10)
 ```
 
-### Application of Color Functions in Visualization Tools
+### Viridis and RColorBrewer Palettes {#viridis-and-rcolorbrewer-palettes}
 
-In the `SeuratExtend` package, functions such as `DimPlot2`, `VlnPlot2`, `Heatmap`, `WaterfallPlot`, and `ClusterDistrBar` allow easy integration of color schemes directly through the `cols` or `col_theme` parameters. This integration means that you do not have to manually generate color codes using `color_pro` or `color_iwh` unless customization beyond the presets is needed. Below, we detail how to apply these parameters effectively in various functions.
+#### Viridis Options {#viridis-options}
 
-#### Applying Colors to Discrete Variables
+The viridis package provides colorblind-friendly, perceptually uniform color scales. Here are all available options:
 
-In `DimPlot2`, `VlnPlot2`, and `ClusterDistrBar`, the `cols` parameter can accept a variety of inputs to color discrete variables. These inputs include:
-
-- **color_pro styles**: "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple".
-- **color_iwh styles**: "iwh_default", "iwh_intense", "iwh_pastel", "iwh_all", "iwh_all_hard".
-- **Brewer color scales**: Available through `brewer.pal.info`, such as "Blues", "Dark2", etc.
-- **Manually specified colors**: Direct input of color codes.
-
-Example of using `color_pro` style in `DimPlot2`:
-```{r, fig.width=6, fig.height=4}
-DimPlot2(pbmc, cols = "light")
+```{r, fig.width=8, fig.height=3}
+library(viridis)
+par(mfrow=c(4,2), mar=c(1,1,2,1))
+for(option in LETTERS[1:8]) {
+  image(1:100, 1, as.matrix(1:100), col=viridis(100, option=option),
+        main=paste0("Viridis option '", toupper(option), "'"), 
+        xlab="", ylab="", axes=FALSE)
+}
 ```
 
-#### Applying Colors to Continuous Variables
+#### RColorBrewer Palettes {#rcolorbrewer-palettes}
 
-In `DimPlot2`, `Heatmap`, and `WaterfallPlot`, the `cols` or `col_theme` parameters can also be used to assign colors to continuous variables. Options for continuous variable coloration include:
+RColorBrewer provides carefully chosen color palettes for different types of data:
 
-- **Predefined color schemes**: Using "A", "B", "C", "D", or "E" from the 'viridis' package.
-- **Three-point gradients**: A named vector with keys "low", "mid", and "high" for colors at specific data points, often used for diverging color schemes. Example: `c(low = "blue", mid = "white", high = "red")`
-- **Two-point gradients**: A simple two-color gradient using keys "low" and "high". Example: `c(low = "blue", high = "red")`
-- **Custom color gradients**: A vector of colors to generate a gradient across a range, suitable for complex data visualizations.
-
-Example of applying a color gradient in `DimPlot2` for a continuous variable:
-```{r, fig.width=5, fig.height=4}
-DimPlot2(pbmc, features = "CD3D", cols = "D")
+```{r, fig.width=7, fig.height=8.5}
+library(RColorBrewer)
+display.brewer.all()
 ```
 
-### Additional Color-Related Functions
+### Additional Color Functions
 
-In the discussion of the `FeaturePlot3` functionality, we touched upon the RYB mixing system used in `SeuratExtend`. The method for mixing these colors is a proprietary development of `SeuratExtend`, designed as an approximation to the traditional RYB color mixing. This approach includes specific adjustments to the primary RYB colors to make them more suitable for visualizing expression gradients:
+#### Using `ryb2rgb()` to Convert RYB to RGB
 
-- **Yellow**: Since pure yellow can be too pale for effective gradient display, it is deepened in `SeuratExtend`.
-- **Red and Blue**: Pure shades of these colors can be harsh on the eyes, so they have been softened to enhance visual comfort.
-
-These modifications ensure that the colors used in visualizations are both effective in conveying information and easier on the eyes.
-
-#### Using `ryb2rgb()` to Convert RYB to RGB Hex Codes
-
-The `ryb2rgb()` function in `SeuratExtend` translates RYB values into conventional RGB hex codes, which can then be used in standard plotting functions. This function accepts a vector of three numbers (ranging from 0 to 1), each representing the intensity of red, yellow, and blue, respectively. Here is a simple example of how to use `ryb2rgb()`:
+The `ryb2rgb()` function translates RYB color values to RGB hex codes:
 
 ```{r}
-ryb2rgb(ryb = c(r = 0.3, y = 0.5, b = 0.2))
-# Outputs: "#CCAF80"
+ryb2rgb(c(r = 0.3, y = 0.5, b = 0.2))
 ```
 
-#### Visualizing Primary and Secondary Colors
-
-To illustrate how `ryb2rgb()` interprets different combinations of primary and secondary colors, consider the following example to create a visual palette:
+Visualizing primary and secondary colors:
 
 ```{r, fig.width=5, fig.height=4}
 library(scales)
@@ -756,17 +1075,12 @@ data.frame(
   show_col()
 ```
 
-This section shows a palette derived from various RYB combinations, demonstrating how `ryb2rgb()` translates these combinations into RGB hex codes. This functionality is particularly useful for researchers and data scientists who need to customize their color schemes beyond the standard options provided by most visualization libraries.
-
 #### Using `save_colors` to Manage Color Settings
 
-The `save_colors` function is designed to store custom color settings within the `Seurat` object, facilitating their reuse across various visualization functions. This approach allows for consistent color usage across multiple plots and simplifies the management of color settings within a project.
-
-This function primarily serves to complement visualization functions such as `DimPlot2` and `VlnPlot2`. By storing color settings directly within the `Seurat` object, `save_colors` enables these visualization tools to automatically retrieve and apply the specified colors to variables such as gene expressions or clustering results. This ensures consistency and repeatability in the color schemes of your plots.
-
-Here's how you can use `save_colors` to specify and store color settings for certain variables, which can then be automatically utilized by functions like `DimPlot2`:
+The `save_colors` function stores color settings within your Seurat object:
 
 ```{r, fig.width=9, fig.height=6}
+# Save color settings
 pbmc <- save_colors(pbmc, col_list = list(
   "cluster" = "pro_blue",
   "CD14" = "D",
@@ -774,11 +1088,15 @@ pbmc <- save_colors(pbmc, col_list = list(
 ))
 
 # Now, when using DimPlot2, the specified colors for 'cluster', 'CD14', and 'CD3D' are automatically applied
-DimPlot2(pbmc, features = c("cluster", "orig.ident", "CD14", "CD3D"))
+DimPlot2(pbmc, features = c("cluster", "orig.ident", "CD14", "CD3D"), theme = NoAxes())
 ```
 
-This example demonstrates setting custom colors for the `cluster`, `CD14`, and `CD3D` variables and then using these colors in a dimension reduction plot without needing to specify them again in the `DimPlot2` function. The colors are stored in the `Seurat` object and retrieved dynamically by the plotting function.
+### Additional Resources
 
-```{r, fig.width=9, fig.height=6}
+For more information about color palettes:
+- RColorBrewer palettes: https://r-graph-gallery.com/38-rcolorbrewers-palettes.html
+- Viridis palettes: https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html
+
+```{r}
 sessionInfo()
 ```

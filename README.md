@@ -6,7 +6,7 @@
 
 **Key Features**:
 
-- **Enhanced Data Visualization**: Includes heatmaps, violin plots, feature plots, waterfall plots, proportion bars, and GSEA plots.
+- **Enhanced Data Visualization**: Includes heatmaps, violin plots, dimensional reduction (UMAP) plots, waterfall plots, dot plots, proportion bars, volcano plots, and GSEA plots.
 - **Integrated Functional and Pathway Analysis**: Supports GO and Reactome databases, with the option to use custom databases.
 - **Python Tool Integration**: Easily apply tools like scVelo, SCENIC, and Palantir within R using the Seurat object.
 - **Utility Functions**: Assorted functions for calculations and color selections to streamline your scRNA-seq analysis.
@@ -16,6 +16,12 @@
 - **GitHub Repository**: Access the source code and contribute to SeuratExtend on [GitHub](https://github.com/huayc09/SeuratExtend).
 - **Online Tutorial**: For a comprehensive guide on using SeuratExtend, visit our [tutorial website](https://huayc09.github.io/SeuratExtend/).
 - **SeuratExtend Chatbot**: Try our AI-powered assistant (beta version, powered by ChatGPT) for help with scRNA-seq analysis: [scRNA-seq Assistant](https://chatgpt.com/g/g-8scQjmzkd-scrna-seq-assistant).
+
+## Citation
+
+If you use SeuratExtend in your research, please cite:
+
+Hua, Y., Weng, L., Zhao, F., and Rambow, F. (2024). SeuratExtend: Streamlining Single-Cell RNA-Seq Analysis Through an Integrated and Intuitive Framework. bioRxiv, 2024.08.01.606144. https://doi.org/10.1101/2024.08.01.606144
 
 ## Installation
 
@@ -32,12 +38,16 @@ remotes::install_github("huayc09/SeuratExtend")
 
 ### [Quick Start-Up Guide](#quick-start-up-guide-1)
 
+### [What's New in v1.1.0](vignettes/News.md)
+
 ### [Enhanced Visualization](vignettes/Visualization.md)
+- [Create an Enhanced Dimensional Reduction Plot](vignettes/Visualization.md#create-an-enhanced-dimensional-reduction-plot) `DimPlot2` `FeaturePlot3` `FeaturePlot3.grid` `theme_umap_arrows`
 - [Generate a Heatmap Plot](vignettes/Visualization.md#generate-a-heatmap-plot) `Heatmap`
-- [Create an Enhanced Dimensional Reduction Plot](vignettes/Visualization.md#create-an-enhanced-dimensional-reduction-plot) `DimPlot2` `FeaturePlot3` `FeaturePlot3.grid`
+- [Create Enhanced Dot Plots](vignettes/Visualization.md#create-enhanced-dot-plots-new-in-v110) **(New in v1.1.0)** `DotPlot2`
 - [Create an Enhanced Violin Plot](vignettes/Visualization.md#create-an-enhanced-violin-plot) `VlnPlot2`
 - [Visualize Cluster Distribution in Samples](vignettes/Visualization.md#visualize-cluster-distribution-in-samples) `ClusterDistrBar`
 - [Generate a Waterfall Plot](vignettes/Visualization.md#generate-a-waterfall-plot) `WaterfallPlot`
+- [Create Volcano Plots](vignettes/Visualization.md#create-volcano-plots-new-in-v110) **(New in v1.1.0)** `VolcanoPlot`
 - [Explore Color Functions](Visualization.md#explore-color-functions) `color_pro` `color_iwh` `ryb2rgb` `save_colors`
 
 ### [Geneset Enrichment Analysis (GSEA)](vignettes/GSEA.md)
@@ -67,6 +77,8 @@ remotes::install_github("huayc09/SeuratExtend")
 - [Assess Proportion of Positive Cells in Clusters](vignettes/Utilities.md#assess-proportion-of-positive-cells-in-clusters) `feature_percent`
 - [Run Standard Seurat Pipeline](vignettes/Utilities.md#run-standard-seurat-pipeline) `RunBasicSeurat`
 
+### [Single-Cell RNA-seq Analysis Course](#single-cell-rna-seq-analysis-course-new-in-v110-1) **(New in v1.1.0)**
+
 ### [FAQ](vignettes/FAQ.md)
 
 ## Quick Start-Up Guide
@@ -81,33 +93,33 @@ demonstrate various functionalities of the `SeuratExtend` package.
 
 ### Visualizing Clusters
 
-```R
+``` r
 library(Seurat)
 library(SeuratExtend)
 
 # Visualizing cell clusters using DimPlot2
-DimPlot2(pbmc)
+DimPlot2(pbmc, theme = theme_umap_arrows())
 ```
 
-![](vignettes/quick_start_files/figure-markdown_strict/unnamed-chunk-6-1.png)
+![](vignettes/quick_start_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
 
 ### Analyzing Cluster Distribution
 
 To check the percentage of each cluster within different samples:
 
-```R
+``` r
 # Cluster distribution bar plot
 ClusterDistrBar(pbmc$orig.ident, pbmc$cluster)
 ```
 
-![](vignettes/quick_start_files/figure-markdown_strict/unnamed-chunk-7-1.png)
+![](vignettes/quick_start_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 ### Marker Gene Analysis with Heatmap
 
 To examine the marker genes of each cluster and visualize them using a
 heatmap:
 
-```R
+``` r
 # Calculating z-scores for variable features
 genes.zscore <- CalcStats(
   pbmc,
@@ -120,14 +132,29 @@ genes.zscore <- CalcStats(
 Heatmap(genes.zscore, lab_fill = "zscore")
 ```
 
-![](vignettes/quick_start_files/figure-markdown_strict/unnamed-chunk-8-1.png)
+![](vignettes/quick_start_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+### Enhanced Dot Plots (New in v1.1.0)
+
+``` r
+# Create grouped features
+grouped_features <- list(
+  "B_cell_markers" = c("MS4A1", "CD79A"),
+  "T_cell_markers" = c("CD3D", "CD8A", "IL7R"),
+  "Myeloid_markers" = c("CD14", "FCGR3A", "S100A8")
+)
+
+DotPlot2(pbmc, features = grouped_features)
+```
+
+![](vignettes/quick_start_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ### Enhanced Visualization of Marker Genes
 
 For visualizing specific markers via a violin plot that incorporates box
 plots, median lines, and performs statistical testing:
 
-```R
+``` r
 # Specifying genes and cells of interest
 genes <- c("CD3D", "CD14", "CD79A")
 cells <- WhichCells(pbmc, idents = c("B cell", "CD8 T cell", "Mono CD14"))
@@ -141,18 +168,30 @@ VlnPlot2(
   stat.method = "wilcox.test")
 ```
 
-![](vignettes/quick_start_files/figure-markdown_strict/unnamed-chunk-9-1.png)
+![](vignettes/quick_start_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ### Visualizing Multiple Markers on UMAP
 
 Displaying three markers on a single UMAP, using RYB coloring for each
 marker:
 
-```R
-FeaturePlot3(pbmc, feature.1 = "CD3D", feature.2 = "CD14", feature.3 = "CD79A")
+``` r
+FeaturePlot3(pbmc, feature.1 = "CD3D", feature.2 = "CD14", feature.3 = "CD79A", pt.size = 1)
 ```
 
-![](vignettes/quick_start_files/figure-markdown_strict/unnamed-chunk-10-1.png)
+![](vignettes/quick_start_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+### Create Volcano Plots (New in v1.1.0)
+
+Create a basic volcano plot comparing two cell types:
+
+``` r
+VolcanoPlot(pbmc, 
+            ident.1 = "B cell",
+            ident.2 = "CD8 T cell")
+```
+
+![](vignettes/quick_start_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ### Conducting Geneset Enrichment Analysis (GSEA)
 
@@ -160,7 +199,7 @@ Examining all the pathways of the immune process in the Gene Ontology
 (GO) database, and visualizing by a heatmap that displays the top
 pathways of each cluster across multiple cell types:
 
-```R
+``` r
 options(spe = "human")
 pbmc <- GeneSetAnalysisGO(pbmc, parent = "immune_system_process", n.min = 5)
 matr <- RenameGO(pbmc@misc$AUCell$GO$immune_system_process)
@@ -172,14 +211,14 @@ go_zscore <- CalcStats(
 Heatmap(go_zscore, lab_fill = "zscore")
 ```
 
-![](vignettes/quick_start_files/figure-markdown_strict/unnamed-chunk-11-1.png)
+![](vignettes/quick_start_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ### Detailed Comparison of Two Cell Types
 
 Using a GSEA plot to focus on a specific pathway for deeper comparative
 analysis:
 
-```R
+``` r
 GSEAplot(
   pbmc,
   ident.1 = "B cell",
@@ -188,17 +227,17 @@ GSEAplot(
   geneset = GO_Data$human$GO2Gene[["GO:0042113"]])
 ```
 
-![](vignettes/quick_start_files/figure-markdown_strict/unnamed-chunk-12-1.png)
+![](vignettes/quick_start_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ### Importing and Visualizing SCENIC Analysis
 
 After conducting Gene Regulatory Networks Analysis using pySCENIC,
 import the output and visualize various aspects within Seurat:
 
-```R
+``` r
 # Downloading a pre-computed SCENIC loom file
 scenic_loom_path <- file.path(tempdir(), "pyscenic_integrated-output.loom")
-download.file("https://zenodo.org/records/10944066/files/pbmc3k_small_pyscenic_integrated-output.loom", scenic_loom_path)
+download.file("https://zenodo.org/records/10944066/files/pbmc3k_small_pyscenic_integrated-output.loom", scenic_loom_path, mode = "wb")
 
 # Importing SCENIC Loom Files into Seurat
 pbmc <- ImportPyscenicLoom(scenic_loom_path, seu = pbmc)
@@ -209,12 +248,12 @@ DimPlot2(
   features = c("cluster", "orig.ident", "CEBPA", "tf_CEBPA"),
   cols = list("tf_CEBPA" = "D"),
   theme = NoAxes()
-)
+) + theme_umap_arrows()
 ```
 
-![](vignettes/quick_start_files/figure-markdown_strict/unnamed-chunk-13-1.png)
+![](vignettes/quick_start_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
-```R
+``` r
 # Creating a waterfall plot to compare regulon activity between cell types
 DefaultAssay(pbmc) <- "TF"
 WaterfallPlot(
@@ -226,7 +265,7 @@ WaterfallPlot(
   top.n = 20)
 ```
 
-![](vignettes/quick_start_files/figure-markdown_strict/unnamed-chunk-14-1.png)
+![](vignettes/quick_start_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ### Trajectory Analysis with Palantir in R
 
@@ -241,7 +280,7 @@ the R environment.
 First, we download a small subset of myeloid cells to illustrate the
 analysis:
 
-```R
+``` r
 # Download the example Seurat Object with myeloid cells
 mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds", "rb"))
 ```
@@ -251,7 +290,7 @@ mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_
 Palantir uses diffusion maps for dimensionality reduction to infer
 trajectories. Here’s how to compute and visualize them:
 
-```{r}
+``` r
 # Compute diffusion map
 mye_small <- Palantir.RunDM(mye_small)
 
@@ -259,14 +298,14 @@ mye_small <- Palantir.RunDM(mye_small)
 DimPlot2(mye_small, reduction = "ms")
 ```
 
-![](vignettes/quick_start_files/figure-markdown_strict/unnamed-chunk-16-1.png)
+![](vignettes/quick_start_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 #### Pseudotime Calculation
 
 Pseudotime ordering assigns each cell a time point in a trajectory,
 indicating its progression along a developmental path:
 
-```R
+``` r
 # Calculate pseudotime with a specified start cell
 mye_small <- Palantir.Pseudotime(mye_small, start_cell = "sample1_GAGAGGTAGCAGTACG-1")
 
@@ -280,17 +319,18 @@ DimPlot2(
   mye_small,
   features = colnames(ps),
   reduction = "ms",
-  cols = list(Entropy = "D"))
+  cols = list(Entropy = "D"),
+  theme = NoAxes())
 ```
 
-![](vignettes/quick_start_files/figure-markdown_strict/unnamed-chunk-17-1.png)
+![](vignettes/quick_start_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 #### Visualization Along Trajectories
 
 Visualizing gene expression or regulon activity along calculated
 trajectories can provide insights into dynamic changes:
 
-```R
+``` r
 # Create smoothed gene expression curves along trajectory
 GeneTrendCurve.Palantir(
   mye_small,
@@ -299,9 +339,9 @@ GeneTrendCurve.Palantir(
 )
 ```
 
-![](vignettes/quick_start_files/figure-markdown_strict/unnamed-chunk-18-1.png)
+![](vignettes/quick_start_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
-```R
+``` r
 # Create a gene trend heatmap for different fates
 GeneTrendHeatmap.Palantir(
   mye_small,
@@ -311,7 +351,7 @@ GeneTrendHeatmap.Palantir(
 )
 ```
 
-![](vignettes/quick_start_files/figure-markdown_strict/unnamed-chunk-19-1.png)
+![](vignettes/quick_start_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 ### scVelo Analysis
 
@@ -323,13 +363,19 @@ workflow using scVelo.
 
 First, download the pre-calculated velocyto loom file:
 
-```R
+``` r
 # Download velocyto loom file
 loom_path <- file.path(tempdir(), "pbmc10k_mye_small.loom")
-download.file("https://zenodo.org/records/10944066/files/pbmc10k_mye_small.loom", loom_path)
+download.file("https://zenodo.org/records/10944066/files/pbmc10k_mye_small.loom", 
+              loom_path,
+              mode = "wb")  # Use binary mode for Windows compatibility
 
-# Path for saving the integrated AnnData object
-adata_path <- file.path(tempdir(), "mye_small.h5ad")
+# Set up the path for saving the AnnData object in the HDF5 (h5ad) format
+if (.Platform$OS.type == "windows") {
+    adata_path <- normalizePath(file.path(tempdir(), "mye_small.h5ad"), winslash = "/")
+} else {
+    adata_path <- file.path(tempdir(), "mye_small.h5ad")
+}
 
 # Integrate Seurat Object and velocyto loom into an AnnData object
 scVelo.SeuratToAnndata(
@@ -345,14 +391,37 @@ scVelo.SeuratToAnndata(
 
 Once the data is processed, visualize the RNA velocity:
 
-```R
+``` r
 # Plot RNA velocity
-scVelo.Plot(color = "cluster", basis = "ms_cell_embeddings", figsize = c(5,4))
+scVelo.Plot(color = "cluster", basis = "ms_cell_embeddings", 
+            save = "quick_start_scvelo.png", figsize = c(5,4))
 ```
 
-![](vignettes/quick_start_files/figure-markdown_strict/unnamed-chunk-21-1.png)
+<img src="vignettes/figures/scvelo_quick_start_scvelo.png" width="700" />
 
 For detailed usage of the functions and more advanced analysis, please refer to the vignettes and tutorials.
+
+## Single-Cell RNA-seq Analysis Course (New in v1.1.0)
+
+A comprehensive 6-lesson course originally presented at the [Institute for AI in Medicine (IKIM)](https://www.ikim.uk-essen.de/institute), University Hospital Essen on October 8, 2024, organized by the [Department of Applied Computational Cancer Research](https://www.ikim.uk-essen.de/groups/accr). The course materials have been updated for SeuratExtend v1.1.0 and are now freely available online. Starting with fundamentals of R and Seurat, the course progressively builds to cover enhanced visualization, functional analysis, quality control, and cutting-edge methods including trajectory analysis, regulatory networks, and cell-cell communication. Perfect for beginners while providing depth needed for advanced applications.
+
+### [Lesson 1: Introduction to R Programming](https://huayc09.github.io/SeuratExtend/articles/single-cell-course/1.basic-R.html)
+Essential R programming fundamentals tailored for scRNA-seq analysis. Covers basic data types, data structures (vectors, matrices, data frames), file operations, and package management. Perfect for beginners starting their journey in bioinformatics.
+
+### [Lesson 2: Basic Single-Cell Analysis with Seurat](https://huayc09.github.io/SeuratExtend/articles/single-cell-course/2.Seurat.html)
+Comprehensive walkthrough of the standard Seurat workflow, from raw count matrix to cell type annotation. Learn about data normalization, dimensionality reduction, clustering, and visualization through hands-on analysis of PBMC data.
+
+### [Lesson 3: Advanced Visualization with SeuratExtend](https://huayc09.github.io/SeuratExtend/articles/single-cell-course/3.Visualization.html)
+Master advanced visualization techniques using SeuratExtend's enhanced plotting functions. Explore DimPlot2, FeaturePlot3, Heatmap, and other tools to create publication-ready figures. Includes practical examples of customizing plots and color schemes.
+
+### [Lesson 4: Gene Set Enrichment Analysis and Utilities](https://huayc09.github.io/SeuratExtend/articles/single-cell-course/4.GSEA.html)
+Master functional enrichment analysis using GO and Reactome databases through SeuratExtend's integrated GSEA pipeline. Learn to perform custom gene set analysis, interpret enrichment scores, and utilize helpful utility functions for gene naming conversions and cell proportions.
+
+### [Lesson 5: Core Workflow Enhancements](https://huayc09.github.io/SeuratExtend/articles/single-cell-course/5.Core-Enhancement.html)
+Elevate your scRNA-seq analysis with advanced quality control, doublet removal, data integration using Harmony, cell cycle analysis, and alternative normalization methods like SCTransform. Understand key considerations for processing and analyzing multi-sample datasets.
+
+### [Lesson 6: Advanced Analytical Methods (Part 1)](https://huayc09.github.io/SeuratExtend/articles/single-cell-course/6.Advanced.html) [(Part 2)](https://huayc09.github.io/SeuratExtend/articles/single-cell-course/6.Advanced-2.html)
+Explore cutting-edge techniques including trajectory analysis with scVelo/Palantir, cell-cell communication using CellChat/NicheNet, regulatory network inference with SCENIC, and specialized analyses for TCR/BCR data and copy number variations.
 
 ## License
 
@@ -360,5 +429,7 @@ GPL (>= 3)
 
 ## Publications Using SeuratExtend
 
-1. Hua, Y., Vella, G., Rambow, F., et al. (2022). Cancer immunotherapies transition endothelial cells into HEVs that generate TCF1+ T lymphocyte niches through a feed-forward loop. Cancer Cell 40, 1600-1618. https://doi.org/10.1016/j.ccell.2022.11.002
-2. Hua, Y., Wu, N., Miao, J., Shen, M. (2023). Single-cell transcriptomic analysis in two patients with rare systemic autoinflammatory diseases treated with anti-TNF therapy. Front. Immunol. 14. https://doi.org/10.3389/fimmu.2023.1091336
+1. Hua, Y., Vella, G., Rambow, F., et al. (2022). Cancer immunotherapies transition endothelial cells into HEVs that generate TCF1+ T lymphocyte niches through a feed-forward loop. **Cancer Cell** 40, 1600-1618. https://doi.org/10.1016/j.ccell.2022.11.002
+2. Hua, Y., Wu, N., Miao, J., Shen, M. (2023). Single-cell transcriptomic analysis in two patients with rare systemic autoinflammatory diseases treated with anti-TNF therapy. **Front. Immunol.** 14. https://doi.org/10.3389/fimmu.2023.1091336
+3. Verhoeven, J., Jacobs, K.A., Rizzollo, F., Lodi, F., Hua, Y., Poźniak, J., Narayanan Srinivasan, A., Houbaert, D., Shankar, G., More, S., et al. (2023). Tumor endothelial cell autophagy is a key vascular-immune checkpoint in melanoma. **EMBO Mol. Med.** 15, e18028. https://doi.org/10.15252/emmm.202318028
+4. Dobersalske, C., Rauschenbach, L., Hua, Y., Berliner, C., Steinbach, A., Grüneboom, A., Kokkaliaris, K.D., Heiland, D.H., Berger, P., Langer, S., et al. (2024). Cranioencephalic functional lymphoid units in glioblastoma. **Nat. Med.** https://doi.org/10.1038/s41591-024-03152-x

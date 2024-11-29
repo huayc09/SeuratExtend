@@ -1,15 +1,18 @@
 ---
 title: "Utility Tools and Functions"
 author: "Yichao Hua"
-date: "2024-5-1"
-version: "SeuratExtend v1.0.0"
+date: "2024-11-28"
+version: "SeuratExtend v1.1.0"
 ---
 
 ## Table of Contents
 
-1.  [Facilitate Gene Naming Conversions](#facilitate-gene-naming-conversions)
-2.  [Compute Statistics Grouped by Clusters](#compute-statistics-grouped-by-clusters)
-3.  [Assess Proportion of Positive Cells in Clusters](#assess-proportion-of-positive-cells-in-clusters)
+1.  [Facilitate Gene Naming
+    Conversions](#facilitate-gene-naming-conversions)
+2.  [Compute Statistics Grouped by
+    Clusters](#compute-statistics-grouped-by-clusters)
+3.  [Assess Proportion of Positive Cells in
+    Clusters](#assess-proportion-of-positive-cells-in-clusters)
 4.  [Run Standard Seurat Pipeline](#run-standard-seurat-pipeline)
 
 ## Facilitate Gene Naming Conversions
@@ -28,12 +31,12 @@ addressing the frequent instability issues with `biomaRt`.
 
 ### Functions for Gene Naming Conversions
 
-The functions provided for these conversions are: 
+The functions provided for these conversions are:
 
-- `HumanToMouseGenesymbol` 
-- `MouseToHumanGenesymbol` 
-- `EnsemblToGenesymbol` 
-- `GenesymbolToEnsembl`
+-   `HumanToMouseGenesymbol`
+-   `MouseToHumanGenesymbol`
+-   `EnsemblToGenesymbol`
+-   `GenesymbolToEnsembl`
 
 These functions share a similar usage pattern, as detailed below using
 `HumanToMouseGenesymbol` as an example.
@@ -43,13 +46,11 @@ These functions share a similar usage pattern, as detailed below using
 First, let’s retrieve a few human gene symbols from a dataset as an
 example:
 
-```{r}
-library(Seurat)
-library(SeuratExtend)
+    library(Seurat)
+    library(SeuratExtend)
 
-human_genes <- VariableFeatures(pbmc)[1:6]
-print(human_genes)
-```
+    human_genes <- VariableFeatures(pbmc)[1:6]
+    print(human_genes)
 
     ## [1] "PPBP"   "LYZ"    "S100A9" "IGLL5"  "GNLY"   "FTL"
 
@@ -58,9 +59,7 @@ print(human_genes)
 By default, `HumanToMouseGenesymbol` returns a data frame showing how
 human gene symbols (HGNC) match with mouse gene symbols (MGI):
 
-```{r}
-HumanToMouseGenesymbol(human_genes)
-```
+    HumanToMouseGenesymbol(human_genes)
 
     ##          MGI.symbol HGNC.symbol
     ## 227   9530003J23Rik         LYZ
@@ -76,9 +75,7 @@ homologs, and some human genes may correspond to multiple mouse genes.
 
 If you prefer a simpler vector output without the matching details:
 
-```{r}
-HumanToMouseGenesymbol(human_genes, match = FALSE)
-```
+    HumanToMouseGenesymbol(human_genes, match = FALSE)
 
     ## [1] "9530003J23Rik" "Ftl1"          "Ftl1-ps1"      "Gm5849"        "Ppbp"
 
@@ -86,23 +83,19 @@ HumanToMouseGenesymbol(human_genes, match = FALSE)
 
 For cases where you require a one-to-one correspondence:
 
-```{r}
-HumanToMouseGenesymbol(human_genes, keep.seq = TRUE)
-```
+    HumanToMouseGenesymbol(human_genes, keep.seq = TRUE)
 
-    ##         PPBP             LYZ          S100A9           IGLL5            GNLY             FTL 
-    ##       "Ppbp" "9530003J23Rik"        "Gm5849"              NA              NA          "Ftl1"
+    ##            PPBP             LYZ          S100A9           IGLL5            GNLY             FTL 
+    ##          "Ppbp" "9530003J23Rik"        "Gm5849"              NA              NA          "Ftl1"
 
 #### Converting Gene Expression Matrices
 
 These functions can also directly convert human gene expression matrices
 to their mouse counterparts:
 
-```{r}
-# Create an example gene expression matrix
-human_matr <- GetAssayData(pbmc)[human_genes, 1:4]
-print(human_matr)
-```
+    # Create an example gene expression matrix
+    human_matr <- GetAssayData(pbmc)[human_genes, 1:4]
+    print(human_matr)
 
     ## 6 x 4 sparse Matrix of class "dgCMatrix"
     ##        CTATAAGATCGTTT-1 GTGATTCTGGTTCA-1 ACGTTGGACCGTAA-1 GGATACTGCAGCTA-1
@@ -113,10 +106,8 @@ print(human_matr)
     ## GNLY           .                5.301497         .                .       
     ## FTL            3.804611         3.441956         6.284984         3.656766
 
-```{r}
-# Convert to a mouse gene expression matrix
-HumanToMouseGenesymbol(human_matr)
-```
+    # Convert to a mouse gene expression matrix
+    HumanToMouseGenesymbol(human_matr)
 
     ## 4 x 4 sparse Matrix of class "dgCMatrix"
     ##               CTATAAGATCGTTT-1 GTGATTCTGGTTCA-1 ACGTTGGACCGTAA-1 GGATACTGCAGCTA-1
@@ -137,45 +128,33 @@ necessary.
 Here are some examples demonstrating the use of other gene naming
 conversion functions:
 
-```{r}
-# Converting mouse gene symbols to human
-mouse_genes <- c("Cd14", "Cd3d", "Cd79a")
-MouseToHumanGenesymbol(mouse_genes, match = FALSE)
-```
+    # Converting mouse gene symbols to human
+    mouse_genes <- c("Cd14", "Cd3d", "Cd79a")
+    MouseToHumanGenesymbol(mouse_genes, match = FALSE)
 
     ## [1] "CD14"  "CD3D"  "CD79A"
 
-```{r}
-# Converting human gene symbols to Ensembl IDs
-human_genes <- c("PPBP", "LYZ", "S100A9", "IGLL5", "GNLY", "FTL")
-GenesymbolToEnsembl(human_genes, spe = "human", keep.seq = TRUE)
-```
+    # Converting human gene symbols to Ensembl IDs
+    human_genes <- c("PPBP", "LYZ", "S100A9", "IGLL5", "GNLY", "FTL")
+    GenesymbolToEnsembl(human_genes, spe = "human", keep.seq = TRUE)
 
-    ##              PPBP               LYZ            S100A9             IGLL5              GNLY 
-    ## "ENSG00000163736" "ENSG00000090382" "ENSG00000163220" "ENSG00000254709" "ENSG00000115523" 
-    ##               FTL 
-    ## "ENSG00000087086"
+    ##              PPBP               LYZ            S100A9             IGLL5              GNLY               FTL 
+    ## "ENSG00000163736" "ENSG00000090382" "ENSG00000163220" "ENSG00000254709" "ENSG00000115523" "ENSG00000087086"
 
-```{r}
-# Converting mouse gene symbols to Ensembl IDs
-GenesymbolToEnsembl(mouse_genes, spe = "mouse", keep.seq = TRUE)
-```
+    # Converting mouse gene symbols to Ensembl IDs
+    GenesymbolToEnsembl(mouse_genes, spe = "mouse", keep.seq = TRUE)
 
     ##                 Cd14                 Cd3d                Cd79a 
     ## "ENSMUSG00000051439" "ENSMUSG00000032094" "ENSMUSG00000003379"
 
-```{r}
-# Converting Ensembl IDs to human gene symbols
-EnsemblToGenesymbol(c("ENSG00000163736", "ENSG00000090382"), spe = "human", keep.seq = TRUE)
-```
+    # Converting Ensembl IDs to human gene symbols
+    EnsemblToGenesymbol(c("ENSG00000163736", "ENSG00000090382"), spe = "human", keep.seq = TRUE)
 
     ## ENSG00000163736 ENSG00000090382 
     ##          "PPBP"           "LYZ"
 
-```{r}
-# Converting Ensembl IDs to mouse gene symbols
-EnsemblToGenesymbol(c("ENSMUSG00000051439", "ENSMUSG00000032094"), spe = "mouse", keep.seq = TRUE)
-```
+    # Converting Ensembl IDs to mouse gene symbols
+    EnsemblToGenesymbol(c("ENSMUSG00000051439", "ENSMUSG00000032094"), spe = "mouse", keep.seq = TRUE)
 
     ## ENSMUSG00000051439 ENSMUSG00000032094 
     ##             "Cd14"             "Cd3d"
@@ -187,17 +166,8 @@ you have the option to directly fetch results from `biomaRt` databases
 if required. This can be useful when working with less common genes or
 newer annotations not yet available in the local database:
 
-```{r}
-# Fetching Ensembl IDs for human genes directly from biomaRt
-GenesymbolToEnsembl(human_genes, spe = "human", local.mode = FALSE, keep.seq = TRUE)
-```
-
-    ## Posible mirrors: 'www', 'useast', 'asia'.
-
-    ##              PPBP               LYZ            S100A9             IGLL5              GNLY 
-    ## "ENSG00000163736" "ENSG00000090382" "ENSG00000163220" "ENSG00000254709" "ENSG00000115523" 
-    ##               FTL 
-    ## "ENSG00000087086"
+    # Fetching Ensembl IDs for human genes directly from biomaRt
+    GenesymbolToEnsembl(human_genes, spe = "human", local.mode = FALSE, keep.seq = TRUE)
 
 #### Converting UniProt IDs to Gene Symbols
 
@@ -214,17 +184,13 @@ function supports both human and mouse species, accommodating research
 that spans multiple types of biological data. Here’s how you can convert
 UniProt IDs to gene symbols for both human and mouse:
 
-```{r}
-# Converting UniProt IDs to human gene symbols
-UniprotToGenesymbol(c("Q8NF67", "Q9NPB9"), spe = "human")
-```
+    # Converting UniProt IDs to human gene symbols
+    UniprotToGenesymbol(c("Q8NF67", "Q9NPB9"), spe = "human")
 
     ## [1] "ANKRD20A12P" "ACKR4"
 
-```{r}
-# Converting UniProt IDs to mouse gene symbols
-UniprotToGenesymbol(c("Q9R1C8", "Q9QY84"), spe = "mouse")
-```
+    # Converting UniProt IDs to mouse gene symbols
+    UniprotToGenesymbol(c("Q9R1C8", "Q9QY84"), spe = "mouse")
 
     ## [1] "Htr6"   "Actl7a"
 
@@ -245,56 +211,42 @@ groups or clusters.
 Begin by selecting a subset of features, such as genes. For this
 example, let’s pick the first 20 variable features from a Seurat object:
 
-```{r}
-library(Seurat)
-library(SeuratExtend)
+    library(Seurat)
+    library(SeuratExtend)
 
-genes <- VariableFeatures(pbmc)[1:20]
-```
+    genes <- VariableFeatures(pbmc)[1:20]
 
 Using `CalcStats`, compute your desired metric, like z-scores, for each
 feature across different cell clusters:
 
-```{r}
-genes.zscore <- CalcStats(pbmc, features = genes, method = "zscore", group.by = "cluster")
-head(genes.zscore)
-```
+    genes.zscore <- CalcStats(pbmc, features = genes, method = "zscore", group.by = "cluster")
+    head(genes.zscore)
 
-    ##            B cell CD4 T Memory CD4 T Naive CD8 T cell          DC  Mono CD14 Mono FCGR3A    NK cell
-    ## PPBP   -0.3371314   -0.3304297  -0.3504324 -0.3241762 -0.35043243 -0.3026097  -0.3206744 -0.3504324
-    ## LYZ    -0.7086608   -0.5312264  -0.7989052 -0.6494664  1.25840432  1.8734207   0.6437754 -0.7119758
-    ## S100A9 -0.6585180   -0.5422840  -0.5670929 -0.5281999  0.06906373  2.3873809   0.7169325 -0.6237505
-    ## IGLL5   2.6061006   -0.2791647  -0.3973560 -0.4712923 -0.47129230 -0.4712923  -0.2258753 -0.4712923
-    ## GNLY   -0.4437914   -0.3985860  -0.4761490  0.2209286 -0.38933003 -0.2937568  -0.4197184  2.6058127
-    ##          Platelet
-    ## PPBP    2.6663186
-    ## LYZ    -0.3753658
-    ## S100A9 -0.2535318
-    ## IGLL5   0.1814646
-    ## GNLY   -0.4054095
-    ##  [ reached 'max' / getOption("max.print") -- omitted 1 rows ]
+    ##            B cell CD4 T Memory CD4 T Naive CD8 T cell          DC  Mono CD14 Mono FCGR3A    NK cell   Platelet
+    ## PPBP   -0.3371314   -0.3304297  -0.3504324 -0.3241762 -0.35043243 -0.3026097  -0.3206744 -0.3504324  2.6663186
+    ## LYZ    -0.7086608   -0.5312264  -0.7989052 -0.6494664  1.25840432  1.8734207   0.6437754 -0.7119758 -0.3753658
+    ## S100A9 -0.6585180   -0.5422840  -0.5670929 -0.5281999  0.06906373  2.3873809   0.7169325 -0.6237505 -0.2535318
+    ## IGLL5   2.6061006   -0.2791647  -0.3973560 -0.4712923 -0.47129230 -0.4712923  -0.2258753 -0.4712923  0.1814646
+    ## GNLY   -0.4437914   -0.3985860  -0.4761490  0.2209286 -0.38933003 -0.2937568  -0.4197184  2.6058127 -0.4054095
+    ## FTL    -0.4544019   -0.8814705  -0.7728842 -0.7232855  0.05204804  1.6055627   1.6557236 -0.7193185  0.2380262
 
 Display the computed statistics using a heatmap:
 
-```{r}
-Heatmap(genes.zscore, lab_fill = "zscore")
-```
+    Heatmap(genes.zscore, lab_fill = "zscore")
 
-![](Utilities_files/figure-markdown_strict/unnamed-chunk-13-1.png)
+![](Utilities_files/figure-markdown_strict/unnamed-chunk-11-1.png)
 
 Select more genes and retain the top 4 genes of each cluster, sorted by
 p-value. This can be a convenient method to display the top marker genes
 of each cluster:
 
-```{r}
-genes <- VariableFeatures(pbmc)
-genes.zscore <- CalcStats(
-  pbmc, features = genes, method = "zscore", group.by = "cluster", 
-  order = "p", n = 4)
-Heatmap(genes.zscore, lab_fill = "zscore")
-```
+    genes <- VariableFeatures(pbmc)
+    genes.zscore <- CalcStats(
+      pbmc, features = genes, method = "zscore", group.by = "cluster", 
+      order = "p", n = 4)
+    Heatmap(genes.zscore, lab_fill = "zscore")
 
-![](Utilities_files/figure-markdown_strict/unnamed-chunk-14-1.png)
+![](Utilities_files/figure-markdown_strict/unnamed-chunk-12-1.png)
 
 ### Using Matrices as Input
 
@@ -302,25 +254,19 @@ For instance, you might perform Enrichment Analysis (GSEA) using the
 Hallmark 50 geneset and obtain the AUCell matrix (rows represent
 pathways, columns represent cells):
 
-```{r}
-pbmc <- GeneSetAnalysis(pbmc, genesets = hall50$human)
-matr <- pbmc@misc$AUCell$genesets
-```
+    pbmc <- GeneSetAnalysis(pbmc, genesets = hall50$human)
+    matr <- pbmc@misc$AUCell$genesets
 
 Using the matrix, compute the z-scores for the genesets across various
 cell clusters:
 
-```{r}
-gsea.zscore <- CalcStats(matr, f = pbmc$cluster, method = "zscore")
-```
+    gsea.zscore <- CalcStats(matr, f = pbmc$cluster, method = "zscore")
 
 Present the z-scores using a heatmap:
 
-```{r}
-Heatmap(gsea.zscore, lab_fill = "zscore")
-```
+    Heatmap(gsea.zscore, lab_fill = "zscore")
 
-![](Utilities_files/figure-markdown_strict/unnamed-chunk-17-1.png)
+![](Utilities_files/figure-markdown_strict/unnamed-chunk-15-1.png)
 
 ## Assess Proportion of Positive Cells in Clusters
 
@@ -336,28 +282,20 @@ datasets.
 To calculate the proportion of positive cells for the top 5 variable
 features in a Seurat object:
 
-```{r}
-library(SeuratExtend)
+    library(SeuratExtend)
 
-genes <- VariableFeatures(pbmc)[1:5]
+    genes <- VariableFeatures(pbmc)[1:5]
 
-# Default usage
-proportions <- feature_percent(pbmc, feature = genes)
-print(proportions)
-```
+    # Default usage
+    proportions <- feature_percent(pbmc, feature = genes)
+    print(proportions)
 
-    ##            B cell CD4 T Memory CD4 T Naive CD8 T cell        DC  Mono CD14 Mono FCGR3A    NK cell
-    ## PPBP   0.01492537   0.02247191  0.00000000 0.02173913 0.0000000 0.05050505  0.03333333 0.00000000
-    ## LYZ    0.43283582   0.61797753  0.37931034 0.50000000 0.9333333 1.00000000  1.00000000 0.45833333
-    ## S100A9 0.05970149   0.16853933  0.12931034 0.17391304 0.4666667 1.00000000  0.86666667 0.08333333
-    ## IGLL5  0.20895522   0.02247191  0.00862069 0.00000000 0.0000000 0.00000000  0.03333333 0.00000000
-    ## GNLY   0.05970149   0.08988764  0.02586207 0.32608696 0.1333333 0.15151515  0.10000000 0.95833333
-    ##          Platelet
-    ## PPBP   1.00000000
-    ## LYZ    0.50000000
-    ## S100A9 0.28571429
-    ## IGLL5  0.07142857
-    ## GNLY   0.07142857
+    ##            B cell CD4 T Memory CD4 T Naive CD8 T cell        DC  Mono CD14 Mono FCGR3A    NK cell   Platelet
+    ## PPBP   0.01492537   0.02247191  0.00000000 0.02173913 0.0000000 0.05050505  0.03333333 0.00000000 1.00000000
+    ## LYZ    0.43283582   0.61797753  0.37931034 0.50000000 0.9333333 1.00000000  1.00000000 0.45833333 0.50000000
+    ## S100A9 0.05970149   0.16853933  0.12931034 0.17391304 0.4666667 1.00000000  0.86666667 0.08333333 0.28571429
+    ## IGLL5  0.20895522   0.02247191  0.00862069 0.00000000 0.0000000 0.00000000  0.03333333 0.00000000 0.07142857
+    ## GNLY   0.05970149   0.08988764  0.02586207 0.32608696 0.1333333 0.15151515  0.10000000 0.95833333 0.07142857
 
 This will return a matrix where rows are features and columns are
 clusters, showing the proportion of cells in each cluster where the
@@ -368,32 +306,22 @@ feature’s expression is above the default threshold (0).
 To count a cell as positive only if its expression is above a value of
 2:
 
-```{r}
-proportions_above_2 <- feature_percent(pbmc, feature = genes, above = 2)
-print(proportions_above_2)
-```
+    proportions_above_2 <- feature_percent(pbmc, feature = genes, above = 2)
+    print(proportions_above_2)
 
-    ##            B cell CD4 T Memory CD4 T Naive CD8 T cell        DC  Mono CD14 Mono FCGR3A   NK cell
-    ## PPBP   0.00000000   0.00000000  0.00000000 0.02173913 0.0000000 0.02020202   0.0000000 0.0000000
-    ## LYZ    0.20895522   0.23595506  0.14655172 0.15217391 0.8666667 1.00000000   0.9000000 0.1250000
-    ## S100A9 0.00000000   0.01123596  0.03448276 0.02173913 0.2666667 1.00000000   0.6333333 0.0000000
-    ## IGLL5  0.08955224   0.00000000  0.00000000 0.00000000 0.0000000 0.00000000   0.0000000 0.0000000
-    ## GNLY   0.00000000   0.00000000  0.00862069 0.23913043 0.0000000 0.07070707   0.0000000 0.9583333
-    ##          Platelet
-    ## PPBP   1.00000000
-    ## LYZ    0.42857143
-    ## S100A9 0.14285714
-    ## IGLL5  0.00000000
-    ## GNLY   0.07142857
+    ##            B cell CD4 T Memory CD4 T Naive CD8 T cell        DC  Mono CD14 Mono FCGR3A   NK cell   Platelet
+    ## PPBP   0.00000000   0.00000000  0.00000000 0.02173913 0.0000000 0.02020202   0.0000000 0.0000000 1.00000000
+    ## LYZ    0.20895522   0.23595506  0.14655172 0.15217391 0.8666667 1.00000000   0.9000000 0.1250000 0.42857143
+    ## S100A9 0.00000000   0.01123596  0.03448276 0.02173913 0.2666667 1.00000000   0.6333333 0.0000000 0.14285714
+    ## IGLL5  0.08955224   0.00000000  0.00000000 0.00000000 0.0000000 0.00000000   0.0000000 0.0000000 0.00000000
+    ## GNLY   0.00000000   0.00000000  0.00862069 0.23913043 0.0000000 0.07070707   0.0000000 0.9583333 0.07142857
 
 ### Targeting Specific Clusters
 
 To calculate proportions for only a subset of clusters:
 
-```{r}
-proportions_subset <- feature_percent(pbmc, feature = genes, ident = c("B cell", "CD8 T cell"))
-print(proportions_subset)
-```
+    proportions_subset <- feature_percent(pbmc, feature = genes, ident = c("B cell", "CD8 T cell"))
+    print(proportions_subset)
 
     ##            B cell CD8 T cell
     ## PPBP   0.01492537 0.02173913
@@ -407,10 +335,8 @@ print(proportions_subset)
 If you wish to group cells by a different variable other than the
 default cluster identities:
 
-```{r}
-proportions_by_ident <- feature_percent(pbmc, feature = genes, group.by = "orig.ident")
-print(proportions_by_ident)
-```
+    proportions_by_ident <- feature_percent(pbmc, feature = genes, group.by = "orig.ident")
+    print(proportions_by_ident)
 
     ##           sample1    sample2
     ## PPBP   0.03571429 0.05421687
@@ -424,23 +350,21 @@ print(proportions_by_ident)
 To also check the proportion of expressed cells in total across selected
 clusters:
 
-```{r}
-proportions_total <- feature_percent(pbmc, feature = genes, total = TRUE)
-print(proportions_total)
-```
+    proportions_total <- feature_percent(pbmc, feature = genes, total = TRUE)
+    print(proportions_total)
 
-    ##            B cell CD4 T Memory CD4 T Naive CD8 T cell        DC  Mono CD14 Mono FCGR3A    NK cell
-    ## PPBP   0.01492537   0.02247191  0.00000000 0.02173913 0.0000000 0.05050505  0.03333333 0.00000000
-    ## LYZ    0.43283582   0.61797753  0.37931034 0.50000000 0.9333333 1.00000000  1.00000000 0.45833333
-    ## S100A9 0.05970149   0.16853933  0.12931034 0.17391304 0.4666667 1.00000000  0.86666667 0.08333333
-    ## IGLL5  0.20895522   0.02247191  0.00862069 0.00000000 0.0000000 0.00000000  0.03333333 0.00000000
-    ## GNLY   0.05970149   0.08988764  0.02586207 0.32608696 0.1333333 0.15151515  0.10000000 0.95833333
-    ##          Platelet total
-    ## PPBP   1.00000000 0.048
-    ## LYZ    0.50000000 0.624
-    ## S100A9 0.28571429 0.360
-    ## IGLL5  0.07142857 0.038
-    ## GNLY   0.07142857 0.148
+    ##            B cell CD4 T Memory CD4 T Naive CD8 T cell        DC  Mono CD14 Mono FCGR3A    NK cell   Platelet
+    ## PPBP   0.01492537   0.02247191  0.00000000 0.02173913 0.0000000 0.05050505  0.03333333 0.00000000 1.00000000
+    ## LYZ    0.43283582   0.61797753  0.37931034 0.50000000 0.9333333 1.00000000  1.00000000 0.45833333 0.50000000
+    ## S100A9 0.05970149   0.16853933  0.12931034 0.17391304 0.4666667 1.00000000  0.86666667 0.08333333 0.28571429
+    ## IGLL5  0.20895522   0.02247191  0.00862069 0.00000000 0.0000000 0.00000000  0.03333333 0.00000000 0.07142857
+    ## GNLY   0.05970149   0.08988764  0.02586207 0.32608696 0.1333333 0.15151515  0.10000000 0.95833333 0.07142857
+    ##        total
+    ## PPBP   0.048
+    ## LYZ    0.624
+    ## S100A9 0.360
+    ## IGLL5  0.038
+    ## GNLY   0.148
 
 ### Logical Output for Expression
 
@@ -448,10 +372,8 @@ For scenarios where you need a logical output indicating whether a
 significant proportion of cells are expressing the feature above a
 certain level (e.g., 20%):
 
-```{r}
-expressed_logical <- feature_percent(pbmc, feature = genes, if.expressed = TRUE, min.pct = 0.2)
-print(expressed_logical)
-```
+    expressed_logical <- feature_percent(pbmc, feature = genes, if.expressed = TRUE, min.pct = 0.2)
+    print(expressed_logical)
 
     ##        B cell CD4 T Memory CD4 T Naive CD8 T cell    DC Mono CD14 Mono FCGR3A NK cell Platelet
     ## PPBP    FALSE        FALSE       FALSE      FALSE FALSE     FALSE       FALSE   FALSE     TRUE
@@ -498,12 +420,10 @@ tutorial](https://satijalab.org/seurat/articles/pbmc3k_tutorial).
 Below are examples demonstrating how to use the `RunBasicSeurat`
 function to process scRNA-seq data:
 
-```{r}
-library(SeuratExtend)
+    library(SeuratExtend)
 
-# Run the full pipeline with forced normalization and default parameters
-pbmc <- RunBasicSeurat(pbmc, force.Normalize = TRUE)
-```
+    # Run the full pipeline with forced normalization and default parameters
+    pbmc <- RunBasicSeurat(pbmc, force.Normalize = TRUE)
 
     ## Centering and scaling data matrix
 
@@ -559,31 +479,35 @@ pbmc <- RunBasicSeurat(pbmc, force.Normalize = TRUE)
     ## Number of communities: 5
     ## Elapsed time: 0 seconds
 
-    ## 21:00:53 UMAP embedding parameters a = 0.9922 b = 1.112
+    ## Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+    ## To use Python UMAP via reticulate, set umap.method to 'umap-learn' and metric to 'correlation'
+    ## This message will be shown once per session
 
-    ## 21:00:53 Read 452 rows and found 10 numeric columns
+    ## 11:11:19 UMAP embedding parameters a = 0.9922 b = 1.112
 
-    ## 21:00:53 Using Annoy for neighbor search, n_neighbors = 30
+    ## 11:11:19 Read 452 rows and found 10 numeric columns
 
-    ## 21:00:53 Building Annoy index with metric = cosine, n_trees = 50
+    ## 11:11:19 Using Annoy for neighbor search, n_neighbors = 30
+
+    ## 11:11:19 Building Annoy index with metric = cosine, n_trees = 50
 
     ## 0%   10   20   30   40   50   60   70   80   90   100%
 
     ## [----|----|----|----|----|----|----|----|----|----|
 
     ## **************************************************|
-    ## 21:00:53 Writing NN index file to temp file /tmp/RtmpoZCA7B/file3100dd5f21e7e4
-    ## 21:00:53 Searching Annoy index using 1 thread, search_k = 3000
-    ## 21:00:53 Annoy recall = 100%
-    ## 21:00:53 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
-    ## 21:00:55 Initializing from normalized Laplacian + noise (using irlba)
-    ## 21:00:55 Commencing optimization for 500 epochs, with 16790 positive edges
-    ## 21:00:56 Optimization finished
+    ## 11:11:19 Writing NN index file to temp file /tmp/RtmpX5iCCU/file8e29b5c7f28a0
+    ## 11:11:19 Searching Annoy index using 1 thread, search_k = 3000
+    ## 11:11:19 Annoy recall = 100%
+    ## 11:11:20 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+    ## 11:11:21 Initializing from normalized Laplacian + noise (using RSpectra)
+    ## 11:11:21 Commencing optimization for 500 epochs, with 16790 positive edges
+    ## 11:11:22 Optimization finished
 
     # Visualize the clusters using DimPlot
     DimPlot2(pbmc, group.by = "cluster")
 
-![](Utilities_files/figure-markdown_strict/unnamed-chunk-24-1.png)
+![](Utilities_files/figure-markdown_strict/unnamed-chunk-22-1.png)
 
 #### Parameters and Customization
 
@@ -624,3 +548,79 @@ features such as conditional execution and batch effect integration.
 This function ensures that users can efficiently process their data
 while maintaining flexibility to adapt the analysis to specific
 requirements.
+
+    sessionInfo()
+
+    ## R version 4.4.0 (2024-04-24)
+    ## Platform: x86_64-pc-linux-gnu
+    ## Running under: Ubuntu 20.04.6 LTS
+    ## 
+    ## Matrix products: default
+    ## BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0 
+    ## LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
+    ## 
+    ## locale:
+    ##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=de_BE.UTF-8        LC_COLLATE=en_US.UTF-8    
+    ##  [5] LC_MONETARY=de_BE.UTF-8    LC_MESSAGES=en_US.UTF-8    LC_PAPER=de_BE.UTF-8       LC_NAME=C                 
+    ##  [9] LC_ADDRESS=C               LC_TELEPHONE=C             LC_MEASUREMENT=de_BE.UTF-8 LC_IDENTIFICATION=C       
+    ## 
+    ## time zone: Europe/Brussels
+    ## tzcode source: system (glibc)
+    ## 
+    ## attached base packages:
+    ##  [1] grid      tools     stats4    stats     graphics  grDevices utils     datasets  methods   base     
+    ## 
+    ## other attached packages:
+    ##  [1] loomR_0.2.0                 itertools_0.1-3             iterators_1.0.14           
+    ##  [4] R6_2.5.1                    hyc_0.1.5                   ggbeeswarm_0.7.2           
+    ##  [7] ggtext_0.1.2                magrittr_2.0.3              slingshot_2.12.0           
+    ## [10] TrajectoryUtils_1.12.0      SingleCellExperiment_1.26.0 SummarizedExperiment_1.34.0
+    ## [13] Biobase_2.64.0              GenomicRanges_1.56.1        GenomeInfoDb_1.40.1        
+    ## [16] princurve_2.1.6             mgcv_1.9-1                  nlme_3.1-165               
+    ## [19] glue_1.7.0                  hdf5r_1.3.11                reticulate_1.38.0          
+    ## [22] rlang_1.1.4                 cowplot_1.1.3               sinew_0.4.0                
+    ## [25] roxygen2_7.3.2              ggrepel_0.9.5               tidyr_1.3.1                
+    ## [28] DelayedMatrixStats_1.26.0   DelayedArray_0.30.1         SparseArray_1.4.8          
+    ## [31] S4Arrays_1.4.1              abind_1.4-5                 IRanges_2.38.1             
+    ## [34] S4Vectors_0.42.1            MatrixGenerics_1.16.0       matrixStats_1.3.0          
+    ## [37] BiocGenerics_0.50.0         ggpubr_0.6.0                RColorBrewer_1.1-3         
+    ## [40] viridis_0.6.5               viridisLite_0.4.2           mosaic_1.9.1               
+    ## [43] mosaicData_0.20.4           ggformula_0.12.0            ggridges_0.5.6             
+    ## [46] scales_1.3.0                Matrix_1.7-0                lattice_0.22-6             
+    ## [49] rlist_0.4.6.2               Seurat_5.1.0                dplyr_1.1.4                
+    ## [52] reshape2_1.4.4              ggplot2_3.5.1               SeuratExtend_1.0.9         
+    ## [55] SeuratObject_5.0.2          sp_2.1-4                    SeuratExtendData_0.2.1     
+    ## 
+    ## loaded via a namespace (and not attached):
+    ##   [1] RcppAnnoy_0.0.22         splines_4.4.0            later_1.3.2              tibble_3.2.1            
+    ##   [5] polyclip_1.10-6          fastDummies_1.7.3        lifecycle_1.0.4          rstatix_0.7.2           
+    ##   [9] globals_0.16.3           MASS_7.3-61              backports_1.5.0          plotly_4.10.4           
+    ##  [13] rmarkdown_2.27           yaml_2.3.9               httpuv_1.6.15            sctransform_0.4.1       
+    ##  [17] spam_2.10-0              spatstat.sparse_3.1-0    pbapply_1.7-2            pkgload_1.4.0           
+    ##  [21] zlibbioc_1.50.0          Rtsne_0.17               purrr_1.0.2              rappdirs_0.3.3          
+    ##  [25] GenomeInfoDbData_1.2.12  labelled_2.13.0          irlba_2.3.5.1            listenv_0.9.1           
+    ##  [29] spatstat.utils_3.0-5     goftest_1.2-3            RSpectra_0.16-1          spatstat.random_3.2-3   
+    ##  [33] brew_1.0-10              fitdistrplus_1.2-1       parallelly_1.37.1        commonmark_1.9.1        
+    ##  [37] pkgdown_2.1.0            leiden_0.4.3.1           codetools_0.2-20         xml2_1.3.6              
+    ##  [41] tidyselect_1.2.1         UCSC.utils_1.0.0         farver_2.1.2             spatstat.explore_3.2-7  
+    ##  [45] jsonlite_1.8.8           progressr_0.14.0         survival_3.7-0           ica_1.0-3               
+    ##  [49] Rcpp_1.0.13              gridExtra_2.3            xfun_0.45                usethis_2.2.3           
+    ##  [53] withr_2.5.0              fastmap_1.2.0            fansi_1.0.6              digest_0.6.36           
+    ##  [57] mime_0.12                colorspace_2.1-0         scattermore_1.2          tensor_1.5              
+    ##  [61] markdown_1.13            spatstat.data_3.1-2      utf8_1.2.4               generics_0.1.3          
+    ##  [65] data.table_1.15.4        httr_1.4.7               htmlwidgets_1.6.4        uwot_0.2.2              
+    ##  [69] pkgconfig_2.0.3          gtable_0.3.5             rsconnect_1.3.1          lmtest_0.9-40           
+    ##  [73] XVector_0.44.0           sos_2.1-8                htmltools_0.5.8.1        carData_3.0-5           
+    ##  [77] dotCall64_1.1-1          png_0.1-8                knitr_1.48               rstudioapi_0.16.0       
+    ##  [81] zoo_1.8-12               stringr_1.5.1            KernSmooth_2.23-24       vipor_0.4.7             
+    ##  [85] parallel_4.4.0           miniUI_0.1.1.1           pillar_1.9.0             vctrs_0.6.5             
+    ##  [89] RANN_2.6.1               promises_1.3.0           car_3.1-2                xtable_1.8-4            
+    ##  [93] cluster_2.1.6            beeswarm_0.4.0           evaluate_0.24.0          cli_3.6.3               
+    ##  [97] compiler_4.4.0           crayon_1.5.3             future.apply_1.11.2      ggsignif_0.6.4          
+    ## [101] labeling_0.4.3           rematch2_2.1.2           fs_1.6.4                 plyr_1.8.9              
+    ## [105] forcats_1.0.0            stringi_1.8.4            deldir_2.0-4             munsell_0.5.1           
+    ## [109] lazyeval_0.2.2           spatstat.geom_3.2-9      mosaicCore_0.9.4.0       RcppHNSW_0.6.0          
+    ## [113] hms_1.1.3                patchwork_1.2.0          bit64_4.0.5              sparseMatrixStats_1.16.0
+    ## [117] future_1.33.2            shiny_1.8.1.1            highr_0.11               haven_2.5.4             
+    ## [121] ROCR_1.0-11              gridtext_0.1.5           igraph_2.0.3             broom_1.0.6             
+    ## [125] bit_4.0.5

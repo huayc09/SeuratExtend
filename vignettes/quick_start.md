@@ -10,33 +10,33 @@ demonstrate various functionalities of the `SeuratExtend` package.
 
 ### Visualizing Clusters
 
-```{r}
+``` r
 library(Seurat)
 library(SeuratExtend)
 
 # Visualizing cell clusters using DimPlot2
-DimPlot2(pbmc)
+DimPlot2(pbmc, theme = theme_umap_arrows())
 ```
 
-![](quick_start_files/figure-markdown_strict/unnamed-chunk-6-1.png)
+![](quick_start_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
 
 ### Analyzing Cluster Distribution
 
 To check the percentage of each cluster within different samples:
 
-```{r}
+``` r
 # Cluster distribution bar plot
 ClusterDistrBar(pbmc$orig.ident, pbmc$cluster)
 ```
 
-![](quick_start_files/figure-markdown_strict/unnamed-chunk-7-1.png)
+![](quick_start_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
 
 ### Marker Gene Analysis with Heatmap
 
 To examine the marker genes of each cluster and visualize them using a
 heatmap:
 
-```{r}
+``` r
 # Calculating z-scores for variable features
 genes.zscore <- CalcStats(
   pbmc,
@@ -49,14 +49,29 @@ genes.zscore <- CalcStats(
 Heatmap(genes.zscore, lab_fill = "zscore")
 ```
 
-![](quick_start_files/figure-markdown_strict/unnamed-chunk-8-1.png)
+![](quick_start_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+### Enhanced Dot Plots (New in v1.1.0)
+
+``` r
+# Create grouped features
+grouped_features <- list(
+  "B_cell_markers" = c("MS4A1", "CD79A"),
+  "T_cell_markers" = c("CD3D", "CD8A", "IL7R"),
+  "Myeloid_markers" = c("CD14", "FCGR3A", "S100A8")
+)
+
+DotPlot2(pbmc, features = grouped_features)
+```
+
+![](quick_start_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
 ### Enhanced Visualization of Marker Genes
 
 For visualizing specific markers via a violin plot that incorporates box
 plots, median lines, and performs statistical testing:
 
-```{r}
+``` r
 # Specifying genes and cells of interest
 genes <- c("CD3D", "CD14", "CD79A")
 cells <- WhichCells(pbmc, idents = c("B cell", "CD8 T cell", "Mono CD14"))
@@ -70,18 +85,30 @@ VlnPlot2(
   stat.method = "wilcox.test")
 ```
 
-![](quick_start_files/figure-markdown_strict/unnamed-chunk-9-1.png)
+![](quick_start_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
 
 ### Visualizing Multiple Markers on UMAP
 
 Displaying three markers on a single UMAP, using RYB coloring for each
 marker:
 
-```{r}
-FeaturePlot3(pbmc, feature.1 = "CD3D", feature.2 = "CD14", feature.3 = "CD79A")
+``` r
+FeaturePlot3(pbmc, feature.1 = "CD3D", feature.2 = "CD14", feature.3 = "CD79A", pt.size = 1)
 ```
 
-![](quick_start_files/figure-markdown_strict/unnamed-chunk-10-1.png)
+![](quick_start_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+### Create Volcano Plots (New in v1.1.0)
+
+Create a basic volcano plot comparing two cell types:
+
+``` r
+VolcanoPlot(pbmc, 
+            ident.1 = "B cell",
+            ident.2 = "CD8 T cell")
+```
+
+![](quick_start_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ### Conducting Geneset Enrichment Analysis (GSEA)
 
@@ -89,7 +116,7 @@ Examining all the pathways of the immune process in the Gene Ontology
 (GO) database, and visualizing by a heatmap that displays the top
 pathways of each cluster across multiple cell types:
 
-```{r}
+``` r
 options(spe = "human")
 pbmc <- GeneSetAnalysisGO(pbmc, parent = "immune_system_process", n.min = 5)
 matr <- RenameGO(pbmc@misc$AUCell$GO$immune_system_process)
@@ -101,14 +128,14 @@ go_zscore <- CalcStats(
 Heatmap(go_zscore, lab_fill = "zscore")
 ```
 
-![](quick_start_files/figure-markdown_strict/unnamed-chunk-11-1.png)
+![](quick_start_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ### Detailed Comparison of Two Cell Types
 
 Using a GSEA plot to focus on a specific pathway for deeper comparative
 analysis:
 
-```{r}
+``` r
 GSEAplot(
   pbmc,
   ident.1 = "B cell",
@@ -117,17 +144,17 @@ GSEAplot(
   geneset = GO_Data$human$GO2Gene[["GO:0042113"]])
 ```
 
-![](quick_start_files/figure-markdown_strict/unnamed-chunk-12-1.png)
+![](quick_start_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ### Importing and Visualizing SCENIC Analysis
 
 After conducting Gene Regulatory Networks Analysis using pySCENIC,
 import the output and visualize various aspects within Seurat:
 
-```{r}
+``` r
 # Downloading a pre-computed SCENIC loom file
 scenic_loom_path <- file.path(tempdir(), "pyscenic_integrated-output.loom")
-download.file("https://zenodo.org/records/10944066/files/pbmc3k_small_pyscenic_integrated-output.loom", scenic_loom_path)
+download.file("https://zenodo.org/records/10944066/files/pbmc3k_small_pyscenic_integrated-output.loom", scenic_loom_path, mode = "wb")
 
 # Importing SCENIC Loom Files into Seurat
 pbmc <- ImportPyscenicLoom(scenic_loom_path, seu = pbmc)
@@ -138,12 +165,12 @@ DimPlot2(
   features = c("cluster", "orig.ident", "CEBPA", "tf_CEBPA"),
   cols = list("tf_CEBPA" = "D"),
   theme = NoAxes()
-)
+) + theme_umap_arrows()
 ```
 
-![](quick_start_files/figure-markdown_strict/unnamed-chunk-13-1.png)
+![](quick_start_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
-```{r}
+``` r
 # Creating a waterfall plot to compare regulon activity between cell types
 DefaultAssay(pbmc) <- "TF"
 WaterfallPlot(
@@ -155,7 +182,7 @@ WaterfallPlot(
   top.n = 20)
 ```
 
-![](quick_start_files/figure-markdown_strict/unnamed-chunk-14-1.png)
+![](quick_start_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ### Trajectory Analysis with Palantir in R
 
@@ -170,7 +197,7 @@ the R environment.
 First, we download a small subset of myeloid cells to illustrate the
 analysis:
 
-```{r}
+``` r
 # Download the example Seurat Object with myeloid cells
 mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds", "rb"))
 ```
@@ -180,7 +207,7 @@ mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_
 Palantir uses diffusion maps for dimensionality reduction to infer
 trajectories. Here’s how to compute and visualize them:
 
-```{r}
+``` r
 # Compute diffusion map
 mye_small <- Palantir.RunDM(mye_small)
 
@@ -188,14 +215,14 @@ mye_small <- Palantir.RunDM(mye_small)
 DimPlot2(mye_small, reduction = "ms")
 ```
 
-![](quick_start_files/figure-markdown_strict/unnamed-chunk-16-1.png)
+![](quick_start_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 #### Pseudotime Calculation
 
 Pseudotime ordering assigns each cell a time point in a trajectory,
 indicating its progression along a developmental path:
 
-```{r}
+``` r
 # Calculate pseudotime with a specified start cell
 mye_small <- Palantir.Pseudotime(mye_small, start_cell = "sample1_GAGAGGTAGCAGTACG-1")
 
@@ -209,17 +236,18 @@ DimPlot2(
   mye_small,
   features = colnames(ps),
   reduction = "ms",
-  cols = list(Entropy = "D"))
+  cols = list(Entropy = "D"),
+  theme = NoAxes())
 ```
 
-![](quick_start_files/figure-markdown_strict/unnamed-chunk-17-1.png)
+![](quick_start_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 #### Visualization Along Trajectories
 
 Visualizing gene expression or regulon activity along calculated
 trajectories can provide insights into dynamic changes:
 
-```{r}
+``` r
 # Create smoothed gene expression curves along trajectory
 GeneTrendCurve.Palantir(
   mye_small,
@@ -228,9 +256,9 @@ GeneTrendCurve.Palantir(
 )
 ```
 
-![](quick_start_files/figure-markdown_strict/unnamed-chunk-18-1.png)
+![](quick_start_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
-```{r}
+``` r
 # Create a gene trend heatmap for different fates
 GeneTrendHeatmap.Palantir(
   mye_small,
@@ -240,7 +268,7 @@ GeneTrendHeatmap.Palantir(
 )
 ```
 
-![](quick_start_files/figure-markdown_strict/unnamed-chunk-19-1.png)
+![](quick_start_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 ### scVelo Analysis
 
@@ -252,13 +280,19 @@ workflow using scVelo.
 
 First, download the pre-calculated velocyto loom file:
 
-```{r}
+``` r
 # Download velocyto loom file
 loom_path <- file.path(tempdir(), "pbmc10k_mye_small.loom")
-download.file("https://zenodo.org/records/10944066/files/pbmc10k_mye_small.loom", loom_path)
+download.file("https://zenodo.org/records/10944066/files/pbmc10k_mye_small.loom", 
+              loom_path,
+              mode = "wb")  # Use binary mode for Windows compatibility
 
-# Path for saving the integrated AnnData object
-adata_path <- file.path(tempdir(), "mye_small.h5ad")
+# Set up the path for saving the AnnData object in the HDF5 (h5ad) format
+if (.Platform$OS.type == "windows") {
+    adata_path <- normalizePath(file.path(tempdir(), "mye_small.h5ad"), winslash = "/")
+} else {
+    adata_path <- file.path(tempdir(), "mye_small.h5ad")
+}
 
 # Integrate Seurat Object and velocyto loom into an AnnData object
 scVelo.SeuratToAnndata(
@@ -274,9 +308,10 @@ scVelo.SeuratToAnndata(
 
 Once the data is processed, visualize the RNA velocity:
 
-```{r}
+``` r
 # Plot RNA velocity
-scVelo.Plot(color = "cluster", basis = "ms_cell_embeddings", figsize = c(5,4))
+scVelo.Plot(color = "cluster", basis = "ms_cell_embeddings", 
+            save = "quick_start_scvelo.png", figsize = c(5,4))
 ```
 
-![](quick_start_files/figure-markdown_strict/unnamed-chunk-21-1.png)
+<img src="figures/scvelo_quick_start_scvelo.png" width="700" />

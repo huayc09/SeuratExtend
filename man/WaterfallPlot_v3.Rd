@@ -9,6 +9,7 @@ WaterfallPlot_v3(
   features,
   group.by = NULL,
   cell = NULL,
+  cells = NULL,
   slot = "data",
   assay = NULL,
   priority = c("expr", "none"),

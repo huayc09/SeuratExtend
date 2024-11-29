@@ -13,6 +13,7 @@ VolcanoPlot(object, ...)
   features = rownames(seu),
   group.by = NULL,
   cell = NULL,
+  cells = NULL,
   slot = "data",
   assay = NULL,
   priority = c("expr", "none"),
@@ -55,6 +56,8 @@ VolcanoPlot(object, ...)
 \item{group.by}{A variable from `meta.data` for grouping, or a character vector of the same length as the number of cells. Only applicable for the Seurat method.}
 
 \item{cell}{Cell identifiers to be used in the plot. Defaults to all cells. Only applicable for the Seurat method.}
+
+\item{cells}{Alternative parameter name for cell identifiers. Same functionality as 'cell'. Defaults to all cells.}
 
 \item{slot}{Slot from which to retrieve feature data. Only applicable for the Seurat method.}
 

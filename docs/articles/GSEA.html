@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Geneset Enrichment Analysis (GSEA) • SeuratExtend</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SeuratExtend</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
       </span>
     </div>
 
@@ -50,6 +50,11 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/News.html">What's New in v1.1.0</a>
+    </li>
+    <li class="divider">
+    </li>
+<li>
       <a href="../articles/Visualization.html">Enhanced Visualization</a>
     </li>
     <li>
@@ -63,6 +68,36 @@
     </li>
     <li>
       <a href="../articles/Utilities.html">Utility Tools and Functions</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    scRNA-seq Course
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="../articles/single-cell-course/1.basic-R.html">1. Introduction to R</a>
+    </li>
+    <li>
+      <a href="../articles/single-cell-course/2.Seurat.html">2. Basic Single-Cell Analysis Workflow</a>
+    </li>
+    <li>
+      <a href="../articles/single-cell-course/3.Visualization.html">3. Advanced Visualization Techniques</a>
+    </li>
+    <li>
+      <a href="../articles/single-cell-course/4.GSEA.html">4. Gene Set Enrichment Analysis</a>
+    </li>
+    <li>
+      <a href="../articles/single-cell-course/5.Core-Enhancement.html">5. Core scRNA-seq Workflow Enhancements</a>
+    </li>
+    <li>
+      <a href="../articles/single-cell-course/6.Advanced.html">6. Advanced Methods (Part 1)</a>
+    </li>
+    <li>
+      <a href="../articles/single-cell-course/6.Advanced-2.html">7. Advanced Methods (Part 2)</a>
     </li>
   </ul>
 </li>
@@ -86,7 +121,7 @@
       <h1 data-toc-skip>Geneset Enrichment Analysis (GSEA)</h1>
                         <h4 data-toc-skip class="author">Yichao Hua</h4>
             
-            <h4 data-toc-skip class="date">2024-07-11</h4>
+            <h4 data-toc-skip class="date">2024-11-28</h4>
       
       
       <div class="hidden name"><code>GSEA.Rmd</code></div>
@@ -142,12 +177,12 @@ location: <code>seu@misc$AUCell$GO[[title]]</code>.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">matr</span>, <span class="fl">2</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                                           cells</span></span>
 <span><span class="co">## gene sets                                  CTATAAGATCGTTT-1 GTGATTCTGGTTCA-1</span></span>
-<span><span class="co">##   GO:0002376 immune system process (3213g)       0.25078236       0.29242312</span></span>
-<span><span class="co">##   GO:0001776 leukocyte homeostasis (84g)         0.05491224       0.05165926</span></span>
+<span><span class="co">##   GO:0002376 immune system process (3213g)       0.25540633       0.29013621</span></span>
+<span><span class="co">##   GO:0001776 leukocyte homeostasis (84g)         0.06705023       0.05466948</span></span>
 <span><span class="co">##                                           cells</span></span>
 <span><span class="co">## gene sets                                  ACGTTGGACCGTAA-1</span></span>
-<span><span class="co">##   GO:0002376 immune system process (3213g)       0.30178639</span></span>
-<span><span class="co">##   GO:0001776 leukocyte homeostasis (84g)         0.05097954</span></span></code></pre>
+<span><span class="co">##   GO:0002376 immune system process (3213g)       0.30090373</span></span>
+<span><span class="co">##   GO:0001776 leukocyte homeostasis (84g)         0.05634452</span></span></code></pre>
 <p>For the “parent” argument, you can input any term from the GO
 database, be it a GO ID or a pathway name. To get a glimpse of commonly
 used GO categories, you can run <code><a href="../reference/GeneSetAnalysis.html">GeneSetAnalysisGO()</a></code> without
@@ -623,16 +658,16 @@ population of the <code>pbmc</code> dataset:</p>
 <span><span class="co">## [8] methods   base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">##  [1] ggpubr_0.6.0      tidyr_1.3.1       rlist_0.4.6.2     mosaic_1.9.1     </span></span>
-<span><span class="co">##  [5] mosaicData_0.20.4 ggformula_0.12.0  lattice_0.22-6    rlang_1.1.4      </span></span>
-<span><span class="co">##  [9] scales_1.3.0      reshape2_1.4.4    ggplot2_3.5.1     doMC_1.3.8       </span></span>
-<span><span class="co">##  [ reached getOption("max.print") -- omitted 18 entries ]</span></span>
+<span><span class="co">##  [1] ggpubr_0.6.0       tidyr_1.3.1        rlist_0.4.6.2      RColorBrewer_1.1-3</span></span>
+<span><span class="co">##  [5] viridis_0.6.5      viridisLite_0.4.2  mosaic_1.9.1       mosaicData_0.20.4 </span></span>
+<span><span class="co">##  [9] ggformula_0.12.0   lattice_0.22-6     rlang_1.1.4        scales_1.3.0      </span></span>
+<span><span class="co">##  [ reached getOption("max.print") -- omitted 21 entries ]</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
 <span><span class="co">##  [1] RcppAnnoy_0.0.22  splines_4.4.0     later_1.3.2       tibble_3.2.1     </span></span>
 <span><span class="co">##  [5] polyclip_1.10-6   fastDummies_1.7.3 lifecycle_1.0.4   rstatix_0.7.2    </span></span>
-<span><span class="co">##  [9] globals_0.16.3    MASS_7.3-60.2     backports_1.5.0   magrittr_2.0.3   </span></span>
-<span><span class="co">##  [ reached getOption("max.print") -- omitted 117 entries ]</span></span></code></pre>
+<span><span class="co">##  [9] globals_0.16.3    MASS_7.3-61       backports_1.5.0   magrittr_2.0.3   </span></span>
+<span><span class="co">##  [ reached getOption("max.print") -- omitted 115 entries ]</span></span></code></pre>
 </div>
   </div>
 
@@ -653,7 +688,7 @@ population of the <code>pbmc</code> dataset:</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

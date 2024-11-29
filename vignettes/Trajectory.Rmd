@@ -34,22 +34,33 @@ library(SeuratExtend)
 # Download the example Seurat Object
 mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds", "rb"))
 
-# Download the example velocyto loom file to tmp folder
+# Download the example velocyto loom file
 loom_path <- file.path(tempdir(), "pbmc10k_mye_small.loom")
-download.file("https://zenodo.org/records/10944066/files/pbmc10k_mye_small.loom", loom_path)
+download.file("https://zenodo.org/records/10944066/files/pbmc10k_mye_small.loom", 
+              loom_path,
+              mode = "wb")  # Use binary mode for Windows compatibility
 
 ```
 
-**Note:** To save disk space, the data downloaded for this tutorial is stored in the temporary folder and will be automatically deleted after the R session is closed. If you wish to permanently retain the tutorial files, please manually change the storage location to your working directory.
+**Note:** 
+
+1. When downloading loom files (which are HDF5-based binary files) on Windows, it's essential to use `mode = "wb"` in the download.file() function. This prevents Windows from modifying line endings in the binary file, which would corrupt the HDF5 format. Mac and Linux users don't require this parameter, but including it is harmless. 
+2. To save disk space, the data downloaded for this tutorial is stored in the temporary folder and will be automatically deleted after the R session is closed. If you wish to permanently retain the tutorial files, please manually change the storage location to your working directory.
 
 ### Preparing Data for scVelo
 
 `scVelo` requires an `AnnData` object from Python's `Scanpy` library for its analyses. `SeuratExtend` makes this process seamless by integrating a Seurat object and a velocyto loom file into a new `AnnData` object, serving as a bridge between R and Python.
 
+**Note**: If this is your first time running Python-related functions (`scVelo`, `Palantir`, etc.) in `SeuratExtend`, it will prompt you to install a conda environment named "seuratextend". This environment automatically installs all required Python packages. It is currently supported and tested on Windows, Intel-based macOS (not Apple Silicon/M1/M2), and Linux (Ubuntu 20.04) systems. Users with Apple Silicon devices who are interested in contributing to the development of M1/M2 support are welcome to reach out via GitHub Issues. More details on managing the `Anndata` object and Python dependencies are provided here: [Integration of Seurat with Python Tools](#integration-of-seurat-with-python-tools).
+
 ```{r, message=FALSE, warning=FALSE}
 
 # Set up the path for saving the AnnData object in the HDF5 (h5ad) format
-adata_path <- file.path(tempdir(), "mye_small.h5ad")
+if (.Platform$OS.type == "windows") {
+    adata_path <- normalizePath(file.path(tempdir(), "mye_small.h5ad"), winslash = "/")
+} else {
+    adata_path <- file.path(tempdir(), "mye_small.h5ad")
+}
 
 # Integrate Seurat Object and velocyto loom information into one AnnData object.
 # This object will be stored at the specified path.
@@ -62,8 +73,6 @@ scVelo.SeuratToAnndata(
 )
 ```
 
-**Note**: If this is your first time running Python-related functions (`scVelo`, `Palantir`, etc.) in `SeuratExtend`, it will prompt you to install a conda environment named "seuratextend". This environment automatically installs all required Python packages, supporting Windows, Mac, or Linux platforms. More details on managing the `Anndata` object and Python dependencies are provided here: [Integration of Seurat with Python Tools](#python).
-
 ### Generating scVelo Plots
 
 Now, you're ready to generate scVelo plots. The default dimension reduction method is typically UMAP, colored by cluster.
@@ -71,7 +80,8 @@ Now, you're ready to generate scVelo plots. The default dimension reduction meth
 ```{r, message=FALSE, warning=FALSE, eval=FALSE}
 scVelo.Plot(color = "cluster", save = "umap1.png", figsize = c(5,4))
 ```
-![](figures/scvelo_umap1.png)
+![](figures/scvelo_umap1.png){width=700px}
+
 `SeuratExtend` supports most commonly used parameters for scVelo plots. You can customize the plot style, dimensionality reduction method, color palette, displayed clusters, and more. For more detailed information on customization and advanced features, refer to the function documentation or the [official scVelo documentation](https://scvelo.readthedocs.io/en/stable/scvelo.pl.velocity_embedding_stream.html?highlight=stream).
 
 ```{r, message=FALSE, warning=FALSE, eval=FALSE}
@@ -85,7 +95,8 @@ scVelo.Plot(
   figsize = c(5,4)
 )
 ```
-![](figures/scvelo_umap2_specified_area.png)
+
+![](figures/scvelo_umap2_specified_area.png){width=700px}
 
 ## Palantir Tutorial for Trajectory and Pseudotime Analysis {#palantir-tutorial-for-trajectory-and-pseudotime-analysis}
 
@@ -142,7 +153,7 @@ adata.AddDR(mye_small, dr = "ms", scv.graph = TRUE)
 # Generate a plot using the newly added 'ms' dimension reduction
 scVelo.Plot(basis = "ms", color = "cluster", save = "umap3_ms.png", figsize = c(5,4))
 ```
-![](figures/scvelo_umap3_ms.png)
+![](figures/scvelo_umap3_ms.png){width=700px}
 
 ### Determining Cell Fates and Calculating Pseudotime
 
@@ -164,7 +175,7 @@ head(ps)
 colnames(ps)[3:4] <- c("fate1", "fate2")
 mye_small@meta.data[,colnames(ps)] <- ps
 DimPlot2(mye_small, features = colnames(ps), reduction = "ms", 
-         cols = list(Entropy = "D"))
+         cols = list(Entropy = "D"), theme = NoAxes())
 ```
 
 ## MAGIC for Denoising and Smoothing Gene Expression {#magic-for-denoising-and-smoothing-gene-expression}
@@ -176,7 +187,8 @@ mye_small <- Palantir.Magic(mye_small)
 
 # Creates a new assay "magic" in the Seurat object
 mye_small <- NormalizeData(mye_small)
-DimPlot2(mye_small, features = c("CD14", "magic_CD14", "FLT3", "magic_FLT3"))
+DimPlot2(mye_small, features = c("CD14", "magic_CD14", "FLT3", "magic_FLT3"), 
+         cols = "A", theme = NoAxes())
 ```
 
 ## CellRank Tutorial for Trajectory Analysis {#cellrank-tutorial-for-trajectory-analysis}
@@ -211,7 +223,8 @@ The process for generating plots with CellRank is similar to that used with `scV
 # Generate a plot using the 'ms' dimension reduction
 Cellrank.Plot(color = "cluster", basis = "ms", save = "umap3_ms_cellrank.png")
 ```
-![](figures/scvelo_umap3_ms_cellrank.png)
+
+![](figures/scvelo_umap3_ms_cellrank.png){width=700px}
 
 ## Gene Expression Dynamics Along Differentiation Trajectories] {#gene-expression-dynamics-along-differentiation-trajectories}
 
@@ -221,7 +234,7 @@ Visualizing smoothed gene expression along a trajectory offers insightful perspe
 
 Assuming you have already executed `Palantir.Pseudotime` as shown in a previous tutorial, you can create gene trend curves as follows:
 
-```{r gene-trend-curve-initial, message=FALSE, warning=FALSE}
+```{r gene-trend-curve-initial, message=FALSE, warning=FALSE, fig.width=7, fig.height=3}
 library(SeuratExtend)
 
 # Basic gene trend curve visualization
@@ -232,7 +245,7 @@ GeneTrendCurve.Palantir(mye_small, features = c("CD14", "FCGR3A"))
 
 You can customize the plots, for instance, by adding points, removing confidence intervals, and renaming cell fates:
 
-```{r gene-trend-curve-custom}
+```{r gene-trend-curve-custom, fig.width=5.5, fig.height=3}
 # Accessing pseudotime and adjusting fate names
 ps <- mye_small@misc$Palantir$Pseudotime
 head(ps)
@@ -252,7 +265,7 @@ GeneTrendCurve.Palantir(
 
 Another powerful method for visualizing gene expression dynamics is through heatmaps, which can illustrate how gene expression changes across pseudotime and for specific lineages:
 
-```{r gene-trend-heatmap, message=FALSE, warning=FALSE}
+```{r gene-trend-heatmap, message=FALSE, warning=FALSE, fig.width=6, fig.height=3}
 # Creating a gene trend heatmap
 GeneTrendHeatmap.Palantir(
   mye_small, 
@@ -281,19 +294,19 @@ mye_small <- RunSlingshot(mye_small, group.by = "cluster", start.clus = "Mono CD
 
 The Slingshot output is stored within the Seurat object. Let's extract the pseudotime values and visualize them on the UMAP:
 
-```{r access-slingshot-output}
+```{r access-slingshot-output, fig.width=7, fig.height=3}
 sling <- mye_small@misc$slingshot$PCA$SlingPseudotime
 head(sling)
 mye_small@meta.data[,colnames(sling)] <- as.data.frame(sling)
 
-DimPlot2(mye_small, features = colnames(sling), cols = "C")
+DimPlot2(mye_small, features = colnames(sling), cols = "C", theme = NoAxes())
 ```
 
 ### Gene Trend Curves for Slingshot Pseudotime
 
 Similar to Palantir, Slingshot pseudotime allows for the creation of gene trend curves, illustrating the dynamics of gene expression along the computed trajectories:
 
-```{r gene-trend-curve-slingshot}
+```{r gene-trend-curve-slingshot, fig.width=6.5, fig.height=3}
 GeneTrendCurve.Slingshot(mye_small, features = c("CD14", "FCGR3A"))
 ```
 
@@ -301,7 +314,7 @@ GeneTrendCurve.Slingshot(mye_small, features = c("CD14", "FCGR3A"))
 
 Additionally, Slingshot pseudotime can be used to generate heatmaps, showcasing the progression of gene expression across different lineages:
 
-```{r gene-trend-heatmap-slingshot}
+```{r gene-trend-heatmap-slingshot, fig.width=6, fig.height=3}
 GeneTrendHeatmap.Slingshot(
   mye_small, 
   features = c("CD14", VariableFeatures(mye_small)[1:10]), 
@@ -321,13 +334,24 @@ In `SeuratExtend`, the conversion from a `Seurat` object to an `AnnData` object 
 
 ### Creating a Conda Environment with All Required Python Packages
 
-If it is your first time running functions related to `scVelo`, `Palantir`, or `CellRank`, you will be automatically prompted to install a Conda environment named "seuratextend". This environment includes all the Python packages required by `SeuratExtend` and is managed through `reticulate`. If you prefer to initiate this installation step manually, you can easily do so by running:
+If it is your first time running functions related to `scVelo`, `Palantir`, or `CellRank`, you will be automatically prompted to install a Conda environment named "seuratextend". This environment includes all the Python packages required by `SeuratExtend` and is managed through `reticulate`.
+
+**Note:** Before creating the conda environment, ensure that Git is installed on your system, as it's required for installing certain Python packages:
+
+- **Windows**: Download and install from [Git for Windows](https://gitforwindows.org/)
+- **Mac**: Install via Homebrew (`brew install git`) or Xcode Command Line Tools (`xcode-select --install`)
+- **Linux**: Install using your package manager:
+  * Ubuntu/Debian: `sudo apt-get install git`
+  * Fedora: `sudo dnf install git`
+  * CentOS/RHEL: `sudo yum install git`
+
+If you prefer to initiate the conda environment installation step manually, you can easily do so by running:
 
 ```{r create-conda-env, eval=FALSE}
 create_condaenv_seuratextend()
 ```
 
-This function automatically detects your operating system and sets up the environment accordingly. It is currently supported and tested on Windows, macOS, and Linux (Ubuntu 20.04) systems.
+This function automatically detects your operating system and sets up the environment accordingly. It is currently supported and tested on Windows, Intel-based macOS (not Apple Silicon/M1/M2), and Linux (Ubuntu 20.04) systems. Users with Apple Silicon devices who are interested in contributing to the development of M1/M2 support are welcome to reach out via GitHub Issues.
 
 ### Integrating Seurat with AnnData
 
@@ -417,7 +441,8 @@ If you have completed the scVelo tutorial and saved the results, you can load th
 adata.Load(adata_path)
 scVelo.Plot(color = "cluster", figsize = c(5,4), save = "umap4_load_adata.png")
 ```
-![](figures/scvelo_umap4_load_adata.png)
+![](figures/scvelo_umap4_load_adata.png){width=700px}
+
 ```{r}
 sessionInfo()
 ```

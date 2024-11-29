@@ -1,0 +1,194 @@
+---
+title: "What's New in v1.1.0"
+author: "Yichao Hua"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{What's New in v1.1.0}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+## New Features and Enhancements in v1.1.0
+
+### New Visualization Functions
+
+#### Enhanced Dot Plots with `DotPlot2`
+
+A new function `DotPlot2` has been introduced, combining dot size (percent of expressing cells) with color intensity (average expression) for more informative visualizations:
+
+```{r, message=FALSE, warning=FALSE, fig.width=6, fig.height=4.5}
+library(Seurat)
+library(SeuratExtend)
+
+# With grouped features
+grouped_features <- list(
+  "B_cell_markers" = c("MS4A1", "CD79A"),
+  "T_cell_markers" = c("CD3D", "CD8A", "IL7R"),
+  "Myeloid_markers" = c("CD14", "FCGR3A", "S100A8")
+)
+DotPlot2(pbmc, features = grouped_features)
+```
+
+#### New Volcano Plots
+
+The new `VolcanoPlot` function provides statistical visualization of differential expression:
+
+```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=5}
+VolcanoPlot(pbmc, 
+            ident.1 = "B cell",
+            ident.2 = "CD8 T cell")
+```
+
+#### UMAP Arrow Annotations
+
+Added `theme_umap_arrows` for simplified axis indicators on dimension reduction plots:
+
+```{r, message=FALSE, warning=FALSE, fig.width=6, fig.height=5}
+DimPlot2(pbmc, theme = NoAxes()) + theme_umap_arrows()
+```
+
+### Enhanced Existing Functions
+
+#### VlnPlot2 Enhancements
+
+Added support for mean and median lines in violin plots:
+
+```{r, message=FALSE, warning=FALSE, fig.width=6, fig.height=6.5}
+VlnPlot2(pbmc, 
+         features = c("CCR7", "IL7R", "TCF7"),
+         cols = "light",
+         show.mean = TRUE,      # Show mean and median lines
+         mean_colors = c("red", "blue"),  # Colors for mean and median
+         ncol = 1)
+```
+
+### New WaterfallPlot Style: "segment"
+
+Added a new visualization style "segment" to WaterfallPlot, providing an alternative way to display differences between conditions:
+
+```{r, message=FALSE, warning=FALSE, fig.width=7, fig.height=7.2}
+# Prepare data
+pbmc <- GeneSetAnalysis(pbmc, genesets = hall50$human)
+matr <- pbmc@misc$AUCell$genesets
+
+# Create a plot using the new segment style
+WaterfallPlot(
+  matr,
+  f = pbmc$cluster,
+  ident.1 = "Mono CD14",
+  ident.2 = "CD8 T cell",
+  style = "segment",
+  color_theme = "D"
+)
+```
+
+### Color Scheme Updates
+
+#### New Default Color Schemes
+
+Two major color scheme changes have been implemented in v1.1.0:
+
+1. For continuous variables: Changed from viridis "A" to RColorBrewer "Blues"
+2. For heatmaps: Updated from `c(low = muted("blue"), mid = "white", high = muted("red"))` to "BuRd"
+
+Here are visual comparisons of the old and new defaults:
+
+##### Continuous Variable Color Scheme
+
+```{r, message=FALSE, warning=FALSE, fig.width=8, fig.height=3.5}
+# Create a side-by-side comparison for continuous variables
+library(cowplot)
+library(ggpubr)
+
+# Old default (viridis "A")
+p1 <- DimPlot2(pbmc, 
+               features = "CD3D", 
+               cols = "A",  # Old default
+               theme = theme_umap_arrows()) 
+
+# New default (Blues)
+p2 <- DimPlot2(pbmc, 
+               features = "CD3D", 
+               theme = theme_umap_arrows()) 
+
+plot_grid(
+  annotate_figure(p1, top = text_grob("Old Default (viridis 'A')", size = 14)), 
+  annotate_figure(p2, top = text_grob("New Default ('Blues')", size = 14)),
+  ncol = 2)
+```
+
+##### Heatmap Color Scheme
+
+```{r, message=FALSE, warning=FALSE, fig.width=10, fig.height=6}
+# Calculate data for heatmap
+genes <- VariableFeatures(pbmc)
+toplot <- CalcStats(pbmc, features = genes, method = "zscore", order = "p", n = 4)
+
+# Create side-by-side heatmap comparison
+p1 <- Heatmap(toplot, 
+              color_scheme = c(low = scales::muted("blue"), 
+                             mid = "white", 
+                             high = scales::muted("red")), # Old default
+              lab_fill = "zscore") +
+      ggtitle("Old Default (blue-white-red)")
+
+p2 <- Heatmap(toplot, 
+              lab_fill = "zscore") +  # New default (BuRd) is automatically applied
+      ggtitle("New Default ('BuRd')")
+
+plot_grid(p1, p2, ncol = 2)
+```
+
+To revert to previous color schemes:
+- For continuous variables: Use `cols = "A"` 
+- For heatmaps: Use `color_scheme = c(low = scales::muted("blue"), mid = "white", high = scales::muted("red"))`
+
+#### New RColorBrewer Integration
+
+Added support for RColorBrewer sequential and diverging palettes:
+
+- Sequential: "Blues", "BuGn", "BuPu", "GnBu", etc.
+- Diverging: "BrBG", "PiYG", "PRGn", "PuOr", etc.
+- Custom diverging: "GnYlRd", "BuYlRd", "GyRd", "BuRd", "PuOr"
+
+### Feature Enhancements
+
+- **VlnPlot2**: Now supports both `stats.method` and `stat.method` as parameter inputs ([#10](https://github.com/huayc09/SeuratExtend/issues/10))
+- **ClusterDistrBar**: Added `reverse_order` parameter to adjust the stacking order ([#11](https://github.com/huayc09/SeuratExtend/issues/11))
+- **WaterfallPlot**: Set upper limit for -log10(p) values to avoid NA issues ([#14](https://github.com/huayc09/SeuratExtend/issues/14))
+- **DimPlot2**: Improved automatic point size adjustment and fixed point display issues in raster mode ([#17](https://github.com/huayc09/SeuratExtend/issues/17))
+- **show_col2**: Function is now exported, allowing users to knit Visualization.Rmd without issues ([#8](https://github.com/huayc09/SeuratExtend/issues/8))
+
+### Bug Fixes
+
+- **VlnPlot2**: Now explicitly uses `dplyr::select` internally to avoid conflicts with other packages' select functions ([#5](https://github.com/huayc09/SeuratExtend/issues/5), [#10](https://github.com/huayc09/SeuratExtend/issues/10))
+- **ClusterDistrBar**: Fixed display issues when factor levels are numeric (e.g., seurat_clusters)
+
+### Documentation Updates
+
+#### Conda Environment Setup
+
+The `create_condaenv_seuratextend()` function documentation has been updated with important compatibility information:
+
+- Currently supported and tested on:
+  * Windows
+  * Intel-based macOS (not Apple Silicon/M1/M2)
+  * Linux (Ubuntu 20.04)
+
+**Note for Apple Silicon Users**: The function is not currently compatible with Apple Silicon/M1/M2 devices ([#7](https://github.com/huayc09/SeuratExtend/issues/7)). Users with Apple Silicon devices who are interested in contributing to the development of M1/M2 support are welcome to reach out via GitHub Issues.
+
+#### Windows-Specific File Download
+
+When downloading loom files (which are HDF5-based binary files) on Windows, it's essential to use `mode = "wb"` in the download.file() function:
+
+```{r eval=FALSE}
+# Example for Windows users
+download.file("https://example.com/file.loom", "file.loom", mode = "wb")
+```
+
+This prevents Windows from modifying line endings in the binary file, which would corrupt the HDF5 format. Mac and Linux users don't require this parameter, but including it is harmless.
+
+```{r}
+sessionInfo()
+```

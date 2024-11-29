@@ -72,5 +72,108 @@ feature_percent <- function(
   return(m2)
 }
 
+#' Display Multiple Color Palettes in a Grid Layout
+#'
+#' @description
+#' Creates a grid visualization of multiple color palettes using ggplot2. Each palette is displayed
+#' as a row of colored tiles with white borders, making it easy to compare different color schemes
+#' or visualize multiple variations of a palette.
+#'
+#' @param palette_list A named list of color palettes. Each element should be a character vector
+#'        of colors (hex codes or color names).
+#' @param ncol Integer specifying the number of columns in the grid. Determines how many colors
+#'        are displayed per row before wrapping.
+#'
+#' @return A ggplot object displaying the color palettes in a grid format.
+#'
+#' @details
+#' The function is particularly useful for visualizing:
+#' - Different variations of color_pro() outputs
+#' - Multiple color schemes side by side
+#' - Comparisons between different palette generation methods
+#' Each row is labeled with the name from the input list, and colors are displayed
+#' as tiles with white borders for clear separation.
+#'
+#' @examples
+#' \dontrun{
+#' library(SeuratExtend)
+#'
+#' # Example 1: Compare different numbers of colors
+#' palette_list <- list(
+#'   "n=2" = color_pro(2),
+#'   "n=5" = color_pro(5),
+#'   "n=10" = color_pro(10),
+#'   "n=20" = color_pro(20)
+#' )
+#' show_col2(palette_list, ncol = 20)
+#'
+#' # Example 2: Compare different color schemes
+#' palette_list <- list(
+#'   "default" = color_pro(10, 1),
+#'   "light" = color_pro(10, 2),
+#'   "red" = color_pro(10, 3),
+#'   "yellow" = color_pro(10, 4),
+#'   "green" = color_pro(10, 5),
+#'   "blue" = color_pro(10, 6),
+#'   "purple" = color_pro(10, 7)
+#' )
+#' show_col2(palette_list, ncol = 10)
+#'
+#' # Example 3: Compare different sorting methods
+#' palette_list <- list(
+#'   "sort_hue" = color_pro(10, 1, sort = "hue"),
+#'   "sort_diff" = color_pro(10, 1, sort = "diff")
+#' )
+#' show_col2(palette_list, ncol = 10)
+#'
+#' # Example 4: Compare different random sets
+#' palette_list <- list(
+#'   "Set1" = color_pro(10, 1, 1, 1),
+#'   "Set2" = color_pro(10, 1, 1, 2),
+#'   "Set3" = color_pro(10, 1, 1, 3),
+#'   "Set4" = color_pro(10, 1, 1, 4),
+#'   "Set5" = color_pro(10, 1, 1, 5)
+#' )
+#' show_col2(palette_list, ncol = 10)
+#'
+#' # Example 5: Compare color_iwh styles
+#' palette_list <- list(
+#'   "default" = color_iwh(10, 1),
+#'   "intense" = color_iwh(10, 2),
+#'   "pastel" = color_iwh(10, 3),
+#'   "all" = color_iwh(10, 4),
+#'   "all_hard" = color_iwh(30, 5)
+#' )
+#' show_col2(palette_list, ncol = 10)
+#' }
+#'
+#' @import ggplot2
+#' @importFrom reshape2 melt
+#' @export
+
+show_col2 <- function(palette_list, ncol) {
+  library(ggplot2)
+  pal_mtx_list <- lapply(palette_list, function(x) {
+    if (length(x) < ncol) x <- x[1:ncol]
+    return(matrix(x, ncol = ncol))
+  })
+  facet_row <-
+    lapply(names(pal_mtx_list), function(x) {
+      rep(x, nrow(pal_mtx_list[[x]]))
+    }) %>% unlist
+  pal_mtx <- list.rbind(pal_mtx_list)
+  ToPlot <- melt(pal_mtx)
+  ToPlot$facet_row <- factor(rep(facet_row, times = ncol), levels = unique(facet_row))
+  p <-
+    ggplot(ToPlot, aes(Var2, Var1)) +
+    geom_tile(aes(fill = value), colour = "white", linewidth = 1) +
+    theme_classic()+
+    scale_fill_identity() + NoAxes() +
+    scale_y_reverse() +
+    theme(strip.background = element_blank(),
+          strip.text.y.left = element_text(angle = 0, size = 12)) +
+    facet_grid(rows = vars(facet_row), scales = "free", space = "free", switch = "y")
+  return(p)
+}
 
 

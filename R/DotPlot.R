@@ -125,12 +125,23 @@ DotPlot2 <- function(
     feature_groups <- NULL
   }
 
-  group_levels <- levels(factor(seu@meta.data[[group.by]]))
+  if (is.null(group.by)) {
+    groups <- Idents(seu)
+    group_levels <- levels(groups)
+  } else {
+    group_levels <- levels(factor(seu@meta.data[[group.by]]))
+  }
 
   # Create combined group if split.by is provided
   if (!is.null(split.by)) {
     split_levels <- levels(factor(seu@meta.data[[split.by]]))
-    combined_group <- paste(seu@meta.data[[group.by]], seu@meta.data[[split.by]], sep = "___")
+    # Handle NULL group.by by using current Idents for combined group
+    if (is.null(group.by)) {
+      group_values <- as.character(Idents(seu))
+    } else {
+      group_values <- seu@meta.data[[group.by]]
+    }
+    combined_group <- paste(group_values, seu@meta.data[[split.by]], sep = "___")
     seu[["__internal_combined_group__"]] <- combined_group
     calc_group.by <- "__internal_combined_group__"
   } else {
@@ -161,6 +172,7 @@ DotPlot2 <- function(
 
   if (!is.null(feature_groups)) {
     ToPlot$FeatureGroup <- rep(feature_groups, times = ncol(pct))
+    ToPlot$FeatureGroup <- factor(ToPlot$FeatureGroup, levels = unique(ToPlot$FeatureGroup))
   }
 
   if (flip) {

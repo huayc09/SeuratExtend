@@ -1,18 +1,24 @@
 ---
 title: "Geneset Enrichment Analysis (GSEA)"
 author: "Yichao Hua"
-date: "2024-5-1"
-version: "SeuratExtend v1.0.0"
+date: "2024-11-28"
+version: "SeuratExtend v1.1.0"
 ---
 
 ## Table of Contents
 
-1.  [Conduct GSEA using the GO or Reactome database](#conduct-gsea-using-the-go-or-reactome-database)
-2.  [Perform GSEA using customized genesets](#perform-gsea-using-customized-genesets)
-3.  [Find pathways in the GO/Reactome database or customized genesets](#find-pathways-in-the-goreactome-database-or-customized-genesets)
-4.  [Convert GO/Reactome pathway IDs to pathway names](#convert-goreactome-pathway-ids-to-pathway-names)
-5.  [Filter the GO/Reactome pathway list based on certain criteria](#filter-the-goreactome-pathway-list-based-on-certain-criteria)
-6.  [Create a GSEA plot emulating the Broad Institute analysis](#create-a-gsea-plot-emulating-the-broad-institute-analysis)
+1.  [Conduct GSEA using the GO or Reactome
+    database](#conduct-gsea-using-the-go-or-reactome-database)
+2.  [Perform GSEA using customized
+    genesets](#perform-gsea-using-customized-genesets)
+3.  [Find pathways in the GO/Reactome database or customized
+    genesets](#find-pathways-in-the-goreactome-database-or-customized-genesets)
+4.  [Convert GO/Reactome pathway IDs to pathway
+    names](#convert-goreactome-pathway-ids-to-pathway-names)
+5.  [Filter the GO/Reactome pathway list based on certain
+    criteria](#filter-the-goreactome-pathway-list-based-on-certain-criteria)
+6.  [Create a GSEA plot emulating the Broad Institute
+    analysis](#create-a-gsea-plot-emulating-the-broad-institute-analysis)
 
 ## Conduct GSEA using the GO or Reactome database
 
@@ -32,36 +38,30 @@ the example below, only the pathways under the “immune\_system\_process”
 category are evaluated. The results from this analysis are saved in the
 location: `seu@misc$AUCell$GO[[title]]`.
 
-```{r}
-library(SeuratExtend)
-library(dplyr)
-options(max.print = 12, spe = "human")
+    library(SeuratExtend)
+    library(dplyr)
+    options(max.print = 12, spe = "human")
 
-pbmc <- GeneSetAnalysisGO(pbmc, parent = "immune_system_process", nCores = 4) # calculating with 4 cores
-matr <- pbmc@misc$AUCell$GO$immune_system_process
-matr <- RenameGO(matr)
-head(matr, 2:3)
-```
+    pbmc <- GeneSetAnalysisGO(pbmc, parent = "immune_system_process", nCores = 4) # calculating with 4 cores
+    matr <- pbmc@misc$AUCell$GO$immune_system_process
+    matr <- RenameGO(matr)
+    head(matr, 2:3)
 
     ##                                           cells
     ## gene sets                                  CTATAAGATCGTTT-1 GTGATTCTGGTTCA-1 ACGTTGGACCGTAA-1
-    ##   GO:0002376 immune system process (3213g)       0.25536621       0.28481013       0.29963991
-    ##   GO:0001776 leukocyte homeostasis (84g)         0.06513243       0.05933047       0.06178234
+    ##   GO:0002376 immune system process (3213g)       0.25327991       0.28138980       0.29885253
+    ##   GO:0001776 leukocyte homeostasis (84g)         0.05413541       0.05073678       0.05503362
 
 For the “parent” argument, you can input any term from the GO database,
 be it a GO ID or a pathway name. To get a glimpse of commonly used GO
 categories, you can run `GeneSetAnalysisGO()` without any arguments:
 
-```{r}
-GeneSetAnalysisGO()
-```
+    GeneSetAnalysisGO()
 
-    ##                 immune_system_process                  response_to_stimulus 
-    ##                          "GO:0002376"                          "GO:0050896" 
-    ##                             signaling                     metabolic_process 
-    ##                          "GO:0023052"                          "GO:0008152" 
-    ## regulation_of_vasculature_development                   signal_transduction 
-    ##                          "GO:1901342"                          "GO:0007165"
+    ##                 immune_system_process                  response_to_stimulus                             signaling 
+    ##                          "GO:0002376"                          "GO:0050896"                          "GO:0023052" 
+    ##                     metabolic_process regulation_of_vasculature_development                   signal_transduction 
+    ##                          "GO:0008152"                          "GO:1901342"                          "GO:0007165"
 
 Here are some suggested visualization methods:
 
@@ -70,9 +70,7 @@ Here are some suggested visualization methods:
 
 <!-- -->
 
-```{r}
-Heatmap(CalcStats(matr, f = pbmc$cluster, order = "p", n = 4), lab_fill = "zscore")
-```
+    Heatmap(CalcStats(matr, f = pbmc$cluster, order = "p", n = 4), lab_fill = "zscore")
 
 ![](GSEA_files/figure-markdown_strict/unnamed-chunk-3-1.png)
 
@@ -82,9 +80,7 @@ Heatmap(CalcStats(matr, f = pbmc$cluster, order = "p", n = 4), lab_fill = "zscor
 
 <!-- -->
 
-```{r}
-VlnPlot2(matr[1:3,], f = pbmc$cluster, ncol = 1)
-```
+    VlnPlot2(matr[1:3,], f = pbmc$cluster, ncol = 1)
 
 ![](GSEA_files/figure-markdown_strict/unnamed-chunk-4-1.png)
 
@@ -92,9 +88,7 @@ VlnPlot2(matr[1:3,], f = pbmc$cluster, ncol = 1)
 
 <!-- -->
 
-```{r}
-WaterfallPlot(matr, f = pbmc$cluster, ident.1 = "B cell", ident.2 = "CD8 T cell", top.n = 20)
-```
+    WaterfallPlot(matr, f = pbmc$cluster, ident.1 = "B cell", ident.2 = "CD8 T cell", top.n = 20)
 
 ![](GSEA_files/figure-markdown_strict/unnamed-chunk-5-1.png)
 
@@ -105,12 +99,10 @@ certain categories to make the process more manageable. The example
 below evaluates pathways under the “Immune System” category. Results
 from this analysis are saved under: `seu@misc$AUCell$Reactome[[title]]`.
 
-```{r}
-pbmc <- GeneSetAnalysisReactome(pbmc, parent = "Immune System")
-matr <- pbmc@misc$AUCell$Reactome$`Immune System`
-matr <- RenameReactome(matr)
-Heatmap(CalcStats(matr, f = pbmc$cluster, order = "p", n = 4), lab_fill = "zscore")
-```
+    pbmc <- GeneSetAnalysisReactome(pbmc, parent = "Immune System")
+    matr <- pbmc@misc$AUCell$Reactome$`Immune System`
+    matr <- RenameReactome(matr)
+    Heatmap(CalcStats(matr, f = pbmc$cluster, order = "p", n = 4), lab_fill = "zscore")
 
 ![](GSEA_files/figure-markdown_strict/unnamed-chunk-6-1.png)
 
@@ -118,9 +110,7 @@ Similar to the GO database, running `GeneSetAnalysisReactome()` without
 any arguments lets you view commonly used categories in the Reactome
 database:
 
-```{r}
-GeneSetAnalysisReactome()
-```
+    GeneSetAnalysisReactome()
 
     ##                           R-HSA-109582                           R-HSA-112316 
     ##                           "Hemostasis"                      "Neuronal System" 
@@ -146,11 +136,9 @@ gene set, commonly employed for general screening. This set can be
 accessed via the `hall50` object. Upon execution, the resulting AUCell
 matrix will be stored under the path: `seu@misc$AUCell[[title]]`.
 
-```{r}
-pbmc <- GeneSetAnalysis(pbmc, genesets = hall50$human)
-matr <- pbmc@misc$AUCell$genesets
-Heatmap(CalcStats(matr, f = pbmc$cluster), lab_fill = "zscore")
-```
+    pbmc <- GeneSetAnalysis(pbmc, genesets = hall50$human)
+    matr <- pbmc@misc$AUCell$genesets
+    Heatmap(CalcStats(matr, f = pbmc$cluster), lab_fill = "zscore")
 
 ![](GSEA_files/figure-markdown_strict/unnamed-chunk-8-1.png)
 
@@ -160,9 +148,7 @@ from the [GSEA MSigDB
 website](https://www.gsea-msigdb.org/gsea/msigdb/human/collections.jsp).
 Here’s how you can view the available collections:
 
-```{r}
-names(SeuratExtendData::Genesets_data$human$GSEA)
-```
+    names(SeuratExtendData::Genesets_data$human$GSEA)
 
     ##  [1] "positional gene sets"                 "all curated gene sets"               
     ##  [3] "chemical and genetic perturbations"   "BioCarta gene sets"                  
@@ -176,9 +162,7 @@ contains a valuable resource: marker lists for 178 distinct cell types,
 curated from [PanglaoDB](https://panglaodb.se/markers.html). To explore
 these marker lists:
 
-```{r}
-names(SeuratExtend::PanglaoDB_data$marker_list_human)
-```
+    names(SeuratExtend::PanglaoDB_data$marker_list_human)
 
     ##  [1] "Acinar cells"                   "Adipocyte progenitor cells"     "Adipocytes"                    
     ##  [4] "Adrenergic neurons"             "Airway epithelial cells"        "Airway goblet cells"           
@@ -199,10 +183,8 @@ name, pathway ID, or even keywords within pathway names. The following
 example demonstrates how to find pathways containing the gene “CD3D” or
 pathways with names including “metabolic.”
 
-```{r}
-result <- SearchDatabase(c("CD3D", "metabolic"))
-names(result)
-```
+    result <- SearchDatabase(c("CD3D", "metabolic"))
+    names(result)
 
     ##  [1] "GO:0000023 maltose metabolic process (3g)"                                  
     ##  [2] "GO:0000038 very long-chain fatty acid metabolic process (31g)"              
@@ -218,9 +200,7 @@ names(result)
     ## [12] "GO:0001573 ganglioside metabolic process (21g)"                             
     ##  [ reached getOption("max.print") -- omitted 1029 entries ]
 
-```{r}
-glimpse(head(result, 3))
-```
+    glimpse(head(result, 3))
 
     ## List of 3
     ##  $ GO:0000023 maltose metabolic process (3g)                    :List of 3
@@ -241,10 +221,8 @@ glimpse(head(result, 3))
 If you wish to limit your search to specific types of items such as gene
 names, you can utilize the ‘type’ parameter as shown below.
 
-```{r}
-result <- SearchDatabase("CD3D", type = "gene")
-names(result)
-```
+    result <- SearchDatabase("CD3D", type = "gene")
+    names(result)
 
     ##  [1] "GO:0001775 cell activation (1458g)"                                                  
     ##  [2] "GO:0002250 adaptive immune response (719g)"                                          
@@ -265,10 +243,8 @@ names(result)
 To focus your search within a particular database, specify the database
 name using the ‘database’ parameter.
 
-```{r}
-result <- SearchDatabase("CD3D", database = "Reactome")
-names(result)
-```
+    result <- SearchDatabase("CD3D", database = "Reactome")
+    names(result)
 
     ##  [1] "R-HSA-1280218 Adaptive Immune System (817g)"                                                 
     ##  [2] "R-HSA-168256 Immune System (2190g)"                                                          
@@ -288,10 +264,8 @@ names(result)
 
 You can specify either ‘human’ or ‘mouse’ using the ‘spe’ parameter.
 
-```{r}
-result <- SearchDatabase("Cd3d", spe = "mouse")
-glimpse(head(result, 3))
-```
+    result <- SearchDatabase("Cd3d", spe = "mouse")
+    glimpse(head(result, 3))
 
     ## List of 3
     ##  $ GO:0001775 cell activation (1169g)        :List of 3
@@ -313,22 +287,18 @@ The function also offers flexibility in output types. For example, if
 you require a list of pathway IDs for downstream analysis, you can use
 the ‘return’ parameter as follows.
 
-```{r}
-result <- SearchDatabase("CD3D", return = "ID")
-result
-```
+    result <- SearchDatabase("CD3D", return = "ID")
+    result
 
-    ##  [1] "GO:0001775" "GO:0002250" "GO:0002253" "GO:0002376" "GO:0002429" "GO:0002520" "GO:0002521"
-    ##  [8] "GO:0002682" "GO:0002684" "GO:0002757" "GO:0002764" "GO:0002768"
+    ##  [1] "GO:0001775" "GO:0002250" "GO:0002253" "GO:0002376" "GO:0002429" "GO:0002520" "GO:0002521" "GO:0002682"
+    ##  [9] "GO:0002684" "GO:0002757" "GO:0002764" "GO:0002768"
     ##  [ reached getOption("max.print") -- omitted 168 entries ]
 
 Alternatively, if you need the output as a gene list formatted for
 `GeneSetAnalysis`, adjust the ‘return’ parameter like so:
 
-```{r}
-result <- SearchDatabase("CD3D", return = "genelist")
-glimpse(head(result, 5))
-```
+    result <- SearchDatabase("CD3D", return = "genelist")
+    glimpse(head(result, 5))
 
     ## List of 5
     ##  $ GO:0001775: chr [1:1458] "IGHV3-64" "IGHV4-4" "IGHV4OR15-8" "IGHV3OR16-12" ...
@@ -340,16 +310,14 @@ glimpse(head(result, 5))
 To export the result as a data frame, suitable for formats like Excel or
 CSV, set the ‘export.to.data.frame’ parameter to TRUE.
 
-```{r}
-result <- SearchDatabase("CD3D", export.to.data.frame = TRUE)
-glimpse(result)
-```
+    result <- SearchDatabase("CD3D", export.to.data.frame = TRUE)
+    glimpse(result)
 
     ## Rows: 180
     ## Columns: 3
-    ## $ SetID   <chr> "GO:0001775", "GO:0002250", "GO:0002253", "GO:0002376", "GO:0002429", "GO:0002520", "GO…
-    ## $ SetName <chr> "cell activation", "adaptive immune response", "activation of immune response", "immune…
-    ## $ Genes   <chr> "IGHV3-64,IGHV4-4,IGHV4OR15-8,IGHV3OR16-12,IGHV1OR15-1,IGHV3OR15-7,IGHV3OR16-13,IGHV3OR…
+    ## $ SetID   <chr> "GO:0001775", "GO:0002250", "GO:0002253", "GO:0002376", "GO:0002429", "GO:0002520", "GO:0002521"…
+    ## $ SetName <chr> "cell activation", "adaptive immune response", "activation of immune response", "immune system p…
+    ## $ Genes   <chr> "IGHV3-64,IGHV4-4,IGHV4OR15-8,IGHV3OR16-12,IGHV1OR15-1,IGHV3OR15-7,IGHV3OR16-13,IGHV3OR16-10,IGH…
 
 ### Filtering a Customized Gene Set
 
@@ -358,18 +326,16 @@ Lastly, you can also filter a given gene set list with the
 database, you can find pathways that include the gene “CD3D” or have
 names that contain “interferon.”
 
-```{r}
-SearchPathways(genesets = hall50$human, item = c("CD3D", "interferon"))
-```
+    SearchPathways(genesets = hall50$human, item = c("CD3D", "interferon"))
 
     ## $HALLMARK_INTERFERON_ALPHA_RESPONSE
-    ##  [1] "MX1"        "ISG15"      "AC004551.1" "IFIT3"      "IFI44"      "IFI35"      "IRF7"      
-    ##  [8] "RSAD2"      "IFI44L"     "IFITM1"     "IFI27"      "IRF9"      
+    ##  [1] "MX1"        "ISG15"      "AC004551.1" "IFIT3"      "IFI44"      "IFI35"      "IRF7"       "RSAD2"     
+    ##  [9] "IFI44L"     "IFITM1"     "IFI27"      "IRF9"      
     ##  [ reached getOption("max.print") -- omitted 85 entries ]
     ## 
     ## $HALLMARK_INTERFERON_GAMMA_RESPONSE
-    ##  [1] "STAT1"   "ISG15"   "IFIT1"   "MX1"     "IFIT3"   "IFI35"   "IRF7"    "IFIT2"   "OAS2"    "TAP1"   
-    ## [11] "EIF2AK2" "RSAD2"  
+    ##  [1] "STAT1"   "ISG15"   "IFIT1"   "MX1"     "IFIT3"   "IFI35"   "IRF7"    "IFIT2"   "OAS2"    "TAP1"    "EIF2AK2"
+    ## [12] "RSAD2"  
     ##  [ reached getOption("max.print") -- omitted 188 entries ]
     ## 
     ## $HALLMARK_ALLOGRAFT_REJECTION
@@ -396,17 +362,13 @@ be:
 
 Convert GO IDs to their respective pathway names for human:
 
-```{r}
-RenameGO(c("GO:0002376","GO:0050896"), spe = "human")
-```
+    RenameGO(c("GO:0002376","GO:0050896"), spe = "human")
 
     ## [1] "GO:0002376 immune system process (3213g)" "GO:0050896 response to stimulus (9342g)"
 
 Similarly, for Reactome IDs:
 
-```{r}
-RenameReactome(c("R-HSA-109582","R-HSA-112316"), spe = "human")
-```
+    RenameReactome(c("R-HSA-109582","R-HSA-112316"), spe = "human")
 
     ## [1] "R-HSA-109582 Hemostasis (679g)"      "R-HSA-112316 Neuronal System (411g)"
 
@@ -428,10 +390,8 @@ Let’s start by looking at how you can filter GO pathways:
 
 <!-- -->
 
-```{r}
-terms <- FilterGOTerms(parent = "GO:0002376")
-RenameGO(terms)
-```
+    terms <- FilterGOTerms(parent = "GO:0002376")
+    RenameGO(terms)
 
     ##  [1] "GO:0001773 myeloid dendritic cell activation (28g)"      
     ##  [2] "GO:0001774 microglial cell activation (45g)"             
@@ -456,10 +416,8 @@ RenameGO(terms)
 
 <!-- -->
 
-```{r}
-terms2 <- FilterGOTerms(term = terms, n.min = 10, n.max = 1000)
-RenameGO(terms2)
-```
+    terms2 <- FilterGOTerms(term = terms, n.min = 10, n.max = 1000)
+    RenameGO(terms2)
 
     ##  [1] "GO:0001773 myeloid dendritic cell activation (28g)"                                        
     ##  [2] "GO:0001774 microglial cell activation (45g)"                                               
@@ -481,10 +439,8 @@ RenameGO(terms2)
 
 <!-- -->
 
-```{r}
-terms3 <- FilterGOTerms(term = terms, only.end.terms = TRUE)
-RenameGO(terms3)
-```
+    terms3 <- FilterGOTerms(term = terms, only.end.terms = TRUE)
+    RenameGO(terms3)
 
     ##  [1] "GO:0001777 T cell homeostatic proliferation (4g)"                      
     ##  [2] "GO:0001780 neutrophil homeostasis (16g)"                               
@@ -505,10 +461,8 @@ RenameGO(terms3)
 The process for Reactome pathways is analogous. For instance, to select
 pathways related to the Immune System:
 
-```{r}
-terms <- FilterReactomeTerms(parent = "R-HSA-168256")
-RenameReactome(terms)
-```
+    terms <- FilterReactomeTerms(parent = "R-HSA-168256")
+    RenameReactome(terms)
 
     ##  [1] "R-HSA-1059683 Interleukin-6 signaling (11g)"                                         
     ##  [2] "R-HSA-109703 PKB-mediated events (2g)"                                               
@@ -535,13 +489,44 @@ Here’s how you can create a GSEA plot for the
 “INTERFERON\_GAMMA\_RESPONSE” gene set within the “Naive CD4 T” cell
 population of the `pbmc` dataset:
 
-```{r}
-GSEAplot(
-  pbmc, 
-  ident.1 = "CD4 T Naive", 
-  title = "INTERFERON_GAMMA_RESPONSE",
-  geneset = hall50$human$HALLMARK_INTERFERON_GAMMA_RESPONSE
-)
-```
+    GSEAplot(
+      pbmc, 
+      ident.1 = "CD4 T Naive", 
+      title = "INTERFERON_GAMMA_RESPONSE",
+      geneset = hall50$human$HALLMARK_INTERFERON_GAMMA_RESPONSE
+    )
 
 ![](GSEA_files/figure-markdown_strict/unnamed-chunk-25-1.png)
+
+    sessionInfo()
+
+    ## R version 4.4.0 (2024-04-24)
+    ## Platform: x86_64-pc-linux-gnu
+    ## Running under: Ubuntu 20.04.6 LTS
+    ## 
+    ## Matrix products: default
+    ## BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0 
+    ## LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
+    ## 
+    ## locale:
+    ##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=de_BE.UTF-8        LC_COLLATE=en_US.UTF-8    
+    ##  [5] LC_MONETARY=de_BE.UTF-8    LC_MESSAGES=en_US.UTF-8    LC_PAPER=de_BE.UTF-8       LC_NAME=C                 
+    ##  [9] LC_ADDRESS=C               LC_TELEPHONE=C             LC_MEASUREMENT=de_BE.UTF-8 LC_IDENTIFICATION=C       
+    ## 
+    ## time zone: Europe/Brussels
+    ## tzcode source: system (glibc)
+    ## 
+    ## attached base packages:
+    ##  [1] parallel  grid      tools     stats4    stats     graphics  grDevices utils     datasets  methods   base     
+    ## 
+    ## other attached packages:
+    ##  [1] doMC_1.3.8             foreach_1.5.2          loomR_0.2.0            itertools_0.1-3       
+    ##  [5] iterators_1.0.14       R6_2.5.1               hyc_0.1.5              ggbeeswarm_0.7.2      
+    ##  [9] ggtext_0.1.2           magrittr_2.0.3         slingshot_2.12.0       TrajectoryUtils_1.12.0
+    ##  [ reached getOption("max.print") -- omitted 47 entries ]
+    ## 
+    ## loaded via a namespace (and not attached):
+    ##  [1] fs_1.6.4              spatstat.sparse_3.1-0 httr_1.4.7            sctransform_0.4.1     backports_1.5.0      
+    ##  [6] utf8_1.2.4            lazyeval_0.2.2        uwot_0.2.2            withr_2.5.0           gridExtra_2.3        
+    ## [11] progressr_0.14.0      cli_3.6.3            
+    ##  [ reached getOption("max.print") -- omitted 112 entries ]

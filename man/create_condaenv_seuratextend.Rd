@@ -4,7 +4,10 @@
 \alias{create_condaenv_seuratextend}
 \title{Create the 'seuratextend' Conda Environment}
 \usage{
-create_condaenv_seuratextend()
+create_condaenv_seuratextend(force = FALSE)
+}
+\arguments{
+\item{force}{Logical; if TRUE, removes any existing 'seuratextend' environment before creating a new one. Default is FALSE. Use this parameter to force recreation of the environment if a previous installation was interrupted or incomplete.}
 }
 \value{
 Does not return any value; it creates and configures a new Conda environment.
@@ -13,11 +16,27 @@ Does not return any value; it creates and configures a new Conda environment.
 Initializes a Conda environment named 'seuratextend' which includes all necessary Python packages for running `scVelo`, `Palantir`, and `CellRank` via `SeuratExtend`. This function is ideal for users setting up their analytical environment for the first time or those who need to ensure they have a compatible environment setup.
 }
 \details{
-When you run functions from `SeuratExtend` that require Python integrations, such as `scVelo`, `Palantir`, or `CellRank`, you might need a specific set of Python packages installed. This function facilitates the setup of a Conda environment specifically tailored for these tools, managed through `reticulate`. The environment setup is automatic and checks your operating system to configure appropriately. It is supported on Windows, macOS, and Linux (Ubuntu 20.04), ensuring broad compatibility and ease of setup.
+When you run functions from `SeuratExtend` that require Python integrations, such as `scVelo`, `Palantir`, or `CellRank`, you might need a specific set of Python packages installed. This function facilitates the setup of a Conda environment specifically tailored for these tools, managed through `reticulate`.
+
+The environment setup is automatic and checks your operating system to configure appropriately. It is currently supported and tested on:
+* Windows (Intel/AMD processors)
+* Intel-based macOS (not compatible with Apple Silicon/M1/M2)
+* Linux (Ubuntu 20.04)
+
+Users with Apple Silicon devices who are interested in contributing to the development of M1/M2 support are welcome to reach out via GitHub Issues.
+
+If force=TRUE is used, any existing 'seuratextend' environment will be removed before creating a new one. This can be useful when:
+* A previous installation was interrupted
+* Required dependencies were not properly installed
+* You need to reset the environment to a clean state
+* You encounter persistent environment-related errors
 }
 \examples{
 \dontrun{
-# To manually create the 'seuratextend' Conda environment, execute:
+# Standard installation
 create_condaenv_seuratextend()
+
+# Force recreation of the environment
+create_condaenv_seuratextend(force = TRUE)
 }
 }

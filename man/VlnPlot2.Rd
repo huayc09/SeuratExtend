@@ -34,6 +34,7 @@ VlnPlot2(object, ...)
   pt.alpha = 1,
   strip.position = "top",
   stat.method = c("none", "wilcox.test", "t.test"),
+  stats.method = NULL,
   p.adjust.method = "holm",
   label = c("p.signif", "p", "p.adj", "p.format"),
   comparisons = NULL,
@@ -65,6 +66,7 @@ VlnPlot2(object, ...)
   pt.alpha = 1,
   strip.position = "top",
   stat.method = c("none", "wilcox.test", "t.test"),
+  stats.method = NULL,
   p.adjust.method = "holm",
   label = c("p.signif", "p", "p.adj", "p.format"),
   comparisons = NULL,
@@ -136,6 +138,9 @@ VlnPlot2(object, ...)
 \item{strip.position}{Positions the strip ("top" (default), "bottom", "left", or "right"). Only used when `f2 = NULL`.}
 
 \item{stat.method}{Determines if pairwise statistics are added to the plot. Either "wilcox.test" or "t.test". Default: "none".}
+
+\item{stats.method}{Alias for \code{stat.method}. Provided for convenience but \code{stat.method} is preferred.
+When both are provided, \code{stats.method} takes precedence.}
 
 \item{p.adjust.method}{Method for adjusting p-values, especially when conducting multiple pairwise tests or dealing with multiple grouping variables. Options include "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", and "none". Note: Adjustments are independently conducted for each variable in formulas containing multiple variables. Default: 'holm'.}
 

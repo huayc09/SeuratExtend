@@ -1,6 +1,14 @@
 pandoc: 3.1.11
-pkgdown: 2.0.9
+pkgdown: 2.0.7
 pkgdown_sha: ~
-articles: {}
-last_built: 2024-07-10T21:45Z
+articles:
+  FAQ: FAQ.html
+  GSEA: GSEA.html
+  News: News.html
+  SCENIC: SCENIC.html
+  Trajectory: Trajectory.html
+  Utilities: Utilities.html
+  Visualization: Visualization.html
+  quick_start: quick_start.html
+last_built: 2024-11-28T15:52Z
 

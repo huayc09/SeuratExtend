@@ -41,3 +41,8 @@ rsconnect/
 # Ignore .DS_Store files in all directories and subdirectories
 **/.DS_Store
 
+# Test script in data-raw
+data-raw/Test.R
+
+# Course build artifacts
+vignettes/single-cell-course

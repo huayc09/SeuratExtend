@@ -39,6 +39,7 @@ VlnPlot2.Seurat <- function(
   pt.alpha = 1,
   strip.position = "top",
   stat.method = c("none", "wilcox.test", "t.test"),
+  stats.method = NULL,
   p.adjust.method = "holm",
   label = c("p.signif","p","p.adj","p.format"),
   comparisons = NULL,
@@ -87,6 +88,7 @@ VlnPlot2.Seurat <- function(
     pt.alpha = pt.alpha,
     strip.position = strip.position,
     stat.method = stat.method,
+    stats.method = stats.method,
     p.adjust.method = p.adjust.method,
     label = label,
     comparisons = comparisons,
@@ -126,6 +128,8 @@ VlnPlot2.Seurat <- function(
 #' @param pt.alpha Adjusts the transparency of points. Default: 1.
 #' @param strip.position Positions the strip ("top" (default), "bottom", "left", or "right"). Only used when `f2 = NULL`.
 #' @param stat.method Determines if pairwise statistics are added to the plot. Either "wilcox.test" or "t.test". Default: "none".
+#' @param stats.method Alias for \code{stat.method}. Provided for convenience but \code{stat.method} is preferred.
+#'   When both are provided, \code{stats.method} takes precedence.
 #' @param p.adjust.method Method for adjusting p-values, especially when conducting multiple pairwise tests or dealing with multiple grouping variables. Options include "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", and "none". Note: Adjustments are independently conducted for each variable in formulas containing multiple variables. Default: 'holm'.
 #' @param label Specifies label type. Options include "p.signif" (showing significance levels), "p.format" (formatted p value), or "p", "p.adj". Default: "p.signif".
 #' @param comparisons List of length-2 vectors, each containing either names of two x-axis values or two integers pointing to groups of interest for comparison. Default: all groups.
@@ -156,6 +160,7 @@ VlnPlot2.default <- function(
   pt.alpha = 1,
   strip.position = "top",
   stat.method = c("none", "wilcox.test", "t.test"),
+  stats.method = NULL,
   p.adjust.method = "holm",
   label = c("p.signif","p","p.adj","p.format"),
   comparisons = NULL,
@@ -164,6 +169,13 @@ VlnPlot2.default <- function(
   tip.length = 0.03,
   ...
 ) {
+
+  # Handle stats.method alias
+  if (!is.null(stats.method)) {
+    # Issue gentle warning
+    warning("Parameter 'stats.method' is an alias for 'stat.method'. Please consider using 'stat.method' in future code.", call. = FALSE)
+    stat.method <- stats.method
+  }
 
   scores <- VlnPlot2_Calc(
     matr = matr,

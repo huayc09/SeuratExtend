@@ -51,43 +51,108 @@ load_condaenv <- function(conda_env) {
 #   !is.na(conda_path) && file.exists(conda_path)
 # }
 
-#' @title Create the 'seuratextend' Conda Environment
+##' @title Create the 'seuratextend' Conda Environment
 #' @description Initializes a Conda environment named 'seuratextend' which includes all necessary Python packages for running `scVelo`, `Palantir`, and `CellRank` via `SeuratExtend`. This function is ideal for users setting up their analytical environment for the first time or those who need to ensure they have a compatible environment setup.
+#' @param force Logical; if TRUE, removes any existing 'seuratextend' environment before creating a new one. Default is FALSE. Use this parameter to force recreation of the environment if a previous installation was interrupted or incomplete.
 #' @return Does not return any value; it creates and configures a new Conda environment.
-#' @details When you run functions from `SeuratExtend` that require Python integrations, such as `scVelo`, `Palantir`, or `CellRank`, you might need a specific set of Python packages installed. This function facilitates the setup of a Conda environment specifically tailored for these tools, managed through `reticulate`. The environment setup is automatic and checks your operating system to configure appropriately. It is supported on Windows, macOS, and Linux (Ubuntu 20.04), ensuring broad compatibility and ease of setup.
+#' @details When you run functions from `SeuratExtend` that require Python integrations, such as `scVelo`, `Palantir`, or `CellRank`, you might need a specific set of Python packages installed. This function facilitates the setup of a Conda environment specifically tailored for these tools, managed through `reticulate`.
+#'
+#' The environment setup is automatic and checks your operating system to configure appropriately. It is currently supported and tested on:
+#' * Windows (Intel/AMD processors)
+#' * Intel-based macOS (not compatible with Apple Silicon/M1/M2)
+#' * Linux (Ubuntu 20.04)
+#'
+#' Users with Apple Silicon devices who are interested in contributing to the development of M1/M2 support are welcome to reach out via GitHub Issues.
+#'
+#' If force=TRUE is used, any existing 'seuratextend' environment will be removed before creating a new one. This can be useful when:
+#' * A previous installation was interrupted
+#' * Required dependencies were not properly installed
+#' * You need to reset the environment to a clean state
+#' * You encounter persistent environment-related errors
 #' @examples
 #' \dontrun{
-#' # To manually create the 'seuratextend' Conda environment, execute:
+#' # Standard installation
 #' create_condaenv_seuratextend()
+#'
+#' # Force recreation of the environment
+#' create_condaenv_seuratextend(force = TRUE)
 #' }
 #' @rdname create_condaenv_seuratextend
 #' @export
 
-create_condaenv_seuratextend <- function() {
+create_condaenv_seuratextend <- function(force = FALSE) {
   library(reticulate)
 
-  # Define the package name and the environment name
+  # Check if git is installed
+  git_path <- Sys.which("git")
+  if (git_path == "") {
+    warning(paste(
+      "Git appears to not be installed on your system.",
+      "You may need to install Git to properly set up the conda environment.",
+      "Please install Git based on your operating system and restart R if you encounter installation issues.",
+      "\nInstallation instructions:",
+      "\n- Windows: Download from https://gitforwindows.org",
+      "\n- Mac: Run 'brew install git' or 'xcode-select --install'",
+      "\n- Linux (Ubuntu/Debian): Run 'sudo apt-get install git'",
+      "\n- Linux (Fedora): Run 'sudo dnf install git'",
+      "\n- Linux (CentOS/RHEL): Run 'sudo yum install git'"
+    ))
+  }
+
+  # Define the package name and environment name
   env_name <- "seuratextend"
 
-  # Check the operating system
-  os_type <- Sys.info()["sysname"]
+  # Check if environment already exists
+  envs <- conda_list()
+  if (!force && env_name %in% envs$name) {
+    message(paste(
+      "Conda environment 'seuratextend' already exists.\n",
+      "Options:\n",
+      "1) Skip creation (enter: skip)\n",
+      "2) Force recreate environment (enter: force)\n",
+      "Please choose (skip/force): "
+    ))
+    response <- tolower(readline(prompt = ""))
 
-  # Define the YAML file based on the operating system
+    if (response == "skip") {
+      message("Skipping environment creation.")
+      return(invisible())
+    } else if (response != "force") {
+      message("Invalid response. Skipping environment creation.")
+      return(invisible())
+    }
+
+    # If force selected, remove existing environment
+    message("Removing existing environment...")
+    conda_remove(env_name)
+  }
+
+  # Check operating system and get appropriate YAML file
+  os_type <- Sys.info()["sysname"]
   yaml_file <- system.file(
     "extdata",
-    switch (os_type,
-            "environment-linux.yml",
-            Windows = "environment-windows.yml",
-            Darwin = "environment-mac.yml"
-            ),
+    switch(os_type,
+           "environment-linux.yml",
+           Windows = "environment-windows.yml",
+           Darwin = "environment-mac.yml"
+    ),
     package = "SeuratExtend",
-    mustWork = TRUE)
+    mustWork = TRUE
+  )
 
-  # Create the Conda environment using the specified YAML file
-  message(glue::glue("Creating Conda environment '{env_name}' using '{yaml_file}'..."))
-  conda_create(envname = env_name, environment = yaml_file)
-
-  message(glue::glue("Conda environment '{env_name}' has been created successfully."))
+  # Create the conda environment
+  message(glue::glue("Creating conda environment '{env_name}' using '{yaml_file}'..."))
+  tryCatch({
+    conda_create(envname = env_name, environment = yaml_file)
+    message(glue::glue("Conda environment '{env_name}' has been created successfully."))
+  }, error = function(e) {
+    message(paste(
+      "Error creating conda environment.",
+      "If you previously had a partially installed environment,",
+      "try running this function again with force=TRUE",
+      "\nError details:", e$message
+    ))
+  })
 }
 
 # check if OS is Windows

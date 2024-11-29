@@ -6,6 +6,7 @@ NULL
 #' @param features Features to be plotted, which can include gene expression, metrics, PC scores, or any other data that can be retrieved using the `FetchData()` function. Only applicable for the Seurat method.
 #' @param group.by A variable from `meta.data` for grouping, or a character vector of the same length as the number of cells. Only applicable for the Seurat method.
 #' @param cell Cell identifiers to be used in the plot. Defaults to all cells. Only applicable for the Seurat method.
+#' @param cells Alternative parameter name for cell identifiers. Same functionality as 'cell'. Defaults to all cells.
 #' @param slot Slot from which to retrieve feature data. Only applicable for the Seurat method.
 #' @param assay Name of the assay to use. If not specified, the active assay will be used. Only applicable for the Seurat method.
 #' @param priority If set to "expr", the function will fetch data from the expression matrix rather than `meta.data`. Only applicable for the Seurat method.
@@ -17,6 +18,7 @@ WaterfallPlot.Seurat <- function(
     features,
     group.by = NULL,
     cell = NULL,
+    cells = NULL,
     slot = "data",
     assay = NULL,
     priority = c("expr","none"),
@@ -41,11 +43,14 @@ WaterfallPlot.Seurat <- function(
 ) {
   style <- match.arg(style)
 
+  # Use cells if provided, otherwise fall back to cell
+  cell_subset <- cells %||% cell
+
   Std.matr <- Seu2Matr(
     seu = seu,
     features = features,
     group.by = group.by,
-    cells = cell,
+    cells = cell_subset,
     slot = slot,
     assay = assay,
     priority = priority

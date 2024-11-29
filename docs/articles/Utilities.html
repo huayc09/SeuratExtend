@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Utility Tools and Functions • SeuratExtend</title>
-<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha256-bZLfwXAP04zRMK2BjiO8iu9pf4FbLqX6zitd+tIvLhE=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SeuratExtend</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
       </span>
     </div>
 
@@ -50,6 +50,11 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
+      <a href="../articles/News.html">What's New in v1.1.0</a>
+    </li>
+    <li class="divider">
+    </li>
+<li>
       <a href="../articles/Visualization.html">Enhanced Visualization</a>
     </li>
     <li>
@@ -63,6 +68,36 @@
     </li>
     <li>
       <a href="../articles/Utilities.html">Utility Tools and Functions</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    scRNA-seq Course
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="../articles/single-cell-course/1.basic-R.html">1. Introduction to R</a>
+    </li>
+    <li>
+      <a href="../articles/single-cell-course/2.Seurat.html">2. Basic Single-Cell Analysis Workflow</a>
+    </li>
+    <li>
+      <a href="../articles/single-cell-course/3.Visualization.html">3. Advanced Visualization Techniques</a>
+    </li>
+    <li>
+      <a href="../articles/single-cell-course/4.GSEA.html">4. Gene Set Enrichment Analysis</a>
+    </li>
+    <li>
+      <a href="../articles/single-cell-course/5.Core-Enhancement.html">5. Core scRNA-seq Workflow Enhancements</a>
+    </li>
+    <li>
+      <a href="../articles/single-cell-course/6.Advanced.html">6. Advanced Methods (Part 1)</a>
+    </li>
+    <li>
+      <a href="../articles/single-cell-course/6.Advanced-2.html">7. Advanced Methods (Part 2)</a>
     </li>
   </ul>
 </li>
@@ -86,7 +121,7 @@
       <h1 data-toc-skip>Utility Tools and Functions</h1>
                         <h4 data-toc-skip class="author">Yichao Hua</h4>
             
-            <h4 data-toc-skip class="date">2024-07-11</h4>
+            <h4 data-toc-skip class="date">2024-11-28</h4>
       
       
       <div class="hidden name"><code>Utilities.Rmd</code></div>
@@ -626,20 +661,20 @@ tutorial</a>.</p>
 <pre><code><span><span class="co">## Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric</span></span>
 <span><span class="co">## To use Python UMAP via reticulate, set umap.method to 'umap-learn' and metric to 'correlation'</span></span>
 <span><span class="co">## This message will be shown once per session</span></span></code></pre>
-<pre><code><span><span class="co">## 10:22:00 UMAP embedding parameters a = 0.9922 b = 1.112</span></span></code></pre>
-<pre><code><span><span class="co">## 10:22:00 Read 452 rows and found 10 numeric columns</span></span></code></pre>
-<pre><code><span><span class="co">## 10:22:00 Using Annoy for neighbor search, n_neighbors = 30</span></span></code></pre>
-<pre><code><span><span class="co">## 10:22:00 Building Annoy index with metric = cosine, n_trees = 50</span></span></code></pre>
+<pre><code><span><span class="co">## 17:03:40 UMAP embedding parameters a = 0.9922 b = 1.112</span></span></code></pre>
+<pre><code><span><span class="co">## 17:03:40 Read 452 rows and found 10 numeric columns</span></span></code></pre>
+<pre><code><span><span class="co">## 17:03:40 Using Annoy for neighbor search, n_neighbors = 30</span></span></code></pre>
+<pre><code><span><span class="co">## 17:03:40 Building Annoy index with metric = cosine, n_trees = 50</span></span></code></pre>
 <pre><code><span><span class="co">## 0%   10   20   30   40   50   60   70   80   90   100%</span></span></code></pre>
 <pre><code><span><span class="co">## [----|----|----|----|----|----|----|----|----|----|</span></span></code></pre>
 <pre><code><span><span class="co">## **************************************************|</span></span>
-<span><span class="co">## 10:22:00 Writing NN index file to temp file /tmp/RtmpCvLAoI/file34781171227952</span></span>
-<span><span class="co">## 10:22:00 Searching Annoy index using 1 thread, search_k = 3000</span></span>
-<span><span class="co">## 10:22:00 Annoy recall = 100%</span></span>
-<span><span class="co">## 10:22:01 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30</span></span>
-<span><span class="co">## 10:22:02 Initializing from normalized Laplacian + noise (using RSpectra)</span></span>
-<span><span class="co">## 10:22:02 Commencing optimization for 500 epochs, with 16790 positive edges</span></span>
-<span><span class="co">## 10:22:02 Optimization finished</span></span></code></pre>
+<span><span class="co">## 17:03:40 Writing NN index file to temp file /tmp/Rtmpx4FX7W/filebb1a8589478a2</span></span>
+<span><span class="co">## 17:03:40 Searching Annoy index using 1 thread, search_k = 3000</span></span>
+<span><span class="co">## 17:03:40 Annoy recall = 100%</span></span>
+<span><span class="co">## 17:03:41 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30</span></span>
+<span><span class="co">## 17:03:42 Initializing from normalized Laplacian + noise (using RSpectra)</span></span>
+<span><span class="co">## 17:03:42 Commencing optimization for 500 epochs, with 16790 positive edges</span></span>
+<span><span class="co">## 17:03:43 Optimization finished</span></span></code></pre>
 <div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualize the clusters using DimPlot</span></span>
 <span><span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, group.by <span class="op">=</span> <span class="st">"cluster"</span><span class="op">)</span></span></code></pre></div>
@@ -737,60 +772,61 @@ requirements.</p>
 <span><span class="co">##  [1] cowplot_1.1.3             rlist_0.4.6.2            </span></span>
 <span><span class="co">##  [3] DelayedMatrixStats_1.26.0 DelayedArray_0.30.1      </span></span>
 <span><span class="co">##  [5] SparseArray_1.4.8         S4Arrays_1.4.1           </span></span>
-<span><span class="co">##  [7] abind_1.4-5               IRanges_2.38.0           </span></span>
-<span><span class="co">##  [9] S4Vectors_0.42.0          MatrixGenerics_1.16.0    </span></span>
+<span><span class="co">##  [7] abind_1.4-5               IRanges_2.38.1           </span></span>
+<span><span class="co">##  [9] S4Vectors_0.42.1          MatrixGenerics_1.16.0    </span></span>
 <span><span class="co">## [11] matrixStats_1.3.0         BiocGenerics_0.50.0      </span></span>
-<span><span class="co">## [13] rlang_1.1.4               scales_1.3.0             </span></span>
-<span><span class="co">## [15] reshape2_1.4.4            mosaic_1.9.1             </span></span>
-<span><span class="co">## [17] mosaicData_0.20.4         ggformula_0.12.0         </span></span>
-<span><span class="co">## [19] Matrix_1.7-0              ggplot2_3.5.1            </span></span>
-<span><span class="co">## [21] lattice_0.22-6            dplyr_1.1.4              </span></span>
-<span><span class="co">## [23] SeuratExtend_1.0.0        SeuratExtendData_0.2.0   </span></span>
-<span><span class="co">## [25] Seurat_5.1.0              SeuratObject_5.0.2       </span></span>
-<span><span class="co">## [27] sp_2.1-4                 </span></span>
+<span><span class="co">## [13] RColorBrewer_1.1-3        viridis_0.6.5            </span></span>
+<span><span class="co">## [15] viridisLite_0.4.2         rlang_1.1.4              </span></span>
+<span><span class="co">## [17] scales_1.3.0              reshape2_1.4.4           </span></span>
+<span><span class="co">## [19] mosaic_1.9.1              mosaicData_0.20.4        </span></span>
+<span><span class="co">## [21] ggformula_0.12.0          Matrix_1.7-0             </span></span>
+<span><span class="co">## [23] ggplot2_3.5.1             lattice_0.22-6           </span></span>
+<span><span class="co">## [25] dplyr_1.1.4               SeuratExtend_1.1.0       </span></span>
+<span><span class="co">## [27] SeuratExtendData_0.2.1    Seurat_5.1.0             </span></span>
+<span><span class="co">## [29] SeuratObject_5.0.2        sp_2.1-4                 </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
-<span><span class="co">##   [1] RColorBrewer_1.1-3       rstudioapi_0.16.0        jsonlite_1.8.8          </span></span>
-<span><span class="co">##   [4] magrittr_2.0.3           spatstat.utils_3.0-4     farver_2.1.2            </span></span>
-<span><span class="co">##   [7] rmarkdown_2.27           zlibbioc_1.50.0          fs_1.6.4                </span></span>
-<span><span class="co">##  [10] ragg_1.3.2               vctrs_0.6.5              ROCR_1.0-11             </span></span>
-<span><span class="co">##  [13] memoise_2.0.1            spatstat.explore_3.2-7   forcats_1.0.0           </span></span>
-<span><span class="co">##  [16] htmltools_0.5.8.1        haven_2.5.4              sass_0.4.9              </span></span>
-<span><span class="co">##  [19] sctransform_0.4.1        parallelly_1.37.1        KernSmooth_2.23-24      </span></span>
-<span><span class="co">##  [22] bslib_0.7.0              htmlwidgets_1.6.4        desc_1.4.3              </span></span>
-<span><span class="co">##  [25] ica_1.0-3                plyr_1.8.9               plotly_4.10.4           </span></span>
-<span><span class="co">##  [28] zoo_1.8-12               cachem_1.1.0             igraph_1.3.4            </span></span>
-<span><span class="co">##  [31] mime_0.12                lifecycle_1.0.4          pkgconfig_2.0.3         </span></span>
-<span><span class="co">##  [34] R6_2.5.1                 fastmap_1.2.0            fitdistrplus_1.1-11     </span></span>
-<span><span class="co">##  [37] future_1.33.2            shiny_1.8.1.1            digest_0.6.35           </span></span>
-<span><span class="co">##  [40] colorspace_2.1-0         patchwork_1.2.0          tensor_1.5              </span></span>
-<span><span class="co">##  [43] RSpectra_0.16-1          irlba_2.3.5.1            textshaping_0.4.0       </span></span>
-<span><span class="co">##  [46] labeling_0.4.3           progressr_0.14.0         fansi_1.0.6             </span></span>
-<span><span class="co">##  [49] spatstat.sparse_3.0-3    httr_1.4.7               polyclip_1.10-6         </span></span>
-<span><span class="co">##  [52] compiler_4.4.0           withr_3.0.0              fastDummies_1.7.3       </span></span>
-<span><span class="co">##  [55] highr_0.11               MASS_7.3-60.2            tools_4.4.0             </span></span>
-<span><span class="co">##  [58] lmtest_0.9-40            httpuv_1.6.15            future.apply_1.11.2     </span></span>
-<span><span class="co">##  [61] goftest_1.2-3            glue_1.7.0               nlme_3.1-165            </span></span>
-<span><span class="co">##  [64] promises_1.3.0           grid_4.4.0               Rtsne_0.17              </span></span>
-<span><span class="co">##  [67] cluster_2.1.6            generics_0.1.3           gtable_0.3.5            </span></span>
-<span><span class="co">##  [70] spatstat.data_3.0-4      labelled_2.13.0          tidyr_1.3.1             </span></span>
-<span><span class="co">##  [73] hms_1.1.3                data.table_1.15.4        XVector_0.44.0          </span></span>
-<span><span class="co">##  [76] utf8_1.2.4               spatstat.geom_3.2-9      RcppAnnoy_0.0.22        </span></span>
-<span><span class="co">##  [79] ggrepel_0.9.5            RANN_2.6.1               pillar_1.9.0            </span></span>
-<span><span class="co">##  [82] stringr_1.5.1            spam_2.10-0              RcppHNSW_0.6.0          </span></span>
-<span><span class="co">##  [85] later_1.3.2              splines_4.4.0            survival_3.7-0          </span></span>
-<span><span class="co">##  [88] deldir_2.0-4             tidyselect_1.2.1         miniUI_0.1.1.1          </span></span>
-<span><span class="co">##  [91] pbapply_1.7-2            knitr_1.47               gridExtra_2.3           </span></span>
-<span><span class="co">##  [94] scattermore_1.2          xfun_0.44                mosaicCore_0.9.4.0      </span></span>
-<span><span class="co">##  [97] stringi_1.8.4            lazyeval_0.2.2           yaml_2.3.8              </span></span>
-<span><span class="co">## [100] evaluate_0.23            codetools_0.2-20         tibble_3.2.1            </span></span>
-<span><span class="co">## [103] cli_3.6.2                uwot_0.2.2               xtable_1.8-4            </span></span>
-<span><span class="co">## [106] reticulate_1.37.0        systemfonts_1.1.0        munsell_0.5.1           </span></span>
-<span><span class="co">## [109] jquerylib_0.1.4          Rcpp_1.0.12              globals_0.16.3          </span></span>
-<span><span class="co">## [112] spatstat.random_3.2-3    png_0.1-8                parallel_4.4.0          </span></span>
-<span><span class="co">## [115] pkgdown_2.0.9            dotCall64_1.1-1          sparseMatrixStats_1.16.0</span></span>
-<span><span class="co">## [118] listenv_0.9.1            viridisLite_0.4.2        ggridges_0.5.6          </span></span>
-<span><span class="co">## [121] crayon_1.5.2             leiden_0.4.3.1           purrr_1.0.2</span></span></code></pre>
+<span><span class="co">##   [1] rstudioapi_0.16.0        jsonlite_1.8.8           magrittr_2.0.3          </span></span>
+<span><span class="co">##   [4] spatstat.utils_3.0-5     farver_2.1.2             rmarkdown_2.29          </span></span>
+<span><span class="co">##   [7] zlibbioc_1.50.0          fs_1.6.4                 ragg_1.3.2              </span></span>
+<span><span class="co">##  [10] vctrs_0.6.5              ROCR_1.0-11              memoise_2.0.1           </span></span>
+<span><span class="co">##  [13] spatstat.explore_3.2-7   forcats_1.0.0            htmltools_0.5.8.1       </span></span>
+<span><span class="co">##  [16] haven_2.5.4              sass_0.4.9               sctransform_0.4.1       </span></span>
+<span><span class="co">##  [19] parallelly_1.37.1        KernSmooth_2.23-24       bslib_0.4.2             </span></span>
+<span><span class="co">##  [22] htmlwidgets_1.6.4        desc_1.4.3               ica_1.0-3               </span></span>
+<span><span class="co">##  [25] plyr_1.8.9               plotly_4.10.4            zoo_1.8-12              </span></span>
+<span><span class="co">##  [28] cachem_1.1.0             igraph_2.0.3             mime_0.12               </span></span>
+<span><span class="co">##  [31] lifecycle_1.0.4          pkgconfig_2.0.3          R6_2.5.1                </span></span>
+<span><span class="co">##  [34] fastmap_1.2.0            fitdistrplus_1.2-1       future_1.33.2           </span></span>
+<span><span class="co">##  [37] shiny_1.8.1.1            digest_0.6.36            colorspace_2.1-0        </span></span>
+<span><span class="co">##  [40] patchwork_1.2.0          tensor_1.5               RSpectra_0.16-1         </span></span>
+<span><span class="co">##  [43] irlba_2.3.5.1            textshaping_0.4.0        labeling_0.4.3          </span></span>
+<span><span class="co">##  [46] progressr_0.14.0         fansi_1.0.6              spatstat.sparse_3.1-0   </span></span>
+<span><span class="co">##  [49] httr_1.4.7               polyclip_1.10-6          compiler_4.4.0          </span></span>
+<span><span class="co">##  [52] withr_3.0.0              fastDummies_1.7.3        highr_0.11              </span></span>
+<span><span class="co">##  [55] MASS_7.3-61              tools_4.4.0              lmtest_0.9-40           </span></span>
+<span><span class="co">##  [58] httpuv_1.6.15            future.apply_1.11.2      goftest_1.2-3           </span></span>
+<span><span class="co">##  [61] glue_1.7.0               nlme_3.1-165             promises_1.3.0          </span></span>
+<span><span class="co">##  [64] grid_4.4.0               Rtsne_0.17               cluster_2.1.6           </span></span>
+<span><span class="co">##  [67] generics_0.1.3           gtable_0.3.5             spatstat.data_3.1-2     </span></span>
+<span><span class="co">##  [70] labelled_2.13.0          tidyr_1.3.1              hms_1.1.3               </span></span>
+<span><span class="co">##  [73] data.table_1.15.4        XVector_0.44.0           utf8_1.2.4              </span></span>
+<span><span class="co">##  [76] spatstat.geom_3.2-9      RcppAnnoy_0.0.22         ggrepel_0.9.5           </span></span>
+<span><span class="co">##  [79] RANN_2.6.1               pillar_1.9.0             stringr_1.5.1           </span></span>
+<span><span class="co">##  [82] spam_2.10-0              RcppHNSW_0.6.0           later_1.3.2             </span></span>
+<span><span class="co">##  [85] splines_4.4.0            survival_3.7-0           deldir_2.0-4            </span></span>
+<span><span class="co">##  [88] tidyselect_1.2.1         miniUI_0.1.1.1           pbapply_1.7-2           </span></span>
+<span><span class="co">##  [91] knitr_1.48               gridExtra_2.3            scattermore_1.2         </span></span>
+<span><span class="co">##  [94] xfun_0.45                mosaicCore_0.9.4.0       stringi_1.8.4           </span></span>
+<span><span class="co">##  [97] lazyeval_0.2.2           yaml_2.3.9               evaluate_0.24.0         </span></span>
+<span><span class="co">## [100] codetools_0.2-20         tibble_3.2.1             cli_3.6.3               </span></span>
+<span><span class="co">## [103] uwot_0.2.2               xtable_1.8-4             reticulate_1.38.0       </span></span>
+<span><span class="co">## [106] systemfonts_1.1.0        munsell_0.5.1            jquerylib_0.1.4         </span></span>
+<span><span class="co">## [109] Rcpp_1.0.13              globals_0.16.3           spatstat.random_3.2-3   </span></span>
+<span><span class="co">## [112] png_0.1-8                parallel_4.4.0           pkgdown_2.0.7           </span></span>
+<span><span class="co">## [115] dotCall64_1.1-1          sparseMatrixStats_1.16.0 listenv_0.9.1           </span></span>
+<span><span class="co">## [118] ggridges_0.5.6           crayon_1.5.3             leiden_0.4.3.1          </span></span>
+<span><span class="co">## [121] purrr_1.0.2</span></span></code></pre>
 </div>
 </div>
   </div>
@@ -812,7 +848,7 @@ requirements.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>

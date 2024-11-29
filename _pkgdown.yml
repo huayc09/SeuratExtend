@@ -1,9 +1,18 @@
+template:
+  params:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+
 navbar:
   left:
     - text: "Reference"
       href: reference/index.html
     - text: "Vignettes"
       menu:
+        - text: "What's New in v1.1.0"
+          href: articles/News.html
+        - text: "-----------------"
         - text: "Enhanced Visualization"
           href: articles/Visualization.html
         - text: "Geneset Enrichment Analysis (GSEA) "
@@ -14,6 +23,21 @@ navbar:
           href: articles/SCENIC.html
         - text: "Utility Tools and Functions"
           href: articles/Utilities.html
+    - text: "scRNA-seq Course"
+      menu:
+        - text: "1. Introduction to R"
+          href: articles/single-cell-course/1.basic-R.html
+        - text: "2. Basic Single-Cell Analysis Workflow"
+          href: articles/single-cell-course/2.Seurat.html
+        - text: "3. Advanced Visualization Techniques"
+          href: articles/single-cell-course/3.Visualization.html
+        - text: "4. Gene Set Enrichment Analysis"
+          href: articles/single-cell-course/4.GSEA.html
+        - text: "5. Core scRNA-seq Workflow Enhancements"
+          href: articles/single-cell-course/5.Core-Enhancement.html
+        - text: "6. Advanced Methods (Part 1)"
+          href: articles/single-cell-course/6.Advanced.html
+        - text: "7. Advanced Methods (Part 2)"
+          href: articles/single-cell-course/6.Advanced-2.html
     - text: "FAQ"
       href: articles/FAQ.html
-
