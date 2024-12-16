@@ -17,7 +17,8 @@ Palantir.Pseudotime(
   start_cell,
   terminal_states = NULL,
   title = "Pseudotime",
-  conda_env = "seuratextend"
+  conda_env = "seuratextend",
+  n_jobs = 1
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ Palantir.Pseudotime(
 \item{terminal_states}{Optional; a named vector of cell identifiers that represent terminal states in the developmental trajectory, with names reflecting the fate labels, such as c("fate1" = "sample1_AAACCCAAGGCCCAAA-1", "fate2" = "sample1_CCTCTAGGTGAACGGT-1"). These terminal states help Palantir more accurately model the trajectory towards cellular differentiation. Default: NULL}
 
 \item{title}{A label used to store and retrieve pseudotime information within the `SeuratObj@misc$Palantir` slot of the Seurat object. Default: 'Pseudotime'}
+
+\item{n_jobs}{Number of jobs for parallel computation. Default: 1}
 }
 \value{
 The Seurat object is updated to include the diffusion map and multiscale space embeddings in the respective slots. Additionally, it adds the calculated pseudotime information to the `SeuratObj@misc$Palantir` slot of the Seurat object.

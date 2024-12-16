@@ -168,6 +168,7 @@ RunPalantirDiffusionMap <- function(seu, reduction = "pca", n_components = 20) {
 #' @param start_cell A vector of cell identifiers from the Seurat object that marks the starting cells for the trajectory analysis. These cells are typically identified as progenitor or early developmental states in the dataset.
 #' @param terminal_states Optional; a named vector of cell identifiers that represent terminal states in the developmental trajectory, with names reflecting the fate labels, such as c("fate1" = "sample1_AAACCCAAGGCCCAAA-1", "fate2" = "sample1_CCTCTAGGTGAACGGT-1"). These terminal states help Palantir more accurately model the trajectory towards cellular differentiation. Default: NULL
 #' @param title A label used to store and retrieve pseudotime information within the `SeuratObj@misc$Palantir` slot of the Seurat object. Default: 'Pseudotime'
+#' @param n_jobs Number of jobs for parallel computation. Default: 1
 #' @rdname Palantir-Methods
 #' @export
 
@@ -176,7 +177,8 @@ Palantir.Pseudotime <- function(
     start_cell,
     terminal_states = NULL,
     title = "Pseudotime",
-    conda_env = "seuratextend"
+    conda_env = "seuratextend",
+    n_jobs = 1
 ) {
   library(Seurat)
 
@@ -208,7 +210,7 @@ start_cell = '{start_cell[1]}'
 
   # Decide which specific Python code to append based on the terminal_states parameter
   if(is.null(terminal_states)) {
-    specific_code <- "pr_res = palantir.core.run_palantir(ms_data, start_cell, num_waypoints=500)"
+    specific_code <- glue::glue("pr_res = palantir.core.run_palantir(ms_data, start_cell, num_waypoints=500, n_jobs={n_jobs})")
   } else {
     # Convert the terminal_states R named vector to a Python dictionary string
     terminal_states_dict_str <- toString(
@@ -225,7 +227,7 @@ terminal_states_dict = {{ {terminal_states_dict_str} }}
 terminal_states = pd.Series(terminal_states_dict)
 
 # Run diffusion maps with start_cell and terminal_states and save the results
-pr_res = palantir.core.run_palantir(ms_data, start_cell, num_waypoints=500, terminal_states=terminal_states.index)
+pr_res = palantir.core.run_palantir(ms_data, start_cell, num_waypoints=500, terminal_states=terminal_states.index, n_jobs={n_jobs})
 pr_res.branch_probs.columns = terminal_states[pr_res.branch_probs.columns]
 ")
   }
