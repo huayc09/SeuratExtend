@@ -8,7 +8,8 @@ Palantir.Magic(
   seu,
   n_top_genes = 2000,
   n_components = 20,
-  conda_env = "seuratextend"
+  conda_env = "seuratextend",
+  n_jobs = 1
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ Palantir.Magic(
 \item{n_components}{The number of principal components to use in dimensionality reduction before applying MAGIC. Useful for preprocessing the data to enhance the effects of MAGIC. Default: 20}
 
 \item{conda_env}{The name of the Conda environment where the necessary Python dependencies for running MAGIC are installed. This environment is used to run Python code from R, ensuring smooth integration of the two platforms. Default: 'seuratextend'}
+
+\item{n_jobs}{Number of jobs for parallel computation. Default: 1}
 }
 \value{
 Updates the provided Seurat object by adding a new assay named 'magic', which contains the denoised and smoothed gene expression data.

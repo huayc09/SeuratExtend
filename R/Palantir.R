@@ -264,6 +264,7 @@ result_df.to_csv('{subfolder}/pr_res.csv')
 #' @param n_top_genes The number of top variable genes to consider in the MAGIC algorithm, which helps in focusing the smoothing on the most informative genes. Default: 2000
 #' @param n_components The number of principal components to use in dimensionality reduction before applying MAGIC. Useful for preprocessing the data to enhance the effects of MAGIC. Default: 20
 #' @param conda_env The name of the Conda environment where the necessary Python dependencies for running MAGIC are installed. This environment is used to run Python code from R, ensuring smooth integration of the two platforms. Default: 'seuratextend'
+#' @param n_jobs Number of jobs for parallel computation. Default: 1
 #' @return Updates the provided Seurat object by adding a new assay named 'magic', which contains the denoised and smoothed gene expression data.
 #' @details MAGIC uses a graph-based approach to infer and smooth gene expression across similar cells, effectively filling in gaps in the data where measurements are sparse or noisy. This process is especially beneficial in datasets with high levels of technical noise or when trying to resolve subtle biological signals that might be obscured by this noise.
 #' @examples
@@ -286,7 +287,8 @@ Palantir.Magic <- function(
     seu,
     n_top_genes = 2000,
     n_components = 20,
-    conda_env = "seuratextend"
+    conda_env = "seuratextend",
+    n_jobs = 1
 ) {
   library(Seurat)
   library(glue)
@@ -311,7 +313,7 @@ palantir.preprocess.log_transform(ad_magic)
 sc.pp.highly_variable_genes(ad_magic, n_top_genes={n_top_genes})
 sc.pp.pca(ad_magic)
 palantir.utils.run_diffusion_maps(ad_magic, n_components={n_components})
-imputed_X = palantir.utils.run_magic_imputation(ad_magic)
+imputed_X = palantir.utils.run_magic_imputation(ad_magic, n_jobs={n_jobs})
 "))
 
   # Add magic_imputation to "magic" assay
@@ -323,4 +325,3 @@ imputed_X = palantir.utils.run_magic_imputation(ad_magic)
 
   return(seu)
 }
-
