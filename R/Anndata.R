@@ -158,7 +158,7 @@ scv.tl.velocity_graph(adata)
 
   # Save adata if save.adata is provided
   if (!is.null(save.adata)) {
-    adata.Save(save.adata)
+    adata.Save(save.adata, conda_env = conda_env)
   }
 
   invisible(NULL)
@@ -203,7 +203,7 @@ adata.obs['", current_col, "'] = ", py_var_name, "
 
   # Save adata if save.adata is provided
   if (!is.null(save.adata)) {
-    adata.Save(save.adata)
+    adata.Save(save.adata, conda_env = conda_env)
   }
 
   invisible(NULL)
@@ -229,7 +229,7 @@ adata = sc.read_loom('{loompath}')
 
   # Save adata if save.adata is provided
   if (!is.null(save.adata)) {
-    adata.Save(save.adata)
+    adata.Save(save.adata, conda_env = conda_env)
   }
 
   invisible(NULL)
@@ -254,7 +254,7 @@ Seu2Adata <- function(
 
   # Save adata if save.adata is provided
   if (!is.null(save.adata)) {
-    adata.Save(save.adata)
+    adata.Save(save.adata, conda_env = conda_env)
   }
 
   invisible(NULL)
