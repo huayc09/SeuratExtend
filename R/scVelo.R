@@ -506,7 +506,7 @@ scVelo.Plot <- function(
 
   # Load adata if load.adata is provided
   if (!is.null(load.adata)) {
-    adata.Load(load.adata)
+    adata.Load(load.adata, conda_env = conda_env)
   }
 
   # Determine the scv plotting function

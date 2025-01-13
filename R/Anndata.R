@@ -133,7 +133,7 @@ adata.AddDR <- function(
 
   # Load adata if load.adata is provided
   if (!is.null(load.adata)) {
-    adata.Load(load.adata)
+    adata.Load(load.adata, conda_env = conda_env)
   }
 
   # Export all the dr to the adata object
@@ -158,7 +158,7 @@ scv.tl.velocity_graph(adata)
 
   # Save adata if save.adata is provided
   if (!is.null(save.adata)) {
-    adata.Save(save.adata)
+    adata.Save(save.adata, conda_env = conda_env)
   }
 
   invisible(NULL)
@@ -181,7 +181,7 @@ adata.AddMetadata <- function(
 
   # Load adata if load.adata is provided
   if (!is.null(load.adata)) {
-    adata.Load(load.adata)
+    adata.Load(load.adata, conda_env = conda_env)
   }
 
   # Check if the specified columns exist in the Seurat metadata
@@ -203,7 +203,7 @@ adata.obs['", current_col, "'] = ", py_var_name, "
 
   # Save adata if save.adata is provided
   if (!is.null(save.adata)) {
-    adata.Save(save.adata)
+    adata.Save(save.adata, conda_env = conda_env)
   }
 
   invisible(NULL)
@@ -229,7 +229,7 @@ adata = sc.read_loom('{loompath}')
 
   # Save adata if save.adata is provided
   if (!is.null(save.adata)) {
-    adata.Save(save.adata)
+    adata.Save(save.adata, conda_env = conda_env)
   }
 
   invisible(NULL)
@@ -254,7 +254,7 @@ Seu2Adata <- function(
 
   # Save adata if save.adata is provided
   if (!is.null(save.adata)) {
-    adata.Save(save.adata)
+    adata.Save(save.adata, conda_env = conda_env)
   }
 
   invisible(NULL)
