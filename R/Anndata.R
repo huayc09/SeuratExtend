@@ -133,7 +133,7 @@ adata.AddDR <- function(
 
   # Load adata if load.adata is provided
   if (!is.null(load.adata)) {
-    adata.Load(load.adata)
+    adata.Load(load.adata, conda_env = conda_env)
   }
 
   # Export all the dr to the adata object
@@ -181,7 +181,7 @@ adata.AddMetadata <- function(
 
   # Load adata if load.adata is provided
   if (!is.null(load.adata)) {
-    adata.Load(load.adata)
+    adata.Load(load.adata, conda_env = conda_env)
   }
 
   # Check if the specified columns exist in the Seurat metadata

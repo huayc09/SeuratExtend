@@ -47,7 +47,7 @@ Cellrank.Compute <- function(
 
   # Load adata if load.adata is provided
   if (!is.null(load.adata)) {
-    adata.Load(load.adata)
+    adata.Load(load.adata, conda_env = conda_env)
   }
 
   # Pass the time_key parameter to Python
@@ -108,7 +108,7 @@ Cellrank.Plot <- function(
 
   # Load adata if load.adata is provided
   if (!is.null(load.adata)) {
-    adata.Load(load.adata)
+    adata.Load(load.adata, conda_env = conda_env)
   }
 
   # Construct the function call
