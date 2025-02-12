@@ -9,7 +9,7 @@ feature_percent(
   feature,
   ident = NULL,
   group.by = NULL,
-  DefaultAssay = "RNA",
+  DefaultAssay = NULL,
   above = 0,
   total = F,
   if.expressed = F,
@@ -27,7 +27,7 @@ retreived by FetchData)}
 \item{group.by}{A variable name in meta.data to group by, if you don't want to use
 default Idents of Seurat object}
 
-\item{DefaultAssay}{Assay to use, Default: 'RNA'}
+\item{DefaultAssay}{Assay to use, Default: NULL (uses object's default assay)}
 
 \item{above}{Above which value will be considered as positive cell, Default: 0}
 

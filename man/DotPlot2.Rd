@@ -39,7 +39,6 @@ DotPlot2(
 \item{split.by}{Column name in seu@meta.data for splitting the groups. Default: NULL.}
 
 \item{split.by.method}{Method for visualizing the split groups. Options are "border" or "color". Default: "border".
-
   - "border": Uses different border colors to represent different split groups, while the fill color represents the expression level.
 
   - "color": Uses different dot colors to represent different split groups, while the transparency represents the expression level.}

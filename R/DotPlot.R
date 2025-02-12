@@ -5,7 +5,6 @@
 #' @param group.by Column name in seu@meta.data for grouping cells. Default: NULL (uses current Idents).
 #' @param split.by Column name in seu@meta.data for splitting the groups. Default: NULL.
 #' @param split.by.method Method for visualizing the split groups. Options are "border" or "color". Default: "border".
-#'
 #'   - "border": Uses different border colors to represent different split groups, while the fill color represents the expression level.
 #'
 #'   - "color": Uses different dot colors to represent different split groups, while the transparency represents the expression level.
@@ -153,7 +152,15 @@ DotPlot2 <- function(
 
   pct <- feature_percent(seu, tp, group.by = calc_group.by)
   pct.m <- melt(pct, value.name = "pct")
-  z <- CalcStats(seu, tp, group.by = calc_group.by) %>% as.matrix %>% melt(value.name = "zscore")
+  if(ncol(pct) == 1) {
+    warning("Only one identity present, the mean expression values will be used")
+    z <- CalcStats(seu, tp, group.by = calc_group.by, method = "mean") %>% as.matrix %>% melt(value.name = "zscore")
+    lab_value <- "Average Expression"
+  } else {
+    z <- CalcStats(seu, tp, group.by = calc_group.by) %>% as.matrix %>% melt(value.name = "zscore")
+    lab_value <- "zscore"
+  }
+
   ToPlot <- inner_join(pct.m, z, by = c("Var1","Var2"))
 
   # Split combined group back into original groups
@@ -230,7 +237,7 @@ DotPlot2 <- function(
         geom_point(shape = 21, stroke = border.width, position = position_nudge(x = ToPlot$nudge))
       color_scale <- scale_fill_cont_auto(color_scheme, center_color = center_color, value_range = value_range)
       split_scale <- scale_color_disc_auto(split.by.colors, n_splits)
-      color_lab <- "zscore"
+      color_lab <- lab_value
     } else if (split.by.method == "color") {
       p <- ggplot(ToPlot, aes(x = group, y = Var1, size = pct, color = split, alpha = zscore)) +
         geom_point(position = position_nudge(x = ToPlot$nudge))
@@ -243,12 +250,12 @@ DotPlot2 <- function(
       p <- ggplot(ToPlot, aes(x = group, y = Var1, size = pct, fill = zscore)) +
         geom_point(shape = 21, color = "black", stroke = border.width)
       color_scale <- scale_fill_cont_auto(color_scheme, center_color = center_color, value_range = value_range)
-      color_lab <- "zscore"
+      color_lab <- lab_value
     } else {
       p <- ggplot(ToPlot, aes(x = group, y = Var1, size = pct, color = zscore)) +
         geom_point()
       color_scale <- scale_color_cont_auto(color_scheme, center_color = center_color, value_range = value_range)
-      color_lab <- "zscore"
+      color_lab <- lab_value
     }
   }
 

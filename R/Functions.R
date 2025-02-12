@@ -7,7 +7,7 @@
 #' @param ident cluster name, Default: all clusters
 #' @param group.by A variable name in meta.data to group by, if you don't want to use
 #' default Idents of Seurat object
-#' @param DefaultAssay Assay to use, Default: 'RNA'
+#' @param DefaultAssay Assay to use, Default: NULL (uses object's default assay)
 #' @param above Above which value will be considered as positive cell, Default: 0
 #' @param total If to calculate proportion in total cells of selected clusters, Default: F
 #' @param if.expressed If only return logical value, Default: F
@@ -43,7 +43,7 @@ feature_percent <- function(
   feature,
   ident = NULL,
   group.by = NULL,
-  DefaultAssay = "RNA",
+  DefaultAssay = NULL,
   above = 0,
   total = F,
   if.expressed = F,
@@ -51,7 +51,17 @@ feature_percent <- function(
 ) {
   library(Seurat)
   library(rlist)
+
+  # Handle default assay and warning
+  if (is.null(DefaultAssay)) {
+    DefaultAssay <- DefaultAssay(seu)
+  }
+  if (DefaultAssay == "TF") {
+    warning("Current assay is set to 'TF'. If you want to examine gene expression, consider changing to 'RNA' assay.")
+  }
+
   DefaultAssay(seu) <- DefaultAssay
+
   if(is.null(group.by)){
     f <- Idents(seu)
   } else {
