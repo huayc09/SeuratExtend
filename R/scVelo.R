@@ -242,7 +242,7 @@ scv.settings.presenter_view = True
 scv.set_figure_params("scvelo")
 
 # Read the loom file
-adata = scv.read("{tmp.loom.path}")
+adata = sc.read("{tmp.loom.path}")
 
 # Pre-process the data
 scv.pp.filter_and_normalize(adata, min_shared_counts=20, n_top_genes=2000)
@@ -450,7 +450,7 @@ scVelo.RunBasic <- function(loom, save.adata = "adata.obj"){
                  'del ds.layers["norm_data"]\n',
                  'del ds.layers["scale_data"]\n',
                  'ds.close()\n',
-                 'adata = scv.read("', loom, '")\n',
+                 'adata = sc.read("', loom, '")\n',
                  "adata\n",
                  "scv.pp.filter_and_normalize(adata, min_shared_counts=20, n_top_genes=2000)\n",
                  "scv.pp.moments(adata, n_pcs=30, n_neighbors=30)\n",
