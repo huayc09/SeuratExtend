@@ -245,6 +245,8 @@ scv.set_figure_params("scvelo")
 
 # Read the loom file
 adata = sc.read("{tmp.loom.path}")
+# Pre-process the data
+scv.pp.filter_and_normalize(adata, min_shared_counts=20, n_top_genes=2000)
 ')
 
   py_run_string(python_code)
@@ -323,8 +325,6 @@ duplicates = get_duplicate_cells(adata)
   }
   # Construct the Python code string to run scVelo and save the Anndata object
   python_code <- glue('
-# Pre-process the data
-scv.pp.filter_and_normalize(adata, min_shared_counts=20, n_top_genes=2000)
 scv.pp.moments(adata, n_pcs=30, n_neighbors=30)
 # Compute velocity and velocity graph
 scv.tl.velocity(adata)
