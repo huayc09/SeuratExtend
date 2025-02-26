@@ -250,7 +250,7 @@ Seu2Adata <- function(
   loompath <- file.path(tempdir(), "seu.loom")
   Seu2Loom(seu, add.normdata = add.normdata, filename = loompath, overwrite = TRUE)
   adata.LoadLoom(loompath = loompath, conda_env = conda_env)
-  adata.AddDR(seu, dr = Reductions(seu))
+  adata.AddDR(seu, dr = Reductions(seu), conda_env = conda_env)
 
   # Save adata if save.adata is provided
   if (!is.null(save.adata)) {
