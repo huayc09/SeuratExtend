@@ -158,7 +158,7 @@ CalcMean <- function(matr, f, method = c("mean","median")) {
   fun <- switch(
     method,
     mean = base::mean,
-    median = base::median
+    median = stats::median
     )
   matr <- lapply(matr, function(x) apply(x,2,fun))
   matr <- rlist::list.cbind(matr)
