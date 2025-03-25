@@ -12,6 +12,7 @@ scVelo.SeuratToAnndata(
   cell.id.match.table = NULL,
   prefix = NULL,
   postfix = "-1",
+  remove_duplicates = FALSE,
   conda_env = "seuratextend"
 )
 
@@ -47,6 +48,8 @@ scVelo.Plot(
 
 \item{postfix}{Postfix appended to cell IDs in the Seurat object to match the corresponding IDs in the Velocyto loom file. Default: '-1'}
 
+\item{remove_duplicates}{Logical flag indicating whether to remove duplicate cells in the AnnData object. If TRUE, duplicate cells are removed based on PCA and sum of gene expression values. Default: FALSE}
+
 \item{conda_env}{Name of the Conda environment where the Python dependencies for scVelo and Scanpy are installed. This environment is used to run Python code from R. Default: 'seuratextend'}
 
 \item{load.adata}{Path to a previously saved AnnData object (in h5ad format) which can be directly loaded to avoid re-running preprocessing. If NULL, reticulate will automatically use the existing AnnData object `adata` in the Python environment for plotting. Default: NULL.}
@@ -80,7 +83,7 @@ scVelo.Plot(
 \item{save}{Path where the plot should be saved. If specified, the plot will be saved to the given location. Supports various file formats like PNG, PDF, SVG, etc. Default: NULL.}
 }
 \value{
-These functions do not return any object within R; instead, they prepare and store an AnnData object `adata` in the Python environment accessible via `reticulate`, and generate plots which can be viewed directly or saved to a file. The plots reflect the dynamics of RNA velocity in single-cell datasets.
+If remove_duplicates = TRUE, returns the filtered Seurat object with duplicate cells removed. Otherwise, does not return any object within R; instead, prepares and stores an AnnData object `adata` in the Python environment accessible via `reticulate`, and generates plots which can be viewed directly or saved to a file. The plots reflect the dynamics of RNA velocity in single-cell datasets.
 }
 \description{
 This set of functions converts a Seurat object and associated Velocyto loom file(s) into an AnnData object and generates visualization plots for RNA velocity analysis using scVelo. The AnnData object can be directly read from a file or accessed from memory to produce various styles of plots. This integrated approach facilitates the use of scVelo for trajectory analysis in Python's Scanpy library, allowing seamless transition between data processing in R and trajectory analysis in Python.

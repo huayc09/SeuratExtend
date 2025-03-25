@@ -6,8 +6,9 @@
 #' @param cell.id.match.table An optional data frame for advanced users that maps cell IDs between the Seurat object and Velocyto loom file across multiple samples. It requires a strict format with three columns: cellid.seurat, cellid.velocyto, and velocyto.loompath, indicating the cell ID in the Seurat object, the corresponding cell ID in the Velocyto loom, and the loom file path for that sample, respectively. Default: NULL
 #' @param prefix Prefix used to prepend to cell IDs in the Seurat object to match the corresponding IDs in the Velocyto loom file, reflecting sample or batch identifiers. Default: NULL
 #' @param postfix Postfix appended to cell IDs in the Seurat object to match the corresponding IDs in the Velocyto loom file. Default: '-1'
+#' @param remove_duplicates Logical flag indicating whether to remove duplicate cells in the AnnData object. If TRUE, duplicate cells are removed based on PCA and sum of gene expression values. Default: FALSE
 #' @param conda_env Name of the Conda environment where the Python dependencies for scVelo and Scanpy are installed. This environment is used to run Python code from R. Default: 'seuratextend'
-#' @return These functions do not return any object within R; instead, they prepare and store an AnnData object `adata` in the Python environment accessible via `reticulate`, and generate plots which can be viewed directly or saved to a file. The plots reflect the dynamics of RNA velocity in single-cell datasets.
+#' @return If remove_duplicates = TRUE, returns the filtered Seurat object with duplicate cells removed. Otherwise, does not return any object within R; instead, prepares and stores an AnnData object `adata` in the Python environment accessible via `reticulate`, and generates plots which can be viewed directly or saved to a file. The plots reflect the dynamics of RNA velocity in single-cell datasets.
 #' @details This integrated functionality facilitates a seamless transition between converting Seurat objects to AnnData objects and plotting with scVelo. The primary metadata and dimension reduction data from the Seurat object are used to prepare the AnnData object, which is then utilized for generating plots. `SeuratExtend` enhances scVelo plotting capabilities in R, supporting a variety of customization options for visualizing single-cell RNA velocity data. Users can manipulate plot styles, color schemes, group highlights, and more, making it an essential tool for advanced single-cell analysis without the need for direct interaction with Python code.
 #' @examples
 #' library(Seurat)
@@ -54,6 +55,7 @@ scVelo.SeuratToAnndata <- function(
     cell.id.match.table = NULL,
     prefix = NULL,
     postfix = "-1",
+    remove_duplicates = FALSE,
     conda_env = "seuratextend"
 ) {
   library(Seurat)
@@ -242,11 +244,9 @@ scv.settings.presenter_view = True
 scv.set_figure_params("scvelo")
 
 # Read the loom file
-adata = scv.read("{tmp.loom.path}")
-
+adata = sc.read("{tmp.loom.path}")
 # Pre-process the data
 scv.pp.filter_and_normalize(adata, min_shared_counts=20, n_top_genes=2000)
-scv.pp.moments(adata, n_pcs=30, n_neighbors=30)
 ')
 
   py_run_string(python_code)
@@ -274,8 +274,58 @@ adata.obsm["{i}_cell_embeddings"] = np.genfromtxt("{tmp_dr_path}", delimiter=","
     }
   }
 
+  # Run Python code to check for duplicates
+  python_code <- glue('
+def get_duplicate_cells(data):
+  """Check for duplicate cells in AnnData object."""
+  from anndata import AnnData
+  from scipy.sparse import issparse
+  from collections import Counter
+  import numpy as np
+  import pandas as pd
+    
+  if isinstance(data, AnnData):
+    X = data.X
+    # Get initial size and PCA sum for comparison
+    lst = list(np.sum(np.abs(data.obsm["X_pca"]), 1) + np.sum(X.toarray() if issparse(X) else X, 1))
+  else:
+    X = data
+    lst = list(np.sum(X, 1).A1 if issparse(X) else np.sum(X, 1))
+
+  idx_dup = []
+  if len(set(lst)) < len(lst):
+    vals = [val for val, count in Counter(lst).items() if count > 1]
+    idx_dup = np.where(pd.Series(lst).isin(vals))[0]
+
+    X_new = np.array(X[idx_dup].toarray() if issparse(X) else X[idx_dup])
+    sorted_idx = np.lexsort(X_new.T)
+    sorted_data = X_new[sorted_idx, :]
+
+    row_mask = np.invert(np.append([True], np.any(np.diff(sorted_data, axis=0), 1)))
+    idx = sorted_idx[row_mask]
+    idx_dup = np.array(idx_dup)[idx]
+  return len(idx_dup)
+if "X_pca" not in adata.obsm.keys():
+      sc.pp.pca(adata)
+duplicates = get_duplicate_cells(adata)
+')
+  py_run_string(python_code)
+  duplicates <- py_eval("duplicates")
+  if (duplicates > 0 && remove_duplicates) {
+    python_code <- "scv.pp.remove_duplicate_cells(adata)"
+    py_run_string(python_code)
+    message(paste0("Removed ", duplicates, " duplicate cells"))
+
+    # Get remaining cells from adata
+    remaining_cells <- py_eval("adata.obs_names.to_list()")
+    # Subset Seurat object
+    seu <- subset(seu, cells = remaining_cells)
+  } else if (duplicates > 0) {
+    message(paste0("Found ", duplicates, " duplicate cells, but skipping removal as remove_duplicates=FALSE"))
+  }
   # Construct the Python code string to run scVelo and save the Anndata object
   python_code <- glue('
+scv.pp.moments(adata, n_pcs=30, n_neighbors=30)
 # Compute velocity and velocity graph
 scv.tl.velocity(adata)
 scv.tl.velocity_graph(adata)
@@ -284,6 +334,12 @@ adata.write("{filename}")
 
   # Run the Python code
   reticulate::py_run_string(python_code)
+
+  if (remove_duplicates) {
+    return(seu)
+  } else {
+    return(NULL)
+  }
 }
 
 #' @title (Deprecated) Export Seurat Object and Velocyto Data to Loom for scVelo Analysis
@@ -450,7 +506,7 @@ scVelo.RunBasic <- function(loom, save.adata = "adata.obj"){
                  'del ds.layers["norm_data"]\n',
                  'del ds.layers["scale_data"]\n',
                  'ds.close()\n',
-                 'adata = scv.read("', loom, '")\n',
+                 'adata = sc.read("', loom, '")\n',
                  "adata\n",
                  "scv.pp.filter_and_normalize(adata, min_shared_counts=20, n_top_genes=2000)\n",
                  "scv.pp.moments(adata, n_pcs=30, n_neighbors=30)\n",
