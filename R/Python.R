@@ -51,7 +51,7 @@ load_condaenv <- function(conda_env) {
 #   !is.na(conda_path) && file.exists(conda_path)
 # }
 
-##' @title Create the 'seuratextend' Conda Environment
+#' @title Create the 'seuratextend' Conda Environment
 #' @description Initializes a Conda environment named 'seuratextend' which includes all necessary Python packages for running `scVelo`, `Palantir`, and `CellRank` via `SeuratExtend`. This function is ideal for users setting up their analytical environment for the first time or those who need to ensure they have a compatible environment setup.
 #' @param force Logical; if TRUE, removes any existing 'seuratextend' environment before creating a new one. Default is FALSE. Use this parameter to force recreation of the environment if a previous installation was interrupted or incomplete.
 #' @return Does not return any value; it creates and configures a new Conda environment.
@@ -59,10 +59,10 @@ load_condaenv <- function(conda_env) {
 #'
 #' The environment setup is automatic and checks your operating system to configure appropriately. It is currently supported and tested on:
 #' * Windows (Intel/AMD processors)
-#' * Intel-based macOS (not compatible with Apple Silicon/M1/M2)
+#' * macOS (both Intel-based and Apple Silicon/M-series processors)
 #' * Linux (Ubuntu 20.04)
 #'
-#' Users with Apple Silicon devices who are interested in contributing to the development of M1/M2 support are welcome to reach out via GitHub Issues.
+#' The function automatically detects Apple Silicon (M1/M2/M3/M4) Macs and uses the appropriate configuration.
 #'
 #' If force=TRUE is used, any existing 'seuratextend' environment will be removed before creating a new one. This can be useful when:
 #' * A previous installation was interrupted
@@ -104,22 +104,24 @@ create_condaenv_seuratextend <- function(force = FALSE) {
 
   # Check if environment already exists
   envs <- conda_list()
-  if (!force && env_name %in% envs$name) {
-    message(paste(
-      "Conda environment 'seuratextend' already exists.\n",
-      "Options:\n",
-      "1) Skip creation (enter: skip)\n",
-      "2) Force recreate environment (enter: force)\n",
-      "Please choose (skip/force): "
-    ))
-    response <- tolower(readline(prompt = ""))
+  if (env_name %in% envs$name) {
+    if(!force) {
+      message(paste(
+        "Conda environment 'seuratextend' already exists.\n",
+        "Options:\n",
+        "1) Skip creation (enter: skip)\n",
+        "2) Force recreate environment (enter: force)\n",
+        "Please choose (skip/force): "
+      ))
+      response <- tolower(readline(prompt = ""))
 
-    if (response == "skip") {
-      message("Skipping environment creation.")
-      return(invisible())
-    } else if (response != "force") {
-      message("Invalid response. Skipping environment creation.")
-      return(invisible())
+      if (response == "skip") {
+        message("Skipping environment creation.")
+        return(invisible())
+      } else if (response != "force") {
+        message("Invalid response. Skipping environment creation.")
+        return(invisible())
+      }
     }
 
     # If force selected, remove existing environment
@@ -129,13 +131,29 @@ create_condaenv_seuratextend <- function(force = FALSE) {
 
   # Check operating system and get appropriate YAML file
   os_type <- Sys.info()["sysname"]
+
+  # Check if on Apple Silicon Mac
+  is_apple_silicon <- FALSE
+  if (os_type == "Darwin") {
+    # Check architecture - Apple Silicon Macs use arm64 or aarch64
+    system_arch <- system("uname -m", intern = TRUE)
+    is_apple_silicon <- tolower(system_arch) %in% c("arm64", "aarch64")
+  }
+
+  # Select appropriate YAML file based on OS and architecture
+  if (os_type == "Darwin" && is_apple_silicon) {
+    yaml_file_name <- "environment-mac-silicon.yml"
+  } else {
+    yaml_file_name <- switch(os_type,
+                             "environment-linux.yml",  # Default for Linux
+                             Windows = "environment-windows.yml",
+                             Darwin = "environment-mac.yml"
+    )
+  }
+
   yaml_file <- system.file(
     "extdata",
-    switch(os_type,
-           "environment-linux.yml",
-           Windows = "environment-windows.yml",
-           Darwin = "environment-mac.yml"
-    ),
+    yaml_file_name,
     package = "SeuratExtend",
     mustWork = TRUE
   )
@@ -187,4 +205,39 @@ r_vector_to_py <- function(vec, type = "list") {
   } else {
     paste0(start_char, paste(shQuote(vec, type = "sh"), collapse = ", "), end_char)
   }
+}
+
+#' Activate Python Environment for SeuratExtend
+#'
+#' This function activates a Python environment (default: "seuratextend")
+#'
+#' @param conda_env Character string specifying the conda environment name. Default is "seuratextend".
+#' @param verbose Logical indicating whether to print status messages. Default is TRUE.
+#' @param packages Character vector of Python packages to import.
+#'
+#' @return Invisible TRUE if successful
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' activate_python()
+#' activate_python(conda_env = "my_custom_env", verbose = TRUE)
+#' }
+activate_python <- function(conda_env = "seuratextend",
+                            verbose = TRUE,
+                            packages = c("os")) {
+
+  load_condaenv(conda_env = conda_env)
+
+  tryCatch({
+    # Import basic packages
+    for (pkg in packages) {
+      if (verbose) message(paste0("Importing ", pkg, "..."))
+      reticulate::py_run_string(paste0("import ", pkg))
+    }
+    invisible(TRUE)
+  },
+  error = function(e) {
+    stop(paste0("Error activating Python environment: ", e$message))
+  })
 }

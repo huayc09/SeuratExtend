@@ -18,6 +18,7 @@ adata.AddDR(
   seu,
   dr = NULL,
   prefix = "X_",
+  postfix = "",
   scv.graph = FALSE,
   load.adata = NULL,
   save.adata = NULL,
@@ -60,6 +61,8 @@ Seu2Loom(
 \item{dr}{Specifies which dimension reductions from the Seurat object should be transferred to the AnnData object. If NULL, all available reductions are included. Default: NULL.}
 
 \item{prefix}{A prefix to add to the dimension reduction names when importing them into the AnnData object's 'obsm' attribute. This helps in differentiating various data types and maintaining order within the dataset. Default: 'X_'.}
+
+\item{postfix}{A postfix to add to the dimension reduction names when importing them into the AnnData object's 'obsm' attribute.}
 
 \item{scv.graph}{Optional; a boolean indicating whether to calculate the velocity graph after importing dimension reduction data. This is useful for kinetic analyses in single-cell studies. Default: FALSE.}
 

@@ -321,7 +321,7 @@ imputed_X = palantir.utils.run_magic_imputation(ad_magic, n_jobs={n_jobs})
   rownames(magic_matr) <- colnames(seu)
   colnames(magic_matr) <- rownames(seu)
 
-  seu[["magic"]] <- CreateAssayObject(data = t(magic_matr))
+  seu[["magic"]] <- CreateAssayObject(data = t(as.matrix(magic_matr)))
 
   return(seu)
 }

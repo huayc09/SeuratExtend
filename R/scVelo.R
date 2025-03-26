@@ -238,7 +238,7 @@ import numpy as np
 import matplotlib.cm as cm
 
 # Set scVelo settings
-scv.logging.print_version()
+print(f"scVelo version: {{scv.__version__}}")
 scv.settings.verbosity = 3
 scv.settings.presenter_view = True
 scv.set_figure_params("scvelo")
@@ -256,22 +256,8 @@ scv.pp.filter_and_normalize(adata, min_shared_counts=20, n_top_genes=2000)
 
   # Check if dr_list is not empty
   if (length(dr_list) > 0) {
-    # Loop over each dimension reduction and add to Anndata object
-    for (i in dr_list) {
-      # Get the embeddings and write to a temporary CSV file
-      embeddings <- Embeddings(seu, reduction = i)
-      tmp_dr_path <- file.path(subfolder, paste0(i, "_dr.csv"))
-      write.csv(embeddings, file = tmp_dr_path, quote = F, row.names = F)
-
-      # Construct the Python code string using glue
-      python_code <- glue('
-import numpy as np
-adata.obsm["{i}_cell_embeddings"] = np.genfromtxt("{tmp_dr_path}", delimiter=",", skip_header=1)
-    ')
-
-      # Run the Python code
-      py_run_string(python_code)
-    }
+    adata.AddDR(seu, prefix = "X_", postfix = "", conda_env = conda_env)
+    adata.AddDR(seu, prefix = "", postfix = "_cell_embeddings", conda_env = conda_env)
   }
 
   # Run Python code to check for duplicates
@@ -283,7 +269,7 @@ def get_duplicate_cells(data):
   from collections import Counter
   import numpy as np
   import pandas as pd
-    
+
   if isinstance(data, AnnData):
     X = data.X
     # Get initial size and PCA sum for comparison
@@ -305,8 +291,10 @@ def get_duplicate_cells(data):
     idx = sorted_idx[row_mask]
     idx_dup = np.array(idx_dup)[idx]
   return len(idx_dup)
+
 if "X_pca" not in adata.obsm.keys():
       sc.pp.pca(adata)
+
 duplicates = get_duplicate_cells(adata)
 ')
   py_run_string(python_code)
@@ -497,7 +485,7 @@ scVelo.RunBasic <- function(loom, save.adata = "adata.obj"){
                  "import scanpy as sc\n",
                  "import numpy as np\n",
                  "import matplotlib.cm as cm\n",
-                 "scv.logging.print_version()\n",
+                 'print(f"scVelo version: {scv.__version__}")\n',
                  "scv.settings.verbosity = 3\n",
                  "scv.settings.presenter_view = True\n",
                  "scv.set_figure_params('scvelo')\n",

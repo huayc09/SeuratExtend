@@ -35,6 +35,7 @@ RunSlingshot <- function(
 ){
   import("slingshot")
   library(Seurat)
+  library(dplyr)
   assay <- assay %||% DefaultAssay(Seu)
   cols_to_remove <- grep(pattern = "slingPseudotime_\\d+", colnames(Seu@meta.data), value = TRUE)
   Seu@meta.data <- Seu@meta.data[, !colnames(Seu@meta.data) %in% cols_to_remove]

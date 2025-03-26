@@ -11,6 +11,7 @@
 #' @param loompath Path to the loom file that needs to be loaded into an AnnData object.
 #' @param dr Specifies which dimension reductions from the Seurat object should be transferred to the AnnData object. If NULL, all available reductions are included. Default: NULL.
 #' @param prefix A prefix to add to the dimension reduction names when importing them into the AnnData object's 'obsm' attribute. This helps in differentiating various data types and maintaining order within the dataset. Default: 'X_'.
+#' @param postfix A postfix to add to the dimension reduction names when importing them into the AnnData object's 'obsm' attribute.
 #' @param scv.graph Optional; a boolean indicating whether to calculate the velocity graph after importing dimension reduction data. This is useful for kinetic analyses in single-cell studies. Default: FALSE.
 #' @param col The name of the metadata column in the Seurat object that needs to be transferred to the AnnData object.
 #' @param conda_env Name of the Conda environment where the necessary Python libraries are installed. This environment is used to run Python code from R, bridging Seurat and AnnData functionalities. Default: 'seuratextend'.
@@ -112,6 +113,7 @@ adata.AddDR <- function(
     seu,
     dr = NULL,
     prefix = "X_",
+    postfix = "",
     scv.graph = FALSE,
     load.adata = NULL,
     save.adata = NULL,
@@ -143,7 +145,7 @@ adata.AddDR <- function(
     py[[py_var_name]] <- embeddings
     reticulate::py_run_string(paste0("
 import numpy as np
-adata.obsm['", prefix, current_dr, "'] = np.array(", py_var_name, ")
+adata.obsm['", prefix, current_dr, postfix, "'] = np.array(", py_var_name, ")
 "))
   }
 

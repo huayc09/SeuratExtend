@@ -20,10 +20,10 @@ When you run functions from `SeuratExtend` that require Python integrations, suc
 
 The environment setup is automatic and checks your operating system to configure appropriately. It is currently supported and tested on:
 * Windows (Intel/AMD processors)
-* Intel-based macOS (not compatible with Apple Silicon/M1/M2)
+* macOS (both Intel-based and Apple Silicon/M-series processors)
 * Linux (Ubuntu 20.04)
 
-Users with Apple Silicon devices who are interested in contributing to the development of M1/M2 support are welcome to reach out via GitHub Issues.
+The function automatically detects Apple Silicon (M1/M2/M3/M4) Macs and uses the appropriate configuration.
 
 If force=TRUE is used, any existing 'seuratextend' environment will be removed before creating a new one. This can be useful when:
 * A previous installation was interrupted
