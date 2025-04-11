@@ -9,18 +9,32 @@
 #' @param reduction The type of dimension reduction used to display the data, such as 'umap' or 'tsne'. This choice determines the underlying plot layout. Default: 'umap'.
 #' @param order A logical value indicating whether to plot cells with higher expressions on top of those with lower expressions, which can help prevent significant data points from being obscured in dense areas of the plot. Default: TRUE.
 #' @param pt.size Point size for plotting individual cells in the grid. Smaller values are typically used for large datasets or dense plots, whereas larger values enhance visibility for plots with fewer cells or less overlap. Default: 0.1.
+#' @param dark.theme A logical value indicating whether to apply Seurat's DarkTheme to the plot. Default: FALSE.
 #' @return A ggplot object that represents a dimension reduction plot incorporating three features with color blending, showing how each feature contributes to the overall expression patterns observed.
 #' @details `FeaturePlot3` is designed for detailed exploratory analysis where understanding the interplay between multiple variables is crucial. This function is particularly useful for researchers looking to explore gene expressions in complex datasets, such as those involving interactions between different cell types or conditions.
 #' @examples
 #' library(Seurat)
 #' library(SeuratExtend)
 #'
+#' # Basic usage
 #' FeaturePlot3(
 #'   pbmc,
 #'   feature.1 = "CD3D",
 #'   feature.2 = "CD14",
 #'   feature.3 = "CD79A",
 #'   color = "ryb"
+#' )
+#'
+#' # With dark theme
+#' FeaturePlot3(
+#'   pbmc,
+#'   feature.1 = "CD3D",
+#'   feature.2 = "CD14",
+#'   feature.3 = "CD79A",
+#'   color = "rgb",
+#'   dark.theme = TRUE,
+#'   pt.size = 1,
+#'   color.range = c(0.1, 1)
 #' )
 #'
 #' @rdname FeaturePlot3
@@ -35,7 +49,8 @@ FeaturePlot3 <- function(
   color.range = c(0.1,0.9),
   reduction = "umap",
   order = T,
-  pt.size = 0.1
+  pt.size = 0.1,
+  dark.theme = FALSE
 ){
   library(Seurat)
   library(reshape2)
@@ -74,6 +89,10 @@ FeaturePlot3 <- function(
       scale_color_gradient(low = col[1], high = col[2]) +
       labs(color = title) +
       theme(legend.justification = c(0,1))
+
+    # Apply DarkTheme to the legend if requested
+    if(dark.theme) p.tmp <- p.tmp + DarkTheme2()
+
     p.tmp <- get_legend(p.tmp)
     return(p.tmp)
   }
@@ -107,10 +126,16 @@ FeaturePlot3 <- function(
     y = colnames(tp.c)[2])) +
     geom_point(color = tp.c$color, size = pt.size) +
     theme_classic()
+
+  # Apply DarkTheme if requested
+  if(dark.theme) p <- p + DarkTheme2()
+
   p <- ggarrange(
     p, ggarrange(plotlist = p.leg, ncol = 1),
     widths = c(8,1)
   )
+
+  if(dark.theme) p <- p + theme(plot.background = black.background)
   return(p)
 }
 
@@ -124,17 +149,30 @@ FeaturePlot3 <- function(
 #' @param order Controls whether cells with higher feature expressions are plotted above those with lower expressions. This is useful for ensuring that cells with significant expression levels are visible and not obscured by those with lower levels. Default: TRUE.
 #' @param pt.size Point size for plotting individual cells in the grid. Smaller values are typically used for large datasets or dense plots, whereas larger values enhance visibility for plots with fewer cells or less overlap. Default: 0.1.
 #' @param legend Determines whether to display a legend describing the features and color scales. Default: FALSE.
+#' @param dark.theme A logical value indicating whether to apply Seurat's DarkTheme to the plot. Default: FALSE.
 #' @return A ggplot object displaying a grid of dimension reduction plots, each illustrating the expression patterns of three features using the specified color blending system.
 #' @details The `FeaturePlot3.grid` function is particularly useful for exploratory data analysis where visualization of multiple gene interactions or expression patterns across different cell populations is required. It effectively combines data from multiple features into a single coherent visual representation.
 #' @examples
 #' library(Seurat)
 #' library(SeuratExtend)
 #'
+#' # Basic usage
 #' FeaturePlot3.grid(
 #'   pbmc,
 #'   features = c("CD3D", "CD14", "CD79A", "FCGR3A", NA, "LYZ"),
 #'   color = "ryb",
 #'   pt.size = 0.5
+#' )
+#'
+#' # With dark theme
+#' FeaturePlot3.grid(
+#'   pbmc,
+#'   features = c("CD3D", "CD14", "CD79A", "FCGR3A", NA, "LYZ"),
+#'   color = "rgb",
+#'   pt.size = 1,
+#'   dark.theme = TRUE,
+#'   legend = TRUE,
+#'   color.range = c(0.1, 1)
 #' )
 #'
 #' @rdname FeaturePlot3-grid
@@ -148,7 +186,8 @@ FeaturePlot3.grid <- function(
   reduction = "umap",
   order = T,
   pt.size = 0.1,
-  legend = F
+  legend = F,
+  dark.theme = FALSE
 ){
   library(Seurat)
   library(reshape2)
@@ -279,6 +318,18 @@ FeaturePlot3.grid <- function(
           strip.text = element_markdown(face = "bold", size = 11),
           strip.background = element_rect(fill = NA))
 
+  # Apply dark theme if requested
+  if(dark.theme) {
+    p <- p +
+      theme(
+        panel.background = element_rect(fill = "black", color = "white", linewidth = 0.6),
+        plot.background = black.background.no.border,
+        panel.border = element_rect(color = "white"),
+        strip.background = element_rect(fill = "black", color = "white", linewidth = 0.6),
+        axis.title = element_text(color = "white")
+      )
+  }
+
   # figure legend
   if(legend){
     p.leg <- list()
@@ -292,6 +343,17 @@ FeaturePlot3.grid <- function(
             breaks = c(0,1), labels = c("min", "max")) +
           labs(color = NULL) +
           theme(legend.justification = c(0,1))
+
+        # Apply dark theme to the legend if requested
+        if(dark.theme) {
+          p.tmp <- p.tmp +
+            theme(
+              legend.background = black.background,
+              legend.key = black.background.no.border,
+              legend.text = element_text(color = "white")
+            )
+        }
+
         p.leg[[as.character(i)]] <- get_legend(p.tmp)
       }
     }
@@ -299,8 +361,39 @@ FeaturePlot3.grid <- function(
       p, ggarrange(plotlist = p.leg, ncol = 1),
       widths = c(8,1)
     )
+
+    # Apply dark theme to the overall combined plot
+    if(dark.theme) {
+      p <- p + theme(plot.background = black.background.no.border)
+    }
   }
   return(p)
 }
 
+black.background <- element_rect(fill = "black")
+black.background.no.border <- element_rect(fill = "black", linewidth = 0)
+font.margin <- 4
+white.text <- element_text(
+  colour = "white", margin = margin(
+    t = font.margin,
+    r = font.margin,
+    b = font.margin,
+    l = font.margin)
+)
+DarkTheme2 <- function (strip.text = "white", ...) {
+  white.line <- element_line(colour = "white", size = 1)
+  no.line <- element_line(size = 0)
+  dark.theme <- theme(
+    plot.background = black.background.no.border,
+    panel.background = black.background, legend.background = black.background,
+    legend.box.background = black.background.no.border,
+    legend.key = black.background.no.border,
+    plot.title = white.text, plot.subtitle = white.text,
+    axis.title = white.text, axis.text = white.text, legend.title = white.text,
+    legend.text = white.text, axis.line.x = white.line,
+    axis.line.y = white.line, panel.grid = no.line, panel.grid.minor = no.line,
+    validate = TRUE, ...)
+  if(strip.text == "white") dark.theme <- dark.theme + theme(strip.text = white.text)
+  return(dark.theme)
+}
 

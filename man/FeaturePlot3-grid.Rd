@@ -12,7 +12,8 @@ FeaturePlot3.grid(
   reduction = "umap",
   order = T,
   pt.size = 0.1,
-  legend = F
+  legend = F,
+  dark.theme = FALSE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ FeaturePlot3.grid(
 \item{pt.size}{Point size for plotting individual cells in the grid. Smaller values are typically used for large datasets or dense plots, whereas larger values enhance visibility for plots with fewer cells or less overlap. Default: 0.1.}
 
 \item{legend}{Determines whether to display a legend describing the features and color scales. Default: FALSE.}
+
+\item{dark.theme}{A logical value indicating whether to apply Seurat's DarkTheme to the plot. Default: FALSE.}
 }
 \value{
 A ggplot object displaying a grid of dimension reduction plots, each illustrating the expression patterns of three features using the specified color blending system.
@@ -45,11 +48,23 @@ The `FeaturePlot3.grid` function is particularly useful for exploratory data ana
 library(Seurat)
 library(SeuratExtend)
 
+# Basic usage
 FeaturePlot3.grid(
   pbmc,
   features = c("CD3D", "CD14", "CD79A", "FCGR3A", NA, "LYZ"),
   color = "ryb",
   pt.size = 0.5
+)
+
+# With dark theme
+FeaturePlot3.grid(
+  pbmc,
+  features = c("CD3D", "CD14", "CD79A", "FCGR3A", NA, "LYZ"),
+  color = "rgb",
+  pt.size = 1, 
+  dark.theme = TRUE, 
+  legend = TRUE, 
+  color.range = c(0.1, 1)
 )
 
 }

@@ -34,6 +34,9 @@ StackedViolin(
   hide.ns = TRUE,
   step.increase = 0.12,
   tip.length = 0.03,
+  angle = NULL,
+  hjust = NULL,
+  vjust = NULL,
   ...
 )
 
@@ -70,6 +73,9 @@ StackedViolin_v3(
   hide.ns = TRUE,
   step.increase = 0.12,
   tip.length = 0.03,
+  angle = NULL,
+  hjust = NULL,
+  vjust = NULL,
   ...
 )
 }

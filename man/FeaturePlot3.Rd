@@ -13,7 +13,8 @@ FeaturePlot3(
   color.range = c(0.1, 0.9),
   reduction = "umap",
   order = T,
-  pt.size = 0.1
+  pt.size = 0.1,
+  dark.theme = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ FeaturePlot3(
 \item{order}{A logical value indicating whether to plot cells with higher expressions on top of those with lower expressions, which can help prevent significant data points from being obscured in dense areas of the plot. Default: TRUE.}
 
 \item{pt.size}{Point size for plotting individual cells in the grid. Smaller values are typically used for large datasets or dense plots, whereas larger values enhance visibility for plots with fewer cells or less overlap. Default: 0.1.}
+
+\item{dark.theme}{A logical value indicating whether to apply Seurat's DarkTheme to the plot. Default: FALSE.}
 }
 \value{
 A ggplot object that represents a dimension reduction plot incorporating three features with color blending, showing how each feature contributes to the overall expression patterns observed.
@@ -48,12 +51,25 @@ This function visualizes three distinct features on a single dimension reduction
 library(Seurat)
 library(SeuratExtend)
 
+# Basic usage
 FeaturePlot3(
   pbmc,
   feature.1 = "CD3D",
   feature.2 = "CD14",
   feature.3 = "CD79A",
   color = "ryb"
+)
+
+# With dark theme
+FeaturePlot3(
+  pbmc,
+  feature.1 = "CD3D",
+  feature.2 = "CD14",
+  feature.3 = "CD79A",
+  color = "rgb", 
+  dark.theme = TRUE, 
+  pt.size = 1, 
+  color.range = c(0.1, 1)
 )
 
 }

@@ -41,6 +41,9 @@ VlnPlot2(object, ...)
   hide.ns = TRUE,
   step.increase = 0.12,
   tip.length = 0.03,
+  angle = NULL,
+  hjust = NULL,
+  vjust = NULL,
   ...
 )
 
@@ -73,6 +76,9 @@ VlnPlot2(object, ...)
   hide.ns = TRUE,
   step.increase = 0.12,
   tip.length = 0.03,
+  angle = NULL,
+  hjust = NULL,
+  vjust = NULL,
   ...
 )
 }
@@ -153,6 +159,12 @@ When both are provided, \code{stats.method} takes precedence.}
 \item{step.increase}{Numeric vector denoting the increase in fraction of total height for each additional comparison, minimizing overlap. Default: 0.12.}
 
 \item{tip.length}{Numeric vector indicating the fraction of total height the bar descends to specify the exact column. For a line display instead of a bracket, set to 0. Default: 0.03.}
+
+\item{angle}{Angle for label rotation. If NULL, automatically determined based on label length. Default: NULL.}
+
+\item{hjust}{Horizontal justification of labels. If NULL, automatically determined based on angle. Default: NULL.}
+
+\item{vjust}{Vertical justification of labels. If NULL, automatically determined based on angle. Default: NULL.}
 
 \item{matr}{A matrix or data frame with rows as features and columns as cells.}
 
