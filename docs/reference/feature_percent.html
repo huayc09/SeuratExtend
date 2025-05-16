@@ -18,7 +18,7 @@ in certain clusters"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/a
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SeuratExtend</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
       </span>
     </div>
 
@@ -108,7 +108,7 @@ in certain clusters</p>
 <span>  <span class="va">feature</span>,</span>
 <span>  ident <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  group.by <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  DefaultAssay <span class="op">=</span> <span class="st">"RNA"</span>,</span>
+<span>  DefaultAssay <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  above <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  total <span class="op">=</span> <span class="cn">F</span>,</span>
 <span>  if.expressed <span class="op">=</span> <span class="cn">F</span>,</span>
@@ -137,7 +137,7 @@ default Idents of Seurat object</p></dd>
 
 
 <dt>DefaultAssay</dt>
-<dd><p>Assay to use, Default: 'RNA'</p></dd>
+<dd><p>Assay to use, Default: NULL (uses object's default assay)</p></dd>
 
 
 <dt>above</dt>
@@ -170,7 +170,7 @@ only use this parameter when "if.expressed" is set to TRUE. Default: 0.1</p></dd
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span>
 <span></span>
 <span><span class="fu">feature_percent</span><span class="op">(</span><span class="va">pbmc</span>, feature <span class="op">=</span> <span class="va">genes</span><span class="op">)</span></span>
 <span></span>

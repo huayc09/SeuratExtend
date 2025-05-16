@@ -10,6 +10,25 @@
 #' @param conda_env Name of the Conda environment where the Python dependencies for scVelo and Scanpy are installed. This environment is used to run Python code from R. Default: 'seuratextend'
 #' @return If remove_duplicates = TRUE, returns the filtered Seurat object with duplicate cells removed. Otherwise, does not return any object within R; instead, prepares and stores an AnnData object `adata` in the Python environment accessible via `reticulate`, and generates plots which can be viewed directly or saved to a file. The plots reflect the dynamics of RNA velocity in single-cell datasets.
 #' @details This integrated functionality facilitates a seamless transition between converting Seurat objects to AnnData objects and plotting with scVelo. The primary metadata and dimension reduction data from the Seurat object are used to prepare the AnnData object, which is then utilized for generating plots. `SeuratExtend` enhances scVelo plotting capabilities in R, supporting a variety of customization options for visualizing single-cell RNA velocity data. Users can manipulate plot styles, color schemes, group highlights, and more, making it an essential tool for advanced single-cell analysis without the need for direct interaction with Python code.
+#' 
+#' ## macOS-Specific Considerations
+#' 
+#' If you are using macOS, be aware of the following:
+#' 
+#' * **Intel Macs**: Using these functions in R Markdown within RStudio may cause the R session to crash. Use regular .R script files instead.
+#' 
+#' * **Apple Silicon (M1/M2/M3/M4)**: There are known memory management issues between R and Python when performing operations like PCA on AnnData objects.
+#'   To avoid crashes, start with a fresh R session and call `activate_python()` before loading any R objects or running any scVelo functions:
+#'   
+#'   ```r
+#'   # Run at the beginning of your session on macOS
+#'   activate_python()
+#'   
+#'   # Then load your data and proceed with analysis
+#'   seu <- readRDS("path/to/seurat_object.rds")
+#'   scVelo.SeuratToAnndata(...)
+#'   ```
+#' 
 #' @examples
 #' library(Seurat)
 #' library(SeuratExtend)

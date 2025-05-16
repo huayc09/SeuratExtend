@@ -154,8 +154,11 @@ is_empty <- function (x) length(x) == 0
 
 # Check species
 
-check_spe <- function(spe){
-  if(is.null(spe)) stop("species undefined: options(spe = c(\"mouse\", \"human\"))")
+check_spe <- function(spe) {
+  if (is.null(spe)) {
+    stop("Species not defined. Please set with options(spe = \"your_species\") or provide directly to the function. Default supported species are 'human' and 'mouse'. For custom species, please refer to the documentation on using custom data.")
+  }
+  return(TRUE)
 }
 
 # Check package version

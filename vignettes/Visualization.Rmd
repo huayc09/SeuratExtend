@@ -77,7 +77,7 @@ DimPlot2(
   pbmc,
   features = c("cluster", "orig.ident", "CD14", "CD3D"),
   cols = list(
-    "cluster" = "light",
+    "cluster" = "default", # dark theme
     "CD14" = "D",
     "CD3D" = "OrRd"
   ),
@@ -160,6 +160,24 @@ For the RGB system, with red for CD3D, green for CD14, and blue for CD79A:
 FeaturePlot3(pbmc, color = "rgb", feature.1 = "CD3D", feature.2 = "CD14", feature.3 = "CD79A", pt.size = 1)
 ```
 
+#### Using Dark Theme (New in v1.2.0)
+
+For improved visualization in presentations or in low-light environments, you can use the dark theme option:
+
+```{r, fig.width=6, fig.height=5, message=FALSE, warning=FALSE}
+FeaturePlot3(
+  pbmc, 
+  color = "rgb", 
+  feature.1 = "CD3D", 
+  feature.2 = "CD14", 
+  feature.3 = "CD79A", 
+  pt.size = 1,
+  dark.theme = TRUE
+)
+```
+
+This dark theme provides better contrast for visualizing gene expression patterns, particularly when using the RGB color system where brighter colors represent higher expression levels.
+
 #### Batch Visualization with `FeaturePlot3.grid`
 
 `FeaturePlot3.grid` extends `FeaturePlot3` by allowing multiple plots to be generated in one go. The `features` parameter requires a vector where every three values are assigned a color (RYB or RGB) and placed together in one plot. If you wish to skip a color, use `NA` as a placeholder.
@@ -173,6 +191,23 @@ Using the RGB system:
 ```{r, fig.width=6.5, fig.height=3.5, message=FALSE, warning=FALSE}
 FeaturePlot3.grid(pbmc, features = c("CD3D", "CD14", "CD79A", "FCGR3A", NA, "LYZ"), color = "rgb", pt.size = 1)
 ```
+
+#### Using Dark Theme with Grid Layout (New in v1.2.0)
+
+You can also apply the dark theme to FeaturePlot3.grid for enhanced visualization:
+
+```{r, fig.width=6.5, fig.height=3.5, message=FALSE, warning=FALSE}
+FeaturePlot3.grid(
+  pbmc, 
+  features = c("CD3D", "CD14", "CD79A", "FCGR3A", NA, "LYZ"), 
+  color = "rgb", 
+  pt.size = 1,
+  dark.theme = TRUE,
+  legend = TRUE
+)
+```
+
+The dark theme with legend enabled provides an elegant visualization that works well in presentations and publications.
 
 #### Tips on Point Size
 
@@ -353,6 +388,14 @@ Or hide both points and outliers for a minimal appearance:
 VlnPlot2(pbmc, features = genes, pt = FALSE, hide.outlier = TRUE, ncol = 1)
 ```
 
+### Outline Style (New in v1.2.0)
+
+You can change the violin plot style from filled to outline:
+
+```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=6}
+VlnPlot2(pbmc, features = genes, style = "outline", ncol = 1)
+```
+
 ### Adding Mean and Median Lines (New in v1.1.0)
 
 For genes with low expression where boxplot might be hard to interpret (e.g., when median and quartiles overlap at zero), you can add mean/median lines for better visualization:
@@ -422,6 +465,8 @@ matr <- pbmc@misc$AUCell$genesets
 VlnPlot2(matr[1:3,], f = pbmc$cluster, ncol = 1)
 ```
 
+> **Note on Statistical Testing:** When using `stat.method` to add statistical annotations to violin plots, be aware that p-values can be artificially inflated in large single-cell datasets due to the high number of cells. This may result in statistically significant differences (small p-values) even when the biological effect size is minimal. We recommend being cautious with statistical interpretations, especially when visual differences are subtle. Consider examining log fold changes (logFC) between groups to better assess the magnitude of biological differences. For a comprehensive visualization of differences between two groups, `WaterfallPlot()` (see [Generate a Waterfall Plot](#generate-a-waterfall-plot)) can provide logFC values along with statistical significance. By default, `VlnPlot2` uses the Holm method (`p.adjust.method = "holm"`) to adjust p-values for multiple comparisons.
+
 ## Visualize Cluster Distribution in Samples {#visualize-cluster-distribution-in-samples}
 
 ### Introduction
@@ -470,6 +515,23 @@ ClusterDistrBar(origin = pbmc$orig.ident,
                 flip = FALSE, 
                 stack = FALSE)
 ```
+
+### Comparing Cluster Distribution Between Conditions (New in v1.2.0)
+
+For comparing cluster distribution patterns between experimental conditions, `SeuratExtend` offers the `ClusterDistrPlot` function. This function extends `ClusterDistrBar` functionality by adding the ability to group samples by a condition variable, creating boxplots grouped by condition instead of stacked bars.
+
+The function supports all parameters from `ClusterDistrBar` when using the standard bar plot mode, and inherits styling options from `VlnPlot2` when using the boxplot mode with conditions. This makes it highly versatile for different visualization needs.
+
+```{r, fig.width=7, fig.height=5}
+# Compare cluster distribution between conditions
+ClusterDistrPlot(
+  origin = pbmc$sample_id,
+  cluster = pbmc$cluster,
+  condition = pbmc$condition
+)
+```
+
+When the `condition` parameter is not provided, `ClusterDistrPlot` behaves exactly like `ClusterDistrBar`, providing seamless backward compatibility.
 
 ## Generate a Waterfall Plot {#generate-a-waterfall-plot}
 
@@ -551,6 +613,44 @@ WaterfallPlot(
   top.n = 20)
 ```
 
+### Using Log2 or Log10 Fold Change (New in v1.2.0)
+
+By default, WaterfallPlot uses natural logarithm (base e) for fold change calculations. You can specify a different base using the `log.base` parameter:
+
+```{r, fig.width=7, fig.height=4}
+# Using log base 2 for fold change calculations
+WaterfallPlot(
+  pbmc, 
+  group.by = "cluster", 
+  features = genes,
+  ident.1 = "Mono CD14", 
+  ident.2 = "CD8 T cell", 
+  length = "logFC",
+  log.base = "2",    # Use log2 instead of natural log
+  top.n = 20)
+```
+
+### Notes on LogFC Calculation
+
+When calculating log fold changes, WaterfallPlot and VolcanoPlot (see the next section):
+
+1. **Adds a pseudocount** to prevent issues with zero values:
+   - For most data: Uses pseudocount=1 by default
+   - For data with values between 0-1 (like AUCell scores): Automatically uses pseudocount=0.01
+   - You can customize this value with the `pseudocount` parameter
+
+2. **Uses natural logarithm (base e) by default**, but supports other bases:
+   - `log.base = "e"`: Natural logarithm (default)
+   - `log.base = "2"`: Log base 2
+   - `log.base = "10"`: Log base 10
+   - Any numeric value for custom bases
+
+3. **For Seurat objects**, applies `expm1` transformation to normalized data by default:
+   - This ensures consistency with Seurat's FindMarkers function
+   - Can be disabled with `exp.transform = FALSE`
+
+The formula used is: `log((mean(x[group1] + pseudocount) / mean(x[group2] + pseudocount)), base)`
+
 ## Create Volcano Plots (New in v1.1.0) {#create-volcano-plots-new-in-v110}
 
 ### Introduction
@@ -610,6 +710,19 @@ VolcanoPlot(
 )
 ```
 
+### Using Log2 or Log10 Fold Change (New in v1.2.0)
+
+By default, VolcanoPlot uses natural logarithm (base e) for fold change calculations. You can specify a different base using the `log.base` parameter:
+
+```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=5}
+VolcanoPlot(
+  pbmc,
+  ident.1 = "B cell",
+  ident.2 = "CD8 T cell",
+  log.base = "2"    # Use log2 instead of natural log
+)
+```
+
 ### Matrix Input
 
 You can also use matrices, such as pathway enrichment scores:
@@ -626,7 +739,7 @@ VolcanoPlot(
   top.n = 5)
 ```
 
-### Tips: Choosing the Right Visualization
+## Tips: Choosing the Right Visualization
 
 When visualizing gene expression or pathway activity data, different plot types serve different purposes. Here's a guide to help you choose:
 
@@ -663,10 +776,12 @@ The `SeuratExtend` package provides comprehensive color management across all vi
 ### For Functions Handling Discrete Variables
 
 - **DimPlot2**, **VlnPlot2**, **ClusterDistrBar** (using `cols` parameter)
-  - Seven [color_pro styles](#professional-discrete-color-presets-with-color_pro): "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple"
+  - Eight [color_pro styles](#professional-discrete-color-presets-with-color_pro): "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple", "bright" (new in v1.2.0)
   - Five [color_iwh styles](#iwanthue-color-series-color_iwh): "iwh_default", "iwh_intense", "iwh_pastel", "iwh_all", "iwh_all_hard"
   - All [RColorBrewer](#rcolorbrewer-palettes) qualitative palettes (e.g., "Set1", "Set2", "Set3", "Paired", "Dark2", "Accent", "Pastel1", "Pastel2")
   - Custom colors as vector of hex codes or color names
+
+> **Note**: Based on user feedback, starting from v1.2.0, the default discrete color scheme has been changed to "light" to avoid color inconsistency in DimPlot2 when toggling between labeled and unlabeled displays. If you prefer to retain the original "default" (darker) color scheme for discrete variables in `DimPlot2`, you can use: `seu <- save_colors(seu, col_list = list("discrete" = "default"))`. This will set the default for all discrete variables to the darker color scheme.
 
 ### For Functions Handling Continuous Variables
 
@@ -701,14 +816,31 @@ Here are some recommended color schemes for different visualization needs in sin
 
 #### For Discrete Variables (e.g., clusters, conditions)
 
-The "light" color scheme from SeuratExtend's `color_pro` is particularly effective for labeled visualizations:
+The "default" (dark) theme and "light" color scheme from SeuratExtend's `color_pro` are particularly effective for different visualization needs:
+
+```{r, fig.width=7.5, fig.height=4, message=FALSE, warning=FALSE}
+library(cowplot)
+plot_grid(
+  DimPlot2(pbmc, cols = "default", theme = NoAxes() + NoLegend()),
+  ClusterDistrBar(pbmc$orig.ident, pbmc$cluster, cols = "default", flip = FALSE, border = "black") +
+    theme(axis.title.x = element_blank())
+)
+```
 
 ```{r, fig.width=7.5, fig.height=4, message=FALSE, warning=FALSE}
 library(cowplot)
 plot_grid(
   DimPlot2(pbmc, cols = "light", theme = NoAxes() + NoLegend()),
-  ClusterDistrBar(pbmc$orig.ident, pbmc$cluster, cols = "light", flip = FALSE, border = "black") +
+  ClusterDistrBar(pbmc$orig.ident, pbmc$cluster, cols = "light", flip = FALSE) +
     theme(axis.title.x = element_blank())
+)
+```
+
+For visualizations requiring more vibrant colors with high contrast (new in v1.2.0):
+
+```{r, fig.width=9.5, fig.height=3.5, message=FALSE, warning=FALSE}
+plot_grid(
+  DimPlot2(pbmc, features = c("orig.ident", "cluster"), cols = "bright", ncol = 2, theme = NoAxes())
 )
 ```
 
@@ -777,18 +909,20 @@ Choosing the right colors for scientific visualizations is crucial. Colors must 
 ```
 
 3. **Good Distinction and Coordination but Too Lively:**
-   While certain vibrant schemes might be engaging in an advertising context, they may be considered too informal for professional journal standards.
+   While certain vibrant schemes might be engaging in an advertising context, they may be considered too informal for professional journal standards. However, we recognize that sometimes higher contrast and more vibrant colors are needed for certain analyses or presentations. For these situations, we provide the "bright" color scheme (new in v1.2.0) while still recommending more subdued options for formal publications.
 
-   Example of colors that might be too lively:
+   Example of colors that might be too lively for formal publication but useful in other contexts:
 ```{r, fig.width=6.5, fig.height=5}
    DimPlot2(pbmc, cols = c("#ff2026","#cf5d00","#ffd03f","#649f00","#a3f83d","#82cc58","#6645fe","#d8009c","#ff43a2"))
 ```
 
-While the RColorBrewer package offers some good solutions, its options are limited and support a maximum of only 12 colors. This can be inadequate for visualizing data with a larger number of clusters. The default ggplot color palette, derived from hue_pal(), can assign an arbitrary number of colors, but similarly suffers from insufficient distinction when many colors are used. This is because the default palette differentiates colors only based on hue, without utilizing luminance and saturation, which limits its effectiveness. To address these limitations, `SeuratExtend` provides `color_pro`, which includes seven color schemes: "default", "light", "red", "yellow", "green", "blue", and "purple". These presets are generated using the algorithm from I Want Hue (http://medialab.github.io/iwanthue/) with adjusted parameters, which is optimized for creating color palettes that are visually pleasing and distinctly separable.
+While the RColorBrewer package offers some good solutions, its options are limited and support a maximum of only 12 colors. This can be inadequate for visualizing data with a larger number of clusters. The default ggplot color palette, derived from hue_pal(), can assign an arbitrary number of colors, but similarly suffers from insufficient distinction when many colors are used. This is because the default palette differentiates colors only based on hue, without utilizing luminance and saturation, which limits its effectiveness. To address these limitations, `SeuratExtend` provides `color_pro`, which includes eight color schemes: "default", "light", "red", "yellow", "green", "blue", "purple", and "bright" (new in v1.2.0). These presets are generated using the algorithm from I Want Hue (http://medialab.github.io/iwanthue/) with adjusted parameters, which is optimized for creating color palettes that are visually pleasing and distinctly separable.
 
 #### Default Color Scheme
 
 The "default" color scheme spans the entire hue domain but features reduced brightness and saturation, supporting 2 to 50 colors with five different presets per color. This scheme is ideal for general use where distinctiveness and subtlety are equally important.
+
+> **Note**: In SeuratExtend v1.0.0, the "default" color scheme was the actual default setting (hence the name), representing a darker theme suitable for general visualizations. Based on user feedback, starting from v1.2.0, the "light" color scheme became the true default setting as users preferred it for better visibility, especially with labeled plots. However, we maintained the original naming convention—so "default" still refers to the darker theme. If you prefer the darker theme, you can manually specify `cols = "default"` in your function calls.
 
 Example using the "default" color scheme:
 
@@ -796,8 +930,8 @@ Example using the "default" color scheme:
 library(cowplot)
 library(SeuratExtend)
 plot_grid(
-  DimPlot2(pbmc, theme = NoAxes() + NoLegend()),
-  ClusterDistrBar(pbmc$orig.ident, pbmc$cluster, flip = FALSE) +
+  DimPlot2(pbmc, theme = NoAxes() + NoLegend(), cols = "default"),
+  ClusterDistrBar(pbmc$orig.ident, pbmc$cluster, flip = FALSE, cols = "default") +
     theme(axis.title.x = element_blank())
 )
 ```
@@ -902,7 +1036,7 @@ show_col2(palette_list, ncol = 10)
 
 #### Available Color Schemes
 
-`color_pro` offers seven different styles: "default", "light", "red", "yellow", "green", "blue", "purple". Example generating 10 colors from each style:
+`color_pro` offers eight different styles: "default", "light", "red", "yellow", "green", "blue", "purple", and "bright". Example generating 10 colors from each style:
 
 ```{r, eval=FALSE}
 color_pro(10, col.space = 1)  # default
@@ -912,6 +1046,7 @@ color_pro(10, 4)              # yellow
 color_pro(10, 5)              # green
 color_pro(10, 6)              # blue
 color_pro(10, 7)              # purple
+color_pro(10, 8)              # bright
 ```
 
 Visual comparison:
@@ -924,7 +1059,8 @@ palette_list <- list(
   "yellow" = color_pro(10, 4),
   "green" = color_pro(10, 5),
   "blue" = color_pro(10, 6),
-  "purple" = color_pro(10, 7)
+  "purple" = color_pro(10, 7),
+  "bright" = color_pro(10, 8)
 )
 show_col2(palette_list, ncol = 10)
 ```
@@ -1094,6 +1230,7 @@ DimPlot2(pbmc, features = c("cluster", "orig.ident", "CD14", "CD3D"), theme = No
 ### Additional Resources
 
 For more information about color palettes:
+
 - RColorBrewer palettes: https://r-graph-gallery.com/38-rcolorbrewers-palettes.html
 - Viridis palettes: https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html
 

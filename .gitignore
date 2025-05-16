@@ -46,3 +46,7 @@ data-raw/Test.R
 
 # Course build artifacts
 vignettes/single-cell-course
+
+# Temporary folder
+tmp/
+data-raw/2024-4-5 color pro from i want hue

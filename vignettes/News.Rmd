@@ -1,13 +1,201 @@
 ---
-title: "What's New in v1.1.0"
+title: "What's New in v1.2.0"
 author: "Yichao Hua"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{What's New in v1.1.0}
+  %\VignetteIndexEntry{What's New in v1.2.0}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
+
+## New Features and Enhancements in v1.2.0
+
+### Dark Theme Support for Feature Plot Visualization
+
+The `FeaturePlot3` and `FeaturePlot3.grid` functions now support a dark theme option, providing better contrast for visualizing gene expression patterns, particularly in presentations or low-light environments:
+
+```{r, message=FALSE, warning=FALSE, fig.width=6, fig.height=5}
+library(Seurat)
+library(SeuratExtend)
+
+# Using dark theme with FeaturePlot3
+FeaturePlot3(
+  pbmc, 
+  color = "rgb", 
+  feature.1 = "CD3D", 
+  feature.2 = "CD14", 
+  feature.3 = "CD79A", 
+  pt.size = 1,
+  dark.theme = TRUE
+)
+```
+
+### New Violin Plot Styling Options
+
+The `VlnPlot2` function now supports an "outline" style option, which uses white-filled violins with colored outlines instead of the default filled style:
+
+```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=6}
+# Outline style for violin plots
+genes <- c("CD3D", "CD14", "CD79A")
+VlnPlot2(pbmc, features = genes, style = "outline", ncol = 1)
+```
+
+### New ClusterDistrPlot Function
+
+The new `ClusterDistrPlot` function extends `ClusterDistrBar` to allow comparison of cluster distribution patterns between experimental conditions. When the `condition` parameter is provided, it creates boxplots grouped by condition instead of stacked bars:
+
+```{r, message=FALSE, warning=FALSE, fig.width=7, fig.height=5}
+# Compare cluster distribution between conditions
+ClusterDistrPlot(
+  origin = pbmc$sample_id,
+  cluster = pbmc$cluster,
+  condition = pbmc$condition
+)
+```
+
+This function inherits styling options from `VlnPlot2` when in boxplot mode, making it highly versatile for comparing cell type proportions across experimental groups.
+
+### Enhanced Log Fold Change Options in Differential Analysis Plots
+
+Both `WaterfallPlot` and `VolcanoPlot` functions now support different logarithm bases for fold change calculations through the `log.base` parameter:
+
+```{r, message=FALSE, warning=FALSE, fig.width=7, fig.height=4}
+# Using log base 2 for fold change calculations in WaterfallPlot
+WaterfallPlot(
+  pbmc, 
+  group.by = "cluster", 
+  features = VariableFeatures(pbmc)[1:80],
+  ident.1 = "Mono CD14", 
+  ident.2 = "CD8 T cell", 
+  length = "logFC",
+  log.base = "2",    # Use log2 instead of natural log
+  top.n = 20)
+```
+
+```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=5}
+# Using log base 2 in VolcanoPlot
+VolcanoPlot(
+  pbmc,
+  ident.1 = "B cell",
+  ident.2 = "CD8 T cell",
+  log.base = "2"    # Use log2 instead of natural log
+)
+```
+
+Available options include:
+- `log.base = "e"`: Natural logarithm (default)
+- `log.base = "2"`: Log base 2
+- `log.base = "10"`: Log base 10
+- Any numeric value for custom bases
+
+### Color Scheme Updates
+
+#### New "Bright" Color Scheme and Default Change
+
+A new vibrant color scheme "bright" has been added for visualizations requiring higher contrast:
+
+```{r, fig.width=9.5, fig.height=3.5, message=FALSE, warning=FALSE}
+library(cowplot)
+DimPlot2(pbmc, features = c("orig.ident", "cluster"), cols = "bright", ncol = 2, theme = NoAxes())
+```
+
+Based on user feedback, the default discrete color scheme has been changed from "default" (darker theme) to "light" to avoid color inconsistency in `DimPlot2` when toggling between labeled and unlabeled displays.
+
+If you prefer to retain the original "default" (darker) color scheme, you can use:
+
+```{r, eval=FALSE}
+seu <- save_colors(seu, col_list = list("discrete" = "default"))
+```
+
+### Enhanced Gene Set Enrichment Analysis (GSEA) Capabilities
+
+#### Improved Database Management
+
+SeuratExtend now offers enhanced ways to manage and update the GO and Reactome databases used in your GSEA analyses:
+
+```{r, eval=FALSE, message=FALSE, warning=FALSE}
+# Install specific versions of SeuratExtendData for different database releases
+install_SeuratExtendData("latest")    # Latest version (April 2025 data)
+install_SeuratExtendData("stable")    # Stable version (January 2020 data)
+install_SeuratExtendData("v0.2.1")    # Specific version with January 2020 datasets
+install_SeuratExtendData("v0.3.0")    # Specific version with April 2025 datasets
+```
+
+This ensures compatibility with specific analysis workflows or when you need to match results from previous studies.
+
+#### Creating and Using Custom Databases
+
+SeuratExtend now provides a more streamlined workflow for creating and using custom GO or Reactome databases:
+
+```{r, eval=FALSE, message=FALSE, warning=FALSE}
+# Load custom database
+custom_GO_Data <- readRDS("path/to/your/GO_Data.rds")
+
+# Use with SeuratExtend by assigning to global environment
+GO_Data <- custom_GO_Data
+
+# Run analysis
+seu <- GeneSetAnalysisGO(seu, parent = "immune_system_process")
+
+# When done, remove the global variable
+rm(GO_Data)
+```
+
+This feature is particularly useful for:
+- Using the latest database updates
+- Creating databases for additional model organisms
+- Developing custom pathway collections
+
+For detailed documentation on creating custom databases, SeuratExtend provides comprehensive guides accessible through:
+
+```{r, eval=FALSE, message=FALSE, warning=FALSE}
+browseURL("https://github.com/huayc09/SeuratExtendData/blob/main/inst/db_creation/README_GO_Data.md")
+browseURL("https://github.com/huayc09/SeuratExtendData/blob/main/inst/db_creation/README_Reactome_Data.md")
+```
+
+### Apple Silicon (M1/M2/M3/M4) Support for Trajectory Analysis
+
+SeuratExtend v1.2.0 adds support for Apple Silicon chips (M1/M2/M3/M4), allowing macOS users to run Python-based trajectory analysis tools. However, this support comes with specific limitations that require following a particular workflow to avoid R session crashes:
+
+```{r, eval=FALSE, message=FALSE, warning=FALSE}
+# IMPORTANT: Apple Silicon users MUST initialize Python environment BEFORE loading any data
+library(SeuratExtend)
+activate_python()  # Must call this function FIRST to prevent memory-related crashes
+
+# Only THEN load your data and proceed with analysis
+seu <- readRDS("path/to/seurat_object.rds")
+```
+
+**Important Considerations:**
+
+- On Apple Silicon, memory management issues exist between R and Python, especially when performing operations like PCA on AnnData objects
+- If R objects are loaded before calling Python functions, the R session will likely crash
+- You must start a fresh R session and call `activate_python()` before loading any data
+- This initialization sequence is necessary when using tools like scVelo, Palantir, or CellRank
+
+Despite these limitations, the `create_condaenv_seuratextend()` function now automatically detects Apple Silicon and uses the appropriate configuration, enabling Mac users to run:
+
+- scVelo: for RNA velocity analysis
+- Palantir: for cell fate determination and pseudotime analysis
+- CellRank: for trajectory analysis
+- MAGIC: for gene expression denoising and smoothing
+
+### Bug Fixes and Improvements
+
+Several important bug fixes and enhancements have been implemented based on user feedback:
+
+- **scVelo Functions**: Fixed issues related to scVelo functionality, addressing reported bugs in GitHub issue #30.
+- **DotPlot2**: Fixed bugs affecting the appearance and functionality of the `DotPlot2` function (GitHub issues #22 and #29).
+- **Palantir Windows Compatibility**: Fixed compatibility issues for Palantir functions on Windows systems (GitHub issue #24).
+- **Color Palette Enhancement**: Increased the color limit from 50 to 80 colors in the `color_pro` function, allowing for more color options in visualizations.
+- **ClusterDistrBar Validation**: Added input validation to the `ClusterDistrBar` function to prevent errors from invalid inputs.
+- **RColorBrewer Sequential Palettes**: Enhanced the lightest colors in sequential color palettes to improve visibility against white backgrounds.
+- **VlnPlot2 Documentation**: Added detailed explanations of the statistics options in the `VlnPlot2` function documentation.
+- **Package Installation**: Fixed issues in the internal `import` function related to automatic package installation.
+- **WaterfallPlot Improvements**: 
+  * Added automatic adjustment of x-axis text angle and alignment for better readability
+  * Added option to display borders around bars for improved visual clarity
 
 ## New Features and Enhancements in v1.1.0
 

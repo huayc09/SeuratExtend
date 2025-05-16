@@ -38,7 +38,7 @@ remotes::install_github("huayc09/SeuratExtend")
 
 ### [Quick Start-Up Guide](#quick-start-up-guide-1)
 
-### [What's New in v1.1.0](vignettes/News.md)
+### [What's New in v1.2.0](vignettes/News.md)
 
 ### [Enhanced Visualization](vignettes/Visualization.md)
 - [Create an Enhanced Dimensional Reduction Plot](vignettes/Visualization.md#create-an-enhanced-dimensional-reduction-plot) `DimPlot2` `FeaturePlot3` `FeaturePlot3.grid` `theme_umap_arrows`
@@ -48,7 +48,7 @@ remotes::install_github("huayc09/SeuratExtend")
 - [Visualize Cluster Distribution in Samples](vignettes/Visualization.md#visualize-cluster-distribution-in-samples) `ClusterDistrBar`
 - [Generate a Waterfall Plot](vignettes/Visualization.md#generate-a-waterfall-plot) `WaterfallPlot`
 - [Create Volcano Plots](vignettes/Visualization.md#create-volcano-plots-new-in-v110) **(New in v1.1.0)** `VolcanoPlot`
-- [Explore Color Functions](Visualization.md#explore-color-functions) `color_pro` `color_iwh` `ryb2rgb` `save_colors`
+- [Explore Color Functions](vignettes/Visualization.md#explore-color-functions) `color_pro` `color_iwh` `ryb2rgb` `save_colors`
 
 ### [Geneset Enrichment Analysis (GSEA)](vignettes/GSEA.md)
 - [Conduct GSEA using the GO or Reactome database](vignettes/GSEA.md#conduct-gsea-using-the-go-or-reactome-database) `GeneSetAnalysisGO` `GeneSetAnalysisReactome`
@@ -246,7 +246,7 @@ pbmc <- ImportPyscenicLoom(scenic_loom_path, seu = pbmc)
 DimPlot2(
   pbmc,
   features = c("cluster", "orig.ident", "CEBPA", "tf_CEBPA"),
-  cols = list("tf_CEBPA" = "D"),
+  cols = list("tf_CEBPA" = "OrRd"),
   theme = NoAxes()
 ) + theme_umap_arrows()
 ```
@@ -293,7 +293,11 @@ trajectories. Here’s how to compute and visualize them:
 ``` r
 # Compute diffusion map
 mye_small <- Palantir.RunDM(mye_small)
+```
 
+    ## Determing nearest neighbor graph...
+
+``` r
 # Visualize the first two diffusion map dimensions
 DimPlot2(mye_small, reduction = "ms")
 ```
@@ -308,7 +312,22 @@ indicating its progression along a developmental path:
 ``` r
 # Calculate pseudotime with a specified start cell
 mye_small <- Palantir.Pseudotime(mye_small, start_cell = "sample1_GAGAGGTAGCAGTACG-1")
+```
 
+    ## Sampling and flocking waypoints...
+    ## Time for determining waypoints: 0.00112607479095459 minutes
+    ## Determining pseudotime...
+    ## Shortest path distances using 30-nearest neighbor graph...
+    ## Time for shortest paths: 0.014574062824249268 minutes
+    ## Iteratively refining the pseudotime...
+    ## Correlation at iteration 1: 1.0000
+    ## Entropy and branch probabilities...
+    ## Markov chain construction...
+    ## Identification of terminal states...
+    ## Computing fundamental matrix and absorption probabilities...
+    ## Project results to all cells...
+
+``` r
 # Store pseudotime results in meta.data for easy plotting
 ps <- mye_small@misc$Palantir$Pseudotime
 colnames(ps)[3:4] <- c("fate1", "fate2")
@@ -319,7 +338,7 @@ DimPlot2(
   mye_small,
   features = colnames(ps),
   reduction = "ms",
-  cols = list(Entropy = "D"),
+  cols = list(continuous = "A", Entropy = "D"),
   theme = NoAxes())
 ```
 
@@ -386,6 +405,28 @@ scVelo.SeuratToAnndata(
   postfix = "-1"
 )
 ```
+
+    ## scVelo version: 0.3.0
+    ## Filtered out 10891 genes that are detected 20 counts (shared).
+    ## Normalized count data: X, spliced, unspliced.
+    ## Extracted 2000 highly variable genes.
+    ## Logarithmized X.
+    ## computing neighbors
+    ##     finished (0:00:00) --> added 
+    ##     'distances' and 'connectivities', weighted adjacency matrices (adata.obsp)
+    ## computing moments based on connectivities
+    ##     finished (0:00:00) --> added 
+    ##     'Ms' and 'Mu', moments of un/spliced abundances (adata.layers)
+    ## computing velocities
+    ##     finished (0:00:00) --> added 
+    ##     'velocity', velocity vectors for each individual cell (adata.layers)
+    ## computing velocity graph (using 1/28 cores)
+    ## WARNING: Unable to create progress bar. Consider installing `tqdm` as `pip install tqdm` and `ipywidgets` as `pip install ipywidgets`,
+    ## or disable the progress bar using `show_progress_bar=False`.
+    ##     finished (0:00:01) --> added 
+    ##     'velocity_graph', sparse matrix with cosine correlations (adata.uns)
+
+    ## NULL
 
 #### Plotting scVelo Results
 

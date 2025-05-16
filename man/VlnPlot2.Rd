@@ -17,11 +17,13 @@ VlnPlot2(object, ...)
   slot = "data",
   assay = NULL,
   priority = c("expr", "none"),
-  cols = "auto",
+  cols = "light",
   load.cols = TRUE,
   ncol = NULL,
+  nrow = NULL,
   lab_fill = "group",
   scales = "free_y",
+  style = c("fill", "outline"),
   violin = T,
   box = T,
   width = 0.9,
@@ -53,10 +55,12 @@ VlnPlot2(object, ...)
   f2 = NULL,
   features = NULL,
   t = F,
-  cols = "pro_default",
+  cols = "light",
   ncol = NULL,
+  nrow = NULL,
   lab_fill = "group",
   scales = "free_y",
+  style = c("fill", "outline"),
   violin = T,
   box = T,
   width = 0.9,
@@ -105,7 +109,7 @@ VlnPlot2(object, ...)
 
 \item{cols}{Flexible color settings for the plot, accepting a variety of inputs:
 
-    - Seven color_pro styles: "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple".
+    - Eight color_pro styles: "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple", "bright".
 
     - Five color_iwh styles: "iwh_default", "iwh_intense", "iwh_pastel", "iwh_all", "iwh_all_hard".
 
@@ -117,9 +121,13 @@ VlnPlot2(object, ...)
 
 \item{ncol}{Specifies the number of columns for display if multiple plots are shown. Default: NULL.}
 
+\item{nrow}{Specifies the number of rows for display if multiple plots are shown. Default: NULL.}
+
 \item{lab_fill}{Label for the figure legend. Default: 'group'.}
 
 \item{scales}{Scales parameter passed to \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}. Default: 'free_y'.}
+
+\item{style}{Plot style: "fill" (default) uses filled violins with group colors, "outline" uses white fill with colored outlines.}
 
 \item{violin}{Indicates whether to generate a violin plot. Default: TRUE.}
 
@@ -184,6 +192,8 @@ Generates advanced violin plots distinct from Seurat's VlnPlot. This improved ve
 }
 \details{
 This function provides a range of customization options to generate violin plots, with or without additional graphical elements such as boxplots and points. You can specify features to plot, control the appearance of violin plots, boxplots, and points, adjust point position, group data, split violin plots, selectively use cells, control the column layout of multiple plots, and add statistical annotations. For a detailed overview, refer to the provided examples.
+
+When using the statistical annotation feature (`stat.method`), it's important to be aware that p-values can be artificially inflated in large single-cell datasets due to the high number of cells. This may result in statistically significant differences (small p-values) even when the biological effect size is minimal. We recommend being cautious with statistical interpretations, especially when visual differences are subtle. Consider examining log fold changes (logFC) between groups to better assess the magnitude of biological differences. For a comprehensive visualization of differences between two groups, `WaterfallPlot()` can provide logFC values along with statistical significance. By default, the `VlnPlot2()` function uses the Holm method (`p.adjust.method = "holm"`) to adjust p-values for multiple comparisons, which helps control the family-wise error rate.
 }
 \examples{
 library(Seurat)
@@ -203,6 +213,9 @@ VlnPlot2(pbmc, features = genes, pt = FALSE, ncol = 1)
 
 # When hiding points, outliers are shown by default (recommended). However, outliers can be hidden for a cleaner appearance:
 VlnPlot2(pbmc, features = genes, pt = FALSE, hide.outlier = T, ncol = 1)
+
+# Using the outline style instead of filled violins:
+VlnPlot2(pbmc, features = genes, style = "outline", ncol = 1)
 
 # Group by cluster and split each cluster by samples:
 VlnPlot2(pbmc, features = genes, group.by = "cluster", split.by = "orig.ident")

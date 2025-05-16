@@ -30,7 +30,10 @@ WaterfallPlot_v3(
   hjust = NULL,
   vjust = NULL,
   title = NULL,
-  style = c("bar", "segment")
+  style = c("bar", "segment"),
+  border = NA,
+  log.base = "e",
+  pseudocount = NULL
 )
 }
 \description{

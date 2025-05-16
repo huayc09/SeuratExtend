@@ -2,7 +2,7 @@ setwd("~/Documents/SeuratExtend-database/2024-4-5 color pro from i want hue")
 
 files <- list.files(pattern = ".csv")
 files <- files[!grepl("_original",files)]
-theme <- c("default","light","red","yellow","green","blue","purple")
+theme <- c("default","light","red","yellow","green","blue","purple","bright")
 
 lines <- readLines(files[1])
 color_palettes <- strsplit(lines, ",")
@@ -20,7 +20,5 @@ for (i in theme) {
   }
 }
 
-usethis::use_data(color_pro_presets, overwrite = TRUE)
-# rename
 presets_color_pro <- color_pro_presets
 usethis::use_data(presets_color_pro, overwrite = TRUE)

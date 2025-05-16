@@ -15,7 +15,7 @@ ClusterDistrBar(
   reverse_order = T,
   width = 0.9,
   stack = T,
-  cols = "pro_default",
+  cols = "light",
   border = "white"
 )
 }
@@ -40,7 +40,7 @@ ClusterDistrBar(
 
 \item{stack}{If TRUE, plot stacked bars, Default: T}
 
-\item{cols}{Colors to use for plotting. Default: "pro_default"}
+\item{cols}{Colors to use for plotting. Default: "light"}
 
 \item{border}{Border color, Default: "white"}
 }

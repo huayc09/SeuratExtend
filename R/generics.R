@@ -5,6 +5,8 @@
 #' @return A ggplot object.
 #' @details This function provides a range of customization options to generate violin plots, with or without additional graphical elements such as boxplots and points. You can specify features to plot, control the appearance of violin plots, boxplots, and points, adjust point position, group data, split violin plots, selectively use cells, control the column layout of multiple plots, and add statistical annotations. For a detailed overview, refer to the provided examples.
 #'
+#' When using the statistical annotation feature (`stat.method`), it's important to be aware that p-values can be artificially inflated in large single-cell datasets due to the high number of cells. This may result in statistically significant differences (small p-values) even when the biological effect size is minimal. We recommend being cautious with statistical interpretations, especially when visual differences are subtle. Consider examining log fold changes (logFC) between groups to better assess the magnitude of biological differences. For a comprehensive visualization of differences between two groups, `WaterfallPlot()` can provide logFC values along with statistical significance. By default, the `VlnPlot2()` function uses the Holm method (`p.adjust.method = "holm"`) to adjust p-values for multiple comparisons, which helps control the family-wise error rate.
+#'
 #' @examples
 #' library(Seurat)
 #' library(SeuratExtend)
@@ -23,6 +25,9 @@
 #'
 #' # When hiding points, outliers are shown by default (recommended). However, outliers can be hidden for a cleaner appearance:
 #' VlnPlot2(pbmc, features = genes, pt = FALSE, hide.outlier = T, ncol = 1)
+#'
+#' # Using the outline style instead of filled violins:
+#' VlnPlot2(pbmc, features = genes, style = "outline", ncol = 1)
 #'
 #' # Group by cluster and split each cluster by samples:
 #' VlnPlot2(pbmc, features = genes, group.by = "cluster", split.by = "orig.ident")
@@ -110,6 +115,24 @@ CalcStats <- function(object, ...) {
 #' @param ... Additional arguments passed to other methods.
 #' @return A ggplot object.
 #' @details For more detailed usage, see the examples provided.
+#' 
+#' By default, log fold change (logFC) calculations use natural logarithm (base e). 
+#' However, you can specify a different logarithm base using the `log.base` parameter. 
+#' Common choices include "e" (natural log, default), "2" (log2), or "10" (log10). 
+#' Any numeric value can also be used as a custom base.
+#' 
+#' When calculating logFC, a pseudocount is added to both the numerator and denominator 
+#' (i.e., log((mean(x[group1]+pseudocount)/(mean(x[group2]+pseudocount)))) to prevent 
+#' issues with zero values and to stabilize calculations for low expression values. 
+#' By default, pseudocount=1 is used for most data types. For data with values 
+#' constrained between 0-1 (like AUCell scores), pseudocount=0.01 is automatically 
+#' applied unless manually specified otherwise.
+#' 
+#' For Seurat objects, when calculating gene expression logFC values, the normalized data 
+#' undergoes expm1 transformation before calculation (controlled by exp.transform=TRUE 
+#' by default). This ensures consistency with Seurat's FindMarkers function. To disable 
+#' this transformation, set exp.transform=FALSE. This behavior only applies when using 
+#' gene expression data from a Seurat object.
 #' @examples
 #' # First, create a matrix using the GeneSetAnalysis() function.
 #' # Rows represent the Hallmark 50 genesets, and columns represent cells.
@@ -143,6 +166,18 @@ CalcStats <- function(object, ...) {
 #'   pbmc, group.by = "cluster", features = genes,
 #'   ident.1 = "Mono CD14", ident.2 = "CD8 T cell", length = "logFC",
 #'   top.n = 20)
+#'   
+#' # Use log2 instead of natural logarithm for fold change calculations
+#' WaterfallPlot(
+#'   pbmc, group.by = "cluster", features = genes,
+#'   ident.1 = "Mono CD14", ident.2 = "CD8 T cell", length = "logFC",
+#'   log.base = "2", top.n = 20)
+#'   
+#' # Specify a custom pseudocount for logFC calculation
+#' # This is useful for data with small values or specialized normalization
+#' WaterfallPlot(
+#'   matr, f = pbmc$cluster, ident.1 = "Mono CD14", ident.2 = "CD8 T cell",
+#'   length = "logFC", pseudocount = 0.001)
 #' @rdname WaterfallPlot
 #' @export
 
@@ -174,6 +209,23 @@ WaterfallPlot <- function(object, ...) {
 #' controlled using the `top.n` parameter.
 #'
 #' When `y = "p"`, the y-axis displays -log10 transformed p-values.
+#' 
+#' By default, log fold change (logFC) calculations use natural logarithm (base e).
+#' You can specify a different logarithm base using the `log.base` parameter.
+#' Common choices include "e" (natural log, default), "2" (log2), or "10" (log10).
+#' 
+#' When calculating logFC, a pseudocount is added to both the numerator and denominator 
+#' (i.e., log((mean(x[group1]+pseudocount)/(mean(x[group2]+pseudocount)))) to prevent 
+#' issues with zero values and to stabilize calculations for low expression values. 
+#' By default, pseudocount=1 is used for most data types. For data with values 
+#' constrained between 0-1 (like AUCell scores), pseudocount=0.01 is automatically 
+#' applied unless manually specified otherwise.
+#' 
+#' For Seurat objects, when calculating gene expression logFC values, the normalized data 
+#' undergoes expm1 transformation before calculation (controlled by exp.transform=TRUE 
+#' by default). This ensures consistency with Seurat's FindMarkers function. To disable 
+#' this transformation, set exp.transform=FALSE. This behavior only applies when using 
+#' gene expression data from a Seurat object.
 #' @examples
 #' # Basic usage with a Seurat object
 #' VolcanoPlot(pbmc)
@@ -204,6 +256,14 @@ WaterfallPlot <- function(object, ...) {
 #'   ident.1 = "B cell",
 #'   ident.2 = "CD8 T cell",
 #'   y = "tscore"
+#' )
+#' 
+#' # Use log2 instead of natural logarithm for fold change calculations
+#' VolcanoPlot(
+#'   pbmc,
+#'   ident.1 = "B cell",
+#'   ident.2 = "CD8 T cell",
+#'   log.base = "2"
 #' )
 #'
 #' # Direct usage with a matrix

@@ -10,6 +10,7 @@ NULL
 #' @param assay Name of the assay to employ. Defaults to the active assay. Only applicable for the Seurat method.
 #' @param priority If set to "expr", extracts data from the expression matrix over `meta.data`. Only applicable for the Seurat method.
 #' @param load.cols When TRUE, automatically loads pre-stored color information for variables from `seu@misc[["var_colors"]]`.
+#' @param style Plot style: "fill" (default) uses filled violins with group colors, "outline" uses white fill with colored outlines.
 #' @param angle Angle for label rotation. If NULL, automatically determined based on label length. Default: NULL.
 #' @param hjust Horizontal justification of labels. If NULL, automatically determined based on angle. Default: NULL.
 #' @param vjust Vertical justification of labels. If NULL, automatically determined based on angle. Default: NULL.
@@ -25,11 +26,13 @@ VlnPlot2.Seurat <- function(
   slot = "data",
   assay = NULL,
   priority = c("expr","none"),
-  cols = "auto",
+  cols = "light",
   load.cols = TRUE,
   ncol = NULL,
+  nrow = NULL,
   lab_fill = "group",
   scales = "free_y",
+  style = c("fill", "outline"),
   violin = T,
   box = T,
   width = 0.9,
@@ -80,8 +83,10 @@ VlnPlot2.Seurat <- function(
     t = T,
     cols = cols,
     ncol = ncol,
+    nrow = nrow,
     lab_fill = lab_fill,
     scales = scales,
+    style = style,
     violin = violin,
     box = box,
     width = width,
@@ -104,7 +109,8 @@ VlnPlot2.Seurat <- function(
     angle = angle,
     hjust = hjust,
     vjust = vjust,
-    ...)
+    ...
+  )
   return(p)
 }
 
@@ -115,7 +121,7 @@ VlnPlot2.Seurat <- function(
 #' @param t If the matrix has features in columns and cells in rows, transpose the matrix first. Default: FALSE.
 #' @param cols Flexible color settings for the plot, accepting a variety of inputs:
 #'
-#'     - Seven color_pro styles: "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple".
+#'     - Eight color_pro styles: "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple", "bright".
 #'
 #'     - Five color_iwh styles: "iwh_default", "iwh_intense", "iwh_pastel", "iwh_all", "iwh_all_hard".
 #'
@@ -123,8 +129,10 @@ VlnPlot2.Seurat <- function(
 #'
 #'     - Any manually specified colors.
 #' @param ncol Specifies the number of columns for display if multiple plots are shown. Default: NULL.
+#' @param nrow Specifies the number of rows for display if multiple plots are shown. Default: NULL.
 #' @param lab_fill Label for the figure legend. Default: 'group'.
 #' @param scales Scales parameter passed to \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}. Default: 'free_y'.
+#' @param style Plot style: "fill" (default) uses filled violins with group colors, "outline" uses white fill with colored outlines.
 #' @param violin Indicates whether to generate a violin plot. Default: TRUE.
 #' @param box Indicates whether to depict a box plot. Default: TRUE.
 #' @param width Width of the box plot. Default: 0.9.
@@ -156,10 +164,12 @@ VlnPlot2.default <- function(
   matr, f, f2 = NULL,
   features = NULL,
   t = F,
-  cols = "pro_default",
+  cols = "light",
   ncol = NULL,
+  nrow = NULL,
   lab_fill = "group",
   scales = "free_y",
+  style = c("fill", "outline"),
   violin = T,
   box = T,
   width = 0.9,
@@ -192,6 +202,9 @@ VlnPlot2.default <- function(
     stat.method <- stats.method
   }
 
+  # Get the style parameter
+  style <- match.arg(style)
+
   scores <- VlnPlot2_Calc(
     matr = matr,
     f = f,
@@ -204,8 +217,10 @@ VlnPlot2.default <- function(
     scores = scores,
     cols = cols,
     ncol = ncol,
+    nrow = nrow,
     lab_fill = lab_fill,
     scales = scales,
+    style = style,
     violin = violin,
     box = box,
     width = width,
@@ -278,8 +293,10 @@ VlnPlot2_Plot <- function(
     scores,
     cols,
     ncol,
+    nrow,
     lab_fill,
     scales,
+    style = c("fill", "outline"),
     violin,
     box,
     width,
@@ -299,6 +316,15 @@ VlnPlot2_Plot <- function(
   x <- ifelse(!"f2" %in% colnames(scores), "f", "f2")
   p <- ggplot(scores, aes(x = .data[[x]], y = value))
   n <- nlevels(factor(scores[[x]]))
+
+  # Get the style parameter
+  style <- match.arg(style)
+
+  # Check for conflict between show.mean=TRUE and style="outline"
+  if(show.mean && style == "outline") {
+    warning("The 'outline' style conflicts with show.mean=TRUE. Reverting to 'fill' style.")
+    style <- "fill"
+  }
 
   # Auto-determine angle, hjust, and vjust if not provided
   if (is.null(angle)) {
@@ -336,15 +362,27 @@ VlnPlot2_Plot <- function(
 
   # Add violin plot if requested
   if(violin) {
-    p <- p + geom_violin(mapping = aes(fill = .data[[x]]), scale = "width", width = width)
+    if(style == "fill") {
+      p <- p + geom_violin(mapping = aes(fill = .data[[x]]), scale = "width", width = width)
+    } else if(style == "outline") {
+      p <- p + geom_violin(mapping = aes(color = .data[[x]]), scale = "width", width = width, fill = "white")
+    }
   }
 
   # Add box plot without violin
   if(box & !violin) {
-    if(pt | hide.outlier) {
-      p <- p + geom_boxplot(mapping = aes(fill = .data[[x]]), outlier.shape = NA, width = width)
-    } else {
-      p <- p + geom_boxplot(mapping = aes(fill = .data[[x]]), outlier.size = pt.size, width = width)
+    if(style == "fill") {
+      if(pt | hide.outlier) {
+        p <- p + geom_boxplot(mapping = aes(fill = .data[[x]]), outlier.shape = NA, width = width)
+      } else {
+        p <- p + geom_boxplot(mapping = aes(fill = .data[[x]]), outlier.size = pt.size, width = width)
+      }
+    } else if(style == "outline") {
+      if(pt | hide.outlier) {
+        p <- p + geom_boxplot(mapping = aes(color = .data[[x]]), outlier.shape = NA, width = width, fill = "white")
+      } else {
+        p <- p + geom_boxplot(mapping = aes(color = .data[[x]]), outlier.size = pt.size, width = width, fill = "white")
+      }
     }
 
     # Add mean/median lines for box without violin
@@ -381,12 +419,20 @@ VlnPlot2_Plot <- function(
 
   # Add box plot with violin
   if(box & violin) {
-    box_width <- if(show.mean) 0.3 else 0.12
+    box_width <- if(show.mean) 0.25 else 0.12
 
-    if(pt | hide.outlier) {
-      p <- p + geom_boxplot(outlier.shape = NA, width = box_width, fill = "white")
-    } else {
-      p <- p + geom_boxplot(fill = "white", outlier.size = pt.size, width = box_width, outlier.alpha = pt.alpha)
+    if(style == "fill") {
+      if(pt | hide.outlier) {
+        p <- p + geom_boxplot(outlier.shape = NA, width = box_width, fill = "white")
+      } else {
+        p <- p + geom_boxplot(fill = "white", outlier.size = pt.size, width = box_width, outlier.alpha = pt.alpha)
+      }
+    } else if(style == "outline") {
+      if(pt | hide.outlier) {
+        p <- p + geom_boxplot(mapping = aes(color = .data[[x]]), outlier.shape = NA, width = box_width, fill = "white")
+      } else {
+        p <- p + geom_boxplot(mapping = aes(color = .data[[x]]), fill = "white", outlier.size = pt.size, width = box_width, outlier.alpha = pt.alpha)
+      }
     }
 
     # Add mean/median lines for box with violin
@@ -406,11 +452,16 @@ VlnPlot2_Plot <- function(
     }
   }
 
-  p <- p + scale_fill_disc_auto(color_scheme = cols, n = n)
+  # Set color scales based on style
+  if(style == "fill") {
+    p <- p + scale_fill_disc_auto(color_scheme = cols, n = n)
+  } else if(style == "outline") {
+    p <- p + scale_color_disc_auto(color_scheme = cols, n = n)
+  }
 
   if(x == "f"){
     p <- p +
-      facet_wrap(vars(feature), ncol = ncol, strip.position=strip.position, scales = scales)+
+      facet_wrap(vars(feature), ncol = ncol, nrow = nrow, strip.position=strip.position, scales = scales)+
       ylab(NULL) +
       xlab(NULL) +
       theme_classic() +
@@ -419,7 +470,8 @@ VlnPlot2_Plot <- function(
             legend.position = if(show.mean) "right" else "none",
             axis.text.x = element_text(angle = angle, hjust = hjust, vjust = vjust),
             strip.text = element_text(face = "bold", size = 10)) +
-      labs(fill = lab_fill) +
+      labs(fill = if(style == "fill") lab_fill else NULL,
+           color = if(style == "outline") lab_fill else NULL) +
       scale_y_continuous(expand = expansion(mult = c(0,0.08)))
   }else{
     p <- p +
@@ -431,7 +483,8 @@ VlnPlot2_Plot <- function(
             strip.placement = "outside",
             axis.text.x = element_blank(),
             strip.text.x = element_text(angle = angle, hjust = hjust, vjust = vjust, face = "bold", size = 10)) +
-      labs(fill = lab_fill) +
+      labs(fill = if(style == "fill") lab_fill else NULL,
+           color = if(style == "outline") lab_fill else NULL) +
       scale_y_continuous(expand = expansion(mult = c(0,0.08)))
   }
   return(p)
@@ -535,7 +588,7 @@ VlnPlot2_SelColDisc <- function(
     load.cols
 ) {
   if(is.null(cols)) return(NULL)
-  if(cols[1] != "auto") return(cols)
+  if(cols[1] != "light") return(cols)
   if(is.null(group.by)) group.by <- "ident"
   if(!is.null(split.by)) {
     var <- split.by
@@ -547,7 +600,7 @@ VlnPlot2_SelColDisc <- function(
     if(!is.null(load_var)) {
       cols <- load_var
     } else {
-      cols <- "pro_default"
+      cols <- "pro_light"
     }
   }
   return(cols)

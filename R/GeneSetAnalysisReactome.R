@@ -20,7 +20,7 @@ GeneSetAnalysisReactome <- function(
   library(SeuratExtendData)
 
   if(is.null(seu)){
-    rd <- SeuratExtendData::Reactome_Data[[spe]]
+    rd <- Reactome_Data[[spe]]
     DatabaseList <- rd$Roots
     message("Commonly used datasets:\n  ",
             paste(format(names(DatabaseList)), DatabaseList, sep = ": " ,collapse = "\n  "))
@@ -33,7 +33,7 @@ GeneSetAnalysisReactome <- function(
     if(is.null(parent)) title <- "All" else title <- parent[1]
   }
 
-  GenesetList <- SeuratExtendData::Reactome_Data[[spe]]$Path2Gene[GenesetNames]
+  GenesetList <- Reactome_Data[[spe]]$Path2Gene[GenesetNames]
   DefaultAssay(seu) <- assay
   GenesetList <- FilterGenesets(
     genes_in_data = rownames(seu),
@@ -86,16 +86,16 @@ FilterReactomeTerms <- function(
   if(is.null(term)) term <- names(Reactome_Data[[spe]]$Path2Gene)
   if(is.vector(term)){
     filter <-
-      SeuratExtendData::Reactome_Data[[spe]]$Path2Gene[term] %>%
+      Reactome_Data[[spe]]$Path2Gene[term] %>%
       sapply(function(x) length(x) >= n.min & length(x) <= n.max)
     term <- term[filter]
     if(!is.null(parent)){
-      if(all(parent %in% SeuratExtendData::Reactome_Data[[spe]]$Ontology$id)) {
+      if(all(parent %in% Reactome_Data[[spe]]$Ontology$id)) {
         term <- intersect(term, GetAllChilrenReactome(parent, spe))
       }else{
         message <- paste0(
           "Parent item(s) not found: ",
-          paste0(setdiff(parent, SeuratExtendData::Reactome_Data[[spe]]$Ontology$id), collapse = ", "))
+          paste0(setdiff(parent, Reactome_Data[[spe]]$Ontology$id), collapse = ", "))
         warning(message)
       }
     }
@@ -127,7 +127,7 @@ RenameReactome <- function(
     if(add_id) renamed <- paste(term2, renamed)
     if(add_n_gene) renamed <- paste0(
       renamed, " (",
-      sapply(SeuratExtendData::Reactome_Data[[spe]]$Path2Gene[term2], length), "g)")
+      sapply(Reactome_Data[[spe]]$Path2Gene[term2], length), "g)")
     term[filter] <- renamed
     return(term)
   }else{
@@ -141,7 +141,7 @@ RenameReactome <- function(
 GetChilrenReactome <- function(term, spe = getOption("spe")){
   library(dplyr)
   check_spe(spe)
-  Child <- union(term, SeuratExtendData::Reactome_Data[[spe]]$Ontology$children[term] %>% unlist)
+  Child <- union(term, Reactome_Data[[spe]]$Ontology$children[term] %>% unlist)
   return(Child)
 }
 
@@ -154,7 +154,7 @@ GetAllChilrenReactome <- function(term, spe = getOption("spe")){
 GetEndTermsReactome <- function(term, spe = getOption("spe")){
   library(dplyr)
   check_spe(spe)
-  anc <- SeuratExtendData::Reactome_Data[[spe]]$Ontology$ancestors[term] %>%
+  anc <- Reactome_Data[[spe]]$Ontology$ancestors[term] %>%
     lapply(function(x) x[-length(x)]) %>%
     unlist() %>% unique()
   return(setdiff(term, anc))
@@ -165,7 +165,7 @@ getReactomedatabase <- function(
     spe = getOption("spe")) {
 
   check_spe(spe)
-  rd <- SeuratExtendData::Reactome_Data[[spe]]
+  rd <- Reactome_Data[[spe]]
   DatabaseList <- rd$Roots
   all_term_names <- na.omit(rd$Ontology$name)
   parent <- parent %||% "All"

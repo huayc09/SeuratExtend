@@ -34,7 +34,10 @@ WaterfallPlot(object, ...)
   hjust = NULL,
   vjust = NULL,
   title = NULL,
-  style = c("bar", "segment")
+  style = c("bar", "segment"),
+  border = NA,
+  log.base = "e",
+  pseudocount = NULL
 )
 
 \method{WaterfallPlot}{default}(
@@ -57,7 +60,10 @@ WaterfallPlot(object, ...)
   hjust = NULL,
   vjust = NULL,
   title = NULL,
-  style = c("bar", "segment")
+  style = c("bar", "segment"),
+  border = NA,
+  log.base = "e",
+  pseudocount = NULL
 )
 }
 \arguments{
@@ -122,6 +128,10 @@ such as z-scores or log fold changes.}
 \item{style}{Character string specifying the plot style. Either "bar" (default) for traditional bar plot style, or
 "segment" for thin segments with end points.}
 
+\item{border}{Color for the border of bars when style="bar". Use NA for no border (default), or specify a color (e.g., "black").}
+
+\item{log.base}{The base for logarithmic calculations when using logFC. Can be "e" (natural logarithm, default), "2" (log2), or "10" (log10).}
+
 \item{matr}{A matrix or data frame where rows represent features and columns represent cells.}
 
 \item{f}{A factor or vector indicating the identity of each cell. The length should match the number of columns in `matr`.}
@@ -153,6 +163,24 @@ Generates a waterfall plot.
 }
 \details{
 For more detailed usage, see the examples provided.
+
+By default, log fold change (logFC) calculations use natural logarithm (base e). 
+However, you can specify a different logarithm base using the `log.base` parameter. 
+Common choices include "e" (natural log, default), "2" (log2), or "10" (log10). 
+Any numeric value can also be used as a custom base.
+
+When calculating logFC, a pseudocount is added to both the numerator and denominator 
+(i.e., log((mean(x[group1]+pseudocount)/(mean(x[group2]+pseudocount)))) to prevent 
+issues with zero values and to stabilize calculations for low expression values. 
+By default, pseudocount=1 is used for most data types. For data with values 
+constrained between 0-1 (like AUCell scores), pseudocount=0.01 is automatically 
+applied unless manually specified otherwise.
+
+For Seurat objects, when calculating gene expression logFC values, the normalized data 
+undergoes expm1 transformation before calculation (controlled by exp.transform=TRUE 
+by default). This ensures consistency with Seurat's FindMarkers function. To disable 
+this transformation, set exp.transform=FALSE. This behavior only applies when using 
+gene expression data from a Seurat object.
 }
 \examples{
 # First, create a matrix using the GeneSetAnalysis() function.
@@ -187,4 +215,16 @@ WaterfallPlot(
   pbmc, group.by = "cluster", features = genes,
   ident.1 = "Mono CD14", ident.2 = "CD8 T cell", length = "logFC",
   top.n = 20)
+  
+# Use log2 instead of natural logarithm for fold change calculations
+WaterfallPlot(
+  pbmc, group.by = "cluster", features = genes,
+  ident.1 = "Mono CD14", ident.2 = "CD8 T cell", length = "logFC",
+  log.base = "2", top.n = 20)
+  
+# Specify a custom pseudocount for logFC calculation
+# This is useful for data with small values or specialized normalization
+WaterfallPlot(
+  matr, f = pbmc$cluster, ident.1 = "Mono CD14", ident.2 = "CD8 T cell",
+  length = "logFC", pseudocount = 0.001)
 }

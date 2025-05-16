@@ -28,7 +28,9 @@ VolcanoPlot(object, ...)
   y.quantile = 0.99,
   top.n = 10,
   color = c("grey20", "grey50", "red3"),
-  title = NULL
+  title = NULL,
+  log.base = "e",
+  pseudocount = NULL
 )
 
 \method{VolcanoPlot}{default}(
@@ -45,7 +47,9 @@ VolcanoPlot(object, ...)
   y.quantile = 0.99,
   top.n = 10,
   color = c("grey20", "grey50", "red3"),
-  title = NULL
+  title = NULL,
+  log.base = "e",
+  pseudocount = NULL
 )
 }
 \arguments{
@@ -91,6 +95,10 @@ the second for points passing single threshold, and the third for points passing
 
 \item{title}{Title of the plot. Defaults to NULL.}
 
+\item{log.base}{The base for logarithmic calculations when using logFC. Can be "e" (natural logarithm, default), "2" (log2), or "10" (log10).}
+
+\item{pseudocount}{Pseudocount to be added to the data before transformation. Only applicable for the Seurat method.}
+
 \item{matr}{A matrix or data frame where rows represent features and columns represent cells.}
 
 \item{f}{A factor or vector indicating the identity of each cell. The length should match the number of columns in `matr`.}
@@ -118,6 +126,23 @@ negative changes) that pass both thresholds. The number of features to label can
 controlled using the `top.n` parameter.
 
 When `y = "p"`, the y-axis displays -log10 transformed p-values.
+
+By default, log fold change (logFC) calculations use natural logarithm (base e).
+You can specify a different logarithm base using the `log.base` parameter.
+Common choices include "e" (natural log, default), "2" (log2), or "10" (log10).
+
+When calculating logFC, a pseudocount is added to both the numerator and denominator 
+(i.e., log((mean(x[group1]+pseudocount)/(mean(x[group2]+pseudocount)))) to prevent 
+issues with zero values and to stabilize calculations for low expression values. 
+By default, pseudocount=1 is used for most data types. For data with values 
+constrained between 0-1 (like AUCell scores), pseudocount=0.01 is automatically 
+applied unless manually specified otherwise.
+
+For Seurat objects, when calculating gene expression logFC values, the normalized data 
+undergoes expm1 transformation before calculation (controlled by exp.transform=TRUE 
+by default). This ensures consistency with Seurat's FindMarkers function. To disable 
+this transformation, set exp.transform=FALSE. This behavior only applies when using 
+gene expression data from a Seurat object.
 }
 \examples{
 # Basic usage with a Seurat object
@@ -149,6 +174,14 @@ VolcanoPlot(
   ident.1 = "B cell",
   ident.2 = "CD8 T cell",
   y = "tscore"
+)
+
+# Use log2 instead of natural logarithm for fold change calculations
+VolcanoPlot(
+  pbmc,
+  ident.1 = "B cell",
+  ident.2 = "CD8 T cell",
+  log.base = "2"
 )
 
 # Direct usage with a matrix

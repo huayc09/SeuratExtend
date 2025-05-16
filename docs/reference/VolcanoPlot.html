@@ -21,7 +21,7 @@ up- and down-regulated directions are labeled."><!-- mathjax --><script src="htt
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SeuratExtend</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
       </span>
     </div>
 
@@ -132,7 +132,9 @@ up- and down-regulated directions are labeled.</p>
 <span>  y.quantile <span class="op">=</span> <span class="fl">0.99</span>,</span>
 <span>  top.n <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grey20"</span>, <span class="st">"grey50"</span>, <span class="st">"red3"</span><span class="op">)</span>,</span>
-<span>  title <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  log.base <span class="op">=</span> <span class="st">"e"</span>,</span>
+<span>  pseudocount <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for default</span></span>
@@ -150,7 +152,9 @@ up- and down-regulated directions are labeled.</p>
 <span>  y.quantile <span class="op">=</span> <span class="fl">0.99</span>,</span>
 <span>  top.n <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grey20"</span>, <span class="st">"grey50"</span>, <span class="st">"red3"</span><span class="op">)</span>,</span>
-<span>  title <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  log.base <span class="op">=</span> <span class="st">"e"</span>,</span>
+<span>  pseudocount <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -238,6 +242,14 @@ the second for points passing single threshold, and the third for points passing
 <dd><p>Title of the plot. Defaults to NULL.</p></dd>
 
 
+<dt>log.base</dt>
+<dd><p>The base for logarithmic calculations when using logFC. Can be "e" (natural logarithm, default), "2" (log2), or "10" (log10).</p></dd>
+
+
+<dt>pseudocount</dt>
+<dd><p>Pseudocount to be added to the data before transformation. Only applicable for the Seurat method.</p></dd>
+
+
 <dt>matr</dt>
 <dd><p>A matrix or data frame where rows represent features and columns represent cells.</p></dd>
 
@@ -260,6 +272,20 @@ are not manually specified.</p>
 negative changes) that pass both thresholds. The number of features to label can be
 controlled using the `top.n` parameter.</p>
 <p>When `y = "p"`, the y-axis displays -log10 transformed p-values.</p>
+<p>By default, log fold change (logFC) calculations use natural logarithm (base e).
+You can specify a different logarithm base using the `log.base` parameter.
+Common choices include "e" (natural log, default), "2" (log2), or "10" (log10).</p>
+<p>When calculating logFC, a pseudocount is added to both the numerator and denominator 
+(i.e., log((mean(x[group1]+pseudocount)/(mean(x[group2]+pseudocount)))) to prevent 
+issues with zero values and to stabilize calculations for low expression values. 
+By default, pseudocount=1 is used for most data types. For data with values 
+constrained between 0-1 (like AUCell scores), pseudocount=0.01 is automatically 
+applied unless manually specified otherwise.</p>
+<p>For Seurat objects, when calculating gene expression logFC values, the normalized data 
+undergoes expm1 transformation before calculation (controlled by exp.transform=TRUE 
+by default). This ensures consistency with Seurat's FindMarkers function. To disable 
+this transformation, set exp.transform=FALSE. This behavior only applies when using 
+gene expression data from a Seurat object.</p>
     </div>
 
     <div id="ref-examples">
@@ -293,6 +319,14 @@ controlled using the `top.n` parameter.</p>
 <span>  ident.1 <span class="op">=</span> <span class="st">"B cell"</span>,</span>
 <span>  ident.2 <span class="op">=</span> <span class="st">"CD8 T cell"</span>,</span>
 <span>  y <span class="op">=</span> <span class="st">"tscore"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Use log2 instead of natural logarithm for fold change calculations</span></span>
+<span><span class="fu">VolcanoPlot</span><span class="op">(</span></span>
+<span>  <span class="va">pbmc</span>,</span>
+<span>  ident.1 <span class="op">=</span> <span class="st">"B cell"</span>,</span>
+<span>  ident.2 <span class="op">=</span> <span class="st">"CD8 T cell"</span>,</span>
+<span>  log.base <span class="op">=</span> <span class="st">"2"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Direct usage with a matrix</span></span>

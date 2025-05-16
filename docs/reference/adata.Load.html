@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SeuratExtend</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
       </span>
     </div>
 
@@ -109,6 +109,7 @@
 <span>  <span class="va">seu</span>,</span>
 <span>  dr <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  prefix <span class="op">=</span> <span class="st">"X_"</span>,</span>
+<span>  postfix <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  scv.graph <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  load.adata <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  save.adata <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -162,6 +163,10 @@
 
 <dt>prefix</dt>
 <dd><p>A prefix to add to the dimension reduction names when importing them into the AnnData object's 'obsm' attribute. This helps in differentiating various data types and maintaining order within the dataset. Default: 'X_'.</p></dd>
+
+
+<dt>postfix</dt>
+<dd><p>A postfix to add to the dimension reduction names when importing them into the AnnData object's 'obsm' attribute.</p></dd>
 
 
 <dt>scv.graph</dt>

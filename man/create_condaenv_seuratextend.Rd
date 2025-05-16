@@ -25,6 +25,21 @@ The environment setup is automatic and checks your operating system to configure
 
 The function automatically detects Apple Silicon (M1/M2/M3/M4) Macs and uses the appropriate configuration.
 
+## Known macOS Issues and Workarounds
+
+Users on macOS may encounter specific issues due to memory management between R and Python:
+
+* **Intel Macs**: When using R Markdown in RStudio with Python tools like scVelo, the R session may crash. 
+  To work around this issue, use regular .R script files instead of R Markdown files.
+
+* **Apple Silicon (M1/M2/M3/M4)**: If any R objects are loaded in the session before calling Python functions
+  (particularly operations like PCA on AnnData objects), the R session may crash. This is a known memory management
+  issue between R and Python on macOS.
+  
+  **Solution**: Start with a fresh R session and call `activate_python()` at the beginning of your workflow 
+  before loading any R objects. This initializes the Python environment first and prevents memory-related crashes.
+  After this initialization, all scVelo-related functions should work properly.
+
 If force=TRUE is used, any existing 'seuratextend' environment will be removed before creating a new one. This can be useful when:
 * A previous installation was interrupted
 * Required dependencies were not properly installed

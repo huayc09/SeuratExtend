@@ -39,7 +39,10 @@ WaterfallPlot.Seurat <- function(
     hjust = NULL,
     vjust = NULL,
     title = NULL,
-    style = c("bar", "segment")
+    style = c("bar", "segment"),
+    border = NA,
+    log.base = "e",
+    pseudocount = NULL
 ) {
   style <- match.arg(style)
 
@@ -76,7 +79,10 @@ WaterfallPlot.Seurat <- function(
     hjust = hjust,
     vjust = vjust,
     title = title,
-    style = style
+    style = style,
+    border = border,
+    log.base = log.base,
+    pseudocount = pseudocount
   )
 
   return(p)
@@ -127,6 +133,8 @@ WaterfallPlot.Seurat <- function(
 #' @param title Title of the plot. Defaults to NULL.
 #' @param style Character string specifying the plot style. Either "bar" (default) for traditional bar plot style, or
 #'   "segment" for thin segments with end points.
+#' @param border Color for the border of bars when style="bar". Use NA for no border (default), or specify a color (e.g., "black").
+#' @param log.base The base for logarithmic calculations when using logFC. Can be "e" (natural logarithm, default), "2" (log2), or "10" (log10).
 #' @rdname WaterfallPlot
 #' @export
 
@@ -150,8 +158,11 @@ WaterfallPlot.default <- function(
     hjust = NULL,
     vjust = NULL,
     title = NULL,
-    style = c("bar", "segment")
-){
+    style = c("bar", "segment"),
+    border = NA,
+    log.base = "e",
+    pseudocount = NULL
+) {
   style <- match.arg(style)
 
   scores <- WaterfallPlot_Calc(
@@ -165,7 +176,9 @@ WaterfallPlot.default <- function(
     color = color,
     len.threshold = len.threshold,
     col.threshold = col.threshold,
-    top.n = top.n
+    top.n = top.n,
+    log.base = log.base,
+    pseudocount = pseudocount
   )
 
   titles <- WaterfallPlot_Title(
@@ -175,7 +188,8 @@ WaterfallPlot.default <- function(
     title = title,
     length_label = length,
     y.label = y.label,
-    flip = flip)
+    flip = flip,
+    log.base = log.base)
 
   p <- WaterfallPlot_Plot(
     scores = scores,
@@ -188,11 +202,11 @@ WaterfallPlot.default <- function(
     hjust = hjust,
     vjust = vjust,
     title = titles[[1]],
-    style = style
+    style = style,
+    border = border
   )
 
   return(p)
-
 }
 
 #' @title WaterfallPlot_v3
@@ -216,17 +230,74 @@ WaterfallPlot_Calc <- function(
     color,
     len.threshold,
     col.threshold,
-    top.n
+    top.n,
+    log.base = "e",
+    pseudocount = NULL
 ) {
   library(dplyr)
   library(rlist)
   library(tidyr)
 
+  # Validate log.base at the beginning of the function
+  valid_bases <- c("e", "2", "10")
+  use_natural_log <- FALSE
+  
+  # Convert log.base to numeric if it's a numeric string
+  if (is.character(log.base) && !(log.base %in% valid_bases)) {
+    # Try to convert to numeric
+    numeric_base <- suppressWarnings(as.numeric(log.base))
+    if (is.na(numeric_base)) {
+      warning("Invalid log.base '", log.base, "' provided, using natural log (base e) instead")
+      log.base <- "e"
+      use_natural_log <- TRUE
+    }
+  }
+  
+  # Validate if it's a non-character, non-numeric value
+  if (!is.character(log.base) && !is.numeric(log.base)) {
+    warning("Invalid log.base type provided, using natural log (base e)")
+    log.base <- "e"
+    use_natural_log <- TRUE
+  }
+
   f <- factor(f)
   ident.1 <- ident.1 %||% levels(f)[1]
   cell.1 <- (f == ident.1)
   cell.2 <- if(is.null(ident.2)) f != ident.1 else f == ident.2
-  if(exp.transform) matr <- expm1(matr)
+  
+  # Check if logFC calculation will be used
+  will_use_logfc <- "logFC" %in% c(length, color)
+  
+  # Prepare matrix for analysis
+  if(exp.transform) {
+    original_matr <- matr
+    matr <- expm1(matr)
+  }
+  
+  # Automatically determine pseudocount if not provided and logFC will be used
+  if (is.null(pseudocount) && will_use_logfc) {
+    # Check the range on the transformed matrix if applicable
+    check_matr <- if(exp.transform) matr else matr
+    data_range <- range(check_matr, na.rm = TRUE)
+    
+    if (data_range[1] >= 0 && data_range[2] <= 1) {
+      # 0-1 range data (like AUCell)
+      pseudocount <- 0.01
+      message("Data range detected as 0-1. Using pseudocount = 0.01 for logFC calculation.")
+    } else {
+      # Default for count data or other types
+      pseudocount <- 1
+      message("Using pseudocount = 1 for logFC calculation.")
+    }
+    
+    # Check for negative values and warn if found
+    if (data_range[1] < 0) {
+      warning("Negative values detected in data. LogFC calculation may be affected.")
+    }
+  } else if (is.null(pseudocount)) {
+    # Set default pseudocount silently if logFC is not used
+    pseudocount <- 1
+  }
 
   # Helper function to handle t.test with zero variance
   safe_ttest <- function(x, idx1, idx2) {
@@ -256,8 +327,21 @@ WaterfallPlot_Calc <- function(
       }, simplify = TRUE)
   }
   if("logFC" %in% c(length, color)){
-    scores[["logFC"]] <-
-      apply(matr, 1, function(x) log(mean(x[cell.1]+1)/mean(x[cell.2]+1)), simplify = TRUE)
+    # Calculate logFC with the specified base and pseudocount
+    scores[["logFC"]] <- apply(matr, 1, function(x) {
+      ratio <- mean(x[cell.1] + pseudocount) / mean(x[cell.2] + pseudocount)
+      if (log.base == "e" || use_natural_log) {
+        return(log(ratio))
+      } else if (log.base == "2") {
+        return(log2(ratio))
+      } else if (log.base == "10") {
+        return(log10(ratio))
+      } else {
+        # Must be a valid numeric at this point
+        base <- as.numeric(log.base)
+        return(log(ratio, base))
+      }
+    }, simplify = TRUE)
   }
 
   scores <- as.data.frame(list.cbind(scores))
@@ -292,21 +376,51 @@ WaterfallPlot_Plot <- function(
     hjust,
     vjust,
     title,
-    style
+    style,
+    border = NA
 ) {
   library(ggplot2)
   library(scales)
+  
+  # Score preprocessing
+  scores$rank <- factor(scores$rank, levels = unique(scores$rank))
   if(flip){
     scores <- scores[nrow(scores):1, ]
-    angle <- angle %||% 0
-    hjust <- hjust %||% 0.5
-    vjust <- vjust %||% 1
-  }else{
-    angle <- angle %||% -90
-    hjust <- hjust %||% 0
-    vjust <- vjust %||% 0.5
   }
-  scores$rank <- factor(scores$rank, levels = unique(scores$rank))
+  
+  # Auto-determine angle, hjust, and vjust if not provided
+  if (is.null(angle)) {
+    max_label_length <- max(nchar(as.character(scores$rank)))
+    if (flip) {
+      angle <- 0  # Horizontal labels for flipped plot
+    } else {
+      angle <- if (max_label_length <= 2) 0 else -90  # Vertical for longer labels
+    }
+  }
+  
+  if (abs(angle) > 90) {
+    warning("Angle should be between -90 and 90 degrees for optimal readability.")
+  }
+  
+  if (is.null(hjust)) {
+    if (angle > 0) {
+      hjust <- 1  # Right align
+    } else if (angle < 0) {
+      hjust <- 0  # Left align
+    } else {
+      hjust <- 0.5  # Center align
+    }
+  }
+  
+  if (is.null(vjust)) {
+    if (abs(angle) == 90) {
+      vjust <- 0.5
+    } else {
+      vjust <- 1
+    }
+  }
+  
+  # Set fill label
   if(color == "p") lab_fill <- "-log10(p)" else lab_fill <- color
 
   # Base plot with common elements
@@ -315,7 +429,7 @@ WaterfallPlot_Plot <- function(
 
   # Add style-specific elements
   if (style == "bar") {
-    p <- p + geom_bar(stat = "identity", aes(fill = color), colour = NA) +
+    p <- p + geom_bar(stat = "identity", aes(fill = color), colour = border) +
       theme_classic()
   } else {
     p <- p +
@@ -338,15 +452,52 @@ WaterfallPlot_Plot <- function(
   return(p)
 }
 
-WaterfallPlot_Title <- function(f, ident.1, ident.2, title, length_label, y.label, flip) {
+WaterfallPlot_Title <- function(f, ident.1, ident.2, title, length_label, y.label, flip, log.base = "e") {
   f <- factor(f)
   ident.1 <- ident.1 %||% levels(f)[1]
   ident.2 <- ident.2 %||% paste0("non-", ident.1)
   title <- title %||% paste0(ident.1, " vs. ", ident.2)
+  
+  # Validate log.base for display
+  valid_bases <- c("e", "2", "10")
+  if (is.character(log.base) && !(log.base %in% valid_bases)) {
+    # Check if it can be converted to numeric
+    numeric_base <- suppressWarnings(as.numeric(log.base))
+    if (is.na(numeric_base)) {
+      # Invalid base, display as log(e)
+      log.base <- "e"
+    }
+  }
+  
+  # Create a formatted label for logFC that includes the base
+  if (length_label == "logFC") {
+    if (log.base == "e") {
+      # PDF-compatible format for base e (with parentheses)
+      formatted_label <- "log(e)FC"
+    } else if (log.base == "2") {
+      # PDF-compatible format for base 2 (without parentheses)
+      formatted_label <- "log2FC"
+    } else if (log.base == "10") {
+      # PDF-compatible format for base 10 (without parentheses)
+      formatted_label <- "log10FC"
+    } else {
+      # Custom numeric base with PDF-compatible format (without parentheses)
+      if (is.numeric(log.base) || (is.character(log.base) && !is.na(as.numeric(log.base)))) {
+        formatted_label <- paste0("log", log.base, "FC")
+      } else {
+        # Fallback for any invalid base
+        formatted_label <- "logFC"
+      }
+    }
+  } else {
+    formatted_label <- length_label
+  }
+  
   if(is.null(y.label)) {
-    y.label <- length_label
+    y.label <- formatted_label
     if(isTRUE(flip)) {
-      y.label <- paste0(ident.2," ← ",y.label," → ",ident.1)
+      # Use more common arrow symbols that work in both PNG and PDF
+      y.label <- paste0(ident.2, " <- ", y.label, " -> ", ident.1)
     }
   }
   return(list(title, y.label))

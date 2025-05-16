@@ -10,6 +10,7 @@ NULL
 #' @param slot Slot from which to retrieve feature data. Only applicable for the Seurat method.
 #' @param assay Name of the assay to use. If not specified, the active assay will be used. Only applicable for the Seurat method.
 #' @param priority If set to "expr", the function will fetch data from the expression matrix rather than `meta.data`. Only applicable for the Seurat method.
+#' @param pseudocount Pseudocount to be added to the data before transformation. Only applicable for the Seurat method.
 #' @rdname VolcanoPlot
 #' @export
 
@@ -33,7 +34,9 @@ VolcanoPlot.Seurat <- function(
     y.quantile = 0.99,
     top.n = 10,
     color = c("grey20", "grey50", "red3"),
-    title = NULL
+    title = NULL,
+    log.base = "e",
+    pseudocount = NULL
 ) {
 
   # Use cells if provided, otherwise fall back to cell
@@ -63,7 +66,9 @@ VolcanoPlot.Seurat <- function(
     y.quantile = y.quantile,
     top.n = top.n,
     color = color,
-    title = title
+    title = title,
+    log.base = log.base,
+    pseudocount = pseudocount
   )
 
   return(p)
@@ -85,6 +90,8 @@ VolcanoPlot.Seurat <- function(
 #'   Defaults to c("grey20", "grey50", "red3"). The first color is used for points near zero (below thresholds),
 #'   the second for points passing single threshold, and the third for points passing both thresholds.
 #' @param title Title of the plot. Defaults to NULL.
+#' @param log.base The base for logarithmic calculations when using logFC. Can be "e" (natural logarithm, default), "2" (log2), or "10" (log10).
+#' @param pseudocount Pseudocount to be added to the data before transformation. Only applicable for the Seurat method.
 #' @rdname VolcanoPlot
 #' @export
 
@@ -102,7 +109,9 @@ VolcanoPlot.default <- function(
     y.quantile = 0.99,
     top.n = 10,
     color = c("grey20", "grey50", "red3"),
-    title = NULL
+    title = NULL,
+    log.base = "e",
+    pseudocount = NULL
 ){
   # Match y argument
   y <- match.arg(y)
@@ -118,7 +127,9 @@ VolcanoPlot.default <- function(
     color = y,
     len.threshold = 0,
     col.threshold = 0,
-    top.n = NULL
+    top.n = NULL,
+    log.base = log.base,
+    pseudocount = pseudocount
   )
 
   scores$color <- abs(scores$color)
@@ -131,7 +142,8 @@ VolcanoPlot.default <- function(
     title = title,
     length_label = x,
     y.label = NULL,
-    flip = TRUE)
+    flip = TRUE,
+    log.base = log.base)
 
   p <- VolcanoPlot_Plot(
     scores = scores,
@@ -144,7 +156,8 @@ VolcanoPlot.default <- function(
     top.n = top.n,
     color = color,
     title = titles[[1]],
-    x.label = titles[[2]]
+    x.label = titles[[2]],
+    log.base = log.base
   )
 
   return(p)
@@ -163,7 +176,8 @@ VolcanoPlot_Plot <- function(
     top.n,
     color,
     title,
-    x.label
+    x.label,
+    log.base = "e"
 ) {
   library(ggplot2)
   library(ggrepel)
@@ -203,6 +217,9 @@ VolcanoPlot_Plot <- function(
 
   scores$label <- ifelse(scores$label %in% c(top_features_up, top_features_down), scores$label, NA)
 
+  # Format axis labels to include log base - use simplified format
+  y_label <- if(y == "p") "-log10(p)" else y
+  
   # Create the plot
   p <- ggplot(scores, aes(x = length, y = color, color = point_color, label = label)) +
     geom_point() +
@@ -210,7 +227,7 @@ VolcanoPlot_Plot <- function(
     theme_bw() +
     geom_hline(yintercept = y.threshold, linetype = "dashed") +
     geom_vline(xintercept = c(-x.threshold, x.threshold), linetype = "dashed") +
-    labs(x = x.label, y = if(y == "p") "-log10(p)" else y, title = title) +
+    labs(x = x.label, y = y_label, title = title) +
     scale_color_identity() +
     scale_y_continuous(expand = expansion(mult = c(0, 0.05))) +
     theme(legend.position = "none") +

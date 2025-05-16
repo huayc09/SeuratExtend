@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SeuratExtend</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
       </span>
     </div>
 
@@ -121,7 +121,7 @@
       <h1 data-toc-skip>Geneset Enrichment Analysis (GSEA)</h1>
                         <h4 data-toc-skip class="author">Yichao Hua</h4>
             
-            <h4 data-toc-skip class="date">2024-11-28</h4>
+            <h4 data-toc-skip class="date">2025-05-16</h4>
       
       
       <div class="hidden name"><code>GSEA.Rmd</code></div>
@@ -157,6 +157,14 @@ primarily facilitated through the <code>GeneSetAnalysisGO</code> and
 <code>GeneSetAnalysisReactome</code> functions, among other
 supplementary functions. In this section, we’ll delve into the usage and
 features of these functions.</p>
+<blockquote>
+<p><strong>Note on database updates</strong>: The GO and Reactome
+databases are regularly updated by their respective consortia.
+SeuratExtend provides mechanisms for users to update these databases or
+create custom ones (including for other model organisms). For detailed
+instructions, please refer to the <a href="https://huayc09.github.io/SeuratExtend/articles/FAQ.html#custom-databases" class="external-link">FAQ:
+Updating or Creating Custom GO/Reactome Databases</a>.</p>
+</blockquote>
 <div class="section level3">
 <h3 id="gene-ontology-go-database">Gene Ontology (GO) Database<a class="anchor" aria-label="anchor" href="#gene-ontology-go-database"></a>
 </h3>
@@ -177,12 +185,12 @@ location: <code>seu@misc$AUCell$GO[[title]]</code>.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">matr</span>, <span class="fl">2</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                                           cells</span></span>
 <span><span class="co">## gene sets                                  CTATAAGATCGTTT-1 GTGATTCTGGTTCA-1</span></span>
-<span><span class="co">##   GO:0002376 immune system process (3213g)       0.25540633       0.29013621</span></span>
-<span><span class="co">##   GO:0001776 leukocyte homeostasis (84g)         0.06705023       0.05466948</span></span>
+<span><span class="co">##   GO:0002376 immune system process (3276g)       0.22356517       0.22811892</span></span>
+<span><span class="co">##   GO:0001776 leukocyte homeostasis (122g)        0.03950416       0.03073332</span></span>
 <span><span class="co">##                                           cells</span></span>
 <span><span class="co">## gene sets                                  ACGTTGGACCGTAA-1</span></span>
-<span><span class="co">##   GO:0002376 immune system process (3213g)       0.30090373</span></span>
-<span><span class="co">##   GO:0001776 leukocyte homeostasis (84g)         0.05634452</span></span></code></pre>
+<span><span class="co">##   GO:0002376 immune system process (3276g)       0.23103773</span></span>
+<span><span class="co">##   GO:0001776 leukocyte homeostasis (122g)        0.03739987</span></span></code></pre>
 <p>For the “parent” argument, you can input any term from the GO
 database, be it a GO ID or a pathway name. To get a glimpse of commonly
 used GO categories, you can run <code><a href="../reference/GeneSetAnalysis.html">GeneSetAnalysisGO()</a></code> without
@@ -253,7 +261,57 @@ view commonly used categories in the Reactome database:</p>
 <span><span class="co">##                           "Cell Cycle"                              "Disease" </span></span>
 <span><span class="co">##                           R-HSA-168256                          R-HSA-1852241 </span></span>
 <span><span class="co">##                        "Immune System" "Organelle biogenesis and maintenance" </span></span>
-<span><span class="co">##  [ reached getOption("max.print") -- omitted 15 entries ]</span></span></code></pre>
+<span><span class="co">##  [ reached getOption("max.print") -- omitted 17 entries ]</span></span></code></pre>
+</div>
+<div class="section level3">
+<h3 id="managing-and-customizing-goreactome-databases-new-in-v1-2-0">Managing and Customizing GO/Reactome Databases (New in v1.2.0)<a class="anchor" aria-label="anchor" href="#managing-and-customizing-goreactome-databases-new-in-v1-2-0"></a>
+</h3>
+<p>SeuratExtend now offers improved ways to manage and update the GO and
+Reactome databases used in your analyses.</p>
+<div class="section level4">
+<h4 id="installing-specific-seuratextenddata-versions">Installing Specific SeuratExtendData Versions<a class="anchor" aria-label="anchor" href="#installing-specific-seuratextenddata-versions"></a>
+</h4>
+<p>You can install specific versions of the SeuratExtendData package to
+access different database releases:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Install the latest version (April 2025 data)</span></span>
+<span><span class="fu"><a href="../reference/install_SeuratExtendData.html">install_SeuratExtendData</a></span><span class="op">(</span><span class="st">"latest"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Install the stable version (January 2020 data)</span></span>
+<span><span class="fu"><a href="../reference/install_SeuratExtendData.html">install_SeuratExtendData</a></span><span class="op">(</span><span class="st">"stable"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Install specific dataset versions </span></span>
+<span><span class="fu"><a href="../reference/install_SeuratExtendData.html">install_SeuratExtendData</a></span><span class="op">(</span><span class="st">"v0.2.1"</span><span class="op">)</span>  <span class="co"># January 2020 datasets</span></span>
+<span><span class="fu"><a href="../reference/install_SeuratExtendData.html">install_SeuratExtendData</a></span><span class="op">(</span><span class="st">"v0.3.0"</span><span class="op">)</span>  <span class="co"># April 2025 datasets</span></span></code></pre></div>
+<p>This ensures compatibility with specific analysis workflows or when
+you need to match results from previous studies.</p>
+</div>
+<div class="section level4">
+<h4 id="creating-custom-databases">Creating Custom Databases<a class="anchor" aria-label="anchor" href="#creating-custom-databases"></a>
+</h4>
+<p>For creating custom databases with the latest data or for additional
+species, SeuratExtend provides comprehensive documentation:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># For complete instructions, refer to:</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/browseURL.html" class="external-link">browseURL</a></span><span class="op">(</span><span class="st">"https://github.com/huayc09/SeuratExtendData/blob/main/inst/db_creation/README_GO_Data.md"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/browseURL.html" class="external-link">browseURL</a></span><span class="op">(</span><span class="st">"https://github.com/huayc09/SeuratExtendData/blob/main/inst/db_creation/README_Reactome_Data.md"</span><span class="op">)</span></span></code></pre></div>
+<p>The custom databases can be easily used by assigning them to the
+global environment:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Load custom database</span></span>
+<span><span class="va">custom_GO_Data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"path/to/your/GO_Data.rds"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Use with SeuratExtend by assigning to global environment</span></span>
+<span><span class="va">GO_Data</span> <span class="op">&lt;-</span> <span class="va">custom_GO_Data</span></span>
+<span></span>
+<span><span class="co"># Run analysis</span></span>
+<span><span class="va">seu</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GeneSetAnalysis.html">GeneSetAnalysisGO</a></span><span class="op">(</span><span class="va">seu</span>, parent <span class="op">=</span> <span class="st">"immune_system_process"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># When done, remove the global variable</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">GO_Data</span><span class="op">)</span></span></code></pre></div>
+<p>For detailed examples and troubleshooting, please refer to the <a href="https://huayc09.github.io/SeuratExtend/articles/FAQ.html#custom-databases" class="external-link">FAQ:
+Updating or Creating Custom GO/Reactome Databases</a>.</p>
+</div>
 </div>
 </div>
 <div class="section level2">
@@ -266,17 +324,17 @@ For instance, one might consider utilizing the <a href="https://www.gsea-msigdb.
 be accessed via the <code>hall50</code> object. Upon execution, the
 resulting AUCell matrix will be stored under the path:
 <code>seu@misc$AUCell[[title]]</code>.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pbmc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GeneSetAnalysis.html">GeneSetAnalysis</a></span><span class="op">(</span><span class="va">pbmc</span>, genesets <span class="op">=</span> <span class="va">hall50</span><span class="op">$</span><span class="va">human</span><span class="op">)</span></span>
 <span><span class="va">matr</span> <span class="op">&lt;-</span> <span class="va">pbmc</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">AUCell</span><span class="op">$</span><span class="va">genesets</span></span>
 <span><span class="fu"><a href="../reference/Heatmap.html">Heatmap</a></span><span class="op">(</span><span class="fu"><a href="../reference/CalcStats.html">CalcStats</a></span><span class="op">(</span><span class="va">matr</span>, f <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span><span class="op">)</span>, lab_fill <span class="op">=</span> <span class="st">"zscore"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="GSEA_files/figure-html/unnamed-chunk-8-1.png" width="720"></p>
+<p><img src="GSEA_files/figure-html/unnamed-chunk-11-1.png" width="720"></p>
 <p>For those seeking a plethora of other gene sets, the
 <code>SeuratExtendData::Genesets_data</code> offers an expansive
 collection sourced from the <a href="https://www.gsea-msigdb.org/gsea/msigdb/human/collections.jsp" class="external-link">GSEA
 MSigDB website</a>. Here’s how you can view the available
 collections:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu">SeuratExtendData</span><span class="fu">::</span><span class="va">Genesets_data</span><span class="op">$</span><span class="va">human</span><span class="op">$</span><span class="va">GSEA</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##  [1] "positional gene sets"                </span></span>
 <span><span class="co">##  [2] "all curated gene sets"               </span></span>
@@ -294,7 +352,7 @@ collections:</p>
 <code>SeuratExtend::PanglaoDB_data</code> contains a valuable resource:
 marker lists for 178 distinct cell types, curated from <a href="https://panglaodb.se/markers.html" class="external-link">PanglaoDB</a>. To explore these
 marker lists:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu">SeuratExtend</span><span class="fu">::</span><span class="va">PanglaoDB_data</span><span class="op">$</span><span class="va">marker_list_human</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##  [1] "Acinar cells"                   "Adipocyte progenitor cells"    </span></span>
 <span><span class="co">##  [3] "Adipocytes"                     "Adrenergic neurons"            </span></span>
@@ -319,33 +377,33 @@ parameters.</p>
 gene name, pathway ID, or even keywords within pathway names. The
 following example demonstrates how to find pathways containing the gene
 “CD3D” or pathways with names including “metabolic.”</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SearchDatabase.html">SearchDatabase</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD3D"</span>, <span class="st">"metabolic"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##  [1] "GO:0000023 maltose metabolic process (3g)"                                  </span></span>
-<span><span class="co">##  [2] "GO:0000038 very long-chain fatty acid metabolic process (31g)"              </span></span>
+<pre><code><span><span class="co">##  [1] "GO:0000023 maltose metabolic process (2g)"                                  </span></span>
+<span><span class="co">##  [2] "GO:0000038 very long-chain fatty acid metabolic process (35g)"              </span></span>
 <span><span class="co">##  [3] "GO:0000052 citrulline metabolic process (8g)"                               </span></span>
 <span><span class="co">##  [4] "GO:0000053 argininosuccinate metabolic process (1g)"                        </span></span>
-<span><span class="co">##  [5] "GO:0000096 sulfur amino acid metabolic process (43g)"                       </span></span>
-<span><span class="co">##  [6] "GO:0000255 allantoin metabolic process (2g)"                                </span></span>
+<span><span class="co">##  [5] "GO:0000096 sulfur amino acid metabolic process (31g)"                       </span></span>
+<span><span class="co">##  [6] "GO:0000255 allantoin metabolic process (10g)"                               </span></span>
 <span><span class="co">##  [7] "GO:0000270 peptidoglycan metabolic process (6g)"                            </span></span>
-<span><span class="co">##  [8] "GO:0000820 regulation of glutamine family amino acid metabolic process (6g)"</span></span>
-<span><span class="co">##  [9] "GO:0000821 regulation of arginine metabolic process (2g)"                   </span></span>
-<span><span class="co">## [10] "GO:0000959 mitochondrial RNA metabolic process (48g)"                       </span></span>
-<span><span class="co">## [11] "GO:0001523 retinoid metabolic process (103g)"                               </span></span>
-<span><span class="co">## [12] "GO:0001573 ganglioside metabolic process (21g)"                             </span></span>
-<span><span class="co">##  [ reached getOption("max.print") -- omitted 1029 entries ]</span></span></code></pre>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<span><span class="co">##  [8] "GO:0000820 regulation of glutamine family amino acid metabolic process (7g)"</span></span>
+<span><span class="co">##  [9] "GO:0000821 regulation of arginine metabolic process (5g)"                   </span></span>
+<span><span class="co">## [10] "GO:0000959 mitochondrial RNA metabolic process (64g)"                       </span></span>
+<span><span class="co">## [11] "GO:0001523 retinoid metabolic process (87g)"                                </span></span>
+<span><span class="co">## [12] "GO:0001573 ganglioside metabolic process (29g)"                             </span></span>
+<span><span class="co">##  [ reached getOption("max.print") -- omitted 943 entries ]</span></span></code></pre>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## List of 3</span></span>
-<span><span class="co">##  $ GO:0000023 maltose metabolic process (3g)                    :List of 3</span></span>
+<span><span class="co">##  $ GO:0000023 maltose metabolic process (2g)                    :List of 3</span></span>
 <span><span class="co">##   ..$ SetID  : chr "GO:0000023"</span></span>
 <span><span class="co">##   ..$ SetName: chr "maltose metabolic process"</span></span>
-<span><span class="co">##   ..$ Genes  : chr [1:3] "MGAM" "GAA" "GANC"</span></span>
-<span><span class="co">##  $ GO:0000038 very long-chain fatty acid metabolic process (31g):List of 3</span></span>
+<span><span class="co">##   ..$ Genes  : chr [1:2] "MGAM" "GAA"</span></span>
+<span><span class="co">##  $ GO:0000038 very long-chain fatty acid metabolic process (35g):List of 3</span></span>
 <span><span class="co">##   ..$ SetID  : chr "GO:0000038"</span></span>
 <span><span class="co">##   ..$ SetName: chr "very long-chain fatty acid metabolic process"</span></span>
-<span><span class="co">##   ..$ Genes  : chr [1:31] "ELOVL7" "HACD1" "SLC27A2" "ACAA1" ...</span></span>
+<span><span class="co">##   ..$ Genes  : chr [1:35] "ELOVL7" "HACD1" "ABCD4" "SLC27A2" ...</span></span>
 <span><span class="co">##  $ GO:0000052 citrulline metabolic process (8g)                 :List of 3</span></span>
 <span><span class="co">##   ..$ SetID  : chr "GO:0000052"</span></span>
 <span><span class="co">##   ..$ SetName: chr "citrulline metabolic process"</span></span>
@@ -356,43 +414,43 @@ following example demonstrates how to find pathways containing the gene
 </h3>
 <p>If you wish to limit your search to specific types of items such as
 gene names, you can utilize the ‘type’ parameter as shown below.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SearchDatabase.html">SearchDatabase</a></span><span class="op">(</span><span class="st">"CD3D"</span>, type <span class="op">=</span> <span class="st">"gene"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##  [1] "GO:0001775 cell activation (1458g)"                                                  </span></span>
-<span><span class="co">##  [2] "GO:0002250 adaptive immune response (719g)"                                          </span></span>
-<span><span class="co">##  [3] "GO:0002253 activation of immune response (738g)"                                     </span></span>
-<span><span class="co">##  [4] "GO:0002376 immune system process (3213g)"                                            </span></span>
-<span><span class="co">##  [5] "GO:0002429 immune response-activating cell surface receptor signaling pathway (493g)"</span></span>
-<span><span class="co">##  [6] "GO:0002520 immune system development (967g)"                                         </span></span>
-<span><span class="co">##  [7] "GO:0002521 leukocyte differentiation (517g)"                                         </span></span>
-<span><span class="co">##  [8] "GO:0002682 regulation of immune system process (1662g)"                              </span></span>
-<span><span class="co">##  [9] "GO:0002684 positive regulation of immune system process (1213g)"                     </span></span>
-<span><span class="co">## [10] "GO:0002757 immune response-activating signal transduction (656g)"                    </span></span>
-<span><span class="co">## [11] "GO:0002764 immune response-regulating signaling pathway (690g)"                      </span></span>
-<span><span class="co">## [12] "GO:0002768 immune response-regulating cell surface receptor signaling pathway (526g)"</span></span>
-<span><span class="co">##  [ reached getOption("max.print") -- omitted 168 entries ]</span></span></code></pre>
+<pre><code><span><span class="co">##  [1] "GO:0001775 cell activation (1239g)"                                                  </span></span>
+<span><span class="co">##  [2] "GO:0002250 adaptive immune response (901g)"                                          </span></span>
+<span><span class="co">##  [3] "GO:0002253 activation of immune response (730g)"                                     </span></span>
+<span><span class="co">##  [4] "GO:0002376 immune system process (3276g)"                                            </span></span>
+<span><span class="co">##  [5] "GO:0002429 immune response-activating cell surface receptor signaling pathway (419g)"</span></span>
+<span><span class="co">##  [6] "GO:0002521 leukocyte differentiation (685g)"                                         </span></span>
+<span><span class="co">##  [7] "GO:0002682 regulation of immune system process (1852g)"                              </span></span>
+<span><span class="co">##  [8] "GO:0002684 positive regulation of immune system process (1301g)"                     </span></span>
+<span><span class="co">##  [9] "GO:0002757 immune response-activating signaling pathway (647g)"                      </span></span>
+<span><span class="co">## [10] "GO:0002764 immune response-regulating signaling pathway (718g)"                      </span></span>
+<span><span class="co">## [11] "GO:0002768 immune response-regulating cell surface receptor signaling pathway (452g)"</span></span>
+<span><span class="co">## [12] "GO:0003674 molecular_function (30703g)"                                              </span></span>
+<span><span class="co">##  [ reached getOption("max.print") -- omitted 94 entries ]</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="database-specific-search">Database-Specific Search<a class="anchor" aria-label="anchor" href="#database-specific-search"></a>
 </h3>
 <p>To focus your search within a particular database, specify the
 database name using the ‘database’ parameter.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SearchDatabase.html">SearchDatabase</a></span><span class="op">(</span><span class="st">"CD3D"</span>, database <span class="op">=</span> <span class="st">"Reactome"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##  [1] "R-HSA-1280218 Adaptive Immune System (817g)"                                                 </span></span>
-<span><span class="co">##  [2] "R-HSA-168256 Immune System (2190g)"                                                          </span></span>
-<span><span class="co">##  [3] "R-HSA-198933 Immunoregulatory interactions between a Lymphoid and a non-Lymphoid cell (191g)"</span></span>
-<span><span class="co">##  [4] "R-HSA-199991 Membrane Trafficking (628g)"                                                    </span></span>
-<span><span class="co">##  [5] "R-HSA-202403 TCR signaling (124g)"                                                           </span></span>
-<span><span class="co">##  [6] "R-HSA-202424 Downstream TCR signaling (102g)"                                                </span></span>
-<span><span class="co">##  [7] "R-HSA-202427 Phosphorylation of CD3 and TCR zeta chains (27g)"                               </span></span>
-<span><span class="co">##  [8] "R-HSA-202430 Translocation of ZAP-70 to Immunological synapse (24g)"                         </span></span>
-<span><span class="co">##  [9] "R-HSA-202433 Generation of second messenger molecules (39g)"                                 </span></span>
-<span><span class="co">## [10] "R-HSA-388841 Costimulation by the CD28 family (74g)"                                         </span></span>
-<span><span class="co">## [11] "R-HSA-389948 PD-1 signaling (28g)"                                                           </span></span>
-<span><span class="co">## [12] "R-HSA-5653656 Vesicle-mediated transport (723g)"                                             </span></span>
+<pre><code><span><span class="co">##  [1] "R-HSA-1280218 Adaptive Immune System (816g)"                                                 </span></span>
+<span><span class="co">##  [2] "R-HSA-168256 Immune System (2108g)"                                                          </span></span>
+<span><span class="co">##  [3] "R-HSA-198933 Immunoregulatory interactions between a Lymphoid and a non-Lymphoid cell (186g)"</span></span>
+<span><span class="co">##  [4] "R-HSA-199991 Membrane Trafficking (630g)"                                                    </span></span>
+<span><span class="co">##  [5] "R-HSA-202403 TCR signaling (108g)"                                                           </span></span>
+<span><span class="co">##  [6] "R-HSA-202424 Downstream TCR signaling (86g)"                                                 </span></span>
+<span><span class="co">##  [7] "R-HSA-202427 Phosphorylation of CD3 and TCR zeta chains (24g)"                               </span></span>
+<span><span class="co">##  [8] "R-HSA-202430 Translocation of ZAP-70 to Immunological synapse (21g)"                         </span></span>
+<span><span class="co">##  [9] "R-HSA-202433 Generation of second messenger molecules (36g)"                                 </span></span>
+<span><span class="co">## [10] "R-HSA-388841 Regulation of T cell activation by CD28 family (76g)"                           </span></span>
+<span><span class="co">## [11] "R-HSA-389948 Co-inhibition by PD-1 (25g)"                                                    </span></span>
+<span><span class="co">## [12] "R-HSA-5653656 Vesicle-mediated transport (725g)"                                             </span></span>
 <span><span class="co">##  [ reached getOption("max.print") -- omitted 2 entries ]</span></span></code></pre>
 </div>
 <div class="section level3">
@@ -400,22 +458,22 @@ database name using the ‘database’ parameter.</p>
 </h3>
 <p>You can specify either ‘human’ or ‘mouse’ using the ‘spe’
 parameter.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SearchDatabase.html">SearchDatabase</a></span><span class="op">(</span><span class="st">"Cd3d"</span>, spe <span class="op">=</span> <span class="st">"mouse"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## List of 3</span></span>
-<span><span class="co">##  $ GO:0001775 cell activation (1169g)        :List of 3</span></span>
+<span><span class="co">##  $ GO:0001775 cell activation (1281g)        :List of 3</span></span>
 <span><span class="co">##   ..$ SetID  : chr "GO:0001775"</span></span>
 <span><span class="co">##   ..$ SetName: chr "cell activation"</span></span>
-<span><span class="co">##   ..$ Genes  : chr [1:1169] "Cd86" "Cd79a" "Cd80" "Serpine2" ...</span></span>
-<span><span class="co">##  $ GO:0002250 adaptive immune response (640g):List of 3</span></span>
+<span><span class="co">##   ..$ Genes  : chr [1:1281] "mCEACAM1a/iso:4L/SigPep-/NGlycoAsn+" "mCEACAM1a/iso:4S/SigPep-/NGlycoAsn+" "mSkint2" "Cd86" ...</span></span>
+<span><span class="co">##  $ GO:0002250 adaptive immune response (688g):List of 3</span></span>
 <span><span class="co">##   ..$ SetID  : chr "GO:0002250"</span></span>
 <span><span class="co">##   ..$ SetName: chr "adaptive immune response"</span></span>
-<span><span class="co">##   ..$ Genes  : chr [1:640] "Cd86" "Cd79a" "Msh2" "Traf2" ...</span></span>
-<span><span class="co">##  $ GO:0002376 immune system process (2850g)  :List of 3</span></span>
+<span><span class="co">##   ..$ Genes  : chr [1:688] "Cd86" "Cd79a" "Cd80" "Msh2" ...</span></span>
+<span><span class="co">##  $ GO:0002376 immune system process (3229g)  :List of 3</span></span>
 <span><span class="co">##   ..$ SetID  : chr "GO:0002376"</span></span>
 <span><span class="co">##   ..$ SetName: chr "immune system process"</span></span>
-<span><span class="co">##   ..$ Genes  : chr [1:2850] "Gm42543" "Cd86" "Cd79a" "Cd80" ...</span></span></code></pre>
+<span><span class="co">##   ..$ Genes  : chr [1:3229] "mCCL27/iso:1/SigPep-" "mCOCH/Nter" "mEPRS/Phos:1" "mCEACAM1a/iso:4L/SigPep-/NGlycoAsn+" ...</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="customizing-return-types">Customizing Return Types<a class="anchor" aria-label="anchor" href="#customizing-return-types"></a>
@@ -423,34 +481,34 @@ parameter.</p>
 <p>The function also offers flexibility in output types. For example, if
 you require a list of pathway IDs for downstream analysis, you can use
 the ‘return’ parameter as follows.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SearchDatabase.html">SearchDatabase</a></span><span class="op">(</span><span class="st">"CD3D"</span>, return <span class="op">=</span> <span class="st">"ID"</span><span class="op">)</span></span>
 <span><span class="va">result</span></span></code></pre></div>
 <pre><code><span><span class="co">##  [1] "GO:0001775" "GO:0002250" "GO:0002253" "GO:0002376" "GO:0002429"</span></span>
-<span><span class="co">##  [6] "GO:0002520" "GO:0002521" "GO:0002682" "GO:0002684" "GO:0002757"</span></span>
-<span><span class="co">## [11] "GO:0002764" "GO:0002768"</span></span>
-<span><span class="co">##  [ reached getOption("max.print") -- omitted 168 entries ]</span></span></code></pre>
+<span><span class="co">##  [6] "GO:0002521" "GO:0002682" "GO:0002684" "GO:0002757" "GO:0002764"</span></span>
+<span><span class="co">## [11] "GO:0002768" "GO:0003674"</span></span>
+<span><span class="co">##  [ reached getOption("max.print") -- omitted 94 entries ]</span></span></code></pre>
 <p>Alternatively, if you need the output as a gene list formatted for
 <code>GeneSetAnalysis</code>, adjust the ‘return’ parameter like so:</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SearchDatabase.html">SearchDatabase</a></span><span class="op">(</span><span class="st">"CD3D"</span>, return <span class="op">=</span> <span class="st">"genelist"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">result</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## List of 5</span></span>
-<span><span class="co">##  $ GO:0001775: chr [1:1458] "IGHV3-64" "IGHV4-4" "IGHV4OR15-8" "IGHV3OR16-12" ...</span></span>
-<span><span class="co">##  $ GO:0002250: chr [1:719] "IGKV3-7" "IGKV1D-42" "IGLV4-69" "IGLV8-61" ...</span></span>
-<span><span class="co">##  $ GO:0002253: chr [1:738] "IGKV2-28" "IGHV3-64" "IGHV4-4" "IGKV2D-30" ...</span></span>
-<span><span class="co">##  $ GO:0002376: chr [1:3213] "IGKV3-7" "IGKV1D-42" "IGLV4-69" "IGLV8-61" ...</span></span>
-<span><span class="co">##  $ GO:0002429: chr [1:493] "IGKV2-28" "IGHV3-64" "IGHV4-4" "IGKV2D-30" ...</span></span></code></pre>
+<span><span class="co">##  $ GO:0001775: chr [1:1239] "TRBC2" "DAPL1" "IRGM" "TESPA1" ...</span></span>
+<span><span class="co">##  $ GO:0002250: chr [1:901] "IGKV3-7" "IGKV1D-42" "IGLV4-69" "IGLV8-61" ...</span></span>
+<span><span class="co">##  $ GO:0002253: chr [1:730] "TRBC2" "IGLC7" "IRGM" "TESPA1" ...</span></span>
+<span><span class="co">##  $ GO:0002376: chr [1:3276] "TRBV20OR9-2" "IGKV3-7" "IGKV1D-42" "IGLV4-69" ...</span></span>
+<span><span class="co">##  $ GO:0002429: chr [1:419] "TRBC2" "IGLC7" "TESPA1" "ACOD1" ...</span></span></code></pre>
 <p>To export the result as a data frame, suitable for formats like Excel
 or CSV, set the ‘export.to.data.frame’ parameter to TRUE.</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SearchDatabase.html">SearchDatabase</a></span><span class="op">(</span><span class="st">"CD3D"</span>, export.to.data.frame <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Rows: 180</span></span>
+<pre><code><span><span class="co">## Rows: 106</span></span>
 <span><span class="co">## Columns: 3</span></span>
 <span><span class="co">## $ SetID   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "GO:0001775", "GO:0002250", "GO:0002253", "GO:0002376", "GO:00…</span></span>
 <span><span class="co">## $ SetName <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "cell activation", "adaptive immune response", "activation of …</span></span>
-<span><span class="co">## $ Genes   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "IGHV3-64,IGHV4-4,IGHV4OR15-8,IGHV3OR16-12,IGHV1OR15-1,IGHV3OR…</span></span></code></pre>
+<span><span class="co">## $ Genes   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "TRBC2,DAPL1,IRGM,TESPA1,TMEM131L,PSMB11,CCDC88B,MFSD2B,LILRA5…</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="filtering-a-customized-gene-set">Filtering a Customized Gene Set<a class="anchor" aria-label="anchor" href="#filtering-a-customized-gene-set"></a>
@@ -459,7 +517,7 @@ or CSV, set the ‘export.to.data.frame’ parameter to TRUE.</p>
 <code>SearchPathways</code> function. For instance, within the “Hallmark
 50” database, you can find pathways that include the gene “CD3D” or have
 names that contain “interferon.”</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/SearchPathways.html">SearchPathways</a></span><span class="op">(</span>genesets <span class="op">=</span> <span class="va">hall50</span><span class="op">$</span><span class="va">human</span>, item <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD3D"</span>, <span class="st">"interferon"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## $HALLMARK_INTERFERON_ALPHA_RESPONSE</span></span>
 <span><span class="co">##  [1] "MX1"        "ISG15"      "AC004551.1" "IFIT3"      "IFI44"     </span></span>
@@ -498,12 +556,12 @@ output of <code>GeneSetAnalysisGO</code> or
 <code>GeneSetAnalysisReactome</code>.</li>
 </ol>
 <p>Convert GO IDs to their respective pathway names for human:</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/RenameGO.html">RenameGO</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"GO:0002376"</span>,<span class="st">"GO:0050896"</span><span class="op">)</span>, spe <span class="op">=</span> <span class="st">"human"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "GO:0002376 immune system process (3213g)"</span></span>
-<span><span class="co">## [2] "GO:0050896 response to stimulus (9342g)"</span></span></code></pre>
+<pre><code><span><span class="co">## [1] "GO:0002376 immune system process (3276g)"</span></span>
+<span><span class="co">## [2] "GO:0050896 response to stimulus (10220g)"</span></span></code></pre>
 <p>Similarly, for Reactome IDs:</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/RenameGO.html">RenameReactome</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"R-HSA-109582"</span>,<span class="st">"R-HSA-112316"</span><span class="op">)</span>, spe <span class="op">=</span> <span class="st">"human"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "R-HSA-109582 Hemostasis (679g)"      "R-HSA-112316 Neuronal System (411g)"</span></span></code></pre>
 </div>
@@ -525,22 +583,22 @@ of GO or Reactome pathways based on specific criteria.</p>
 category, use the <code>parent</code> parameter. For example, to get
 pathways related to the immune system process:</li>
 </ul>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">terms</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FilterGOTerms.html">FilterGOTerms</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="st">"GO:0002376"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/RenameGO.html">RenameGO</a></span><span class="op">(</span><span class="va">terms</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##  [1] "GO:0001773 myeloid dendritic cell activation (28g)"      </span></span>
-<span><span class="co">##  [2] "GO:0001774 microglial cell activation (45g)"             </span></span>
-<span><span class="co">##  [3] "GO:0001776 leukocyte homeostasis (84g)"                  </span></span>
-<span><span class="co">##  [4] "GO:0001777 T cell homeostatic proliferation (4g)"        </span></span>
-<span><span class="co">##  [5] "GO:0001779 natural killer cell differentiation (21g)"    </span></span>
-<span><span class="co">##  [6] "GO:0001780 neutrophil homeostasis (16g)"                 </span></span>
-<span><span class="co">##  [7] "GO:0001782 B cell homeostasis (27g)"                     </span></span>
-<span><span class="co">##  [8] "GO:0001787 natural killer cell proliferation (11g)"      </span></span>
-<span><span class="co">##  [9] "GO:0001788 antibody-dependent cellular cytotoxicity (2g)"</span></span>
-<span><span class="co">## [10] "GO:0001794 type IIa hypersensitivity (4g)"               </span></span>
-<span><span class="co">## [11] "GO:0001802 type III hypersensitivity (2g)"               </span></span>
-<span><span class="co">## [12] "GO:0001806 type IV hypersensitivity (4g)"                </span></span>
-<span><span class="co">##  [ reached getOption("max.print") -- omitted 395 entries ]</span></span></code></pre>
+<pre><code><span><span class="co">##  [1] "GO:0001773 myeloid dendritic cell activation (32g)"       </span></span>
+<span><span class="co">##  [2] "GO:0001774 microglial cell activation (57g)"              </span></span>
+<span><span class="co">##  [3] "GO:0001776 leukocyte homeostasis (122g)"                  </span></span>
+<span><span class="co">##  [4] "GO:0001777 T cell homeostatic proliferation (4g)"         </span></span>
+<span><span class="co">##  [5] "GO:0001779 natural killer cell differentiation (27g)"     </span></span>
+<span><span class="co">##  [6] "GO:0001780 neutrophil homeostasis (23g)"                  </span></span>
+<span><span class="co">##  [7] "GO:0001782 B cell homeostasis (37g)"                      </span></span>
+<span><span class="co">##  [8] "GO:0001787 natural killer cell proliferation (19g)"       </span></span>
+<span><span class="co">##  [9] "GO:0001788 antibody-dependent cellular cytotoxicity (10g)"</span></span>
+<span><span class="co">## [10] "GO:0001794 type IIa hypersensitivity (12g)"               </span></span>
+<span><span class="co">## [11] "GO:0001802 type III hypersensitivity (3g)"                </span></span>
+<span><span class="co">## [12] "GO:0001806 type IV hypersensitivity (5g)"                 </span></span>
+<span><span class="co">##  [ reached getOption("max.print") -- omitted 420 entries ]</span></span></code></pre>
 <ul>
 <li>
 <strong>By Gene Count:</strong> If you’re interested in pathways of
@@ -551,66 +609,66 @@ pathways we selected under the “immune system process”
 (<code>terms</code>), to keep only those pathways that contain between
 10 and 1000 genes:</li>
 </ul>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">terms2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FilterGOTerms.html">FilterGOTerms</a></span><span class="op">(</span>term <span class="op">=</span> <span class="va">terms</span>, n.min <span class="op">=</span> <span class="fl">10</span>, n.max <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/RenameGO.html">RenameGO</a></span><span class="op">(</span><span class="va">terms2</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##  [1] "GO:0001773 myeloid dendritic cell activation (28g)"                                        </span></span>
-<span><span class="co">##  [2] "GO:0001774 microglial cell activation (45g)"                                               </span></span>
-<span><span class="co">##  [3] "GO:0001776 leukocyte homeostasis (84g)"                                                    </span></span>
-<span><span class="co">##  [4] "GO:0001779 natural killer cell differentiation (21g)"                                      </span></span>
-<span><span class="co">##  [5] "GO:0001780 neutrophil homeostasis (16g)"                                                   </span></span>
-<span><span class="co">##  [6] "GO:0001782 B cell homeostasis (27g)"                                                       </span></span>
-<span><span class="co">##  [7] "GO:0001787 natural killer cell proliferation (11g)"                                        </span></span>
-<span><span class="co">##  [8] "GO:0001865 NK T cell differentiation (10g)"                                                </span></span>
-<span><span class="co">##  [9] "GO:0001867 complement activation, lectin pathway (11g)"                                    </span></span>
-<span><span class="co">## [10] "GO:0001913 T cell mediated cytotoxicity (46g)"                                             </span></span>
-<span><span class="co">## [11] "GO:0002200 somatic diversification of immune receptors (77g)"                              </span></span>
-<span><span class="co">## [12] "GO:0002204 somatic recombination of immunoglobulin genes involved in immune response (50g)"</span></span>
-<span><span class="co">##  [ reached getOption("max.print") -- omitted 202 entries ]</span></span></code></pre>
+<pre><code><span><span class="co">##  [1] "GO:0001773 myeloid dendritic cell activation (32g)"       </span></span>
+<span><span class="co">##  [2] "GO:0001774 microglial cell activation (57g)"              </span></span>
+<span><span class="co">##  [3] "GO:0001776 leukocyte homeostasis (122g)"                  </span></span>
+<span><span class="co">##  [4] "GO:0001779 natural killer cell differentiation (27g)"     </span></span>
+<span><span class="co">##  [5] "GO:0001780 neutrophil homeostasis (23g)"                  </span></span>
+<span><span class="co">##  [6] "GO:0001782 B cell homeostasis (37g)"                      </span></span>
+<span><span class="co">##  [7] "GO:0001787 natural killer cell proliferation (19g)"       </span></span>
+<span><span class="co">##  [8] "GO:0001788 antibody-dependent cellular cytotoxicity (10g)"</span></span>
+<span><span class="co">##  [9] "GO:0001794 type IIa hypersensitivity (12g)"               </span></span>
+<span><span class="co">## [10] "GO:0001865 NK T cell differentiation (11g)"               </span></span>
+<span><span class="co">## [11] "GO:0001866 NK T cell proliferation (14g)"                 </span></span>
+<span><span class="co">## [12] "GO:0001867 complement activation, lectin pathway (21g)"   </span></span>
+<span><span class="co">##  [ reached getOption("max.print") -- omitted 234 entries ]</span></span></code></pre>
 <ul>
 <li>
 <strong>End-Level Pathways:</strong> If you prefer to look at only
 the end-level (most specific) pathways, set the
 <code>only.end.terms</code> parameter to <code>TRUE</code>.</li>
 </ul>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">terms3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FilterGOTerms.html">FilterGOTerms</a></span><span class="op">(</span>term <span class="op">=</span> <span class="va">terms</span>, only.end.terms <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/RenameGO.html">RenameGO</a></span><span class="op">(</span><span class="va">terms3</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##  [1] "GO:0001777 T cell homeostatic proliferation (4g)"                      </span></span>
-<span><span class="co">##  [2] "GO:0001780 neutrophil homeostasis (16g)"                               </span></span>
-<span><span class="co">##  [3] "GO:0001787 natural killer cell proliferation (11g)"                    </span></span>
-<span><span class="co">##  [4] "GO:0001788 antibody-dependent cellular cytotoxicity (2g)"              </span></span>
-<span><span class="co">##  [5] "GO:0001802 type III hypersensitivity (2g)"                             </span></span>
-<span><span class="co">##  [6] "GO:0001806 type IV hypersensitivity (4g)"                              </span></span>
-<span><span class="co">##  [7] "GO:0001865 NK T cell differentiation (10g)"                            </span></span>
-<span><span class="co">##  [8] "GO:0001866 NK T cell proliferation (7g)"                               </span></span>
-<span><span class="co">##  [9] "GO:0001867 complement activation, lectin pathway (11g)"                </span></span>
-<span><span class="co">## [10] "GO:0001905 activation of membrane attack complex (3g)"                 </span></span>
-<span><span class="co">## [11] "GO:0001922 B-1 B cell homeostasis (3g)"                                </span></span>
-<span><span class="co">## [12] "GO:0002223 stimulatory C-type lectin receptor signaling pathway (112g)"</span></span>
-<span><span class="co">##  [ reached getOption("max.print") -- omitted 188 entries ]</span></span></code></pre>
+<pre><code><span><span class="co">##  [1] "GO:0001777 T cell homeostatic proliferation (4g)"                                      </span></span>
+<span><span class="co">##  [2] "GO:0001780 neutrophil homeostasis (23g)"                                               </span></span>
+<span><span class="co">##  [3] "GO:0001787 natural killer cell proliferation (19g)"                                    </span></span>
+<span><span class="co">##  [4] "GO:0001788 antibody-dependent cellular cytotoxicity (10g)"                             </span></span>
+<span><span class="co">##  [5] "GO:0001802 type III hypersensitivity (3g)"                                             </span></span>
+<span><span class="co">##  [6] "GO:0001806 type IV hypersensitivity (5g)"                                              </span></span>
+<span><span class="co">##  [7] "GO:0001865 NK T cell differentiation (11g)"                                            </span></span>
+<span><span class="co">##  [8] "GO:0001866 NK T cell proliferation (14g)"                                              </span></span>
+<span><span class="co">##  [9] "GO:0001867 complement activation, lectin pathway (21g)"                                </span></span>
+<span><span class="co">## [10] "GO:0001905 activation of membrane attack complex (3g)"                                 </span></span>
+<span><span class="co">## [11] "GO:0001922 B-1 B cell homeostasis (4g)"                                                </span></span>
+<span><span class="co">## [12] "GO:0002222 stimulatory killer cell immunoglobulin-like receptor signaling pathway (2g)"</span></span>
+<span><span class="co">##  [ reached getOption("max.print") -- omitted 207 entries ]</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="filtering-reactome-pathways">Filtering Reactome Pathways<a class="anchor" aria-label="anchor" href="#filtering-reactome-pathways"></a>
 </h3>
 <p>The process for Reactome pathways is analogous. For instance, to
 select pathways related to the Immune System:</p>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">terms</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FilterGOTerms.html">FilterReactomeTerms</a></span><span class="op">(</span>parent <span class="op">=</span> <span class="st">"R-HSA-168256"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/RenameGO.html">RenameReactome</a></span><span class="op">(</span><span class="va">terms</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##  [1] "R-HSA-1059683 Interleukin-6 signaling (11g)"                                         </span></span>
-<span><span class="co">##  [2] "R-HSA-109703 PKB-mediated events (2g)"                                               </span></span>
-<span><span class="co">##  [3] "R-HSA-109704 PI3K Cascade (44g)"                                                     </span></span>
-<span><span class="co">##  [4] "R-HSA-1168372 Downstream signaling events of B Cell Receptor (BCR) (81g)"            </span></span>
-<span><span class="co">##  [5] "R-HSA-1169091 Activation of NF-kappaB in B cells (67g)"                              </span></span>
-<span><span class="co">##  [6] "R-HSA-1169092 Activation of RAS in B cells (5g)"                                     </span></span>
-<span><span class="co">##  [7] "R-HSA-1169408 ISG15 antiviral mechanism (74g)"                                       </span></span>
-<span><span class="co">##  [8] "R-HSA-1169410 Antiviral mechanism by IFN-stimulated genes (82g)"                     </span></span>
-<span><span class="co">##  [9] "R-HSA-1170546 Prolactin receptor signaling (15g)"                                    </span></span>
-<span><span class="co">## [10] "R-HSA-1222556 ROS and RNS production in phagocytes (36g)"                            </span></span>
-<span><span class="co">## [11] "R-HSA-1236973 Cross-presentation of particulate exogenous antigens (phagosomes) (8g)"</span></span>
-<span><span class="co">## [12] "R-HSA-1236974 ER-Phagosome pathway (83g)"                                            </span></span>
-<span><span class="co">##  [ reached getOption("max.print") -- omitted 185 entries ]</span></span></code></pre>
+<span><span class="co">##  [2] "R-HSA-1168372 Downstream signaling events of B Cell Receptor (BCR) (68g)"            </span></span>
+<span><span class="co">##  [3] "R-HSA-1169091 Activation of NF-kappaB in B cells (54g)"                              </span></span>
+<span><span class="co">##  [4] "R-HSA-1169092 Activation of RAS in B cells (5g)"                                     </span></span>
+<span><span class="co">##  [5] "R-HSA-1169408 ISG15 antiviral mechanism (74g)"                                       </span></span>
+<span><span class="co">##  [6] "R-HSA-1169410 Antiviral mechanism by IFN-stimulated genes (151g)"                    </span></span>
+<span><span class="co">##  [7] "R-HSA-1170546 Prolactin receptor signaling (15g)"                                    </span></span>
+<span><span class="co">##  [8] "R-HSA-1222556 ROS and RNS production in phagocytes (36g)"                            </span></span>
+<span><span class="co">##  [9] "R-HSA-1236973 Cross-presentation of particulate exogenous antigens (phagosomes) (8g)"</span></span>
+<span><span class="co">## [10] "R-HSA-1236974 ER-Phagosome pathway (82g)"                                            </span></span>
+<span><span class="co">## [11] "R-HSA-1236975 Antigen processing-Cross presentation (98g)"                           </span></span>
+<span><span class="co">## [12] "R-HSA-1236977 Endosomal/Vacuolar pathway (11g)"                                      </span></span>
+<span><span class="co">##  [ reached getOption("max.print") -- omitted 190 entries ]</span></span></code></pre>
 </div>
 </div>
 <div class="section level2">
@@ -624,16 +682,17 @@ conditions.</p>
 <p>Here’s how you can create a GSEA plot for the
 “INTERFERON_GAMMA_RESPONSE” gene set within the “Naive CD4 T” cell
 population of the <code>pbmc</code> dataset:</p>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/GSEAplot.html">GSEAplot</a></span><span class="op">(</span></span>
 <span>  <span class="va">pbmc</span>, </span>
 <span>  ident.1 <span class="op">=</span> <span class="st">"CD4 T Naive"</span>, </span>
 <span>  title <span class="op">=</span> <span class="st">"INTERFERON_GAMMA_RESPONSE"</span>,</span>
 <span>  geneset <span class="op">=</span> <span class="va">hall50</span><span class="op">$</span><span class="va">human</span><span class="op">$</span><span class="va">HALLMARK_INTERFERON_GAMMA_RESPONSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="GSEA_files/figure-html/unnamed-chunk-25-1.png" width="528"></p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="GSEA_files/figure-html/unnamed-chunk-28-1.png" width="528"></p>
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>max.print <span class="op">=</span> <span class="fl">200</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## R version 4.4.0 (2024-04-24)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
 <span><span class="co">## Running under: Ubuntu 20.04.6 LTS</span></span>
@@ -658,16 +717,67 @@ population of the <code>pbmc</code> dataset:</p>
 <span><span class="co">## [8] methods   base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">##  [1] ggpubr_0.6.0       tidyr_1.3.1        rlist_0.4.6.2      RColorBrewer_1.1-3</span></span>
-<span><span class="co">##  [5] viridis_0.6.5      viridisLite_0.4.2  mosaic_1.9.1       mosaicData_0.20.4 </span></span>
-<span><span class="co">##  [9] ggformula_0.12.0   lattice_0.22-6     rlang_1.1.4        scales_1.3.0      </span></span>
-<span><span class="co">##  [ reached getOption("max.print") -- omitted 21 entries ]</span></span>
+<span><span class="co">##  [1] ggpubr_0.6.0              tidyr_1.3.1              </span></span>
+<span><span class="co">##  [3] rlist_0.4.6.2             RColorBrewer_1.1-3       </span></span>
+<span><span class="co">##  [5] viridis_0.6.5             viridisLite_0.4.2        </span></span>
+<span><span class="co">##  [7] mosaic_1.9.1              mosaicData_0.20.4        </span></span>
+<span><span class="co">##  [9] ggformula_0.12.0          lattice_0.22-6           </span></span>
+<span><span class="co">## [11] rlang_1.1.4               scales_1.3.0             </span></span>
+<span><span class="co">## [13] reshape2_1.4.4            ggplot2_3.5.1            </span></span>
+<span><span class="co">## [15] doMC_1.3.8                iterators_1.0.14         </span></span>
+<span><span class="co">## [17] foreach_1.5.2             DelayedMatrixStats_1.26.0</span></span>
+<span><span class="co">## [19] DelayedArray_0.30.1       SparseArray_1.4.8        </span></span>
+<span><span class="co">## [21] S4Arrays_1.4.1            abind_1.4-5              </span></span>
+<span><span class="co">## [23] IRanges_2.38.1            S4Vectors_0.42.1         </span></span>
+<span><span class="co">## [25] MatrixGenerics_1.16.0     matrixStats_1.3.0        </span></span>
+<span><span class="co">## [27] BiocGenerics_0.50.0       Matrix_1.7-0             </span></span>
+<span><span class="co">## [29] dplyr_1.1.4               SeuratExtend_1.2.0       </span></span>
+<span><span class="co">## [31] SeuratObject_5.0.2        sp_2.1-4                 </span></span>
+<span><span class="co">## [33] SeuratExtendData_0.3.0   </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
-<span><span class="co">##  [1] RcppAnnoy_0.0.22  splines_4.4.0     later_1.3.2       tibble_3.2.1     </span></span>
-<span><span class="co">##  [5] polyclip_1.10-6   fastDummies_1.7.3 lifecycle_1.0.4   rstatix_0.7.2    </span></span>
-<span><span class="co">##  [9] globals_0.16.3    MASS_7.3-61       backports_1.5.0   magrittr_2.0.3   </span></span>
-<span><span class="co">##  [ reached getOption("max.print") -- omitted 115 entries ]</span></span></code></pre>
+<span><span class="co">##   [1] RcppAnnoy_0.0.22         splines_4.4.0            later_1.3.2             </span></span>
+<span><span class="co">##   [4] tibble_3.2.1             polyclip_1.10-6          fastDummies_1.7.3       </span></span>
+<span><span class="co">##   [7] lifecycle_1.0.4          rstatix_0.7.2            globals_0.16.3          </span></span>
+<span><span class="co">##  [10] MASS_7.3-61              backports_1.5.0          magrittr_2.0.3          </span></span>
+<span><span class="co">##  [13] plotly_4.10.4            sass_0.4.9               rmarkdown_2.29          </span></span>
+<span><span class="co">##  [16] jquerylib_0.1.4          yaml_2.3.9               httpuv_1.6.15           </span></span>
+<span><span class="co">##  [19] Seurat_5.2.1             sctransform_0.4.1        spam_2.10-0             </span></span>
+<span><span class="co">##  [22] spatstat.sparse_3.1-0    reticulate_1.38.0        cowplot_1.1.3           </span></span>
+<span><span class="co">##  [25] pbapply_1.7-2            zlibbioc_1.50.0          Rtsne_0.17              </span></span>
+<span><span class="co">##  [28] purrr_1.0.2              labelled_2.13.0          ggrepel_0.9.5           </span></span>
+<span><span class="co">##  [31] irlba_2.3.5.1            listenv_0.9.1            spatstat.utils_3.0-5    </span></span>
+<span><span class="co">##  [34] goftest_1.2-3            RSpectra_0.16-1          spatstat.random_3.2-3   </span></span>
+<span><span class="co">##  [37] fitdistrplus_1.2-1       parallelly_1.37.1        pkgdown_2.0.7           </span></span>
+<span><span class="co">##  [40] codetools_0.2-20         tidyselect_1.2.1         farver_2.1.2            </span></span>
+<span><span class="co">##  [43] spatstat.explore_3.2-7   jsonlite_1.8.8           progressr_0.14.0        </span></span>
+<span><span class="co">##  [46] ggridges_0.5.6           survival_3.7-0           systemfonts_1.1.0       </span></span>
+<span><span class="co">##  [49] tools_4.4.0              ragg_1.3.2               ica_1.0-3               </span></span>
+<span><span class="co">##  [52] Rcpp_1.0.13              glue_1.7.0               gridExtra_2.3           </span></span>
+<span><span class="co">##  [55] xfun_0.45                withr_3.0.0              fastmap_1.2.0           </span></span>
+<span><span class="co">##  [58] fansi_1.0.6              digest_0.6.36            R6_2.5.1                </span></span>
+<span><span class="co">##  [61] mime_0.12                textshaping_0.4.0        colorspace_2.1-0        </span></span>
+<span><span class="co">##  [64] scattermore_1.2          tensor_1.5               spatstat.data_3.1-2     </span></span>
+<span><span class="co">##  [67] utf8_1.2.4               generics_0.1.3           data.table_1.15.4       </span></span>
+<span><span class="co">##  [70] httr_1.4.7               htmlwidgets_1.6.4        uwot_0.2.2              </span></span>
+<span><span class="co">##  [73] pkgconfig_2.0.3          gtable_0.3.5             lmtest_0.9-40           </span></span>
+<span><span class="co">##  [76] XVector_0.44.0           htmltools_0.5.8.1        carData_3.0-5           </span></span>
+<span><span class="co">##  [79] dotCall64_1.1-1          png_0.1-8                knitr_1.48              </span></span>
+<span><span class="co">##  [82] rstudioapi_0.16.0        nlme_3.1-165             cachem_1.1.0            </span></span>
+<span><span class="co">##  [85] zoo_1.8-12               stringr_1.5.1            KernSmooth_2.23-24      </span></span>
+<span><span class="co">##  [88] miniUI_0.1.1.1           desc_1.4.3               pillar_1.9.0            </span></span>
+<span><span class="co">##  [91] grid_4.4.0               vctrs_0.6.5              RANN_2.6.1              </span></span>
+<span><span class="co">##  [94] promises_1.3.0           car_3.1-2                xtable_1.8-4            </span></span>
+<span><span class="co">##  [97] cluster_2.1.6            evaluate_0.24.0          cli_3.6.3               </span></span>
+<span><span class="co">## [100] compiler_4.4.0           crayon_1.5.3             future.apply_1.11.2     </span></span>
+<span><span class="co">## [103] ggsignif_0.6.4           labeling_0.4.3           plyr_1.8.9              </span></span>
+<span><span class="co">## [106] forcats_1.0.0            fs_1.6.4                 stringi_1.8.4           </span></span>
+<span><span class="co">## [109] deldir_2.0-4             munsell_0.5.1            lazyeval_0.2.2          </span></span>
+<span><span class="co">## [112] spatstat.geom_3.2-9      mosaicCore_0.9.4.0       RcppHNSW_0.6.0          </span></span>
+<span><span class="co">## [115] hms_1.1.3                patchwork_1.2.0          sparseMatrixStats_1.16.0</span></span>
+<span><span class="co">## [118] future_1.33.2            shiny_1.8.1.1            highr_0.11              </span></span>
+<span><span class="co">## [121] haven_2.5.4              ROCR_1.0-11              igraph_2.0.3            </span></span>
+<span><span class="co">## [124] broom_1.0.6              memoise_2.0.1            bslib_0.4.2</span></span></code></pre>
 </div>
   </div>
 

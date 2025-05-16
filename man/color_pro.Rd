@@ -6,7 +6,7 @@
 \usage{
 color_pro(
   n,
-  col.space = c("default", "light", "red", "yellow", "green", "blue", "purple"),
+  col.space = c("default", "light", "red", "yellow", "green", "blue", "purple", "bright"),
   sort = c("hue", "diff"),
   set = 1
 )
@@ -14,7 +14,7 @@ color_pro(
 \arguments{
 \item{n}{How many colors to generate}
 
-\item{col.space}{Color space, Options: "default", "light", "red", "yellow", "green", "blue", or "purple"}
+\item{col.space}{Color space, Options: "default", "light", "red", "yellow", "green", "blue", "purple", or "bright"}
 
 \item{sort}{Sort colors by hue (default) or differentiation, Options: "hue", "diff"}
 

@@ -43,5 +43,13 @@ DimPlot(pbmc_sub, label = T)
 DimPlot(pbmc_sub, group.by = "orig.ident")
 pbmc <- pbmc_sub
 
+set.seed(42)
+
+pbmc$condition <- gsub("sample","condition",pbmc$orig.ident)
+pbmc$sample_id <- paste0(
+  pbmc$condition, "_rep",
+  sample(1:3, ncol(pbmc), replace = TRUE)
+)
+
 usethis::use_data(pbmc, overwrite = TRUE)
 

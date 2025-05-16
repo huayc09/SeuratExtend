@@ -49,7 +49,7 @@
 #'
 #'   For discrete variables:
 #'
-#'     - Seven color_pro styles: "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple".
+#'     - Eight color_pro styles: "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple", "bright".
 #'
 #'     - Five color_iwh styles: "iwh_default", "iwh_intense", "iwh_pastel", "iwh_all", "iwh_all_hard".
 #'
@@ -57,7 +57,7 @@
 #'
 #'     - Any manually specified colors.
 #'
-#'   Default: list(discrete = "auto", continuous = "Blues").
+#'   Default: list().
 #' @param load.cols When TRUE, automatically loads pre-stored color information for variables from `seu@misc[["var_colors"]]`.
 #'   Default: TRUE.#' @param pt.size Point size for plotting, adjusts the size of each cell in the plot.
 #'   Default: NULL.
@@ -152,7 +152,7 @@ DimPlot2 <- function(
     nrow = NULL,
     nrow.each = NULL,
     ncol.legend = NULL,
-    cols = list(discrete = "auto", continuous = "Blues"),
+    cols = list(),
     load.cols = TRUE,
     pt.size = NULL,
     shape.by = NULL,
@@ -700,7 +700,7 @@ DimPlot2_SelColCont <- function(
   } else if(load.cols & !is.null(load_cont)) {
     cols <- load_cont
   } else if (list_l) {
-    cols <- "A"
+    cols <- "Blues"
   }
   scale_color <- scale_color_cont_auto(cols, center_color = FALSE, value_range = NULL)
   return(scale_color)
@@ -708,8 +708,8 @@ DimPlot2_SelColCont <- function(
 
 DimPlot2_SelColDisc <- function(
     seu,
-    var,
     n,
+    var,
     cols,
     load.cols,
     label,
@@ -731,10 +731,10 @@ DimPlot2_SelColDisc <- function(
   } else if(load.cols & !is.null(load_disc)) {
     cols <- load_disc
   } else if(list_l) {
-    cols <- "pro_default"
+    cols <- "pro_light"
   }
   if(is.null(cols)) return(NULL)
-  if(cols[1] == "auto") cols <- ifelse(label_l, "pro_light","pro_default")
+  if(cols[1] == "light") cols <- ifelse(label_l, "pro_light","pro_light")
   scale_color <- scale_color_disc_auto(cols, n = n, labels = labels)
   return(scale_color)
 }

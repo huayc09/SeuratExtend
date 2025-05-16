@@ -10,5 +10,12 @@ articles:
   Utilities: Utilities.html
   Visualization: Visualization.html
   quick_start: quick_start.html
-last_built: 2024-11-28T15:52Z
+  1.basic-R: single-cell-course/1.basic-R.html
+  2.Seurat: single-cell-course/2.Seurat.html
+  3.Visualization: single-cell-course/3.Visualization.html
+  4.GSEA: single-cell-course/4.GSEA.html
+  5.Core-Enhancement: single-cell-course/5.Core-Enhancement.html
+  6.Advanced-2: single-cell-course/6.Advanced-2.html
+  6.Advanced: single-cell-course/6.Advanced.html
+last_built: 2025-05-16T12:32Z
 

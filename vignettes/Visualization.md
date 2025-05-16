@@ -1,10 +1,3 @@
----
-title: "Enhanced Visualization"
-author: "Yichao Hua"
-date: "2024-11-28"
-version: "SeuratExtend v1.1.0"
----
-
 ## Table of Contents
 
 1.  [Create an Enhanced Dimensional Reduction
@@ -108,7 +101,7 @@ DimPlot2(
   pbmc,
   features = c("cluster", "orig.ident", "CD14", "CD3D"),
   cols = list(
-    "cluster" = "light",
+    "cluster" = "default", # dark theme
     "CD14" = "D",
     "CD3D" = "OrRd"
   ),
@@ -226,6 +219,29 @@ FeaturePlot3(pbmc, color = "rgb", feature.1 = "CD3D", feature.2 = "CD14", featur
 
 ![](Visualization_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
+#### Using Dark Theme (New in v1.2.0)
+
+For improved visualization in presentations or in low-light
+environments, you can use the dark theme option:
+
+``` r
+FeaturePlot3(
+  pbmc, 
+  color = "rgb", 
+  feature.1 = "CD3D", 
+  feature.2 = "CD14", 
+  feature.3 = "CD79A", 
+  pt.size = 1,
+  dark.theme = TRUE
+)
+```
+
+![](Visualization_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+This dark theme provides better contrast for visualizing gene expression
+patterns, particularly when using the RGB color system where brighter
+colors represent higher expression levels.
+
 #### Batch Visualization with `FeaturePlot3.grid`
 
 `FeaturePlot3.grid` extends `FeaturePlot3` by allowing multiple plots to
@@ -240,7 +256,7 @@ RYB system, and skip yellow in the second plot:
 FeaturePlot3.grid(pbmc, features = c("CD3D", "CD14", "CD79A", "FCGR3A", NA, "LYZ"), pt.size = 0.5)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 Using the RGB system:
 
@@ -248,7 +264,28 @@ Using the RGB system:
 FeaturePlot3.grid(pbmc, features = c("CD3D", "CD14", "CD79A", "FCGR3A", NA, "LYZ"), color = "rgb", pt.size = 1)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+#### Using Dark Theme with Grid Layout (New in v1.2.0)
+
+You can also apply the dark theme to FeaturePlot3.grid for enhanced
+visualization:
+
+``` r
+FeaturePlot3.grid(
+  pbmc, 
+  features = c("CD3D", "CD14", "CD79A", "FCGR3A", NA, "LYZ"), 
+  color = "rgb", 
+  pt.size = 1,
+  dark.theme = TRUE,
+  legend = TRUE
+)
+```
+
+![](Visualization_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
+The dark theme with legend enabled provides an elegant visualization
+that works well in presentations and publications.
 
 #### Tips on Point Size
 
@@ -296,7 +333,7 @@ Now, we can produce a basic heatmap:
 Heatmap(toplot, lab_fill = "zscore")
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 ### Adjusting Color Schemes
 
@@ -308,14 +345,14 @@ Here are some ways to change the color theme of your heatmap:
 Heatmap(toplot, lab_fill = "zscore", color_scheme = "A")
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 ``` r
 # White - blue - dark green
 Heatmap(toplot, lab_fill = "zscore", color_scheme = "BuGn")
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-17-2.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-19-2.png)<!-- -->
 
 For detailed information on color customization, refer to the [Explore
 Color Functions](#explore-color-functions) section.
@@ -333,7 +370,7 @@ this:
 Heatmap(toplot, lab_fill = "zscore", plot.margin = margin(l = 50))
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 For dense matrices with many features, you might want to show only a
 subset of gene names:
@@ -343,7 +380,7 @@ toplot2 <- CalcStats(pbmc, features = genes[1:500], method = "zscore", order = "
 Heatmap(toplot2, lab_fill = "zscore", feature_text_subset = genes[1:20], expand_limits_x = c(-0.5, 11))
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 ### Faceting the Heatmap
 
@@ -355,7 +392,7 @@ Heatmap(toplot2, lab_fill = "zscore", facet_row = gene_groups) +
   theme(axis.text.y = element_blank())
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 ## Create Enhanced Dot Plots (New in v1.1.0)
 
@@ -381,7 +418,7 @@ genes <- VariableFeatures(pbmc)[1:10]
 DotPlot2(pbmc, features = genes)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 ### Grouped Features
 
@@ -398,7 +435,7 @@ grouped_features <- list(
 DotPlot2(pbmc, features = grouped_features)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
 ### Split Visualization
 
@@ -410,7 +447,7 @@ expression patterns across different conditions:
 DotPlot2(pbmc, features = genes, group.by = "cluster", split.by = "orig.ident", show_grid = FALSE)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
 
 ### Alternative Split Visualization
 
@@ -427,7 +464,7 @@ DotPlot2(pbmc,
          show_grid = FALSE)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
 
 ### Customizing Appearance
 
@@ -443,7 +480,7 @@ DotPlot2(pbmc,
          flip = TRUE)          # Flip coordinates
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
 
 ## Create an Enhanced Violin Plot
 
@@ -467,7 +504,7 @@ genes <- c("CD3D","CD14","CD79A")
 VlnPlot2(pbmc, features = genes, ncol = 1)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
 
 ### Customizing Plot Elements
 
@@ -479,7 +516,7 @@ quasirandom point distribution:
 VlnPlot2(pbmc, features = genes, violin = FALSE, pt.style = "quasirandom", ncol = 1)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
 
 ### Managing Point Display
 
@@ -490,7 +527,7 @@ showing outliers:
 VlnPlot2(pbmc, features = genes, pt = FALSE, ncol = 1)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
 Or hide both points and outliers for a minimal appearance:
 
@@ -498,7 +535,17 @@ Or hide both points and outliers for a minimal appearance:
 VlnPlot2(pbmc, features = genes, pt = FALSE, hide.outlier = TRUE, ncol = 1)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
+
+### Outline Style (New in v1.2.0)
+
+You can change the violin plot style from filled to outline:
+
+``` r
+VlnPlot2(pbmc, features = genes, style = "outline", ncol = 1)
+```
+
+![](Visualization_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
 
 ### Adding Mean and Median Lines (New in v1.1.0)
 
@@ -516,7 +563,7 @@ VlnPlot2(pbmc,
          ncol = 1)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
 
 ### Split Visualization
 
@@ -526,7 +573,7 @@ You can group by cluster and split each cluster by samples:
 VlnPlot2(pbmc, features = genes, group.by = "cluster", split.by = "orig.ident")
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
 
 ### Subset Analysis
 
@@ -537,7 +584,7 @@ cells <- colnames(pbmc)[pbmc$cluster %in% c("B cell", "Mono CD14", "CD8 T cell")
 VlnPlot2(pbmc, features = genes, group.by = "cluster", cells = cells)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-35-1.png)<!-- -->
 
 ### Statistical Analysis
 
@@ -553,7 +600,7 @@ VlnPlot2(pbmc,
          hide.ns = TRUE)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
 
 Or specify particular comparisons using t-test:
 
@@ -567,7 +614,7 @@ VlnPlot2(pbmc,
          hide.ns = FALSE)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-37-1.png)<!-- -->
 
 ### Using Matrix Input
 
@@ -583,7 +630,22 @@ matr <- pbmc@misc$AUCell$genesets
 VlnPlot2(matr[1:3,], f = pbmc$cluster, ncol = 1)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-35-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-38-1.png)<!-- -->
+
+> **Note on Statistical Testing:** When using `stat.method` to add
+> statistical annotations to violin plots, be aware that p-values can be
+> artificially inflated in large single-cell datasets due to the high
+> number of cells. This may result in statistically significant
+> differences (small p-values) even when the biological effect size is
+> minimal. We recommend being cautious with statistical interpretations,
+> especially when visual differences are subtle. Consider examining log
+> fold changes (logFC) between groups to better assess the magnitude of
+> biological differences. For a comprehensive visualization of
+> differences between two groups, `WaterfallPlot()` (see [Generate a
+> Waterfall Plot](#generate-a-waterfall-plot)) can provide logFC values
+> along with statistical significance. By default, `VlnPlot2` uses the
+> Holm method (`p.adjust.method = "holm"`) to adjust p-values for
+> multiple comparisons.
 
 ## Visualize Cluster Distribution in Samples
 
@@ -601,7 +663,7 @@ Create a basic bar plot showing cluster distribution within samples:
 ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-39-1.png)<!-- -->
 
 ### Absolute Cell Counts
 
@@ -611,7 +673,7 @@ To show absolute cell counts instead of proportions:
 ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, percent = FALSE)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-37-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-40-1.png)<!-- -->
 
 ### Normalized Proportions with Reversed Axes
 
@@ -621,7 +683,7 @@ For normalized data with reversed axes:
 ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, rev = TRUE, normalize = TRUE)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-38-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-41-1.png)<!-- -->
 
 ### Vertical Orientation
 
@@ -631,7 +693,7 @@ Create a vertical bar plot:
 ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, flip = FALSE, reverse_order = FALSE)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-39-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-42-1.png)<!-- -->
 
 ### Non-Stacked Display
 
@@ -644,7 +706,37 @@ ClusterDistrBar(origin = pbmc$orig.ident,
                 stack = FALSE)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-40-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-43-1.png)<!-- -->
+
+### Comparing Cluster Distribution Between Conditions (New in v1.2.0)
+
+For comparing cluster distribution patterns between experimental
+conditions, `SeuratExtend` offers the `ClusterDistrPlot` function. This
+function extends `ClusterDistrBar` functionality by adding the ability
+to group samples by a condition variable, creating boxplots grouped by
+condition instead of stacked bars.
+
+The function supports all parameters from `ClusterDistrBar` when using
+the standard bar plot mode, and inherits styling options from `VlnPlot2`
+when using the boxplot mode with conditions. This makes it highly
+versatile for different visualization needs.
+
+``` r
+# Compare cluster distribution between conditions
+ClusterDistrPlot(
+  origin = pbmc$sample_id,
+  cluster = pbmc$cluster,
+  condition = pbmc$condition
+)
+```
+
+    ## No statistical significance.
+
+![](Visualization_files/figure-gfm/unnamed-chunk-44-1.png)<!-- -->
+
+When the `condition` parameter is not provided, `ClusterDistrPlot`
+behaves exactly like `ClusterDistrBar`, providing seamless backward
+compatibility.
 
 ## Generate a Waterfall Plot
 
@@ -671,7 +763,7 @@ Generate a basic waterfall plot comparing two cell types:
 WaterfallPlot(matr, f = pbmc$cluster, ident.1 = "Mono CD14", ident.2 = "CD8 T cell")
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-42-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-46-1.png)<!-- -->
 
 ### WaterfallPlot Style: “segment” (New in v1.1.0)
 
@@ -690,7 +782,7 @@ WaterfallPlot(
 )
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-43-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-47-1.png)<!-- -->
 
 ### Filtering by Significance
 
@@ -705,7 +797,7 @@ WaterfallPlot(
   len.threshold = 2)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-44-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-48-1.png)<!-- -->
 
 ### Gene Expression Comparison
 
@@ -722,7 +814,9 @@ WaterfallPlot(
   length = "logFC")
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-45-1.png)<!-- -->
+    ## Using pseudocount = 1 for logFC calculation.
+
+![](Visualization_files/figure-gfm/unnamed-chunk-49-1.png)<!-- -->
 
 ### Focusing on Top Features
 
@@ -739,7 +833,56 @@ WaterfallPlot(
   top.n = 20)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-46-1.png)<!-- -->
+    ## Using pseudocount = 1 for logFC calculation.
+
+![](Visualization_files/figure-gfm/unnamed-chunk-50-1.png)<!-- -->
+
+### Using Log2 or Log10 Fold Change (New in v1.2.0)
+
+By default, WaterfallPlot uses natural logarithm (base e) for fold
+change calculations. You can specify a different base using the
+`log.base` parameter:
+
+``` r
+# Using log base 2 for fold change calculations
+WaterfallPlot(
+  pbmc, 
+  group.by = "cluster", 
+  features = genes,
+  ident.1 = "Mono CD14", 
+  ident.2 = "CD8 T cell", 
+  length = "logFC",
+  log.base = "2",    # Use log2 instead of natural log
+  top.n = 20)
+```
+
+    ## Using pseudocount = 1 for logFC calculation.
+
+![](Visualization_files/figure-gfm/unnamed-chunk-51-1.png)<!-- -->
+
+### Notes on LogFC Calculation
+
+When calculating log fold changes, WaterfallPlot and VolcanoPlot (see
+the next section):
+
+1.  **Adds a pseudocount** to prevent issues with zero values:
+    - For most data: Uses pseudocount=1 by default
+    - For data with values between 0-1 (like AUCell scores):
+      Automatically uses pseudocount=0.01
+    - You can customize this value with the `pseudocount` parameter
+2.  **Uses natural logarithm (base e) by default**, but supports other
+    bases:
+    - `log.base = "e"`: Natural logarithm (default)
+    - `log.base = "2"`: Log base 2
+    - `log.base = "10"`: Log base 10
+    - Any numeric value for custom bases
+3.  **For Seurat objects**, applies `expm1` transformation to normalized
+    data by default:
+    - This ensures consistency with Seurat’s FindMarkers function
+    - Can be disabled with `exp.transform = FALSE`
+
+The formula used is:
+`log((mean(x[group1] + pseudocount) / mean(x[group2] + pseudocount)), base)`
 
 ## Create Volcano Plots (New in v1.1.0)
 
@@ -762,7 +905,7 @@ VolcanoPlot(pbmc,
             ident.2 = "CD8 T cell")
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-47-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-52-1.png)<!-- -->
 
 ### Customizing Thresholds
 
@@ -778,7 +921,7 @@ VolcanoPlot(
 )
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-48-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-53-1.png)<!-- -->
 
 ### Fine-tuning Plot Parameters
 
@@ -796,7 +939,7 @@ VolcanoPlot(
 )
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-49-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-54-1.png)<!-- -->
 
 ### Using Alternative Statistics
 
@@ -817,7 +960,24 @@ VolcanoPlot(
 )
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-50-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-55-1.png)<!-- -->
+
+### Using Log2 or Log10 Fold Change (New in v1.2.0)
+
+By default, VolcanoPlot uses natural logarithm (base e) for fold change
+calculations. You can specify a different base using the `log.base`
+parameter:
+
+``` r
+VolcanoPlot(
+  pbmc,
+  ident.1 = "B cell",
+  ident.2 = "CD8 T cell",
+  log.base = "2"    # Use log2 instead of natural log
+)
+```
+
+![](Visualization_files/figure-gfm/unnamed-chunk-56-1.png)<!-- -->
 
 ### Matrix Input
 
@@ -835,9 +995,9 @@ VolcanoPlot(
   top.n = 5)
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-51-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-57-1.png)<!-- -->
 
-### Tips: Choosing the Right Visualization
+## Tips: Choosing the Right Visualization
 
 When visualizing gene expression or pathway activity data, different
 plot types serve different purposes. Here’s a guide to help you choose:
@@ -883,10 +1043,10 @@ continuous variables.
 
 - **DimPlot2**, **VlnPlot2**, **ClusterDistrBar** (using `cols`
   parameter)
-  - Seven [color_pro
+  - Eight [color_pro
     styles](#professional-discrete-color-presets-with-color_pro):
     “default”, “light”, “pro_red”, “pro_yellow”, “pro_green”,
-    “pro_blue”, “pro_purple”
+    “pro_blue”, “pro_purple”, “bright” (new in v1.2.0)
   - Five [color_iwh styles](#iwanthue-color-series-color_iwh):
     “iwh_default”, “iwh_intense”, “iwh_pastel”, “iwh_all”,
     “iwh_all_hard”
@@ -894,6 +1054,15 @@ continuous variables.
     (e.g., “Set1”, “Set2”, “Set3”, “Paired”, “Dark2”, “Accent”,
     “Pastel1”, “Pastel2”)
   - Custom colors as vector of hex codes or color names
+
+> **Note**: Based on user feedback, starting from v1.2.0, the default
+> discrete color scheme has been changed to “light” to avoid color
+> inconsistency in DimPlot2 when toggling between labeled and unlabeled
+> displays. If you prefer to retain the original “default” (darker)
+> color scheme for discrete variables in `DimPlot2`, you can use:
+> `seu <- save_colors(seu, col_list = list("discrete" = "default"))`.
+> This will set the default for all discrete variables to the darker
+> color scheme.
 
 ### For Functions Handling Continuous Variables
 
@@ -932,19 +1101,42 @@ needs in single-cell analysis:
 
 #### For Discrete Variables (e.g., clusters, conditions)
 
-The “light” color scheme from SeuratExtend’s `color_pro` is particularly
-effective for labeled visualizations:
+The “default” (dark) theme and “light” color scheme from SeuratExtend’s
+`color_pro` are particularly effective for different visualization
+needs:
+
+``` r
+library(cowplot)
+plot_grid(
+  DimPlot2(pbmc, cols = "default", theme = NoAxes() + NoLegend()),
+  ClusterDistrBar(pbmc$orig.ident, pbmc$cluster, cols = "default", flip = FALSE, border = "black") +
+    theme(axis.title.x = element_blank())
+)
+```
+
+![](Visualization_files/figure-gfm/unnamed-chunk-58-1.png)<!-- -->
 
 ``` r
 library(cowplot)
 plot_grid(
   DimPlot2(pbmc, cols = "light", theme = NoAxes() + NoLegend()),
-  ClusterDistrBar(pbmc$orig.ident, pbmc$cluster, cols = "light", flip = FALSE, border = "black") +
+  ClusterDistrBar(pbmc$orig.ident, pbmc$cluster, cols = "light", flip = FALSE) +
     theme(axis.title.x = element_blank())
 )
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-52-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-59-1.png)<!-- -->
+
+For visualizations requiring more vibrant colors with high contrast (new
+in v1.2.0):
+
+``` r
+plot_grid(
+  DimPlot2(pbmc, features = c("orig.ident", "cluster"), cols = "bright", ncol = 2, theme = NoAxes())
+)
+```
+
+![](Visualization_files/figure-gfm/unnamed-chunk-60-1.png)<!-- -->
 
 #### For Continuous Variables (e.g., gene expression)
 
@@ -954,7 +1146,7 @@ the “A” or “D” color schemes from viridis:
 Heatmap(toplot, lab_fill = "zscore", color_scheme = "A")
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-53-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-61-1.png)<!-- -->
 
 ``` r
 WaterfallPlot(
@@ -963,7 +1155,9 @@ WaterfallPlot(
   top.n = 20, color_theme = "D")
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-54-1.png)<!-- -->
+    ## Using pseudocount = 1 for logFC calculation.
+
+![](Visualization_files/figure-gfm/unnamed-chunk-62-1.png)<!-- -->
 
 You can also use various color palettes from RColorBrewer
 (<https://r-graph-gallery.com/38-rcolorbrewers-palettes.html>):
@@ -981,7 +1175,7 @@ DimPlot2(
   theme = NoAxes())
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-55-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-63-1.png)<!-- -->
 
 ``` r
 DimPlot2(
@@ -991,7 +1185,7 @@ DimPlot2(
   theme = NoAxes())
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-56-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-64-1.png)<!-- -->
 
 ### Professional Discrete Color Presets with `color_pro`
 
@@ -1019,7 +1213,7 @@ visual strain.
    DimPlot2(pbmc, cols = "Greens")
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-57-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-65-1.png)<!-- -->
 
 2.  **Sufficiently Distinct but Overly Saturated Colors:** High
     saturation can be visually aggressive and distracting, detracting
@@ -1031,19 +1225,25 @@ visual strain.
    DimPlot2(pbmc, cols = c("#ccffaa","#c00bff","#cfdb00","#0147ee","#f67900","#1b002c","#00e748","#e30146","#ffb1e8"))
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-58-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-66-1.png)<!-- -->
 
 3.  **Good Distinction and Coordination but Too Lively:** While certain
     vibrant schemes might be engaging in an advertising context, they
     may be considered too informal for professional journal standards.
+    However, we recognize that sometimes higher contrast and more
+    vibrant colors are needed for certain analyses or presentations. For
+    these situations, we provide the “bright” color scheme (new in
+    v1.2.0) while still recommending more subdued options for formal
+    publications.
 
-    Example of colors that might be too lively:
+    Example of colors that might be too lively for formal publication
+    but useful in other contexts:
 
 ``` r
    DimPlot2(pbmc, cols = c("#ff2026","#cf5d00","#ffd03f","#649f00","#a3f83d","#82cc58","#6645fe","#d8009c","#ff43a2"))
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-59-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-67-1.png)<!-- -->
 
 While the RColorBrewer package offers some good solutions, its options
 are limited and support a maximum of only 12 colors. This can be
@@ -1054,11 +1254,12 @@ distinction when many colors are used. This is because the default
 palette differentiates colors only based on hue, without utilizing
 luminance and saturation, which limits its effectiveness. To address
 these limitations, `SeuratExtend` provides `color_pro`, which includes
-seven color schemes: “default”, “light”, “red”, “yellow”, “green”,
-“blue”, and “purple”. These presets are generated using the algorithm
-from I Want Hue (<http://medialab.github.io/iwanthue/>) with adjusted
-parameters, which is optimized for creating color palettes that are
-visually pleasing and distinctly separable.
+eight color schemes: “default”, “light”, “red”, “yellow”, “green”,
+“blue”, “purple”, and “bright” (new in v1.2.0). These presets are
+generated using the algorithm from I Want Hue
+(<http://medialab.github.io/iwanthue/>) with adjusted parameters, which
+is optimized for creating color palettes that are visually pleasing and
+distinctly separable.
 
 #### Default Color Scheme
 
@@ -1067,19 +1268,29 @@ reduced brightness and saturation, supporting 2 to 50 colors with five
 different presets per color. This scheme is ideal for general use where
 distinctiveness and subtlety are equally important.
 
+> **Note**: In SeuratExtend v1.0.0, the “default” color scheme was the
+> actual default setting (hence the name), representing a darker theme
+> suitable for general visualizations. Based on user feedback, starting
+> from v1.2.0, the “light” color scheme became the true default setting
+> as users preferred it for better visibility, especially with labeled
+> plots. However, we maintained the original naming convention—so
+> “default” still refers to the darker theme. If you prefer the darker
+> theme, you can manually specify `cols = "default"` in your function
+> calls.
+
 Example using the “default” color scheme:
 
 ``` r
 library(cowplot)
 library(SeuratExtend)
 plot_grid(
-  DimPlot2(pbmc, theme = NoAxes() + NoLegend()),
-  ClusterDistrBar(pbmc$orig.ident, pbmc$cluster, flip = FALSE) +
+  DimPlot2(pbmc, theme = NoAxes() + NoLegend(), cols = "default"),
+  ClusterDistrBar(pbmc$orig.ident, pbmc$cluster, flip = FALSE, cols = "default") +
     theme(axis.title.x = element_blank())
 )
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-60-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-68-1.png)<!-- -->
 
 #### Light Color Scheme
 
@@ -1098,7 +1309,7 @@ plot_grid(
 )
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-61-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-69-1.png)<!-- -->
 
 #### Specialized Color Schemes
 
@@ -1121,7 +1332,7 @@ plot_grid(
 )
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-62-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-70-1.png)<!-- -->
 
 ##### Yellow Color Scheme
 
@@ -1135,7 +1346,7 @@ plot_grid(
 )
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-63-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-71-1.png)<!-- -->
 
 ##### Green Color Scheme
 
@@ -1149,7 +1360,7 @@ plot_grid(
 )
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-64-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-72-1.png)<!-- -->
 
 ##### Blue Color Scheme
 
@@ -1163,7 +1374,7 @@ plot_grid(
 )
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-65-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-73-1.png)<!-- -->
 
 ##### Purple Color Scheme
 
@@ -1177,7 +1388,7 @@ plot_grid(
 )
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-66-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-74-1.png)<!-- -->
 
 #### Generating Color Codes
 
@@ -1193,13 +1404,13 @@ color_pro(50)      # Generates 50 colors
 
 Visual demonstration of different color sets:
 
-![](Visualization_files/figure-gfm/unnamed-chunk-68-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-76-1.png)<!-- -->
 
 #### Available Color Schemes
 
-`color_pro` offers seven different styles: “default”, “light”, “red”,
-“yellow”, “green”, “blue”, “purple”. Example generating 10 colors from
-each style:
+`color_pro` offers eight different styles: “default”, “light”, “red”,
+“yellow”, “green”, “blue”, “purple”, and “bright”. Example generating 10
+colors from each style:
 
 ``` r
 color_pro(10, col.space = 1)  # default
@@ -1209,11 +1420,12 @@ color_pro(10, 4)              # yellow
 color_pro(10, 5)              # green
 color_pro(10, 6)              # blue
 color_pro(10, 7)              # purple
+color_pro(10, 8)              # bright
 ```
 
 Visual comparison:
 
-![](Visualization_files/figure-gfm/unnamed-chunk-70-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-78-1.png)<!-- -->
 
 #### Sorting Options
 
@@ -1230,7 +1442,7 @@ color_pro(10, 1, sort = "diff")
 
 Visualizing the effect of different sorting methods:
 
-![](Visualization_files/figure-gfm/unnamed-chunk-72-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-80-1.png)<!-- -->
 
 #### Random Sequence Options
 
@@ -1250,7 +1462,7 @@ color_pro(10, 1, 1, 5)
 
 Visualizing different random sequences:
 
-![](Visualization_files/figure-gfm/unnamed-chunk-74-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-82-1.png)<!-- -->
 
 ### IWantHue Color Series (`color_iwh`)
 
@@ -1295,14 +1507,7 @@ color_iwh(30, 5)  # all_hard
 
 Visual comparison of `color_iwh` palettes:
 
-    ## 
-    ## Attaching package: 'hyc'
-
-    ## The following object is masked from 'package:SeuratExtend':
-    ## 
-    ##     show_col2
-
-![](Visualization_files/figure-gfm/unnamed-chunk-76-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-84-1.png)<!-- -->
 
 ### Viridis and RColorBrewer Palettes
 
@@ -1321,7 +1526,7 @@ for(option in LETTERS[1:8]) {
 }
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-77-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-85-1.png)<!-- -->
 
 #### RColorBrewer Palettes
 
@@ -1333,7 +1538,7 @@ library(RColorBrewer)
 display.brewer.all()
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-78-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-86-1.png)<!-- -->
 
 ### Additional Color Functions
 
@@ -1368,7 +1573,7 @@ data.frame(
   show_col()
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-80-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-88-1.png)<!-- -->
 
 #### Using `save_colors` to Manage Color Settings
 
@@ -1387,14 +1592,16 @@ pbmc <- save_colors(pbmc, col_list = list(
 DimPlot2(pbmc, features = c("cluster", "orig.ident", "CD14", "CD3D"), theme = NoAxes())
 ```
 
-![](Visualization_files/figure-gfm/unnamed-chunk-81-1.png)<!-- -->
+![](Visualization_files/figure-gfm/unnamed-chunk-89-1.png)<!-- -->
 
 ### Additional Resources
 
-For more information about color palettes: - RColorBrewer palettes:
-<https://r-graph-gallery.com/38-rcolorbrewers-palettes.html> - Viridis
-palettes:
-<https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html>
+For more information about color palettes:
+
+- RColorBrewer palettes:
+  <https://r-graph-gallery.com/38-rcolorbrewers-palettes.html>
+- Viridis palettes:
+  <https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html>
 
 ``` r
 sessionInfo()
@@ -1417,54 +1624,16 @@ sessionInfo()
     ## tzcode source: system (glibc)
     ## 
     ## attached base packages:
-    ## [1] stats4    grid      stats     graphics  grDevices utils     datasets  methods   base     
+    ##  [1] tools     parallel  grid      stats4    stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ##  [1] hyc_0.1.5                 tidyr_1.3.1               DelayedMatrixStats_1.26.0 DelayedArray_0.30.1      
-    ##  [5] SparseArray_1.4.8         S4Arrays_1.4.1            abind_1.4-5               IRanges_2.38.1           
-    ##  [9] S4Vectors_0.42.1          MatrixGenerics_1.16.0     matrixStats_1.3.0         BiocGenerics_0.50.0      
-    ## [13] ggbeeswarm_0.7.2          rlang_1.1.4               scales_1.3.0              mosaic_1.9.1             
-    ## [17] mosaicData_0.20.4         ggformula_0.12.0          Matrix_1.7-0              lattice_0.22-6           
-    ## [21] ggtext_0.1.2              rlist_0.4.6.2             magrittr_2.0.3            dplyr_1.1.4              
-    ## [25] ggpubr_0.6.0              reshape2_1.4.4            ggrepel_0.9.5             viridis_0.6.5            
-    ## [29] viridisLite_0.4.2         cowplot_1.1.3             RColorBrewer_1.1-3        ggplot2_3.5.1            
-    ## [33] SeuratExtend_1.1.0        SeuratExtendData_0.2.1    Seurat_5.1.0              SeuratObject_5.0.2       
-    ## [37] sp_2.1-4                 
+    ##  [1] slingshot_2.12.0            TrajectoryUtils_1.12.0      SingleCellExperiment_1.26.0 SummarizedExperiment_1.34.0
+    ##  [5] Biobase_2.64.0              GenomicRanges_1.56.1        GenomeInfoDb_1.40.1         princurve_2.1.6            
+    ##  [9] mgcv_1.9-1                  nlme_3.1-165                reticulate_1.38.0           glue_1.7.0                 
+    ##  [ reached getOption("max.print") -- omitted 56 entries ]
     ## 
     ## loaded via a namespace (and not attached):
-    ##   [1] RcppAnnoy_0.0.22         splines_4.4.0            later_1.3.2              tibble_3.2.1            
-    ##   [5] polyclip_1.10-6          fastDummies_1.7.3        lifecycle_1.0.4          rstatix_0.7.2           
-    ##   [9] globals_0.16.3           processx_3.8.4           MASS_7.3-61              backports_1.5.0         
-    ##  [13] plotly_4.10.4            sass_0.4.9               rmarkdown_2.29           jquerylib_0.1.4         
-    ##  [17] yaml_2.3.9               remotes_2.5.0            httpuv_1.6.15            sctransform_0.4.1       
-    ##  [21] spam_2.10-0              sessioninfo_1.2.2        pkgbuild_1.4.4           spatstat.sparse_3.1-0   
-    ##  [25] reticulate_1.38.0        pbapply_1.7-2            zlibbioc_1.50.0          pkgload_1.4.0           
-    ##  [29] Rtsne_0.17               purrr_1.0.2              downlit_0.4.4            labelled_2.13.0         
-    ##  [33] irlba_2.3.5.1            listenv_0.9.1            spatstat.utils_3.0-5     goftest_1.2-3           
-    ##  [37] RSpectra_0.16-1          spatstat.random_3.2-3    fitdistrplus_1.2-1       parallelly_1.37.1       
-    ##  [41] pkgdown_2.0.7            commonmark_1.9.1         leiden_0.4.3.1           codetools_0.2-20        
-    ##  [45] xml2_1.3.6               tidyselect_1.2.1         farver_2.1.2             spatstat.explore_3.2-7  
-    ##  [49] jsonlite_1.8.8           ellipsis_0.3.2           progressr_0.14.0         ggridges_0.5.6          
-    ##  [53] survival_3.7-0           tools_4.4.0              ica_1.0-3                Rcpp_1.0.13             
-    ##  [57] glue_1.7.0               gridExtra_2.3            xfun_0.45                usethis_2.2.3           
-    ##  [61] withr_3.0.0              BiocManager_1.30.23      fastmap_1.2.0            fansi_1.0.6             
-    ##  [65] callr_3.7.6              digest_0.6.36            R6_2.5.1                 mime_0.12               
-    ##  [69] colorspace_2.1-0         scattermore_1.2          tensor_1.5               markdown_1.13           
-    ##  [73] spatstat.data_3.1-2      utf8_1.2.4               generics_0.1.3           data.table_1.15.4       
-    ##  [77] httr_1.4.7               htmlwidgets_1.6.4        whisker_0.4.1            uwot_0.2.2              
-    ##  [81] pkgconfig_2.0.3          gtable_0.3.5             rsconnect_1.3.1          lmtest_0.9-40           
-    ##  [85] XVector_0.44.0           htmltools_0.5.8.1        carData_3.0-5            profvis_0.3.8           
-    ##  [89] dotCall64_1.1-1          png_0.1-8                knitr_1.48               rstudioapi_0.16.0       
-    ##  [93] nlme_3.1-165             curl_6.0.1               cachem_1.1.0             zoo_1.8-12              
-    ##  [97] stringr_1.5.1            KernSmooth_2.23-24       vipor_0.4.7              parallel_4.4.0          
-    ## [101] miniUI_0.1.1.1           desc_1.4.3               pillar_1.9.0             vctrs_0.6.5             
-    ## [105] RANN_2.6.1               urlchecker_1.0.1         promises_1.3.0           car_3.1-2               
-    ## [109] xtable_1.8-4             cluster_2.1.6            beeswarm_0.4.0           evaluate_0.24.0         
-    ## [113] cli_3.6.3                compiler_4.4.0           crayon_1.5.3             future.apply_1.11.2     
-    ## [117] ggsignif_0.6.4           labeling_0.4.3           ps_1.7.7                 forcats_1.0.0           
-    ## [121] plyr_1.8.9               fs_1.6.4                 stringi_1.8.4            deldir_2.0-4            
-    ## [125] munsell_0.5.1            lazyeval_0.2.2           devtools_2.4.5           spatstat.geom_3.2-9     
-    ## [129] mosaicCore_0.9.4.0       RcppHNSW_0.6.0           hms_1.1.3                patchwork_1.2.0         
-    ## [133] sparseMatrixStats_1.16.0 future_1.33.2            shiny_1.8.1.1            highr_0.11              
-    ## [137] haven_2.5.4              ROCR_1.0-11              gridtext_0.1.5           igraph_2.0.3            
-    ## [141] broom_1.0.6              memoise_2.0.1            bslib_0.4.2
+    ##  [1] fs_1.6.4              spatstat.sparse_3.1-0 bitops_1.0-7          httr_1.4.7            sctransform_0.4.1    
+    ##  [6] backports_1.5.0       utf8_1.2.4            lazyeval_0.2.2        uwot_0.2.2            withr_2.5.0          
+    ## [11] gridExtra_2.3         progressr_0.14.0     
+    ##  [ reached getOption("max.print") -- omitted 124 entries ]

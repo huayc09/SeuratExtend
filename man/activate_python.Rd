@@ -17,11 +17,30 @@ activate_python(conda_env = "seuratextend", verbose = TRUE, packages = c("os"))
 Invisible TRUE if successful
 }
 \description{
-This function activates a Python environment (default: "seuratextend")
+This function activates a Python environment (default: "seuratextend") and imports specified packages.
+It's particularly important for macOS users to call this function at the beginning of their workflow
+to prevent R session crashes when running Python-dependent functions later.
+}
+\details{
+This function serves two main purposes:
+
+1. It activates the specified conda environment and imports the specified Python packages.
+
+2. **For macOS users (especially on Apple Silicon M1/M2/M3/M4)**: Running this function at the start
+   of your R session, before loading any R objects, prevents memory management issues between R and Python
+   that can otherwise cause R to crash when running operations like PCA on AnnData objects.
+   
+   This is a crucial first step for macOS users working with `scVelo` functions.
 }
 \examples{
 \dontrun{
+# For macOS users, run this at the beginning of your session
 activate_python()
+
+# Then load your Seurat objects and continue with your analysis
+seu <- readRDS("my_seurat_object.rds")
+
+# Custom environment with verbose output
 activate_python(conda_env = "my_custom_env", verbose = TRUE)
 }
 }

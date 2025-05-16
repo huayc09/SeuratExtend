@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SeuratExtend</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
       </span>
     </div>
 
@@ -121,9 +121,19 @@
     <p>When you run functions from `SeuratExtend` that require Python integrations, such as `scVelo`, `Palantir`, or `CellRank`, you might need a specific set of Python packages installed. This function facilitates the setup of a Conda environment specifically tailored for these tools, managed through `reticulate`.</p>
 <p>The environment setup is automatic and checks your operating system to configure appropriately. It is currently supported and tested on:
 * Windows (Intel/AMD processors)
-* Intel-based macOS (not compatible with Apple Silicon/M1/M2)
+* macOS (both Intel-based and Apple Silicon/M-series processors)
 * Linux (Ubuntu 20.04)</p>
-<p>Users with Apple Silicon devices who are interested in contributing to the development of M1/M2 support are welcome to reach out via GitHub Issues.</p>
+<p>The function automatically detects Apple Silicon (M1/M2/M3/M4) Macs and uses the appropriate configuration.</p>
+<p>## Known macOS Issues and Workarounds</p>
+<p>Users on macOS may encounter specific issues due to memory management between R and Python:</p>
+<p>* **Intel Macs**: When using R Markdown in RStudio with Python tools like scVelo, the R session may crash. 
+  To work around this issue, use regular .R script files instead of R Markdown files.</p>
+<p>* **Apple Silicon (M1/M2/M3/M4)**: If any R objects are loaded in the session before calling Python functions
+  (particularly operations like PCA on AnnData objects), the R session may crash. This is a known memory management
+  issue between R and Python on macOS.</p>  
+<p>**Solution**: Start with a fresh R session and call `activate_python()` at the beginning of your workflow 
+  before loading any R objects. This initializes the Python environment first and prevents memory-related crashes.
+  After this initialization, all scVelo-related functions should work properly.</p>
 <p>If force=TRUE is used, any existing 'seuratextend' environment will be removed before creating a new one. This can be useful when:
 * A previous installation was interrupted
 * Required dependencies were not properly installed

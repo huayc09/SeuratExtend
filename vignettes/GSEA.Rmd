@@ -22,6 +22,8 @@ vignette: >
 
 The `SeuratExtend` package integrates both the GO and Reactome databases, streamlining the GSEA analysis process. This is primarily facilitated through the `GeneSetAnalysisGO` and `GeneSetAnalysisReactome` functions, among other supplementary functions. In this section, we'll delve into the usage and features of these functions.
 
+> **Note on database updates**: The GO and Reactome databases are regularly updated by their respective consortia. SeuratExtend provides mechanisms for users to update these databases or create custom ones (including for other model organisms). For detailed instructions, please refer to the [FAQ: Updating or Creating Custom GO/Reactome Databases](https://huayc09.github.io/SeuratExtend/articles/FAQ.html#custom-databases).
+
 ### Gene Ontology (GO) Database
 
 Performing GSEA using the GO database can be resource-intensive due to its extensive size. To make the analysis more feasible, you might consider evaluating pathways under specific categories. For instance, in the example below, only the pathways under the "immune_system_process" category are evaluated. The results from this analysis are saved in the location: `seu@misc$AUCell$GO[[title]]`.
@@ -76,6 +78,56 @@ Similar to the GO database, running `GeneSetAnalysisReactome()` without any argu
 ```{r, message=FALSE, warning=FALSE}
 GeneSetAnalysisReactome()
 ```
+
+### Managing and Customizing GO/Reactome Databases (New in v1.2.0)
+
+SeuratExtend now offers improved ways to manage and update the GO and Reactome databases used in your analyses.
+
+#### Installing Specific SeuratExtendData Versions
+
+You can install specific versions of the SeuratExtendData package to access different database releases:
+
+```{r, eval=FALSE, message=FALSE, warning=FALSE}
+# Install the latest version (April 2025 data)
+install_SeuratExtendData("latest")
+
+# Install the stable version (January 2020 data)
+install_SeuratExtendData("stable")
+
+# Install specific dataset versions 
+install_SeuratExtendData("v0.2.1")  # January 2020 datasets
+install_SeuratExtendData("v0.3.0")  # April 2025 datasets
+```
+
+This ensures compatibility with specific analysis workflows or when you need to match results from previous studies.
+
+#### Creating Custom Databases
+
+For creating custom databases with the latest data or for additional species, SeuratExtend provides comprehensive documentation:
+
+```{r, eval=FALSE, message=FALSE, warning=FALSE}
+# For complete instructions, refer to:
+browseURL("https://github.com/huayc09/SeuratExtendData/blob/main/inst/db_creation/README_GO_Data.md")
+browseURL("https://github.com/huayc09/SeuratExtendData/blob/main/inst/db_creation/README_Reactome_Data.md")
+```
+
+The custom databases can be easily used by assigning them to the global environment:
+
+```{r, eval=FALSE, message=FALSE, warning=FALSE}
+# Load custom database
+custom_GO_Data <- readRDS("path/to/your/GO_Data.rds")
+
+# Use with SeuratExtend by assigning to global environment
+GO_Data <- custom_GO_Data
+
+# Run analysis
+seu <- GeneSetAnalysisGO(seu, parent = "immune_system_process")
+
+# When done, remove the global variable
+rm(GO_Data)
+```
+
+For detailed examples and troubleshooting, please refer to the [FAQ: Updating or Creating Custom GO/Reactome Databases](https://huayc09.github.io/SeuratExtend/articles/FAQ.html#custom-databases).
 
 ## Perform GSEA using customized genesets {#perform-gsea-using-customized-genesets}
 
@@ -246,5 +298,6 @@ GSEAplot(
 ```
 
 ```{r}
+options(max.print = 200)
 sessionInfo()
 ```

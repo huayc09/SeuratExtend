@@ -66,9 +66,9 @@ FeaturePlot3(
   feature.1 = "CD3D",
   feature.2 = "CD14",
   feature.3 = "CD79A",
-  color = "rgb", 
-  dark.theme = TRUE, 
-  pt.size = 1, 
+  color = "rgb",
+  dark.theme = TRUE,
+  pt.size = 1,
   color.range = c(0.1, 1)
 )
 

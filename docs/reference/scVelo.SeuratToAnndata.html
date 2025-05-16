@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SeuratExtend</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
       </span>
     </div>
 
@@ -108,6 +108,7 @@
 <span>  cell.id.match.table <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  prefix <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  postfix <span class="op">=</span> <span class="st">"-1"</span>,</span>
+<span>  remove_duplicates <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  conda_env <span class="op">=</span> <span class="st">"seuratextend"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -155,6 +156,10 @@
 
 <dt>postfix</dt>
 <dd><p>Postfix appended to cell IDs in the Seurat object to match the corresponding IDs in the Velocyto loom file. Default: '-1'</p></dd>
+
+
+<dt>remove_duplicates</dt>
+<dd><p>Logical flag indicating whether to remove duplicate cells in the AnnData object. If TRUE, duplicate cells are removed based on PCA and sum of gene expression values. Default: FALSE</p></dd>
 
 
 <dt>conda_env</dt>
@@ -225,11 +230,23 @@
     <h2>Value</h2>
     
 
-<p>These functions do not return any object within R; instead, they prepare and store an AnnData object `adata` in the Python environment accessible via `reticulate`, and generate plots which can be viewed directly or saved to a file. The plots reflect the dynamics of RNA velocity in single-cell datasets.</p>
+<p>If remove_duplicates = TRUE, returns the filtered Seurat object with duplicate cells removed. Otherwise, does not return any object within R; instead, prepares and stores an AnnData object `adata` in the Python environment accessible via `reticulate`, and generates plots which can be viewed directly or saved to a file. The plots reflect the dynamics of RNA velocity in single-cell datasets.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
     <p>This integrated functionality facilitates a seamless transition between converting Seurat objects to AnnData objects and plotting with scVelo. The primary metadata and dimension reduction data from the Seurat object are used to prepare the AnnData object, which is then utilized for generating plots. `SeuratExtend` enhances scVelo plotting capabilities in R, supporting a variety of customization options for visualizing single-cell RNA velocity data. Users can manipulate plot styles, color schemes, group highlights, and more, making it an essential tool for advanced single-cell analysis without the need for direct interaction with Python code.</p>
+<p>## macOS-Specific Considerations</p>
+<p>If you are using macOS, be aware of the following:</p>
+<p>* **Intel Macs**: Using these functions in R Markdown within RStudio may cause the R session to crash. Use regular .R script files instead.</p>
+<p>* **Apple Silicon (M1/M2/M3/M4)**: There are known memory management issues between R and Python when performing operations like PCA on AnnData objects.
+  To avoid crashes, start with a fresh R session and call `activate_python()` before loading any R objects or running any scVelo functions:</p>  
+<p>```r
+  # Run at the beginning of your session on macOS
+  activate_python()</p>  
+<p># Then load your data and proceed with analysis
+  seu &lt;- readRDS("path/to/seurat_object.rds")
+  scVelo.SeuratToAnndata(...)
+  ```</p>
     </div>
 
     <div id="ref-examples">

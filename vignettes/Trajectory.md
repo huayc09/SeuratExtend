@@ -1,10 +1,3 @@
----
-title: "Trajectory and Pseudotime Analysis"
-author: "Yichao Hua"
-date: "2024-11-28"
-version: "SeuratExtend v1.1.0"
----
-
 ## Table of Contents
 
 1.  [scVelo Tutorial for Trajectory
@@ -78,12 +71,39 @@ serving as a bridge between R and Python.
 (`scVelo`, `Palantir`, etc.) in `SeuratExtend`, it will prompt you to
 install a conda environment named “seuratextend”. This environment
 automatically installs all required Python packages. It is currently
-supported and tested on Windows, Intel-based macOS (not Apple
-Silicon/M1/M2), and Linux (Ubuntu 20.04) systems. Users with Apple
-Silicon devices who are interested in contributing to the development of
-M1/M2 support are welcome to reach out via GitHub Issues. More details
-on managing the `Anndata` object and Python dependencies are provided
-here: [Integration of Seurat with Python
+supported and tested on Windows, macOS (both Intel-based and Apple
+Silicon/M-series), and Linux (Ubuntu 20.04) systems.
+
+**macOS-Specific Considerations**:
+
+- **Intel Macs**: When using R Markdown in RStudio with Python tools
+  like scVelo, the R session may crash. To work around this issue, use
+  regular .R script files instead of R Markdown files.
+
+- **Apple Silicon (M1/M2/M3/M4)** *(new in v1.2.0)*: Testing on M4 chips
+  has revealed memory management issues between R and Python. If any R
+  objects are loaded in the session before calling Python functions
+  (particularly operations like PCA on AnnData objects), the R session
+  may crash.
+
+  **Solution**: Start with a fresh R session and call
+  `activate_python()` at the beginning of your workflow before loading
+  any R objects:
+
+  ``` r
+  # Run at the beginning of your session on macOS
+  library(SeuratExtend)
+  activate_python()
+
+  # Then load your data and proceed with analysis
+  seu <- readRDS("path/to/seurat_object.rds")
+  ```
+
+  After this initialization, all scVelo-related functions should work
+  properly.
+
+More details on managing the `Anndata` object and Python dependencies
+are provided here: [Integration of Seurat with Python
 Tools](#integration-of-seurat-with-python-tools).
 
 ``` r
@@ -105,7 +125,7 @@ scVelo.SeuratToAnndata(
 )
 ```
 
-    ## Running scvelo 0.3.0 (python 3.10.12) on 2024-11-28 12:59.
+    ## scVelo version: 0.3.0
     ## Filtered out 10891 genes that are detected 20 counts (shared).
     ## Normalized count data: X, spliced, unspliced.
     ## Extracted 2000 highly variable genes.
@@ -125,6 +145,8 @@ scVelo.SeuratToAnndata(
     ##     finished (0:00:01) --> added 
     ##     'velocity_graph', sparse matrix with cosine correlations (adata.uns)
 
+    ## NULL
+
 ### Generating scVelo Plots
 
 Now, you’re ready to generate scVelo plots. The default dimension
@@ -134,10 +156,10 @@ reduction method is typically UMAP, colored by cluster.
 scVelo.Plot(color = "cluster", save = "umap1.png", figsize = c(5,4))
 ```
 
-<img src="figures/scvelo_umap1.png" width="700" /> 
+<img src="figures/scvelo_umap1.png" width="700" />
 
-`SeuratExtend` supports most commonly used parameters for scVelo plots. You can
-customize the plot style, dimensionality reduction method, color
+`SeuratExtend` supports most commonly used parameters for scVelo plots.
+You can customize the plot style, dimensionality reduction method, color
 palette, displayed clusters, and more. For more detailed information on
 customization and advanced features, refer to the function documentation
 or the [official scVelo
@@ -297,10 +319,10 @@ mye_small <- Palantir.Pseudotime(mye_small, start_cell = "sample1_GAGAGGTAGCAGTA
 ```
 
     ## Sampling and flocking waypoints...
-    ## Time for determining waypoints: 0.0011950333913167317 minutes
+    ## Time for determining waypoints: 0.0011410673459370932 minutes
     ## Determining pseudotime...
     ## Shortest path distances using 30-nearest neighbor graph...
-    ## Time for shortest paths: 0.1065106749534607 minutes
+    ## Time for shortest paths: 0.014483002821604411 minutes
     ## Iteratively refining the pseudotime...
     ## Correlation at iteration 1: 1.0000
     ## Entropy and branch probabilities...
@@ -327,12 +349,8 @@ head(ps)
 colnames(ps)[3:4] <- c("fate1", "fate2")
 mye_small@meta.data[,colnames(ps)] <- ps
 DimPlot2(mye_small, features = colnames(ps), reduction = "ms", 
-         cols = list(Entropy = "D"), theme = NoAxes())
+         cols = list(continuous = "A", Entropy = "D"), theme = NoAxes())
 ```
-
-    ## Loading required package: viridis
-
-    ## Loading required package: viridisLite
 
 ![](Trajectory_files/figure-gfm/calculate-pseudotime-1.png)<!-- -->
 
@@ -617,10 +635,28 @@ create_condaenv_seuratextend()
 
 This function automatically detects your operating system and sets up
 the environment accordingly. It is currently supported and tested on
-Windows, Intel-based macOS (not Apple Silicon/M1/M2), and Linux (Ubuntu
-20.04) systems. Users with Apple Silicon devices who are interested in
-contributing to the development of M1/M2 support are welcome to reach
-out via GitHub Issues.
+Windows, macOS (both Intel-based and Apple Silicon/M-series), and Linux
+(Ubuntu 20.04) systems.
+
+**Important for macOS Users**:
+
+- **Intel Macs**: Using R Markdown in RStudio may cause crashes when
+  calling Python functions. If you encounter this issue, switch to using
+  regular .R script files.
+
+- **Apple Silicon (M1/M2/M3/M4)** *(new in v1.2.0)*: Testing on M4 chips
+  has shown that memory management issues between R and Python can cause
+  crashes, particularly when performing operations like PCA on AnnData
+  objects after loading R objects. To prevent this:
+
+  ``` r
+  # Run this at the START of your session on macOS (before loading any objects)
+  library(SeuratExtend)
+  activate_python()
+
+  # Only then load your data and proceed with analysis
+  seu <- readRDS("path/to/seurat_object.rds")
+  ```
 
 ### Integrating Seurat with AnnData
 
@@ -662,7 +698,7 @@ py_run_string("print(adata)")
 ```
 
     ## AnnData object with n_obs × n_vars = 500 × 12627
-    ##     obs: 'RNA_snn_res.0.5', 'cluster', 'nCount_RNA', 'nFeature_RNA', 'orig.ident', 'percent.mt', 'seurat_clusters'
+    ##     obs: 'RNA_snn_res.0.5', 'cluster', 'condition', 'nCount_RNA', 'nFeature_RNA', 'orig.ident', 'percent.mt', 'sample_id', 'seurat_clusters'
     ##     layers: 'counts'
 
 #### Adding Dimension Reduction Data
@@ -678,7 +714,7 @@ py_run_string("print(adata)")
 ```
 
     ## AnnData object with n_obs × n_vars = 500 × 12627
-    ##     obs: 'RNA_snn_res.0.5', 'cluster', 'nCount_RNA', 'nFeature_RNA', 'orig.ident', 'percent.mt', 'seurat_clusters'
+    ##     obs: 'RNA_snn_res.0.5', 'cluster', 'condition', 'nCount_RNA', 'nFeature_RNA', 'orig.ident', 'percent.mt', 'sample_id', 'seurat_clusters'
     ##     obsm: 'X_pca', 'X_umap'
     ##     layers: 'counts'
 
@@ -706,7 +742,7 @@ py_run_string("print(adata)")
 ```
 
     ## AnnData object with n_obs × n_vars = 500 × 12627
-    ##     obs: 'RNA_snn_res.0.5', 'cluster', 'nCount_RNA', 'nFeature_RNA', 'orig.ident', 'percent.mt', 'seurat_clusters', 'cluster2'
+    ##     obs: 'RNA_snn_res.0.5', 'cluster', 'condition', 'nCount_RNA', 'nFeature_RNA', 'orig.ident', 'percent.mt', 'sample_id', 'seurat_clusters', 'cluster2'
     ##     obsm: 'X_pca', 'X_umap'
     ##     layers: 'counts'
 
@@ -762,46 +798,40 @@ sessionInfo()
     ## [1] stats4    tools     stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ##  [1] slingshot_2.12.0            TrajectoryUtils_1.12.0      SingleCellExperiment_1.26.0
-    ##  [4] SummarizedExperiment_1.34.0 Biobase_2.64.0              GenomicRanges_1.56.1       
-    ##  [7] GenomeInfoDb_1.40.1         IRanges_2.38.1              S4Vectors_0.42.1           
-    ## [10] BiocGenerics_0.50.0         MatrixGenerics_1.16.0       matrixStats_1.3.0          
-    ## [13] princurve_2.1.6             rlang_1.1.4                 scales_1.3.0               
-    ## [16] dplyr_1.1.4                 mgcv_1.9-1                  nlme_3.1-165               
-    ## [19] reshape2_1.4.4              viridis_0.6.5               viridisLite_0.4.2          
-    ## [22] cowplot_1.1.3               RColorBrewer_1.1-3          ggplot2_3.5.1              
-    ## [25] reticulate_1.38.0           glue_1.7.0                  hdf5r_1.3.11               
-    ## [28] SeuratExtend_1.0.9          SeuratExtendData_0.2.1      Seurat_5.1.0               
-    ## [31] SeuratObject_5.0.2          sp_2.1-4                   
+    ##  [1] slingshot_2.12.0            TrajectoryUtils_1.12.0      SingleCellExperiment_1.26.0 SummarizedExperiment_1.34.0
+    ##  [5] Biobase_2.64.0              GenomicRanges_1.56.1        GenomeInfoDb_1.40.1         IRanges_2.38.1             
+    ##  [9] S4Vectors_0.42.1            BiocGenerics_0.50.0         MatrixGenerics_1.16.0       matrixStats_1.3.0          
+    ## [13] princurve_2.1.6             rlang_1.1.4                 scales_1.3.0                dplyr_1.1.4                
+    ## [17] mgcv_1.9-1                  nlme_3.1-165                reshape2_1.4.4              viridis_0.6.5              
+    ## [21] viridisLite_0.4.2           cowplot_1.1.3               RColorBrewer_1.1-3          ggplot2_3.5.1              
+    ## [25] reticulate_1.38.0           glue_1.7.0                  hdf5r_1.3.11                roxygen2_7.3.2             
+    ## [29] Seurat_5.2.1                SeuratExtend_1.2.0          SeuratObject_5.0.2          sp_2.1-4                   
+    ## [33] SeuratExtendData_0.2.1     
     ## 
     ## loaded via a namespace (and not attached):
-    ##   [1] rstudioapi_0.16.0         jsonlite_1.8.8            magrittr_2.0.3            spatstat.utils_3.0-5     
-    ##   [5] farver_2.1.2              rmarkdown_2.27            zlibbioc_1.50.0           fs_1.6.4                 
-    ##   [9] vctrs_0.6.5               ROCR_1.0-11               DelayedMatrixStats_1.26.0 spatstat.explore_3.2-7   
-    ##  [13] S4Arrays_1.4.1            htmltools_0.5.8.1         usethis_2.2.3             SparseArray_1.4.8        
-    ##  [17] sctransform_0.4.1         parallelly_1.37.1         KernSmooth_2.23-24        htmlwidgets_1.6.4        
-    ##  [21] ica_1.0-3                 plyr_1.8.9                plotly_4.10.4             zoo_1.8-12               
-    ##  [25] igraph_2.0.3              mime_0.12                 lifecycle_1.0.4           pkgconfig_2.0.3          
-    ##  [29] Matrix_1.7-0              R6_2.5.1                  fastmap_1.2.0             GenomeInfoDbData_1.2.12  
-    ##  [33] fitdistrplus_1.2-1        future_1.33.2             shiny_1.8.1.1             digest_0.6.36            
-    ##  [37] colorspace_2.1-0          patchwork_1.2.0           tensor_1.5                RSpectra_0.16-1          
-    ##  [41] irlba_2.3.5.1             labeling_0.4.3            progressr_0.14.0          fansi_1.0.6              
-    ##  [45] spatstat.sparse_3.1-0     httr_1.4.7                polyclip_1.10-6           abind_1.4-5              
-    ##  [49] compiler_4.4.0            bit64_4.0.5               withr_3.0.0               fastDummies_1.7.3        
-    ##  [53] highr_0.11                MASS_7.3-61               DelayedArray_0.30.1       rappdirs_0.3.3           
-    ##  [57] lmtest_0.9-40             httpuv_1.6.15             future.apply_1.11.2       goftest_1.2-3            
-    ##  [61] promises_1.3.0            grid_4.4.0                Rtsne_0.17                cluster_2.1.6            
-    ##  [65] generics_0.1.3            gtable_0.3.5              spatstat.data_3.1-2       tidyr_1.3.1              
-    ##  [69] data.table_1.15.4         XVector_0.44.0            utf8_1.2.4                spatstat.geom_3.2-9      
-    ##  [73] RcppAnnoy_0.0.22          ggrepel_0.9.5             RANN_2.6.1                pillar_1.9.0             
-    ##  [77] stringr_1.5.1             spam_2.10-0               RcppHNSW_0.6.0            later_1.3.2              
-    ##  [81] splines_4.4.0             lattice_0.22-6            survival_3.7-0            bit_4.0.5                
-    ##  [85] deldir_2.0-4              tidyselect_1.2.1          miniUI_0.1.1.1            pbapply_1.7-2            
-    ##  [89] knitr_1.48                gridExtra_2.3             scattermore_1.2           xfun_0.45                
-    ##  [93] UCSC.utils_1.0.0          stringi_1.8.4             lazyeval_0.2.2            yaml_2.3.9               
-    ##  [97] evaluate_0.24.0           codetools_0.2-20          tibble_3.2.1              cli_3.6.3                
-    ## [101] uwot_0.2.2                xtable_1.8-4              munsell_0.5.1             Rcpp_1.0.13              
-    ## [105] globals_0.16.3            spatstat.random_3.2-3     png_0.1-8                 parallel_4.4.0           
-    ## [109] pkgdown_2.1.0             dotCall64_1.1-1           sparseMatrixStats_1.16.0  listenv_0.9.1            
-    ## [113] rlist_0.4.6.2             ggridges_0.5.6            crayon_1.5.3              leiden_0.4.3.1           
-    ## [117] purrr_1.0.2
+    ##   [1] RcppAnnoy_0.0.22          splines_4.4.0             later_1.3.2               tibble_3.2.1             
+    ##   [5] polyclip_1.10-6           fastDummies_1.7.3         lifecycle_1.0.4           globals_0.16.3           
+    ##   [9] lattice_0.22-6            MASS_7.3-61               magrittr_2.0.3            plotly_4.10.4            
+    ##  [13] rmarkdown_2.29            yaml_2.3.9                rlist_0.4.6.2             httpuv_1.6.15            
+    ##  [17] sctransform_0.4.1         spam_2.10-0               spatstat.sparse_3.1-0     pbapply_1.7-2            
+    ##  [21] abind_1.4-5               zlibbioc_1.50.0           Rtsne_0.17                purrr_1.0.2              
+    ##  [25] rappdirs_0.3.3            GenomeInfoDbData_1.2.12   ggrepel_0.9.5             irlba_2.3.5.1            
+    ##  [29] listenv_0.9.1             spatstat.utils_3.0-5      goftest_1.2-3             RSpectra_0.16-1          
+    ##  [33] spatstat.random_3.2-3     fitdistrplus_1.2-1        parallelly_1.37.1         pkgdown_2.0.7            
+    ##  [37] DelayedMatrixStats_1.26.0 codetools_0.2-20          DelayedArray_0.30.1       xml2_1.3.6               
+    ##  [41] tidyselect_1.2.1          UCSC.utils_1.0.0          farver_2.1.2              spatstat.explore_3.2-7   
+    ##  [45] jsonlite_1.8.8            progressr_0.14.0          ggridges_0.5.6            survival_3.7-0           
+    ##  [49] ica_1.0-3                 Rcpp_1.0.13               gridExtra_2.3             SparseArray_1.4.8        
+    ##  [53] xfun_0.45                 usethis_2.2.3             withr_3.0.0               BiocManager_1.30.23      
+    ##  [57] fastmap_1.2.0             fansi_1.0.6               digest_0.6.36             R6_2.5.1                 
+    ##  [61] mime_0.12                 colorspace_2.1-0          scattermore_1.2           tensor_1.5               
+    ##  [65] spatstat.data_3.1-2       utf8_1.2.4                tidyr_1.3.1               generics_0.1.3           
+    ##  [69] data.table_1.15.4         httr_1.4.7                htmlwidgets_1.6.4         S4Arrays_1.4.1           
+    ##  [73] uwot_0.2.2                pkgconfig_2.0.3           gtable_0.3.5              lmtest_0.9-40            
+    ##  [77] XVector_0.44.0            htmltools_0.5.8.1         dotCall64_1.1-1           png_0.1-8                
+    ##  [81] knitr_1.48                rstudioapi_0.16.0         cachem_1.1.0              zoo_1.8-12               
+    ##  [85] stringr_1.5.1             KernSmooth_2.23-24        parallel_4.4.0            miniUI_0.1.1.1           
+    ##  [89] pillar_1.9.0              grid_4.4.0                vctrs_0.6.5               RANN_2.6.1               
+    ##  [93] promises_1.3.0            xtable_1.8-4              cluster_2.1.6             evaluate_0.24.0          
+    ##  [97] cli_3.6.3                 compiler_4.4.0            crayon_1.5.3              future.apply_1.11.2      
+    ##  [ reached getOption("max.print") -- omitted 20 entries ]

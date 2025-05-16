@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SeuratExtend</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
       </span>
     </div>
 
@@ -113,11 +113,13 @@
 <span>  slot <span class="op">=</span> <span class="st">"data"</span>,</span>
 <span>  assay <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  priority <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"expr"</span>, <span class="st">"none"</span><span class="op">)</span>,</span>
-<span>  cols <span class="op">=</span> <span class="st">"auto"</span>,</span>
+<span>  cols <span class="op">=</span> <span class="st">"light"</span>,</span>
 <span>  load.cols <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  nrow <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lab_fill <span class="op">=</span> <span class="st">"group"</span>,</span>
 <span>  scales <span class="op">=</span> <span class="st">"free_y"</span>,</span>
+<span>  style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fill"</span>, <span class="st">"outline"</span><span class="op">)</span>,</span>
 <span>  violin <span class="op">=</span> <span class="cn">T</span>,</span>
 <span>  box <span class="op">=</span> <span class="cn">T</span>,</span>
 <span>  width <span class="op">=</span> <span class="fl">0.9</span>,</span>
@@ -137,6 +139,9 @@
 <span>  hide.ns <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  step.increase <span class="op">=</span> <span class="fl">0.12</span>,</span>
 <span>  tip.length <span class="op">=</span> <span class="fl">0.03</span>,</span>
+<span>  angle <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  hjust <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  vjust <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -147,10 +152,12 @@
 <span>  f2 <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  features <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  t <span class="op">=</span> <span class="cn">F</span>,</span>
-<span>  cols <span class="op">=</span> <span class="st">"pro_default"</span>,</span>
+<span>  cols <span class="op">=</span> <span class="st">"light"</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  nrow <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lab_fill <span class="op">=</span> <span class="st">"group"</span>,</span>
 <span>  scales <span class="op">=</span> <span class="st">"free_y"</span>,</span>
+<span>  style <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fill"</span>, <span class="st">"outline"</span><span class="op">)</span>,</span>
 <span>  violin <span class="op">=</span> <span class="cn">T</span>,</span>
 <span>  box <span class="op">=</span> <span class="cn">T</span>,</span>
 <span>  width <span class="op">=</span> <span class="fl">0.9</span>,</span>
@@ -170,6 +177,9 @@
 <span>  hide.ns <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  step.increase <span class="op">=</span> <span class="fl">0.12</span>,</span>
 <span>  tip.length <span class="op">=</span> <span class="fl">0.03</span>,</span>
+<span>  angle <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  hjust <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  vjust <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -218,7 +228,7 @@
 
 <dt>cols</dt>
 <dd><p>Flexible color settings for the plot, accepting a variety of inputs:</p>
-<p>- Seven color_pro styles: "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple".</p>
+<p>- Eight color_pro styles: "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple", "bright".</p>
 <p>- Five color_iwh styles: "iwh_default", "iwh_intense", "iwh_pastel", "iwh_all", "iwh_all_hard".</p>
 <p>- Brewer color scales as specified by `brewer.pal.info`.</p>
 <p>- Any manually specified colors.</p></dd>
@@ -232,12 +242,20 @@
 <dd><p>Specifies the number of columns for display if multiple plots are shown. Default: NULL.</p></dd>
 
 
+<dt>nrow</dt>
+<dd><p>Specifies the number of rows for display if multiple plots are shown. Default: NULL.</p></dd>
+
+
 <dt>lab_fill</dt>
 <dd><p>Label for the figure legend. Default: 'group'.</p></dd>
 
 
 <dt>scales</dt>
 <dd><p>Scales parameter passed to <code><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">ggplot2::facet_wrap()</a></code>. Default: 'free_y'.</p></dd>
+
+
+<dt>style</dt>
+<dd><p>Plot style: "fill" (default) uses filled violins with group colors, "outline" uses white fill with colored outlines.</p></dd>
 
 
 <dt>violin</dt>
@@ -317,6 +335,18 @@ When both are provided, <code>stats.method</code> takes precedence.</p></dd>
 <dd><p>Numeric vector indicating the fraction of total height the bar descends to specify the exact column. For a line display instead of a bracket, set to 0. Default: 0.03.</p></dd>
 
 
+<dt>angle</dt>
+<dd><p>Angle for label rotation. If NULL, automatically determined based on label length. Default: NULL.</p></dd>
+
+
+<dt>hjust</dt>
+<dd><p>Horizontal justification of labels. If NULL, automatically determined based on angle. Default: NULL.</p></dd>
+
+
+<dt>vjust</dt>
+<dd><p>Vertical justification of labels. If NULL, automatically determined based on angle. Default: NULL.</p></dd>
+
+
 <dt>matr</dt>
 <dd><p>A matrix or data frame with rows as features and columns as cells.</p></dd>
 
@@ -345,6 +375,7 @@ When both are provided, <code>stats.method</code> takes precedence.</p></dd>
     <div id="details">
     <h2>Details</h2>
     <p>This function provides a range of customization options to generate violin plots, with or without additional graphical elements such as boxplots and points. You can specify features to plot, control the appearance of violin plots, boxplots, and points, adjust point position, group data, split violin plots, selectively use cells, control the column layout of multiple plots, and add statistical annotations. For a detailed overview, refer to the provided examples.</p>
+<p>When using the statistical annotation feature (`stat.method`), it's important to be aware that p-values can be artificially inflated in large single-cell datasets due to the high number of cells. This may result in statistically significant differences (small p-values) even when the biological effect size is minimal. We recommend being cautious with statistical interpretations, especially when visual differences are subtle. Consider examining log fold changes (logFC) between groups to better assess the magnitude of biological differences. For a comprehensive visualization of differences between two groups, `WaterfallPlot()` can provide logFC values along with statistical significance. By default, the `VlnPlot2()` function uses the Holm method (`p.adjust.method = "holm"`) to adjust p-values for multiple comparisons, which helps control the family-wise error rate.</p>
     </div>
 
     <div id="ref-examples">
@@ -366,6 +397,9 @@ When both are provided, <code>stats.method</code> takes precedence.</p></dd>
 <span></span>
 <span><span class="co"># When hiding points, outliers are shown by default (recommended). However, outliers can be hidden for a cleaner appearance:</span></span>
 <span><span class="fu">VlnPlot2</span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="va">genes</span>, pt <span class="op">=</span> <span class="cn">FALSE</span>, hide.outlier <span class="op">=</span> <span class="cn">T</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Using the outline style instead of filled violins:</span></span>
+<span><span class="fu">VlnPlot2</span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="va">genes</span>, style <span class="op">=</span> <span class="st">"outline"</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Group by cluster and split each cluster by samples:</span></span>
 <span><span class="fu">VlnPlot2</span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="va">genes</span>, group.by <span class="op">=</span> <span class="st">"cluster"</span>, split.by <span class="op">=</span> <span class="st">"orig.ident"</span><span class="op">)</span></span>

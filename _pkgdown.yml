@@ -10,7 +10,7 @@ navbar:
       href: reference/index.html
     - text: "Vignettes"
       menu:
-        - text: "What's New in v1.1.0"
+        - text: "What's New in v1.2.0"
           href: articles/News.html
         - text: "-----------------"
         - text: "Enhanced Visualization"

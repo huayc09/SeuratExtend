@@ -3,6 +3,11 @@
 1.  [Running scVelo Functions in RStudio on Linux](#scvelo-linux)
 2.  [Creating ‘seuratextend’ Conda Environment](#conda-env)
 3.  [Merging Multiple Samples with Seurat v5.0](#seurat-v5-merge)
+4.  [Troubleshooting macOS-Specific Issues](#macos-issues)
+5.  [Updating or Creating Custom GO/Reactome
+    Databases](#custom-databases)
+6.  [Working with scVelo in SeuratExtend](#scvelo-usage)
+7.  [Installing SeuratExtend Using Conda](#conda-installation)
 
 ## Running scVelo Functions in RStudio on Linux
 
@@ -23,17 +28,19 @@ in the ‘seuratextend’ conda environment, RStudio can’t locate it.
 RStudio searches for shared libraries in the paths specified by the
 `LD_LIBRARY_PATH` environment variable. You can check these paths with:
 
-    Sys.getenv("LD_LIBRARY_PATH")
+``` r
+Sys.getenv("LD_LIBRARY_PATH")
+```
 
 To resolve this issue, manually copy the following files from
 `/home/username/.local/share/r-miniconda/envs/seuratextend/lib/` to one
 of the paths in `LD_LIBRARY_PATH` (e.g., `/usr/lib/R/lib`, which may
 require sudo permissions):
 
--   libR.so
--   libstdc++.so
--   libstdc++.so.6
--   libstdc++.so.6.0.32
+- libR.so
+- libstdc++.so
+- libstdc++.so.6
+- libstdc++.so.6.0.32
 
 After copying these files, restart your R session, and the issue should
 be resolved.
@@ -50,7 +57,9 @@ finding conda or git.
 
 1.  If conda is not found, you can install miniconda using:
 
-        reticulate::install_miniconda()
+    ``` r
+    reticulate::install_miniconda()
+    ```
 
 2.  If git is not found, download and install it from the official
     website: <https://git-scm.com/>. Choose the appropriate version for
@@ -58,6 +67,31 @@ finding conda or git.
 
 After installing conda or git, restart your R session and try running
 `create_condaenv_seuratextend()` again.
+
+### Q: What Python dependencies are included in the ‘seuratextend’ conda environment?
+
+The `create_condaenv_seuratextend()` function creates a conda
+environment with compatible versions of all necessary packages for
+SeuratExtend’s Python-based functionality. Using this built-in
+environment is strongly recommended over creating separate environments
+for each tool.
+
+The ‘seuratextend’ conda environment includes the following key packages
+with specific versions to ensure compatibility:
+
+- scVelo: from GitHub: <theislab/scvelo@d89ca6a>
+- scanpy: 1.9.5
+- pandas: 1.5.3
+- numpy: 1.24.4
+- matplotlib: 3.7.1
+- palantir: 1.3.0
+- scikit-learn: 1.1.3
+- python: 3.10.12
+
+This configuration eliminates the need to switch conda environments and
+restart R sessions when running different functions (like scVelo or
+Palantir). All SeuratExtend Python wrappers are designed to work
+seamlessly with this environment.
 
 ## Merging Multiple Samples with Seurat v5.0
 
@@ -78,9 +112,454 @@ separate count layers for each sample by default. This prevents
 To resolve this issue, you need to join the layers before using
 `GetAssayData()`. Use the following code:
 
-    seu <- JoinLayers(seu)
+``` r
+seu <- JoinLayers(seu)
+```
 
 After joining the layers, you should be able to use `GetAssayData()`
 without errors.
 
 Note that this issue does not occur in Seurat v4 and earlier versions.
+
+## Troubleshooting macOS-Specific Issues
+
+### Q: I’m experiencing crashes when running Python-based functions like scVelo or Palantir on macOS. How can I fix this?
+
+macOS users may encounter specific issues due to memory management
+between R and Python when using functions that rely on Python packages.
+These issues differ based on whether you’re using an Intel Mac or an
+Apple Silicon Mac.
+
+#### Intel Macs:
+
+**Issue:** When using R Markdown in RStudio with Python tools like
+scVelo, the R session may crash unexpectedly.
+
+**Solution:** Use regular .R script files instead of R Markdown files
+for your analysis workflow.
+
+#### Apple Silicon (M1/M2/M3/M4):
+
+**Issue:** If you load any R objects (like Seurat objects) before
+calling Python functions (particularly operations like PCA on AnnData
+objects), the R session will likely crash. This is a known memory
+management issue between R and Python specific to Apple Silicon chips,
+observed during testing on M4 chips.
+
+**Solution:** Always initialize the Python environment BEFORE loading
+any R objects:
+
+``` r
+# 1. Start with a fresh R session
+# 2. First initialize Python (BEFORE loading any data)
+library(SeuratExtend)
+activate_python()
+
+# 3. Only AFTER Python initialization, load your data
+seu <- readRDS("path/to/seurat_object.rds")
+
+# 4. Now you can safely use Python-based functions
+scVelo.SeuratToAnndata(seu, ...)
+```
+
+This initialization sequence prevents memory-related crashes and allows
+all scVelo-related functions to work properly.
+
+### Q: Does SeuratExtend support Apple Silicon (M1/M2/M3/M4) Macs?
+
+Yes, as of SeuratExtend v1.2.0, Apple Silicon/M-series processors are
+fully supported. The `create_condaenv_seuratextend()` function
+automatically detects Apple Silicon and uses the appropriate
+configuration.
+
+However, due to memory management issues between R and Python on Apple
+Silicon, you must follow the initialization sequence described above to
+prevent crashes.
+
+## Updating or Creating Custom GO/Reactome Databases
+
+### Q: How can I update the GO and Reactome databases as they get updated in the future?
+
+The GO and Reactome databases in SeuratExtend are included via the
+SeuratExtendData package, which provides comprehensive documentation for
+creating and updating databases:
+
+- [SeuratExtendData GitHub
+  Repository](https://github.com/huayc09/SeuratExtendData)
+- [Creating GO
+  Data](https://github.com/huayc09/SeuratExtendData/blob/main/inst/db_creation/README_GO_Data.md)
+- [Creating Reactome
+  Data](https://github.com/huayc09/SeuratExtendData/blob/main/inst/db_creation/README_Reactome_Data.md)
+
+For quick reference, here are the steps to update both databases:
+
+#### Quick Start: Updating GO Database (Human and Mouse)
+
+``` r
+# Create working directory
+dir.create("GO_data_creation", showWarnings = FALSE)
+setwd("GO_data_creation")
+
+# Download helper scripts
+download.file(
+  "https://raw.githubusercontent.com/huayc09/SeuratExtendData/main/data-raw/create_GO_Data.R",
+  "create_GO_Data.R"
+)
+download.file(
+  "https://raw.githubusercontent.com/huayc09/SeuratExtendData/main/data-raw/fix_gaf.R",
+  "fix_gaf.R"
+)
+
+# Create directory for downloads
+dir.create("your-download-path", showWarnings = FALSE)
+
+# Download data files (Human and Mouse example)
+# GO ontology
+download.file(
+  "https://purl.obolibrary.org/obo/go/go-basic.obo",
+  "your-download-path/go-basic.obo"
+)
+
+# Human GAF file
+download.file(
+  "https://current.geneontology.org/annotations/goa_human.gaf.gz",
+  "your-download-path/goa_human.gaf.gz"
+)
+R.utils::gunzip("your-download-path/goa_human.gaf.gz", remove = FALSE)
+
+# Mouse GAF file
+download.file(
+  "https://current.geneontology.org/annotations/mgi.gaf.gz",
+  "your-download-path/mgi.gaf.gz"
+)
+R.utils::gunzip("your-download-path/mgi.gaf.gz", remove = FALSE)
+
+# Configure paths and run
+GO_ontology_path <- "your-download-path/go-basic.obo"
+species_files <- list(
+  human = "your-download-path/goa_human.gaf",
+  mouse = "your-download-path/mgi.gaf"
+)
+output_dir <- "."  # Current directory
+
+# Source and run the script
+source("create_GO_Data.R")
+# The script will create GO_Data.rds and GO_ontology.rds in your current directory
+
+# Load and use your custom GO data
+custom_GO_Data <- readRDS("GO_Data.rds")
+
+# Use with SeuratExtend:
+# Simply assign to the global environment
+GO_Data <- custom_GO_Data
+
+# Run your analysis with SeuratExtend functions
+# seu <- GeneSetAnalysisGO(seu, parent = "immune_system_process")
+
+# When done, restore the original data by removing the global variable
+rm(GO_Data)
+```
+
+#### Quick Start: Updating Reactome Database (Human and Mouse)
+
+``` r
+# Create working directory
+dir.create("Reactome_data_creation", showWarnings = FALSE)
+setwd("Reactome_data_creation")
+
+# Download the Reactome data creation script
+download.file(
+  "https://raw.githubusercontent.com/huayc09/SeuratExtendData/main/data-raw/create_Reactome_Data.R",
+  "create_Reactome_Data.R"
+)
+
+# Create directory for downloads
+dir.create("your-download-path", showWarnings = FALSE)
+
+# Download Reactome data files
+download.file(
+  "https://reactome.org/download/current/Ensembl2Reactome_PE_All_Levels.txt",
+  "your-download-path/Ensembl2Reactome_PE_All_Levels.txt"
+)
+download.file(
+  "https://reactome.org/download/current/ReactomePathwaysRelation.txt",
+  "your-download-path/ReactomePathwaysRelation.txt"
+)
+
+# Configure paths and run
+reactome_files <- list(
+  ensembl2reactome = "your-download-path/Ensembl2Reactome_PE_All_Levels.txt",
+  pathways_relation = "your-download-path/ReactomePathwaysRelation.txt"
+)
+
+# Specify which species to process
+species_to_process <- c("human", "mouse")
+
+# Set output directory
+output_dir <- "."  # Current directory
+
+# Source and run the script
+source("create_Reactome_Data.R")
+# The script will create Reactome_Data.rds in your current directory
+
+# Load and use your custom Reactome data
+custom_Reactome_Data <- readRDS("Reactome_Data.rds")
+
+# Use with SeuratExtend:
+# Simply assign to the global environment
+Reactome_Data <- custom_Reactome_Data
+
+# Run your analysis with SeuratExtend functions
+# seu <- GeneSetAnalysisReactome(seu, parent = "Immune System")
+
+# When done, restore the original data by removing the global variable
+rm(Reactome_Data)
+```
+
+### Q: Can I use SeuratExtend with custom databases for other model organisms?
+
+Yes, SeuratExtend supports using custom databases for any organism of
+interest. The workflow is similar to updating the databases as described
+above, but you’ll need to:
+
+1.  **Obtain organism-specific GAF files** for GO analysis or create
+    appropriate gene-to-pathway mappings for other databases.
+
+2.  **Set up the data structure** following the format in the
+    SeuratExtendData package:
+
+    - For GO data: A list with species names as keys, each containing
+      `GO_ontology`, `GO2Gene`, and other required components
+    - For Reactome data: A similar list structure with pathway
+      hierarchies and gene mappings
+
+3.  **Use your custom data** as shown in the examples above.
+
+For detailed instructions on creating custom databases, see the
+comprehensive guides in the SeuratExtendData repository: - [Creating GO
+Data](https://github.com/huayc09/SeuratExtendData/blob/main/inst/db_creation/README_GO_Data.md) -
+[Creating Reactome
+Data](https://github.com/huayc09/SeuratExtendData/blob/main/inst/db_creation/README_Reactome_Data.md)
+
+### Q: How do I specify versions when installing SeuratExtendData?
+
+You can install specific versions of SeuratExtendData using the
+`install_SeuratExtendData()` function:
+
+``` r
+library(SeuratExtend)
+
+# Install the latest version
+install_SeuratExtendData("latest")
+
+# Install the stable version (January 2020)
+install_SeuratExtendData("stable")
+
+# Install specific versions
+install_SeuratExtendData("v0.2.1")  # January 2020 datasets
+install_SeuratExtendData("v0.3.0")  # April 2025 datasets
+```
+
+This is useful when you need to ensure compatibility with specific
+analysis workflows or when you want to use a specific version of the
+databases.
+
+## Working with scVelo in SeuratExtend
+
+### Q: How do I use the `cell.id.match.table` parameter in `scVelo.SeuratToAnndata` when integrating multiple loom files?
+
+There are two main approaches to handle cell ID matching between Seurat
+and velocyto loom files:
+
+1.  Using prefix/postfix (simpler approach)
+2.  Using cell.id.match.table (more flexible approach)
+
+Here’s a detailed explanation with a concrete example using the example
+data:
+
+``` r
+library(Seurat)
+library(SeuratExtend)
+
+# Download the example Seurat Object
+mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds", "rb"))
+
+# Download the example velocyto loom file
+loom_path <- file.path(tempdir(), "pbmc10k_mye_small.loom")
+download.file("https://zenodo.org/records/10944066/files/pbmc10k_mye_small.loom", 
+              loom_path,
+              mode = "wb")  # Use binary mode for Windows compatibility
+
+# Set up the path for saving the AnnData object in the HDF5 (h5ad) format
+if (.Platform$OS.type == "windows") {
+    adata_path <- normalizePath(file.path(tempdir(), "mye_small.h5ad"), winslash = "/")
+} else {
+    adata_path <- file.path(tempdir(), "mye_small.h5ad")
+}
+
+# First, let's look at the cell IDs in both objects
+# Seurat cell IDs
+head(colnames(mye_small))
+#> [1] "sample1_GAGTCATGTACCCGCA-1" "sample1_TGGAGGAGTGTATACC-1" "sample1_CCCGGAAGTTGGCTAT-1"
+#> [4] "sample1_CTGAGGCAGTCAGGGT-1" "sample1_GCCAACGTCCCGTGTT-1" "sample1_TCAAGCAGTGTGGTCC-1"
+
+# Velocyto cell IDs
+library(hdf5r)
+loom <- H5File$new(loom_path, mode = "r")
+velocyto_cells <- loom[["col_attrs/CellID"]][]
+head(velocyto_cells)
+#> [1] "pbmc10k_10X:AAACGCTCATACGCATx" "pbmc10k_10X:AAACGAATCTCGACCTx" "pbmc10k_10X:AAAGGTAGTCGCATGCx"
+#> [4] "pbmc10k_10X:AAAGAACCAGGTTCGCx" "pbmc10k_10X:AAACCCAAGGCCCAAAx" "pbmc10k_10X:AAAGGGCTCTTTGCTAx"
+loom$close_all()
+
+# Extract barcodes from velocyto IDs and create corresponding Seurat-style IDs
+velocyto_barcodes <- sub(".*:", "", velocyto_cells) # Remove everything before ":"
+velocyto_barcodes <- sub("x$", "", velocyto_barcodes) # Remove trailing "x"
+seurat_style_ids <- paste0("sample1_", velocyto_barcodes, "-1")
+
+# Create the matching table
+cell_match_df <- data.frame(
+  cellid.seurat = seurat_style_ids,
+  cellid.velocyto = velocyto_cells,
+  velocyto.loompath = loom_path
+)
+
+# View the table structure
+head(cell_match_df)
+#                cellid.seurat               cellid.velocyto                      velocyto.loompath
+# 1 sample1_AAACGCTCATACGCAT-1 pbmc10k_10X:AAACGCTCATACGCATx /tmp/RtmpWaN5N2/pbmc10k_mye_small.loom
+# 2 sample1_AAACGAATCTCGACCT-1 pbmc10k_10X:AAACGAATCTCGACCTx /tmp/RtmpWaN5N2/pbmc10k_mye_small.loom
+# 3 sample1_AAAGGTAGTCGCATGC-1 pbmc10k_10X:AAAGGTAGTCGCATGCx /tmp/RtmpWaN5N2/pbmc10k_mye_small.loom
+# 4 sample1_AAAGAACCAGGTTCGC-1 pbmc10k_10X:AAAGAACCAGGTTCGCx /tmp/RtmpWaN5N2/pbmc10k_mye_small.loom
+# 5 sample1_AAACCCAAGGCCCAAA-1 pbmc10k_10X:AAACCCAAGGCCCAAAx /tmp/RtmpWaN5N2/pbmc10k_mye_small.loom
+# 6 sample1_AAAGGGCTCTTTGCTA-1 pbmc10k_10X:AAAGGGCTCTTTGCTAx /tmp/RtmpWaN5N2/pbmc10k_mye_small.loom
+
+# Use the table in scVelo.SeuratToAnndata
+scVelo.SeuratToAnndata(
+  seu = mye_small,
+  filename = "output.h5ad",
+  velocyto.loompath = loom_path,
+  cell.id.match.table = cell_match_df
+)
+```
+
+### Q: How do I handle different cell barcodes and features between Seurat and loom files?
+
+Different feature numbers between Seurat and loom files is normal - the
+function will automatically handle this by finding common features. For
+cell barcodes, you have two options:
+
+1.  Use `cell.id.match.table` to explicitly map the different formats
+2.  Use `prefix`/`postfix` to transform the barcodes (e.g.,
+    prefix=“sample1\_”, postfix=“-1”)
+
+The `cell.id.match.table` approach is more versatile and can handle
+various data types (10X, SmartSeq2, etc.), but it’s more complex to set
+up. For 10X Genomics data, the prefix/postfix method is usually simpler
+and recommended. Here’s how to determine the correct prefix/postfix from
+your Seurat object:
+
+``` r
+# Look at the cell IDs in your Seurat object
+head(colnames(mye_small))
+#> [1] "sample1_GAGTCATGTACCCGCA-1" "sample1_TGGAGGAGTGTATACC-1" "sample1_CCCGGAAGTTGGCTAT-1"
+```
+
+We can see that: - The prefix is “sample1\_” (typically defined when you
+create your Seurat object) - The postfix is “-1” (default value in most
+cases)
+
+For multiple samples, you can provide vectors for prefix and postfix:
+
+``` r
+scVelo.SeuratToAnndata(
+  seu = your_seurat_object,
+  filename = "output.h5ad",
+  velocyto.loompath = c("/path/to/sample1.loom", "/path/to/sample2.loom"),
+  prefix = c("sample1_", "sample2_"),  # One prefix per loom file
+  postfix = "-1"  # Same postfix for all samples
+)
+```
+
+### Q: How can I access and use Python functionality after running scVelo.SeuratToAnndata?
+
+The wrapper functions in SeuratExtend provide convenient interfaces to
+Python-based tools but don’t cover all possible functionalities. After
+running `scVelo.SeuratToAnndata`, you have several options to access the
+full power of Python:
+
+1.  The `adata` object is already available in the Python environment.
+    If you’re using RStudio, you can create a Python document and write
+    code directly:
+
+    ``` python
+    # In RStudio Python document
+    import scvelo as scv
+    import scanpy as sc
+
+    # Access the adata object that's already in memory
+    scv.pl.velocity_embedding_stream(adata, basis='umap_cell_embeddings')
+    ```
+
+2.  You can use `reticulate::repl_python()` to enter Python mode from
+    your R session:
+
+    ``` r
+    # In R session
+    reticulate::repl_python()
+
+    # Now in Python mode
+    import scvelo as scv
+    scv.pl.velocity_embedding_stream(adata, basis='umap_cell_embeddings')
+
+    # Exit with 'exit' command
+    exit
+    ```
+
+This approach retains all your Seurat information (UMAP coordinates,
+metadata, etc.) while giving you full access to Python functionality.
+
+## Installing SeuratExtend Using Conda
+
+### Q: How can I install SeuratExtend through Conda?
+
+While the `create_condaenv_seuratextend()` function manages Python
+dependencies for tools like scVelo, you may prefer to use Conda to
+manage the R environment for SeuratExtend itself. This approach can help
+resolve dependency issues, especially on systems where installing R
+packages with system-level dependencies is challenging.
+
+### Solution:
+
+Here’s the recommended approach to install SeuratExtend using Conda:
+
+1.  First, create and activate a new Conda environment:
+
+``` bash
+conda create -n newenv
+conda activate newenv
+```
+
+2.  Install the dependencies through conda-forge:
+
+``` bash
+conda install -c conda-forge r-seurat r-hdf5r r-remotes r-ggpubr r-mosaic r-terra r-harmony r-xml r-biocmanager r-spatstat.univar
+```
+
+3.  Optionally, if you plan to use Jupyter notebooks:
+
+``` bash
+conda install -c conda-forge jupyterlab
+```
+
+4.  Finally, launch R and install SeuratExtend:
+
+``` r
+remotes::install_github("huayc09/SeuratExtend")
+```
+
+This approach ensures all system-level dependencies are properly handled
+through Conda before installing SeuratExtend. After installation, you
+can proceed with creating the Python environment for scVelo and other
+tools as described in the [Creating ‘seuratextend’ Conda
+Environment](#conda-env) section.

@@ -52,7 +52,7 @@ GeneSetAnalysisGO <- function(
     if(is.null(parent)) title <- root[1] else title <- parent[1]
   }
 
-  GenesetList <- SeuratExtendData::GO_Data[[spe]]$GO2Gene[GenesetNames]
+  GenesetList <- GO_Data[[spe]]$GO2Gene[GenesetNames]
   DefaultAssay(seu) <- assay
   GenesetList <- FilterGenesets(
     genes_in_data = rownames(seu),
@@ -135,16 +135,16 @@ FilterGOTerms <- function(
   if(is.null(term)) term <- names(GO_Data[[spe]]$GO2Gene)
   if(is.vector(term)){
     filter <-
-      SeuratExtendData::GO_Data[[spe]]$GO2Gene[term] %>%
+      GO_Data[[spe]]$GO2Gene[term] %>%
       sapply(function(x) length(x) >= n.min & length(x) <= n.max)
     term <- term[filter]
     if(!is.null(parent)){
-      if(all(parent %in% SeuratExtendData::GO_Data[[spe]]$GO_ontology$id)) {
+      if(all(parent %in% GO_Data[[spe]]$GO_ontology$id)) {
         term <- intersect(term, GetAllChilrenGO(parent, spe))
       }else{
         message <- paste0(
           "Parent item(s) not found: ",
-          paste0(setdiff(parent, SeuratExtendData::GO_Data[[spe]]$GO_ontology$id),
+          paste0(setdiff(parent, GO_Data[[spe]]$GO_ontology$id),
                  collapse = ", "))
         warning(message)
       }
@@ -204,7 +204,7 @@ RenameGO <- function(
 
 GetChilrenGO <- function(term, spe = getOption("spe")){
   check_spe(spe)
-  Child <- union(term, unlist(SeuratExtendData::GO_Data[[spe]]$GO_ontology$children[term]))
+  Child <- union(term, unlist(GO_Data[[spe]]$GO_ontology$children[term]))
   return(Child)
 }
 
@@ -217,7 +217,7 @@ GetAllChilrenGO <- function(term, spe = getOption("spe")){
 GetEndTermsGO <- function(term, spe = getOption("spe")){
   library(dplyr)
   check_spe(spe)
-  anc <- SeuratExtendData::GO_Data[[spe]]$GO_ontology$ancestors[term] %>%
+  anc <- GO_Data[[spe]]$GO_ontology$ancestors[term] %>%
     lapply(function(x) x[-length(x)]) %>%
     unlist() %>% unique()
   return(setdiff(term, anc))
@@ -246,7 +246,7 @@ getGOdatabase <- function(
     if(any(!parent %in% c(GenesetNames, names(DatabaseList)))) {
       ol <- setdiff(parent, c(GenesetNames, names(DatabaseList)))
       stop(length(ol),
-           " ‘parent' GO term(s) not found in the current root database (",
+           " 'parent' GO term(s) not found in the current root database (",
            paste0(root, collapse = ", "),
            "): ", ol[1], "...")
     }

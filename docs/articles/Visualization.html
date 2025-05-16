@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SeuratExtend</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
       </span>
     </div>
 
@@ -121,7 +121,7 @@
       <h1 data-toc-skip>Enhanced Visualization</h1>
                         <h4 data-toc-skip class="author">Yichao Hua</h4>
             
-            <h4 data-toc-skip class="date">2024-11-29</h4>
+            <h4 data-toc-skip class="date">2025-05-16</h4>
       
       
       <div class="hidden name"><code>Visualization.Rmd</code></div>
@@ -232,7 +232,7 @@ For detailed information on color customization, refer to the <a href="#explore-
 <span>  <span class="va">pbmc</span>,</span>
 <span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cluster"</span>, <span class="st">"orig.ident"</span>, <span class="st">"CD14"</span>, <span class="st">"CD3D"</span><span class="op">)</span>,</span>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="st">"cluster"</span> <span class="op">=</span> <span class="st">"light"</span>,</span>
+<span>    <span class="st">"cluster"</span> <span class="op">=</span> <span class="st">"default"</span>, <span class="co"># dark theme</span></span>
 <span>    <span class="st">"CD14"</span> <span class="op">=</span> <span class="st">"D"</span>,</span>
 <span>    <span class="st">"CD3D"</span> <span class="op">=</span> <span class="st">"OrRd"</span></span>
 <span>  <span class="op">)</span>,</span>
@@ -340,6 +340,26 @@ CD79A:</p>
 <p><img src="Visualization_files/figure-html/unnamed-chunk-12-1.png" width="576"></p>
 </div>
 <div class="section level4">
+<h4 id="using-dark-theme-new-in-v1-2-0">Using Dark Theme (New in v1.2.0)<a class="anchor" aria-label="anchor" href="#using-dark-theme-new-in-v1-2-0"></a>
+</h4>
+<p>For improved visualization in presentations or in low-light
+environments, you can use the dark theme option:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/FeaturePlot3.html">FeaturePlot3</a></span><span class="op">(</span></span>
+<span>  <span class="va">pbmc</span>, </span>
+<span>  color <span class="op">=</span> <span class="st">"rgb"</span>, </span>
+<span>  feature.1 <span class="op">=</span> <span class="st">"CD3D"</span>, </span>
+<span>  feature.2 <span class="op">=</span> <span class="st">"CD14"</span>, </span>
+<span>  feature.3 <span class="op">=</span> <span class="st">"CD79A"</span>, </span>
+<span>  pt.size <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  dark.theme <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-13-1.png" width="576"></p>
+<p>This dark theme provides better contrast for visualizing gene
+expression patterns, particularly when using the RGB color system where
+brighter colors represent higher expression levels.</p>
+</div>
+<div class="section level4">
 <h4 id="batch-visualization-with-featureplot3-grid">Batch Visualization with <code>FeaturePlot3.grid</code><a class="anchor" aria-label="anchor" href="#batch-visualization-with-featureplot3-grid"></a>
 </h4>
 <p><code>FeaturePlot3.grid</code> extends <code>FeaturePlot3</code> by
@@ -350,13 +370,31 @@ plot. If you wish to skip a color, use <code>NA</code> as a
 placeholder.</p>
 <p>For instance, to place the following five genes into two plots using
 the RYB system, and skip yellow in the second plot:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/FeaturePlot3-grid.html">FeaturePlot3.grid</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD3D"</span>, <span class="st">"CD14"</span>, <span class="st">"CD79A"</span>, <span class="st">"FCGR3A"</span>, <span class="cn">NA</span>, <span class="st">"LYZ"</span><span class="op">)</span>, pt.size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-13-1.png" width="624"></p>
-<p>Using the RGB system:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/FeaturePlot3-grid.html">FeaturePlot3.grid</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD3D"</span>, <span class="st">"CD14"</span>, <span class="st">"CD79A"</span>, <span class="st">"FCGR3A"</span>, <span class="cn">NA</span>, <span class="st">"LYZ"</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"rgb"</span>, pt.size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/FeaturePlot3-grid.html">FeaturePlot3.grid</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD3D"</span>, <span class="st">"CD14"</span>, <span class="st">"CD79A"</span>, <span class="st">"FCGR3A"</span>, <span class="cn">NA</span>, <span class="st">"LYZ"</span><span class="op">)</span>, pt.size <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Visualization_files/figure-html/unnamed-chunk-14-1.png" width="624"></p>
+<p>Using the RGB system:</p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/FeaturePlot3-grid.html">FeaturePlot3.grid</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD3D"</span>, <span class="st">"CD14"</span>, <span class="st">"CD79A"</span>, <span class="st">"FCGR3A"</span>, <span class="cn">NA</span>, <span class="st">"LYZ"</span><span class="op">)</span>, color <span class="op">=</span> <span class="st">"rgb"</span>, pt.size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-15-1.png" width="624"></p>
+</div>
+<div class="section level4">
+<h4 id="using-dark-theme-with-grid-layout-new-in-v1-2-0">Using Dark Theme with Grid Layout (New in v1.2.0)<a class="anchor" aria-label="anchor" href="#using-dark-theme-with-grid-layout-new-in-v1-2-0"></a>
+</h4>
+<p>You can also apply the dark theme to FeaturePlot3.grid for enhanced
+visualization:</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/FeaturePlot3-grid.html">FeaturePlot3.grid</a></span><span class="op">(</span></span>
+<span>  <span class="va">pbmc</span>, </span>
+<span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD3D"</span>, <span class="st">"CD14"</span>, <span class="st">"CD79A"</span>, <span class="st">"FCGR3A"</span>, <span class="cn">NA</span>, <span class="st">"LYZ"</span><span class="op">)</span>, </span>
+<span>  color <span class="op">=</span> <span class="st">"rgb"</span>, </span>
+<span>  pt.size <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  dark.theme <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  legend <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-16-1.png" width="624"></p>
+<p>The dark theme with legend enabled provides an elegant visualization
+that works well in presentations and publications.</p>
 </div>
 <div class="section level4">
 <h4 id="tips-on-point-size">Tips on Point Size<a class="anchor" aria-label="anchor" href="#tips-on-point-size"></a>
@@ -398,15 +436,15 @@ color scheme, simply set
 </h3>
 <p>First, let’s generate a sample matrix using the
 <code>CalcStats</code> function:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Calculate z-scores for variable features</span></span>
-<span><span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span></span>
+<span><span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span></span>
 <span><span class="va">toplot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CalcStats.html">CalcStats</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="va">genes</span>, method <span class="op">=</span> <span class="st">"zscore"</span>, order <span class="op">=</span> <span class="st">"p"</span>, n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 <p>Now, we can produce a basic heatmap:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a basic heatmap</span></span>
 <span><span class="fu"><a href="../reference/Heatmap.html">Heatmap</a></span><span class="op">(</span><span class="va">toplot</span>, lab_fill <span class="op">=</span> <span class="st">"zscore"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-16-1.png" width="480"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-18-1.png" width="480"></p>
 </div>
 <div class="section level3">
 <h3 id="adjusting-color-schemes">Adjusting Color Schemes<a class="anchor" aria-label="anchor" href="#adjusting-color-schemes"></a>
@@ -414,14 +452,14 @@ color scheme, simply set
 <p>The <code>color_scheme</code> parameter allows for flexibility in
 visualizing data. Here are some ways to change the color theme of your
 heatmap:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Viridis-A theme</span></span>
 <span><span class="fu"><a href="../reference/Heatmap.html">Heatmap</a></span><span class="op">(</span><span class="va">toplot</span>, lab_fill <span class="op">=</span> <span class="st">"zscore"</span>, color_scheme <span class="op">=</span> <span class="st">"A"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-17-1.png" width="480"></p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<p><img src="Visualization_files/figure-html/unnamed-chunk-19-1.png" width="480"></p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># White - blue - dark green</span></span>
 <span><span class="fu"><a href="../reference/Heatmap.html">Heatmap</a></span><span class="op">(</span><span class="va">toplot</span>, lab_fill <span class="op">=</span> <span class="st">"zscore"</span>, color_scheme <span class="op">=</span> <span class="st">"BuGn"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-17-2.png" width="480"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-19-2.png" width="480"></p>
 <p>For detailed information on color customization, refer to the <a href="#explore-color-functions">Explore Color Functions</a> section.</p>
 </div>
 <div class="section level3">
@@ -433,25 +471,25 @@ labels are fully visible, you can increase the space on the left side of
 the plot by adjusting the <code>plot.margin</code> parameter. For
 example, to add more space, you can specify a larger value for the left
 margin (<code>l</code>) like this:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Heatmap.html">Heatmap</a></span><span class="op">(</span><span class="va">toplot</span>, lab_fill <span class="op">=</span> <span class="st">"zscore"</span>, plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">margin</a></span><span class="op">(</span>l <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-18-1.png" width="528"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-20-1.png" width="528"></p>
 <p>For dense matrices with many features, you might want to show only a
 subset of gene names:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">toplot2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CalcStats.html">CalcStats</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="va">genes</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">500</span><span class="op">]</span>, method <span class="op">=</span> <span class="st">"zscore"</span>, order <span class="op">=</span> <span class="st">"p"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/Heatmap.html">Heatmap</a></span><span class="op">(</span><span class="va">toplot2</span>, lab_fill <span class="op">=</span> <span class="st">"zscore"</span>, feature_text_subset <span class="op">=</span> <span class="va">genes</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">]</span>, expand_limits_x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.5</span>, <span class="fl">11</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-19-1.png" width="480"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-21-1.png" width="480"></p>
 </div>
 <div class="section level3">
 <h3 id="faceting-the-heatmap">Faceting the Heatmap<a class="anchor" aria-label="anchor" href="#faceting-the-heatmap"></a>
 </h3>
 <p>You can split the heatmap based on gene groups:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gene_groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"group1"</span>, <span class="st">"group2"</span>, <span class="st">"group3"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">toplot2</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/Heatmap.html">Heatmap</a></span><span class="op">(</span><span class="va">toplot2</span>, lab_fill <span class="op">=</span> <span class="st">"zscore"</span>, facet_row <span class="op">=</span> <span class="va">gene_groups</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-20-1.png" width="480"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-22-1.png" width="480"></p>
 </div>
 </div>
 <div class="section level2">
@@ -473,17 +511,17 @@ cell populations.</p>
 <h3 id="basic-usage-2">Basic Usage<a class="anchor" aria-label="anchor" href="#basic-usage-2"></a>
 </h3>
 <p>Let’s create a basic dot plot for some variable features:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Select some variable features</span></span>
-<span><span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span>
+<span><span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span></span>
 <span><span class="fu"><a href="../reference/DotPlot2.html">DotPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="va">genes</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-21-1.png" width="576"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-23-1.png" width="576"></p>
 </div>
 <div class="section level3">
 <h3 id="grouped-features">Grouped Features<a class="anchor" aria-label="anchor" href="#grouped-features"></a>
 </h3>
 <p>You can organize features into groups for clearer visualization:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create grouped features</span></span>
 <span><span class="va">grouped_features</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="st">"B_cell_markers"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"MS4A1"</span>, <span class="st">"CD79A"</span><span class="op">)</span>,</span>
@@ -492,24 +530,24 @@ cell populations.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/DotPlot2.html">DotPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="va">grouped_features</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-22-1.png" width="624"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-24-1.png" width="624"></p>
 </div>
 <div class="section level3">
 <h3 id="split-visualization">Split Visualization<a class="anchor" aria-label="anchor" href="#split-visualization"></a>
 </h3>
 <p>You can split the visualization by a metadata column to compare
 expression patterns across different conditions:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Basic split visualization</span></span>
 <span><span class="fu"><a href="../reference/DotPlot2.html">DotPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="va">genes</span>, group.by <span class="op">=</span> <span class="st">"cluster"</span>, split.by <span class="op">=</span> <span class="st">"orig.ident"</span>, show_grid <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-23-1.png" width="768"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-25-1.png" width="768"></p>
 </div>
 <div class="section level3">
 <h3 id="alternative-split-visualization">Alternative Split Visualization<a class="anchor" aria-label="anchor" href="#alternative-split-visualization"></a>
 </h3>
 <p>The split groups can be represented either by border colors (default)
 or by dot colors:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Using colors instead of borders for split groups</span></span>
 <span><span class="fu"><a href="../reference/DotPlot2.html">DotPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, </span>
 <span>         features <span class="op">=</span> <span class="va">genes</span>, </span>
@@ -517,21 +555,21 @@ or by dot colors:</p>
 <span>         split.by <span class="op">=</span> <span class="st">"orig.ident"</span>, </span>
 <span>         split.by.method <span class="op">=</span> <span class="st">"color"</span>, </span>
 <span>         show_grid <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-24-1.png" width="768"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-26-1.png" width="768"></p>
 </div>
 <div class="section level3">
 <h3 id="customizing-appearance">Customizing Appearance<a class="anchor" aria-label="anchor" href="#customizing-appearance"></a>
 </h3>
 <p>You can customize various aspects of the plot, including color
 schemes, dot sizes, and grid lines:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/DotPlot2.html">DotPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, </span>
 <span>         features <span class="op">=</span> <span class="va">grouped_features</span>, </span>
 <span>         color_scheme <span class="op">=</span> <span class="st">"BuRd"</span>, </span>
 <span>         border <span class="op">=</span> <span class="cn">FALSE</span>,        <span class="co"># Remove dot borders</span></span>
 <span>         show_grid <span class="op">=</span> <span class="cn">FALSE</span>,     <span class="co"># Remove grid lines</span></span>
 <span>         flip <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>          <span class="co"># Flip coordinates</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-25-1.png" width="672"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-27-1.png" width="672"></p>
 </div>
 </div>
 <div class="section level2">
@@ -551,13 +589,13 @@ presentation.</p>
 <h3 id="basic-usage-3">Basic Usage<a class="anchor" aria-label="anchor" href="#basic-usage-3"></a>
 </h3>
 <p>Let’s start with some common gene markers:</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat" class="external-link">Seurat</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SeuratExtend</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD3D"</span>,<span class="st">"CD14"</span>,<span class="st">"CD79A"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/VlnPlot2.html">VlnPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="va">genes</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-26-1.png" width="480"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-28-1.png" width="480"></p>
 </div>
 <div class="section level3">
 <h3 id="customizing-plot-elements">Customizing Plot Elements<a class="anchor" aria-label="anchor" href="#customizing-plot-elements"></a>
@@ -565,22 +603,30 @@ presentation.</p>
 <p>You can create different variations of the plot by adjusting its
 components. For instance, you might want to show only the box plot with
 quasirandom point distribution:</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/VlnPlot2.html">VlnPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="va">genes</span>, violin <span class="op">=</span> <span class="cn">FALSE</span>, pt.style <span class="op">=</span> <span class="st">"quasirandom"</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-27-1.png" width="480"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-29-1.png" width="480"></p>
 </div>
 <div class="section level3">
 <h3 id="managing-point-display">Managing Point Display<a class="anchor" aria-label="anchor" href="#managing-point-display"></a>
 </h3>
 <p>For cleaner visualization, you can hide individual points while still
 showing outliers:</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/VlnPlot2.html">VlnPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="va">genes</span>, pt <span class="op">=</span> <span class="cn">FALSE</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-28-1.png" width="480"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-30-1.png" width="480"></p>
 <p>Or hide both points and outliers for a minimal appearance:</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/VlnPlot2.html">VlnPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="va">genes</span>, pt <span class="op">=</span> <span class="cn">FALSE</span>, hide.outlier <span class="op">=</span> <span class="cn">TRUE</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-29-1.png" width="480"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-31-1.png" width="480"></p>
+</div>
+<div class="section level3">
+<h3 id="outline-style-new-in-v1-2-0">Outline Style (New in v1.2.0)<a class="anchor" aria-label="anchor" href="#outline-style-new-in-v1-2-0"></a>
+</h3>
+<p>You can change the violin plot style from filled to outline:</p>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/VlnPlot2.html">VlnPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="va">genes</span>, style <span class="op">=</span> <span class="st">"outline"</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-32-1.png" width="480"></p>
 </div>
 <div class="section level3">
 <h3 id="adding-mean-and-median-lines-new-in-v1-1-0">Adding Mean and Median Lines (New in v1.1.0)<a class="anchor" aria-label="anchor" href="#adding-mean-and-median-lines-new-in-v1-1-0"></a>
@@ -588,7 +634,7 @@ showing outliers:</p>
 <p>For genes with low expression where boxplot might be hard to
 interpret (e.g., when median and quartiles overlap at zero), you can add
 mean/median lines for better visualization:</p>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lowExprGenes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CCR7"</span>, <span class="st">"IL7R"</span>, <span class="st">"TCF7"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/VlnPlot2.html">VlnPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, </span>
 <span>         features <span class="op">=</span> <span class="va">lowExprGenes</span>, </span>
@@ -596,41 +642,41 @@ mean/median lines for better visualization:</p>
 <span>         mean_colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"red"</span>, <span class="st">"blue"</span><span class="op">)</span>,  <span class="co"># Colors for mean and median</span></span>
 <span>         cols <span class="op">=</span> <span class="st">"light"</span>,        <span class="co"># Light color scheme for better visibility</span></span>
 <span>         ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-30-1.png" width="576"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-33-1.png" width="576"></p>
 </div>
 <div class="section level3">
 <h3 id="split-visualization-1">Split Visualization<a class="anchor" aria-label="anchor" href="#split-visualization-1"></a>
 </h3>
 <p>You can group by cluster and split each cluster by samples:</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/VlnPlot2.html">VlnPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="va">genes</span>, group.by <span class="op">=</span> <span class="st">"cluster"</span>, split.by <span class="op">=</span> <span class="st">"orig.ident"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-31-1.png" width="864"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-34-1.png" width="864"></p>
 </div>
 <div class="section level3">
 <h3 id="subset-analysis">Subset Analysis<a class="anchor" aria-label="anchor" href="#subset-analysis"></a>
 </h3>
 <p>You can focus on specific cell types and arrange plots in
 columns:</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cells</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span><span class="op">[</span><span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"B cell"</span>, <span class="st">"Mono CD14"</span>, <span class="st">"CD8 T cell"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="fu"><a href="../reference/VlnPlot2.html">VlnPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="va">genes</span>, group.by <span class="op">=</span> <span class="st">"cluster"</span>, cells <span class="op">=</span> <span class="va">cells</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-32-1.png" width="576"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-35-1.png" width="576"></p>
 </div>
 <div class="section level3">
 <h3 id="statistical-analysis">Statistical Analysis<a class="anchor" aria-label="anchor" href="#statistical-analysis"></a>
 </h3>
 <p>Add statistical annotations using the Wilcoxon test, hiding
 non-significant results:</p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/VlnPlot2.html">VlnPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, </span>
 <span>         features <span class="op">=</span> <span class="va">genes</span>, </span>
 <span>         group.by <span class="op">=</span> <span class="st">"cluster"</span>, </span>
 <span>         cells <span class="op">=</span> <span class="va">cells</span>,</span>
 <span>         stat.method <span class="op">=</span> <span class="st">"wilcox.test"</span>, </span>
 <span>         hide.ns <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-33-1.png" width="576"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-36-1.png" width="576"></p>
 <p>Or specify particular comparisons using t-test:</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/VlnPlot2.html">VlnPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, </span>
 <span>         features <span class="op">=</span> <span class="va">genes</span>, </span>
 <span>         group.by <span class="op">=</span> <span class="st">"cluster"</span>, </span>
@@ -638,21 +684,38 @@ non-significant results:</p>
 <span>         stat.method <span class="op">=</span> <span class="st">"t.test"</span>, </span>
 <span>         comparisons <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">3</span><span class="op">)</span><span class="op">)</span>, </span>
 <span>         hide.ns <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-34-1.png" width="576"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-37-1.png" width="576"></p>
 </div>
 <div class="section level3">
 <h3 id="using-matrix-input">Using Matrix Input<a class="anchor" aria-label="anchor" href="#using-matrix-input"></a>
 </h3>
 <p>You can also use <code>VlnPlot2</code> with matrices, such as AUCell
 scores from gene set enrichment analysis:</p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Perform gene set analysis</span></span>
 <span><span class="va">pbmc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GeneSetAnalysis.html">GeneSetAnalysis</a></span><span class="op">(</span><span class="va">pbmc</span>, genesets <span class="op">=</span> <span class="va">hall50</span><span class="op">$</span><span class="va">human</span><span class="op">)</span></span>
 <span><span class="va">matr</span> <span class="op">&lt;-</span> <span class="va">pbmc</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">AUCell</span><span class="op">$</span><span class="va">genesets</span></span>
 <span></span>
 <span><span class="co"># Plot the first three pathways</span></span>
 <span><span class="fu"><a href="../reference/VlnPlot2.html">VlnPlot2</a></span><span class="op">(</span><span class="va">matr</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>,<span class="op">]</span>, f <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-35-1.png" width="576"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-38-1.png" width="576"></p>
+<blockquote>
+<p><strong>Note on Statistical Testing:</strong> When using
+<code>stat.method</code> to add statistical annotations to violin plots,
+be aware that p-values can be artificially inflated in large single-cell
+datasets due to the high number of cells. This may result in
+statistically significant differences (small p-values) even when the
+biological effect size is minimal. We recommend being cautious with
+statistical interpretations, especially when visual differences are
+subtle. Consider examining log fold changes (logFC) between groups to
+better assess the magnitude of biological differences. For a
+comprehensive visualization of differences between two groups,
+<code><a href="../reference/WaterfallPlot.html">WaterfallPlot()</a></code> (see <a href="#generate-a-waterfall-plot">Generate a Waterfall Plot</a>) can
+provide logFC values along with statistical significance. By default,
+<code>VlnPlot2</code> uses the Holm method
+(<code>p.adjust.method = "holm"</code>) to adjust p-values for multiple
+comparisons.</p>
+</blockquote>
 </div>
 </div>
 <div class="section level2">
@@ -670,44 +733,73 @@ and proportions, with various customization options.</p>
 </h3>
 <p>Create a basic bar plot showing cluster distribution within
 samples:</p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span>origin <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, cluster <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-36-1.png" width="672"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-39-1.png" width="672"></p>
 </div>
 <div class="section level3">
 <h3 id="absolute-cell-counts">Absolute Cell Counts<a class="anchor" aria-label="anchor" href="#absolute-cell-counts"></a>
 </h3>
 <p>To show absolute cell counts instead of proportions:</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span>origin <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, cluster <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, percent <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-37-1.png" width="672"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-40-1.png" width="672"></p>
 </div>
 <div class="section level3">
 <h3 id="normalized-proportions-with-reversed-axes">Normalized Proportions with Reversed Axes<a class="anchor" aria-label="anchor" href="#normalized-proportions-with-reversed-axes"></a>
 </h3>
 <p>For normalized data with reversed axes:</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span>origin <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, cluster <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, rev <span class="op">=</span> <span class="cn">TRUE</span>, normalize <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-38-1.png" width="624"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-41-1.png" width="624"></p>
 </div>
 <div class="section level3">
 <h3 id="vertical-orientation">Vertical Orientation<a class="anchor" aria-label="anchor" href="#vertical-orientation"></a>
 </h3>
 <p>Create a vertical bar plot:</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span>origin <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, cluster <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, flip <span class="op">=</span> <span class="cn">FALSE</span>, reverse_order <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-39-1.png" width="345.6"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-42-1.png" width="345.6"></p>
 </div>
 <div class="section level3">
 <h3 id="non-stacked-display">Non-Stacked Display<a class="anchor" aria-label="anchor" href="#non-stacked-display"></a>
 </h3>
 <p>Show bars side by side instead of stacked:</p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span>origin <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, </span>
 <span>                cluster <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, </span>
 <span>                flip <span class="op">=</span> <span class="cn">FALSE</span>, </span>
 <span>                stack <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-40-1.png" width="672"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-43-1.png" width="672"></p>
+</div>
+<div class="section level3">
+<h3 id="comparing-cluster-distribution-between-conditions-new-in-v1-2-0">Comparing Cluster Distribution Between Conditions (New in
+v1.2.0)<a class="anchor" aria-label="anchor" href="#comparing-cluster-distribution-between-conditions-new-in-v1-2-0"></a>
+</h3>
+<p>For comparing cluster distribution patterns between experimental
+conditions, <code>SeuratExtend</code> offers the
+<code>ClusterDistrPlot</code> function. This function extends
+<code>ClusterDistrBar</code> functionality by adding the ability to
+group samples by a condition variable, creating boxplots grouped by
+condition instead of stacked bars.</p>
+<p>The function supports all parameters from
+<code>ClusterDistrBar</code> when using the standard bar plot mode, and
+inherits styling options from <code>VlnPlot2</code> when using the
+boxplot mode with conditions. This makes it highly versatile for
+different visualization needs.</p>
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Compare cluster distribution between conditions</span></span>
+<span><span class="fu"><a href="../reference/ClusterDistrPlot.html">ClusterDistrPlot</a></span><span class="op">(</span></span>
+<span>  origin <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">sample_id</span>,</span>
+<span>  cluster <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>,</span>
+<span>  condition <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">condition</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## No statistical significance.</span></span></code></pre>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-44-1.png" width="672"></p>
+<p>When the <code>condition</code> parameter is not provided,
+<code>ClusterDistrPlot</code> behaves exactly like
+<code>ClusterDistrBar</code>, providing seamless backward
+compatibility.</p>
 </div>
 </div>
 <div class="section level2">
@@ -727,20 +819,20 @@ scheme has been updated to use more vibrant RColorBrewer palettes.</p>
 </h3>
 <p>First, let’s create a matrix using the <code><a href="../reference/GeneSetAnalysis.html">GeneSetAnalysis()</a></code>
 function:</p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pbmc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GeneSetAnalysis.html">GeneSetAnalysis</a></span><span class="op">(</span><span class="va">pbmc</span>, genesets <span class="op">=</span> <span class="va">hall50</span><span class="op">$</span><span class="va">human</span><span class="op">)</span></span>
 <span><span class="va">matr</span> <span class="op">&lt;-</span> <span class="va">pbmc</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">AUCell</span><span class="op">$</span><span class="va">genesets</span></span></code></pre></div>
 <p>Generate a basic waterfall plot comparing two cell types:</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/WaterfallPlot.html">WaterfallPlot</a></span><span class="op">(</span><span class="va">matr</span>, f <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, ident.1 <span class="op">=</span> <span class="st">"Mono CD14"</span>, ident.2 <span class="op">=</span> <span class="st">"CD8 T cell"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-42-1.png" width="672"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-46-1.png" width="672"></p>
 </div>
 <div class="section level3">
 <h3 id="waterfallplot-style-segment-new-in-v1-1-0">WaterfallPlot Style: “segment” (New in v1.1.0)<a class="anchor" aria-label="anchor" href="#waterfallplot-style-segment-new-in-v1-1-0"></a>
 </h3>
 <p>Added a new visualization style “segment” to WaterfallPlot, providing
 an alternative way to display differences between conditions:</p>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a plot using the new segment style</span></span>
 <span><span class="fu"><a href="../reference/WaterfallPlot.html">WaterfallPlot</a></span><span class="op">(</span></span>
 <span>  <span class="va">matr</span>,</span>
@@ -750,27 +842,27 @@ an alternative way to display differences between conditions:</p>
 <span>  style <span class="op">=</span> <span class="st">"segment"</span>,</span>
 <span>  color_theme <span class="op">=</span> <span class="st">"D"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-43-1.png" width="672"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-47-1.png" width="672"></p>
 </div>
 <div class="section level3">
 <h3 id="filtering-by-significance">Filtering by Significance<a class="anchor" aria-label="anchor" href="#filtering-by-significance"></a>
 </h3>
 <p>Focus on significant differences by setting a threshold:</p>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/WaterfallPlot.html">WaterfallPlot</a></span><span class="op">(</span></span>
 <span>  <span class="va">matr</span>, </span>
 <span>  f <span class="op">=</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, </span>
 <span>  ident.1 <span class="op">=</span> <span class="st">"Mono CD14"</span>, </span>
 <span>  ident.2 <span class="op">=</span> <span class="st">"CD8 T cell"</span>, </span>
 <span>  len.threshold <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-44-1.png" width="672"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-48-1.png" width="672"></p>
 </div>
 <div class="section level3">
 <h3 id="gene-expression-comparison">Gene Expression Comparison<a class="anchor" aria-label="anchor" href="#gene-expression-comparison"></a>
 </h3>
 <p>Compare expression levels directly from a Seurat object:</p>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">80</span><span class="op">]</span></span>
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">80</span><span class="op">]</span></span>
 <span><span class="fu"><a href="../reference/WaterfallPlot.html">WaterfallPlot</a></span><span class="op">(</span></span>
 <span>  <span class="va">pbmc</span>, </span>
 <span>  group.by <span class="op">=</span> <span class="st">"cluster"</span>, </span>
@@ -778,13 +870,14 @@ an alternative way to display differences between conditions:</p>
 <span>  ident.1 <span class="op">=</span> <span class="st">"Mono CD14"</span>, </span>
 <span>  ident.2 <span class="op">=</span> <span class="st">"CD8 T cell"</span>, </span>
 <span>  length <span class="op">=</span> <span class="st">"logFC"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-45-1.png" width="960"></p>
+<pre><code><span><span class="co">## Using pseudocount = 1 for logFC calculation.</span></span></code></pre>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-49-1.png" width="960"></p>
 </div>
 <div class="section level3">
 <h3 id="focusing-on-top-features">Focusing on Top Features<a class="anchor" aria-label="anchor" href="#focusing-on-top-features"></a>
 </h3>
 <p>Display only the most differentially expressed genes:</p>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/WaterfallPlot.html">WaterfallPlot</a></span><span class="op">(</span></span>
 <span>  <span class="va">pbmc</span>, </span>
 <span>  group.by <span class="op">=</span> <span class="st">"cluster"</span>, </span>
@@ -793,7 +886,71 @@ an alternative way to display differences between conditions:</p>
 <span>  ident.2 <span class="op">=</span> <span class="st">"CD8 T cell"</span>, </span>
 <span>  length <span class="op">=</span> <span class="st">"logFC"</span>,</span>
 <span>  top.n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-46-1.png" width="672"></p>
+<pre><code><span><span class="co">## Using pseudocount = 1 for logFC calculation.</span></span></code></pre>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-50-1.png" width="672"></p>
+</div>
+<div class="section level3">
+<h3 id="using-log2-or-log10-fold-change-new-in-v1-2-0">Using Log2 or Log10 Fold Change (New in v1.2.0)<a class="anchor" aria-label="anchor" href="#using-log2-or-log10-fold-change-new-in-v1-2-0"></a>
+</h3>
+<p>By default, WaterfallPlot uses natural logarithm (base e) for fold
+change calculations. You can specify a different base using the
+<code>log.base</code> parameter:</p>
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Using log base 2 for fold change calculations</span></span>
+<span><span class="fu"><a href="../reference/WaterfallPlot.html">WaterfallPlot</a></span><span class="op">(</span></span>
+<span>  <span class="va">pbmc</span>, </span>
+<span>  group.by <span class="op">=</span> <span class="st">"cluster"</span>, </span>
+<span>  features <span class="op">=</span> <span class="va">genes</span>,</span>
+<span>  ident.1 <span class="op">=</span> <span class="st">"Mono CD14"</span>, </span>
+<span>  ident.2 <span class="op">=</span> <span class="st">"CD8 T cell"</span>, </span>
+<span>  length <span class="op">=</span> <span class="st">"logFC"</span>,</span>
+<span>  log.base <span class="op">=</span> <span class="st">"2"</span>,    <span class="co"># Use log2 instead of natural log</span></span>
+<span>  top.n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Using pseudocount = 1 for logFC calculation.</span></span></code></pre>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-51-1.png" width="672"></p>
+</div>
+<div class="section level3">
+<h3 id="notes-on-logfc-calculation">Notes on LogFC Calculation<a class="anchor" aria-label="anchor" href="#notes-on-logfc-calculation"></a>
+</h3>
+<p>When calculating log fold changes, WaterfallPlot and VolcanoPlot (see
+the next section):</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Adds a pseudocount</strong> to prevent issues with zero
+values:
+<ul>
+<li>For most data: Uses pseudocount=1 by default</li>
+<li>For data with values between 0-1 (like AUCell scores): Automatically
+uses pseudocount=0.01</li>
+<li>You can customize this value with the <code>pseudocount</code>
+parameter</li>
+</ul>
+</li>
+<li>
+<strong>Uses natural logarithm (base e) by default</strong>, but
+supports other bases:
+<ul>
+<li>
+<code>log.base = "e"</code>: Natural logarithm (default)</li>
+<li>
+<code>log.base = "2"</code>: Log base 2</li>
+<li>
+<code>log.base = "10"</code>: Log base 10</li>
+<li>Any numeric value for custom bases</li>
+</ul>
+</li>
+<li>
+<strong>For Seurat objects</strong>, applies <code>expm1</code>
+transformation to normalized data by default:
+<ul>
+<li>This ensures consistency with Seurat’s FindMarkers function</li>
+<li>Can be disabled with <code>exp.transform = FALSE</code>
+</li>
+</ul>
+</li>
+</ol>
+<p>The formula used is:
+<code>log((mean(x[group1] + pseudocount) / mean(x[group2] + pseudocount)), base)</code></p>
 </div>
 </div>
 <div class="section level2">
@@ -813,17 +970,17 @@ changes.</p>
 <h3 id="basic-usage-6">Basic Usage<a class="anchor" aria-label="anchor" href="#basic-usage-6"></a>
 </h3>
 <p>Create a basic volcano plot comparing two cell types:</p>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/VolcanoPlot.html">VolcanoPlot</a></span><span class="op">(</span><span class="va">pbmc</span>, </span>
 <span>            ident.1 <span class="op">=</span> <span class="st">"B cell"</span>,</span>
 <span>            ident.2 <span class="op">=</span> <span class="st">"CD8 T cell"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-47-1.png" width="480"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-52-1.png" width="480"></p>
 </div>
 <div class="section level3">
 <h3 id="customizing-thresholds">Customizing Thresholds<a class="anchor" aria-label="anchor" href="#customizing-thresholds"></a>
 </h3>
 <p>You can set custom thresholds for both axes:</p>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/VolcanoPlot.html">VolcanoPlot</a></span><span class="op">(</span></span>
 <span>  <span class="va">pbmc</span>,</span>
 <span>  ident.1 <span class="op">=</span> <span class="st">"B cell"</span>,</span>
@@ -831,13 +988,13 @@ changes.</p>
 <span>  x.threshold <span class="op">=</span> <span class="fl">0.5</span>,    <span class="co"># Log fold change threshold</span></span>
 <span>  y.threshold <span class="op">=</span> <span class="fl">2</span>     <span class="co"># -log10(p-value) threshold</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-48-1.png" width="480"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-53-1.png" width="480"></p>
 </div>
 <div class="section level3">
 <h3 id="fine-tuning-plot-parameters">Fine-tuning Plot Parameters<a class="anchor" aria-label="anchor" href="#fine-tuning-plot-parameters"></a>
 </h3>
 <p>Adjust quantile thresholds and number of labeled genes:</p>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/VolcanoPlot.html">VolcanoPlot</a></span><span class="op">(</span></span>
 <span>  <span class="va">pbmc</span>,</span>
 <span>  ident.1 <span class="op">=</span> <span class="st">"B cell"</span>,</span>
@@ -847,7 +1004,7 @@ changes.</p>
 <span>  top.n <span class="op">=</span> <span class="fl">5</span>,            <span class="co"># Label fewer genes</span></span>
 <span>  color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"grey20"</span>, <span class="st">"grey70"</span>, <span class="st">"darkred"</span><span class="op">)</span>  <span class="co"># Custom colors</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-49-1.png" width="480"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-54-1.png" width="480"></p>
 </div>
 <div class="section level3">
 <h3 id="using-alternative-statistics">Using Alternative Statistics<a class="anchor" aria-label="anchor" href="#using-alternative-statistics"></a>
@@ -859,20 +1016,35 @@ causing many genes to cluster at the top of the y-axis when using
 -log10(p-value). This can make it difficult to distinguish between genes
 that are all technically highly significant. T-scores provide better
 spread and can help create more informative visualizations.</p>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/VolcanoPlot.html">VolcanoPlot</a></span><span class="op">(</span></span>
 <span>  <span class="va">pbmc</span>,</span>
 <span>  ident.1 <span class="op">=</span> <span class="st">"B cell"</span>,</span>
 <span>  ident.2 <span class="op">=</span> <span class="st">"CD8 T cell"</span>,</span>
 <span>  y <span class="op">=</span> <span class="st">"tscore"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-50-1.png" width="480"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-55-1.png" width="480"></p>
+</div>
+<div class="section level3">
+<h3 id="using-log2-or-log10-fold-change-new-in-v1-2-0-1">Using Log2 or Log10 Fold Change (New in v1.2.0)<a class="anchor" aria-label="anchor" href="#using-log2-or-log10-fold-change-new-in-v1-2-0-1"></a>
+</h3>
+<p>By default, VolcanoPlot uses natural logarithm (base e) for fold
+change calculations. You can specify a different base using the
+<code>log.base</code> parameter:</p>
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/VolcanoPlot.html">VolcanoPlot</a></span><span class="op">(</span></span>
+<span>  <span class="va">pbmc</span>,</span>
+<span>  ident.1 <span class="op">=</span> <span class="st">"B cell"</span>,</span>
+<span>  ident.2 <span class="op">=</span> <span class="st">"CD8 T cell"</span>,</span>
+<span>  log.base <span class="op">=</span> <span class="st">"2"</span>    <span class="co"># Use log2 instead of natural log</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-56-1.png" width="480"></p>
 </div>
 <div class="section level3">
 <h3 id="matrix-input">Matrix Input<a class="anchor" aria-label="anchor" href="#matrix-input"></a>
 </h3>
 <p>You can also use matrices, such as pathway enrichment scores:</p>
-<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Using the previously calculated pathway enrichment scores</span></span>
 <span><span class="fu"><a href="../reference/VolcanoPlot.html">VolcanoPlot</a></span><span class="op">(</span></span>
 <span>  <span class="va">matr</span>,</span>
@@ -882,11 +1054,12 @@ spread and can help create more informative visualizations.</p>
 <span>  x.quantile <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span>  y.quantile <span class="op">=</span> <span class="fl">0.8</span>,</span>
 <span>  top.n <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-51-1.png" width="576"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-57-1.png" width="576"></p>
 </div>
-<div class="section level3">
-<h3 id="tips-choosing-the-right-visualization">Tips: Choosing the Right Visualization<a class="anchor" aria-label="anchor" href="#tips-choosing-the-right-visualization"></a>
-</h3>
+</div>
+<div class="section level2">
+<h2 id="tips-choosing-the-right-visualization">Tips: Choosing the Right Visualization<a class="anchor" aria-label="anchor" href="#tips-choosing-the-right-visualization"></a>
+</h2>
 <p>When visualizing gene expression or pathway activity data, different
 plot types serve different purposes. Here’s a guide to help you
 choose:</p>
@@ -951,7 +1124,6 @@ can be shown</li>
 </li>
 </ol>
 </div>
-</div>
 <div class="section level2">
 <h2 id="explore-color-functions">Explore Color Functions<a class="anchor" aria-label="anchor" href="#explore-color-functions"></a>
 </h2>
@@ -967,9 +1139,9 @@ with discrete or continuous variables.</p>
 <strong>DimPlot2</strong>, <strong>VlnPlot2</strong>,
 <strong>ClusterDistrBar</strong> (using <code>cols</code> parameter)
 <ul>
-<li>Seven <a href="#professional-discrete-color-presets-with-color_pro">color_pro
+<li>Eight <a href="#professional-discrete-color-presets-with-color_pro">color_pro
 styles</a>: “default”, “light”, “pro_red”, “pro_yellow”, “pro_green”,
-“pro_blue”, “pro_purple”</li>
+“pro_blue”, “pro_purple”, “bright” (new in v1.2.0)</li>
 <li>Five <a href="#iwanthue-color-series-color_iwh">color_iwh
 styles</a>: “iwh_default”, “iwh_intense”, “iwh_pastel”, “iwh_all”,
 “iwh_all_hard”</li>
@@ -980,6 +1152,17 @@ palettes (e.g., “Set1”, “Set2”, “Set3”, “Paired”, “Dark2”, �
 </ul>
 </li>
 </ul>
+<blockquote>
+<p><strong>Note</strong>: Based on user feedback, starting from v1.2.0,
+the default discrete color scheme has been changed to “light” to avoid
+color inconsistency in DimPlot2 when toggling between labeled and
+unlabeled displays. If you prefer to retain the original “default”
+(darker) color scheme for discrete variables in <code>DimPlot2</code>,
+you can use:
+<code>seu &lt;- save_colors(seu, col_list = list("discrete" = "default"))</code>.
+This will set the default for all discrete variables to the darker color
+scheme.</p>
+</blockquote>
 </div>
 <div class="section level3">
 <h3 id="for-functions-handling-continuous-variables">For Functions Handling Continuous Variables<a class="anchor" aria-label="anchor" href="#for-functions-handling-continuous-variables"></a>
@@ -1044,32 +1227,49 @@ needs in single-cell analysis:</p>
 <div class="section level4">
 <h4 id="for-discrete-variables-e-g--clusters-conditions">For Discrete Variables (e.g., clusters, conditions)<a class="anchor" aria-label="anchor" href="#for-discrete-variables-e-g--clusters-conditions"></a>
 </h4>
-<p>The “light” color scheme from SeuratExtend’s <code>color_pro</code>
-is particularly effective for labeled visualizations:</p>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<p>The “default” (dark) theme and “light” color scheme from
+SeuratExtend’s <code>color_pro</code> are particularly effective for
+different visualization needs:</p>
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/" class="external-link">cowplot</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, cols <span class="op">=</span> <span class="st">"default"</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, cols <span class="op">=</span> <span class="st">"default"</span>, flip <span class="op">=</span> <span class="cn">FALSE</span>, border <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-58-1.png" width="720"></p>
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/" class="external-link">cowplot</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, cols <span class="op">=</span> <span class="st">"light"</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, cols <span class="op">=</span> <span class="st">"light"</span>, flip <span class="op">=</span> <span class="cn">FALSE</span>, border <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, cols <span class="op">=</span> <span class="st">"light"</span>, flip <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-52-1.png" width="720"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-59-1.png" width="720"></p>
+<p>For visualizations requiring more vibrant colors with high contrast
+(new in v1.2.0):</p>
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"orig.ident"</span>, <span class="st">"cluster"</span><span class="op">)</span>, cols <span class="op">=</span> <span class="st">"bright"</span>, ncol <span class="op">=</span> <span class="fl">2</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-60-1.png" width="912"></p>
 </div>
 <div class="section level4">
 <h4 id="for-continuous-variables-e-g--gene-expression">For Continuous Variables (e.g., gene expression)<a class="anchor" aria-label="anchor" href="#for-continuous-variables-e-g--gene-expression"></a>
 </h4>
 <p>the “A” or “D” color schemes from viridis:</p>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/Heatmap.html">Heatmap</a></span><span class="op">(</span><span class="va">toplot</span>, lab_fill <span class="op">=</span> <span class="st">"zscore"</span>, color_scheme <span class="op">=</span> <span class="st">"A"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-53-1.png" width="480"></p>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<p><img src="Visualization_files/figure-html/unnamed-chunk-61-1.png" width="480"></p>
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/WaterfallPlot.html">WaterfallPlot</a></span><span class="op">(</span></span>
-<span>  <span class="va">pbmc</span>, group.by <span class="op">=</span> <span class="st">"cluster"</span>, features <span class="op">=</span> <span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">80</span><span class="op">]</span>,</span>
+<span>  <span class="va">pbmc</span>, group.by <span class="op">=</span> <span class="st">"cluster"</span>, features <span class="op">=</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">80</span><span class="op">]</span>,</span>
 <span>  ident.1 <span class="op">=</span> <span class="st">"Mono CD14"</span>, ident.2 <span class="op">=</span> <span class="st">"CD8 T cell"</span>, length <span class="op">=</span> <span class="st">"logFC"</span>,</span>
 <span>  top.n <span class="op">=</span> <span class="fl">20</span>, color_theme <span class="op">=</span> <span class="st">"D"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-54-1.png" width="672"></p>
+<pre><code><span><span class="co">## Using pseudocount = 1 for logFC calculation.</span></span></code></pre>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-62-1.png" width="672"></p>
 <p>You can also use various color palettes from RColorBrewer (<a href="https://r-graph-gallery.com/38-rcolorbrewers-palettes.html" class="external-link uri">https://r-graph-gallery.com/38-rcolorbrewers-palettes.html</a>):</p>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">RColorBrewer</span><span class="op">)</span></span>
 <span><span class="va">markers_genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>  <span class="st">"MS4A1"</span>, <span class="st">"GNLY"</span>, <span class="st">"CD3E"</span>,</span>
@@ -1080,14 +1280,14 @@ is particularly effective for labeled visualizations:</p>
 <span>  features <span class="op">=</span> <span class="va">markers_genes</span>,</span>
 <span>  cols <span class="op">=</span> <span class="st">"OrRd"</span>,</span>
 <span>  theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-55-1.png" width="768"></p>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<p><img src="Visualization_files/figure-html/unnamed-chunk-63-1.png" width="768"></p>
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span></span>
 <span>  <span class="va">pbmc</span>,</span>
 <span>  features <span class="op">=</span> <span class="va">markers_genes</span>,</span>
 <span>  cols <span class="op">=</span> <span class="st">"Spectral-rev"</span>,</span>
 <span>  theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-56-1.png" width="768"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-64-1.png" width="768"></p>
 </div>
 </div>
 <div class="section level3">
@@ -1116,9 +1316,9 @@ data points to blend together.</p>
 <p>Example of an inadvisable choice:</p>
 </li>
 </ol>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span>   <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, cols <span class="op">=</span> <span class="st">"Greens"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-57-1.png" width="624"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-65-1.png" width="624"></p>
 <ol start="2" style="list-style-type: decimal">
 <li>
 <p><strong>Sufficiently Distinct but Overly Saturated
@@ -1127,21 +1327,26 @@ distracting, detracting from the scientific message.</p>
 <p>Example of overly saturated colors:</p>
 </li>
 </ol>
-<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span>   <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#ccffaa"</span>,<span class="st">"#c00bff"</span>,<span class="st">"#cfdb00"</span>,<span class="st">"#0147ee"</span>,<span class="st">"#f67900"</span>,<span class="st">"#1b002c"</span>,<span class="st">"#00e748"</span>,<span class="st">"#e30146"</span>,<span class="st">"#ffb1e8"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-58-1.png" width="624"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-66-1.png" width="624"></p>
 <ol start="3" style="list-style-type: decimal">
 <li>
 <p><strong>Good Distinction and Coordination but Too
 Lively:</strong> While certain vibrant schemes might be engaging in an
 advertising context, they may be considered too informal for
-professional journal standards.</p>
-<p>Example of colors that might be too lively:</p>
+professional journal standards. However, we recognize that sometimes
+higher contrast and more vibrant colors are needed for certain analyses
+or presentations. For these situations, we provide the “bright” color
+scheme (new in v1.2.0) while still recommending more subdued options for
+formal publications.</p>
+<p>Example of colors that might be too lively for formal publication but
+useful in other contexts:</p>
 </li>
 </ol>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span>   <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"#ff2026"</span>,<span class="st">"#cf5d00"</span>,<span class="st">"#ffd03f"</span>,<span class="st">"#649f00"</span>,<span class="st">"#a3f83d"</span>,<span class="st">"#82cc58"</span>,<span class="st">"#6645fe"</span>,<span class="st">"#d8009c"</span>,<span class="st">"#ff43a2"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-59-1.png" width="624"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-67-1.png" width="624"></p>
 <p>While the RColorBrewer package offers some good solutions, its
 options are limited and support a maximum of only 12 colors. This can be
 inadequate for visualizing data with a larger number of clusters. The
@@ -1151,9 +1356,10 @@ distinction when many colors are used. This is because the default
 palette differentiates colors only based on hue, without utilizing
 luminance and saturation, which limits its effectiveness. To address
 these limitations, <code>SeuratExtend</code> provides
-<code>color_pro</code>, which includes seven color schemes: “default”,
-“light”, “red”, “yellow”, “green”, “blue”, and “purple”. These presets
-are generated using the algorithm from I Want Hue (<a href="http://medialab.github.io/iwanthue/" class="external-link uri">http://medialab.github.io/iwanthue/</a>) with adjusted
+<code>color_pro</code>, which includes eight color schemes: “default”,
+“light”, “red”, “yellow”, “green”, “blue”, “purple”, and “bright” (new
+in v1.2.0). These presets are generated using the algorithm from I Want
+Hue (<a href="http://medialab.github.io/iwanthue/" class="external-link uri">http://medialab.github.io/iwanthue/</a>) with adjusted
 parameters, which is optimized for creating color palettes that are
 visually pleasing and distinctly separable.</p>
 </div>
@@ -1165,16 +1371,27 @@ visually pleasing and distinctly separable.</p>
 reduced brightness and saturation, supporting 2 to 50 colors with five
 different presets per color. This scheme is ideal for general use where
 distinctiveness and subtlety are equally important.</p>
+<blockquote>
+<p><strong>Note</strong>: In SeuratExtend v1.0.0, the “default” color
+scheme was the actual default setting (hence the name), representing a
+darker theme suitable for general visualizations. Based on user
+feedback, starting from v1.2.0, the “light” color scheme became the true
+default setting as users preferred it for better visibility, especially
+with labeled plots. However, we maintained the original naming
+convention—so “default” still refers to the darker theme. If you prefer
+the darker theme, you can manually specify <code>cols = "default"</code>
+in your function calls.</p>
+</blockquote>
 <p>Example using the “default” color scheme:</p>
-<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://wilkelab.org/cowplot/" class="external-link">cowplot</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SeuratExtend</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, flip <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span>, cols <span class="op">=</span> <span class="st">"default"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, flip <span class="op">=</span> <span class="cn">FALSE</span>, cols <span class="op">=</span> <span class="st">"default"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-60-1.png" width="720"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-68-1.png" width="720"></p>
 </div>
 <div class="section level4">
 <h4 id="light-color-scheme">Light Color Scheme<a class="anchor" aria-label="anchor" href="#light-color-scheme"></a>
@@ -1184,13 +1401,13 @@ increased brightness and reduced saturation, making it suitable when
 using labels with darker texts which may require a lighter background
 for visibility.</p>
 <p>Example using the “light” color scheme:</p>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, label <span class="op">=</span> <span class="cn">TRUE</span>, repel <span class="op">=</span> <span class="cn">TRUE</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, cols <span class="op">=</span> <span class="st">"light"</span>, flip <span class="op">=</span> <span class="cn">FALSE</span>, border <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-61-1.png" width="720"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-69-1.png" width="720"></p>
 </div>
 <div class="section level4">
 <h4 id="specialized-color-schemes">Specialized Color Schemes<a class="anchor" aria-label="anchor" href="#specialized-color-schemes"></a>
@@ -1205,61 +1422,61 @@ and harmonious without being overwhelming.</p>
 <h5 id="red-color-scheme">Red Color Scheme<a class="anchor" aria-label="anchor" href="#red-color-scheme"></a>
 </h5>
 <p>Example using the “red” color scheme:</p>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, cols <span class="op">=</span> <span class="st">"pro_red"</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, cols <span class="op">=</span> <span class="st">"pro_red"</span>, flip <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-62-1.png" width="720"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-70-1.png" width="720"></p>
 </div>
 <div class="section level5">
 <h5 id="yellow-color-scheme">Yellow Color Scheme<a class="anchor" aria-label="anchor" href="#yellow-color-scheme"></a>
 </h5>
 <p>Example using the “yellow” color scheme:</p>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, cols <span class="op">=</span> <span class="st">"pro_yellow"</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, cols <span class="op">=</span> <span class="st">"pro_yellow"</span>, flip <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-63-1.png" width="720"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-71-1.png" width="720"></p>
 </div>
 <div class="section level5">
 <h5 id="green-color-scheme">Green Color Scheme<a class="anchor" aria-label="anchor" href="#green-color-scheme"></a>
 </h5>
 <p>Example using the “green” color scheme:</p>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, cols <span class="op">=</span> <span class="st">"pro_green"</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, cols <span class="op">=</span> <span class="st">"pro_green"</span>, flip <span class="op">=</span> <span class="cn">FALSE</span>, border <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-64-1.png" width="720"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-72-1.png" width="720"></p>
 </div>
 <div class="section level5">
 <h5 id="blue-color-scheme">Blue Color Scheme<a class="anchor" aria-label="anchor" href="#blue-color-scheme"></a>
 </h5>
 <p>Example using the “blue” color scheme:</p>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, cols <span class="op">=</span> <span class="st">"pro_blue"</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, cols <span class="op">=</span> <span class="st">"pro_blue"</span>, flip <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-65-1.png" width="720"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-73-1.png" width="720"></p>
 </div>
 <div class="section level5">
 <h5 id="purple-color-scheme">Purple Color Scheme<a class="anchor" aria-label="anchor" href="#purple-color-scheme"></a>
 </h5>
 <p>Example using the “purple” color scheme:</p>
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, cols <span class="op">=</span> <span class="st">"pro_purple"</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, cols <span class="op">=</span> <span class="st">"pro_purple"</span>, flip <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-66-1.png" width="720"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-74-1.png" width="720"></p>
 </div>
 </div>
 <div class="section level4">
@@ -1267,31 +1484,32 @@ and harmonious without being overwhelming.</p>
 </h4>
 <p>The <code>color_pro</code> function can generate between 2 to 50
 colors:</p>
-<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb81"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>   <span class="co"># Example output: "#a05d49" "#6181a7"</span></span>
 <span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">5</span><span class="op">)</span>       <span class="co"># Example output: "#996742" "#5e824b" "#5d7880" "#7169a7" "#9f516c"</span></span>
 <span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>      <span class="co"># Generates 10 colors</span></span>
 <span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">20</span><span class="op">)</span>      <span class="co"># Generates 20 colors</span></span>
 <span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">50</span><span class="op">)</span>      <span class="co"># Generates 50 colors</span></span></code></pre></div>
 <p>Visual demonstration of different color sets:</p>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-68-1.png" width="720"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-76-1.png" width="720"></p>
 </div>
 <div class="section level4">
 <h4 id="available-color-schemes">Available Color Schemes<a class="anchor" aria-label="anchor" href="#available-color-schemes"></a>
 </h4>
-<p><code>color_pro</code> offers seven different styles: “default”,
-“light”, “red”, “yellow”, “green”, “blue”, “purple”. Example generating
-10 colors from each style:</p>
-<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<p><code>color_pro</code> offers eight different styles: “default”,
+“light”, “red”, “yellow”, “green”, “blue”, “purple”, and “bright”.
+Example generating 10 colors from each style:</p>
+<div class="sourceCode" id="cb82"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">10</span>, col.space <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>  <span class="co"># default</span></span>
 <span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span>              <span class="co"># light</span></span>
 <span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">3</span><span class="op">)</span>              <span class="co"># red</span></span>
 <span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">4</span><span class="op">)</span>              <span class="co"># yellow</span></span>
 <span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">5</span><span class="op">)</span>              <span class="co"># green</span></span>
 <span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">6</span><span class="op">)</span>              <span class="co"># blue</span></span>
-<span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">7</span><span class="op">)</span>              <span class="co"># purple</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">7</span><span class="op">)</span>              <span class="co"># purple</span></span>
+<span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">8</span><span class="op">)</span>              <span class="co"># bright</span></span></code></pre></div>
 <p>Visual comparison:</p>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-70-1.png" width="720"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-78-1.png" width="720"></p>
 </div>
 <div class="section level4">
 <h4 id="sorting-options">Sorting Options<a class="anchor" aria-label="anchor" href="#sorting-options"></a>
@@ -1300,11 +1518,11 @@ colors:</p>
 “difference” for enhanced distinction among colors. This feature can be
 specified by name or by numbers 1 or 2.</p>
 <p>Example of sorting colors by hue and by difference:</p>
-<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb83"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1</span>, sort <span class="op">=</span> <span class="st">"hue"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1</span>, sort <span class="op">=</span> <span class="st">"diff"</span><span class="op">)</span></span></code></pre></div>
 <p>Visualizing the effect of different sorting methods:</p>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-72-1.png" width="720"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-80-1.png" width="720"></p>
 </div>
 <div class="section level4">
 <h4 id="random-sequence-options">Random Sequence Options<a class="anchor" aria-label="anchor" href="#random-sequence-options"></a>
@@ -1314,14 +1532,14 @@ sequences available, providing variations even within the same
 parameters.</p>
 <p>Example of generating different sets from the default color
 scheme:</p>
-<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb84"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1</span>, <span class="fl">1</span>, set <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/color_pro.html">color_pro</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 <p>Visualizing different random sequences:</p>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-74-1.png" width="720"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-82-1.png" width="720"></p>
 </div>
 </div>
 <div class="section level3">
@@ -1367,7 +1585,7 @@ specify the number of colors and the style index. Here are examples of
 generating 10 colors from each predefined style:</p>
 <p>Example of generating colors from each <code>color_iwh</code>
 style:</p>
-<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb85"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/color_iwh.html">color_iwh</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">1</span><span class="op">)</span>  <span class="co"># default</span></span>
 <span><span class="fu"><a href="../reference/color_iwh.html">color_iwh</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">2</span><span class="op">)</span>  <span class="co"># intense</span></span>
 <span><span class="fu"><a href="../reference/color_iwh.html">color_iwh</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">3</span><span class="op">)</span>  <span class="co"># pastel</span></span>
@@ -1379,7 +1597,7 @@ style:</p>
 <pre><code><span><span class="co">## The following object is masked from 'package:SeuratExtend':</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">##     show_col2</span></span></code></pre>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-76-1.png" width="720"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-84-1.png" width="720"></p>
 </div>
 </div>
 <div class="section level3">
@@ -1390,7 +1608,7 @@ style:</p>
 </h4>
 <p>The viridis package provides colorblind-friendly, perceptually
 uniform color scales. Here are all available options:</p>
-<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb88"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://sjmgarnier.github.io/viridis/" class="external-link">viridis</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4</span>,<span class="fl">2</span><span class="op">)</span>, mar<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">1</span>,<span class="fl">2</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="kw">for</span><span class="op">(</span><span class="va">option</span> <span class="kw">in</span> <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">8</span><span class="op">]</span><span class="op">)</span> <span class="op">{</span></span>
@@ -1398,17 +1616,17 @@ uniform color scales. Here are all available options:</p>
 <span>        main<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Viridis option '"</span>, <span class="fu"><a href="https://rdrr.io/r/base/chartr.html" class="external-link">toupper</a></span><span class="op">(</span><span class="va">option</span><span class="op">)</span>, <span class="st">"'"</span><span class="op">)</span>, </span>
 <span>        xlab<span class="op">=</span><span class="st">""</span>, ylab<span class="op">=</span><span class="st">""</span>, axes<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-77-1.png" width="768"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-85-1.png" width="768"></p>
 </div>
 <div class="section level4">
 <h4 id="rcolorbrewer-palettes">RColorBrewer Palettes<a class="anchor" aria-label="anchor" href="#rcolorbrewer-palettes"></a>
 </h4>
 <p>RColorBrewer provides carefully chosen color palettes for different
 types of data:</p>
-<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb89"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">RColorBrewer</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/RColorBrewer/man/ColorBrewer.html" class="external-link">display.brewer.all</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-78-1.png" width="672"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-86-1.png" width="672"></p>
 </div>
 </div>
 <div class="section level3">
@@ -1419,11 +1637,11 @@ types of data:</p>
 </h4>
 <p>The <code><a href="../reference/ryb2rgb.html">ryb2rgb()</a></code> function translates RYB color values to
 RGB hex codes:</p>
-<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb90"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/ryb2rgb.html">ryb2rgb</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>r <span class="op">=</span> <span class="fl">0.3</span>, y <span class="op">=</span> <span class="fl">0.5</span>, b <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "#CCAF80"</span></span></code></pre>
 <p>Visualizing primary and secondary colors:</p>
-<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb92"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://scales.r-lib.org" class="external-link">scales</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
@@ -1440,14 +1658,14 @@ RGB hex codes:</p>
 <span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="fl">2</span>, <span class="va">ryb2rgb</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://scales.r-lib.org/reference/show_col.html" class="external-link">show_col</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-80-1.png" width="480"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-88-1.png" width="480"></p>
 </div>
 <div class="section level4">
 <h4 id="using-save_colors-to-manage-color-settings">Using <code>save_colors</code> to Manage Color Settings<a class="anchor" aria-label="anchor" href="#using-save_colors-to-manage-color-settings"></a>
 </h4>
 <p>The <code>save_colors</code> function stores color settings within
 your Seurat object:</p>
-<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb93"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Save color settings</span></span>
 <span><span class="va">pbmc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/save_colors.html">save_colors</a></span><span class="op">(</span><span class="va">pbmc</span>, col_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="st">"cluster"</span> <span class="op">=</span> <span class="st">"pro_blue"</span>,</span>
@@ -1457,16 +1675,20 @@ your Seurat object:</p>
 <span></span>
 <span><span class="co"># Now, when using DimPlot2, the specified colors for 'cluster', 'CD14', and 'CD3D' are automatically applied</span></span>
 <span><span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cluster"</span>, <span class="st">"orig.ident"</span>, <span class="st">"CD14"</span>, <span class="st">"CD3D"</span><span class="op">)</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Visualization_files/figure-html/unnamed-chunk-81-1.png" width="864"></p>
+<p><img src="Visualization_files/figure-html/unnamed-chunk-89-1.png" width="864"></p>
 </div>
 </div>
 <div class="section level3">
 <h3 id="additional-resources">Additional Resources<a class="anchor" aria-label="anchor" href="#additional-resources"></a>
 </h3>
-<p>For more information about color palettes: - RColorBrewer palettes:
-<a href="https://r-graph-gallery.com/38-rcolorbrewers-palettes.html" class="external-link uri">https://r-graph-gallery.com/38-rcolorbrewers-palettes.html</a>
-- Viridis palettes: <a href="https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html" class="external-link uri">https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html</a></p>
-<div class="sourceCode" id="cb81"><pre class="downlit sourceCode r">
+<p>For more information about color palettes:</p>
+<ul>
+<li>RColorBrewer palettes: <a href="https://r-graph-gallery.com/38-rcolorbrewers-palettes.html" class="external-link uri">https://r-graph-gallery.com/38-rcolorbrewers-palettes.html</a>
+</li>
+<li>Viridis palettes: <a href="https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html" class="external-link uri">https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html</a>
+</li>
+</ul>
+<div class="sourceCode" id="cb94"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## R version 4.4.0 (2024-04-24)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
@@ -1492,7 +1714,7 @@ your Seurat object:</p>
 <span><span class="co">## [8] methods   base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">##  [1] hyc_0.1.5                 tidyr_1.3.1              </span></span>
+<span><span class="co">##  [1] hyc_0.1.6                 tidyr_1.3.1              </span></span>
 <span><span class="co">##  [3] DelayedMatrixStats_1.26.0 DelayedArray_0.30.1      </span></span>
 <span><span class="co">##  [5] SparseArray_1.4.8         S4Arrays_1.4.1           </span></span>
 <span><span class="co">##  [7] abind_1.4-5               IRanges_2.38.1           </span></span>
@@ -1508,8 +1730,8 @@ your Seurat object:</p>
 <span><span class="co">## [27] ggrepel_0.9.5             viridis_0.6.5            </span></span>
 <span><span class="co">## [29] viridisLite_0.4.2         cowplot_1.1.3            </span></span>
 <span><span class="co">## [31] RColorBrewer_1.1-3        ggplot2_3.5.1            </span></span>
-<span><span class="co">## [33] SeuratExtend_1.1.0        SeuratExtendData_0.2.1   </span></span>
-<span><span class="co">## [35] Seurat_5.1.0              SeuratObject_5.0.2       </span></span>
+<span><span class="co">## [33] SeuratExtend_1.2.0        SeuratExtendData_0.3.0   </span></span>
+<span><span class="co">## [35] Seurat_5.2.1              SeuratObject_5.0.2       </span></span>
 <span><span class="co">## [37] sp_2.1-4                 </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
@@ -1525,37 +1747,37 @@ your Seurat object:</p>
 <span><span class="co">##  [28] listenv_0.9.1            spatstat.utils_3.0-5     goftest_1.2-3           </span></span>
 <span><span class="co">##  [31] RSpectra_0.16-1          spatstat.random_3.2-3    fitdistrplus_1.2-1      </span></span>
 <span><span class="co">##  [34] parallelly_1.37.1        pkgdown_2.0.7            commonmark_1.9.1        </span></span>
-<span><span class="co">##  [37] leiden_0.4.3.1           codetools_0.2-20         xml2_1.3.6              </span></span>
-<span><span class="co">##  [40] tidyselect_1.2.1         farver_2.1.2             spatstat.explore_3.2-7  </span></span>
-<span><span class="co">##  [43] jsonlite_1.8.8           progressr_0.14.0         ggridges_0.5.6          </span></span>
-<span><span class="co">##  [46] survival_3.7-0           systemfonts_1.1.0        tools_4.4.0             </span></span>
-<span><span class="co">##  [49] ragg_1.3.2               ica_1.0-3                Rcpp_1.0.13             </span></span>
-<span><span class="co">##  [52] glue_1.7.0               gridExtra_2.3            xfun_0.45               </span></span>
-<span><span class="co">##  [55] withr_3.0.0              fastmap_1.2.0            fansi_1.0.6             </span></span>
-<span><span class="co">##  [58] digest_0.6.36            R6_2.5.1                 mime_0.12               </span></span>
-<span><span class="co">##  [61] textshaping_0.4.0        colorspace_2.1-0         scattermore_1.2         </span></span>
-<span><span class="co">##  [64] tensor_1.5               markdown_1.13            spatstat.data_3.1-2     </span></span>
-<span><span class="co">##  [67] utf8_1.2.4               generics_0.1.3           data.table_1.15.4       </span></span>
-<span><span class="co">##  [70] httr_1.4.7               htmlwidgets_1.6.4        uwot_0.2.2              </span></span>
-<span><span class="co">##  [73] pkgconfig_2.0.3          gtable_0.3.5             lmtest_0.9-40           </span></span>
-<span><span class="co">##  [76] XVector_0.44.0           htmltools_0.5.8.1        carData_3.0-5           </span></span>
-<span><span class="co">##  [79] dotCall64_1.1-1          png_0.1-8                knitr_1.48              </span></span>
-<span><span class="co">##  [82] rstudioapi_0.16.0        nlme_3.1-165             cachem_1.1.0            </span></span>
-<span><span class="co">##  [85] zoo_1.8-12               stringr_1.5.1            KernSmooth_2.23-24      </span></span>
-<span><span class="co">##  [88] parallel_4.4.0           miniUI_0.1.1.1           vipor_0.4.7             </span></span>
-<span><span class="co">##  [91] desc_1.4.3               pillar_1.9.0             vctrs_0.6.5             </span></span>
-<span><span class="co">##  [94] RANN_2.6.1               promises_1.3.0           car_3.1-2               </span></span>
-<span><span class="co">##  [97] xtable_1.8-4             cluster_2.1.6            beeswarm_0.4.0          </span></span>
-<span><span class="co">## [100] evaluate_0.24.0          cli_3.6.3                compiler_4.4.0          </span></span>
-<span><span class="co">## [103] crayon_1.5.3             future.apply_1.11.2      ggsignif_0.6.4          </span></span>
-<span><span class="co">## [106] labeling_0.4.3           plyr_1.8.9               forcats_1.0.0           </span></span>
-<span><span class="co">## [109] fs_1.6.4                 stringi_1.8.4            deldir_2.0-4            </span></span>
-<span><span class="co">## [112] munsell_0.5.1            lazyeval_0.2.2           spatstat.geom_3.2-9     </span></span>
-<span><span class="co">## [115] mosaicCore_0.9.4.0       RcppHNSW_0.6.0           hms_1.1.3               </span></span>
-<span><span class="co">## [118] patchwork_1.2.0          sparseMatrixStats_1.16.0 future_1.33.2           </span></span>
-<span><span class="co">## [121] shiny_1.8.1.1            highr_0.11               haven_2.5.4             </span></span>
-<span><span class="co">## [124] ROCR_1.0-11              gridtext_0.1.5           igraph_2.0.3            </span></span>
-<span><span class="co">## [127] broom_1.0.6              memoise_2.0.1            bslib_0.4.2</span></span></code></pre>
+<span><span class="co">##  [37] codetools_0.2-20         xml2_1.3.6               tidyselect_1.2.1        </span></span>
+<span><span class="co">##  [40] farver_2.1.2             spatstat.explore_3.2-7   jsonlite_1.8.8          </span></span>
+<span><span class="co">##  [43] progressr_0.14.0         ggridges_0.5.6           survival_3.7-0          </span></span>
+<span><span class="co">##  [46] systemfonts_1.1.0        tools_4.4.0              ragg_1.3.2              </span></span>
+<span><span class="co">##  [49] ica_1.0-3                Rcpp_1.0.13              glue_1.7.0              </span></span>
+<span><span class="co">##  [52] gridExtra_2.3            xfun_0.45                withr_3.0.0             </span></span>
+<span><span class="co">##  [55] fastmap_1.2.0            fansi_1.0.6              digest_0.6.36           </span></span>
+<span><span class="co">##  [58] R6_2.5.1                 mime_0.12                textshaping_0.4.0       </span></span>
+<span><span class="co">##  [61] colorspace_2.1-0         scattermore_1.2          tensor_1.5              </span></span>
+<span><span class="co">##  [64] markdown_1.13            spatstat.data_3.1-2      utf8_1.2.4              </span></span>
+<span><span class="co">##  [67] generics_0.1.3           data.table_1.15.4        httr_1.4.7              </span></span>
+<span><span class="co">##  [70] htmlwidgets_1.6.4        uwot_0.2.2               pkgconfig_2.0.3         </span></span>
+<span><span class="co">##  [73] gtable_0.3.5             lmtest_0.9-40            XVector_0.44.0          </span></span>
+<span><span class="co">##  [76] htmltools_0.5.8.1        carData_3.0-5            dotCall64_1.1-1         </span></span>
+<span><span class="co">##  [79] png_0.1-8                knitr_1.48               rstudioapi_0.16.0       </span></span>
+<span><span class="co">##  [82] nlme_3.1-165             cachem_1.1.0             zoo_1.8-12              </span></span>
+<span><span class="co">##  [85] stringr_1.5.1            KernSmooth_2.23-24       parallel_4.4.0          </span></span>
+<span><span class="co">##  [88] miniUI_0.1.1.1           vipor_0.4.7              desc_1.4.3              </span></span>
+<span><span class="co">##  [91] pillar_1.9.0             vctrs_0.6.5              RANN_2.6.1              </span></span>
+<span><span class="co">##  [94] promises_1.3.0           car_3.1-2                xtable_1.8-4            </span></span>
+<span><span class="co">##  [97] cluster_2.1.6            beeswarm_0.4.0           evaluate_0.24.0         </span></span>
+<span><span class="co">## [100] cli_3.6.3                compiler_4.4.0           crayon_1.5.3            </span></span>
+<span><span class="co">## [103] future.apply_1.11.2      ggsignif_0.6.4           labeling_0.4.3          </span></span>
+<span><span class="co">## [106] plyr_1.8.9               forcats_1.0.0            fs_1.6.4                </span></span>
+<span><span class="co">## [109] stringi_1.8.4            deldir_2.0-4             munsell_0.5.1           </span></span>
+<span><span class="co">## [112] lazyeval_0.2.2           spatstat.geom_3.2-9      mosaicCore_0.9.4.0      </span></span>
+<span><span class="co">## [115] RcppHNSW_0.6.0           hms_1.1.3                patchwork_1.2.0         </span></span>
+<span><span class="co">## [118] sparseMatrixStats_1.16.0 future_1.33.2            shiny_1.8.1.1           </span></span>
+<span><span class="co">## [121] highr_0.11               haven_2.5.4              ROCR_1.0-11             </span></span>
+<span><span class="co">## [124] gridtext_0.1.5           igraph_2.0.3             broom_1.0.6             </span></span>
+<span><span class="co">## [127] memoise_2.0.1            bslib_0.4.2</span></span></code></pre>
 </div>
 </div>
   </div>

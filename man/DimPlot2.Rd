@@ -19,7 +19,7 @@ DimPlot2(
   nrow = NULL,
   nrow.each = NULL,
   ncol.legend = NULL,
-  cols = list(discrete = "auto", continuous = "Blues"),
+  cols = list(),
   load.cols = TRUE,
   pt.size = NULL,
   shape.by = NULL,
@@ -107,7 +107,7 @@ Default: NULL.}
 
   For discrete variables:
 
-    - Seven color_pro styles: "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple".
+    - Eight color_pro styles: "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple", "bright".
 
     - Five color_iwh styles: "iwh_default", "iwh_intense", "iwh_pastel", "iwh_all", "iwh_all_hard".
 
@@ -115,7 +115,7 @@ Default: NULL.}
 
     - Any manually specified colors.
 
-  Default: list(discrete = "auto", continuous = "Blues").}
+  Default: list().}
 
 \item{load.cols}{When TRUE, automatically loads pre-stored color information for variables from `seu@misc[["var_colors"]]`.
 Default: TRUE.#' @param pt.size Point size for plotting, adjusts the size of each cell in the plot.

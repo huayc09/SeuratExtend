@@ -80,24 +80,64 @@ package_data <- list(
   )
 )
 
-import <- function(package, hpc.mode = F, detach = F){
-  if(!require(package, character.only = T)) {
-    message("Required package '", package, "' not installed\n")
+import <- function(package, hpc.mode = FALSE, detach = FALSE){
+  # Suppress warnings from require - we'll handle messaging ourselves
+  is_installed <- suppressWarnings(require(package, character.only = TRUE, quietly = TRUE))
+  
+  if(!is_installed) {
+    message("Required package '", package, "' not installed")
     if(package %in% names(package_data)) {
       message("Website: ", package_data[[package]]$website)
       message("Tutorial: ", package_data[[package]]$tutorial)
       message("Recommended installation:\n", package_data[[package]]$install_info,"\n")
     }
+    
+    # Ask if user wants to install
     if(!hpc.mode){
       input <- readline(prompt="Try install? y/[n] ")
     } else input <- "y"
+    
     if(input %in% c("y","yes","Y","Yes")){
-      if(package %in% names(package_data))
-        package_data[[package]]$install() else
+      message("Attempting to install package '", package, "'...")
+      
+      # Try to install the package
+      tryCatch({
+        if(package %in% names(package_data)) {
+          package_data[[package]]$install()
+        } else {
           install.packages(package)
+        }
+        
+        # Check if installation was successful
+        if(suppressWarnings(require(package, character.only = TRUE, quietly = TRUE))) {
+          message("Package '", package, "' installed and loaded successfully")
+          
+          # If detach was requested, detach after loading
+          if(detach) {
+            detach(paste0("package:", package), unload = TRUE, character.only = TRUE)
+            return(TRUE)
+          }
+          return(TRUE)
+        } else {
+          message("Package installation appeared to complete but the package could not be loaded")
+          message("Please try installing manually using the command above")
+          return(FALSE)
+        }
+      }, error = function(e) {
+        message("Error during installation: ", e$message)
+        message("Please try installing manually using the command above")
+        return(FALSE)
+      })
+    } else {
+      message("Package installation skipped")
+      return(FALSE)
     }
+  } else {
+    # Package is already installed and loaded
+    if(detach) {
+      detach(paste0("package:", package), unload = TRUE, character.only = TRUE)
+    }
+    return(TRUE)
   }
-  library(package, character.only = T)
-  if(detach) detach(paste0("package:",package), unload = TRUE, character.only = T)
 }
 

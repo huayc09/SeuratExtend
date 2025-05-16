@@ -52,7 +52,7 @@ color_iwh <- function(
 #' @title Professional discrete color presets by 'I want hue'
 #' @description Generate professional color presets from 'I want hue' color tool
 #' @param n How many colors to generate
-#' @param col.space Color space, Options: "default", "light", "red", "yellow", "green", "blue", or "purple"
+#' @param col.space Color space, Options: "default", "light", "red", "yellow", "green", "blue", "purple", or "bright"
 #' @param sort Sort colors by hue (default) or differentiation, Options: "hue", "diff"
 #' @param set Several random presets, Default: 1
 #' @return Vector of colors
@@ -65,15 +65,15 @@ color_iwh <- function(
 
 color_pro <- function(
     n,
-    col.space = c("default","light","red","yellow","green","blue","purple"),
+    col.space = c("default","light","red","yellow","green","blue","purple","bright"),
     sort = c("hue","diff"),
     set = 1
 ) {
   message_only_once("color_iwh","The 'I want hue' color presets were generated from: https://medialab.github.io/iwanthue/")
 
-  if(!col.space[1] %in% c("default","light","red","yellow","green","blue","purple", 1:7)) {
-    message('"col.space" should be "default", "light", "red", "yellow", "green", "blue", or "purple"\nUsing "default" preset.')
-    col.space <- "default"
+  if(!col.space[1] %in% c("default","light","red","yellow","green","blue","purple","bright", 1:8)) {
+    message('"col.space" should be "default", "light", "red", "yellow", "green", "blue", "purple", or "bright"\nUsing "light" preset.')
+    col.space <- "light"
   }
   col.space <- col.space[1]
 
@@ -220,7 +220,11 @@ handle_color_scheme <- function(color_scheme) {
     # Check if the palette is Sequential or Diverging
     if (palette_type %in% c("seq", "div")) {
       max_colors <- brewer.pal.info[palette_name, "maxcolors"]
-      colors <- brewer.pal(max_colors, palette_name)
+      colors <- if (palette_type == "seq") {
+        brewer.pal(max_colors-2, palette_name)
+      } else {
+        brewer.pal(max_colors, palette_name)
+      }
       if (is_reversed) colors <- rev(colors)
       is_diverging <- palette_type == "div"
       return(list(type = "brewer", colors = colors, is_diverging = is_diverging))
@@ -345,13 +349,13 @@ scale_disc_auto <- function(color_scheme, n, type = c("color", "fill"), labels =
     )
   }
 
-  pro_theme <- c("default","light","red","yellow","green","blue","purple")
-  iwh_theme <- c("default","intense","pastel","all","all_hard")
+  pro_theme <- names(presets_color_pro)
+  iwh_theme <- names(presets_color_iwh)
 
-  if(length(color_scheme) == 1 & n <= 50) {
-    if(color_scheme %in% c("default","light",paste0("pro_",pro_theme))) {
+  if(length(color_scheme) == 1 & n <= 80) {
+    if(color_scheme %in% c("default","light","bright",paste0("pro_",pro_theme))) {
       color_scheme <- sub("pro_","",color_scheme)
-      if(n == 1 && color_scheme == "default" && type == "fill") return(NULL)
+      if(n == 1 && color_scheme == "light" && type == "fill") return(NULL)
       cols <- color_pro(n, col.space = color_scheme)
       cols <- scale_func$manual(values = cols, labels = if(type == "color") labels else waiver())
     } else if(color_scheme %in% paste0("iwh_",iwh_theme)) {

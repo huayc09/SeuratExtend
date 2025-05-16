@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SeuratExtend</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
       </span>
     </div>
 
@@ -121,7 +121,7 @@
       <h1 data-toc-skip>Frequently Asked Questions (FAQ)</h1>
                         <h4 data-toc-skip class="author">Yichao Hua</h4>
             
-            <h4 data-toc-skip class="date">2024-11-28</h4>
+            <h4 data-toc-skip class="date">2025-05-16</h4>
       
       
       <div class="hidden name"><code>FAQ.Rmd</code></div>
@@ -140,6 +140,13 @@ Linux</a></li>
 Environment</a></li>
 <li><a href="#seurat-v5-merge">Merging Multiple Samples with Seurat
 v5.0</a></li>
+<li><a href="#macos-issues">Troubleshooting macOS-Specific
+Issues</a></li>
+<li><a href="#custom-databases">Updating or Creating Custom GO/Reactome
+Databases</a></li>
+<li><a href="#scvelo-usage">Working with scVelo in SeuratExtend</a></li>
+<li><a href="#conda-installation">Installing SeuratExtend Using
+Conda</a></li>
 </ol>
 </div>
 <div class="section level2">
@@ -208,6 +215,33 @@ your operating system.</p></li>
 <p>After installing conda or git, restart your R session and try running
 <code><a href="../reference/create_condaenv_seuratextend.html">create_condaenv_seuratextend()</a></code> again.</p>
 </div>
+<div class="section level3">
+<h3 id="q-what-python-dependencies-are-included-in-the-seuratextend-conda-environment">Q: What Python dependencies are included in the ‘seuratextend’ conda
+environment?<a class="anchor" aria-label="anchor" href="#q-what-python-dependencies-are-included-in-the-seuratextend-conda-environment"></a>
+</h3>
+<p>The <code><a href="../reference/create_condaenv_seuratextend.html">create_condaenv_seuratextend()</a></code> function creates a
+conda environment with compatible versions of all necessary packages for
+SeuratExtend’s Python-based functionality. Using this built-in
+environment is strongly recommended over creating separate environments
+for each tool.</p>
+<p>The ‘seuratextend’ conda environment includes the following key
+packages with specific versions to ensure compatibility:</p>
+<ul>
+<li>scVelo: from GitHub: <a href="mailto:theislab/scvelo@d89ca6a" class="email">theislab/scvelo@d89ca6a</a>
+</li>
+<li>scanpy: 1.9.5</li>
+<li>pandas: 1.5.3</li>
+<li>numpy: 1.24.4</li>
+<li>matplotlib: 3.7.1</li>
+<li>palantir: 1.3.0</li>
+<li>scikit-learn: 1.1.3</li>
+<li>python: 3.10.12</li>
+</ul>
+<p>This configuration eliminates the need to switch conda environments
+and restart R sessions when running different functions (like scVelo or
+Palantir). All SeuratExtend Python wrappers are designed to work
+seamlessly with this environment.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="seurat-v5-merge">Merging Multiple Samples with Seurat v5.0<a class="anchor" aria-label="anchor" href="#seurat-v5-merge"></a>
@@ -223,19 +257,468 @@ merging multiple samples and trying to run certain functions:</p>
 ! GetAssayData doesn't work for multiple layers in v5 assay.</code></pre>
 <p>This error occurs because in Seurat v5.0, the <code><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge()</a></code>
 function creates separate count layers for each sample by default. This
-prevents <code>GetAssayData()</code> from extracting the matrix.</p>
+prevents <code><a href="https://satijalab.github.io/seurat-object/reference/AssayData.html" class="external-link">GetAssayData()</a></code> from extracting the matrix.</p>
 </div>
 <div class="section level3">
 <h3 id="solution-1">Solution:<a class="anchor" aria-label="anchor" href="#solution-1"></a>
 </h3>
 <p>To resolve this issue, you need to join the layers before using
-<code>GetAssayData()</code>. Use the following code:</p>
+<code><a href="https://satijalab.github.io/seurat-object/reference/AssayData.html" class="external-link">GetAssayData()</a></code>. Use the following code:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">seu</span> <span class="op">&lt;-</span> <span class="fu">JoinLayers</span><span class="op">(</span><span class="va">seu</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">seu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/SplitLayers.html" class="external-link">JoinLayers</a></span><span class="op">(</span><span class="va">seu</span><span class="op">)</span></span></code></pre></div>
 <p>After joining the layers, you should be able to use
-<code>GetAssayData()</code> without errors.</p>
+<code><a href="https://satijalab.github.io/seurat-object/reference/AssayData.html" class="external-link">GetAssayData()</a></code> without errors.</p>
 <p>Note that this issue does not occur in Seurat v4 and earlier
 versions.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="macos-issues">Troubleshooting macOS-Specific Issues<a class="anchor" aria-label="anchor" href="#macos-issues"></a>
+</h2>
+<div class="section level3">
+<h3 id="q-im-experiencing-crashes-when-running-python-based-functions-like-scvelo-or-palantir-on-macos--how-can-i-fix-this">Q: I’m experiencing crashes when running Python-based functions like
+scVelo or Palantir on macOS. How can I fix this?<a class="anchor" aria-label="anchor" href="#q-im-experiencing-crashes-when-running-python-based-functions-like-scvelo-or-palantir-on-macos--how-can-i-fix-this"></a>
+</h3>
+<p>macOS users may encounter specific issues due to memory management
+between R and Python when using functions that rely on Python packages.
+These issues differ based on whether you’re using an Intel Mac or an
+Apple Silicon Mac.</p>
+<div class="section level4">
+<h4 id="intel-macs">Intel Macs:<a class="anchor" aria-label="anchor" href="#intel-macs"></a>
+</h4>
+<p><strong>Issue:</strong> When using R Markdown in RStudio with Python
+tools like scVelo, the R session may crash unexpectedly.</p>
+<p><strong>Solution:</strong> Use regular .R script files instead of R
+Markdown files for your analysis workflow.</p>
+</div>
+<div class="section level4">
+<h4 id="apple-silicon-m1m2m3m4">Apple Silicon (M1/M2/M3/M4):<a class="anchor" aria-label="anchor" href="#apple-silicon-m1m2m3m4"></a>
+</h4>
+<p><strong>Issue:</strong> If you load any R objects (like Seurat
+objects) before calling Python functions (particularly operations like
+PCA on AnnData objects), the R session will likely crash. This is a
+known memory management issue between R and Python specific to Apple
+Silicon chips, observed during testing on M4 chips.</p>
+<p><strong>Solution:</strong> Always initialize the Python environment
+BEFORE loading any R objects:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 1. Start with a fresh R session</span></span>
+<span><span class="co"># 2. First initialize Python (BEFORE loading any data)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SeuratExtend</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/activate_python.html">activate_python</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 3. Only AFTER Python initialization, load your data</span></span>
+<span><span class="va">seu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"path/to/seurat_object.rds"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 4. Now you can safely use Python-based functions</span></span>
+<span><span class="fu"><a href="../reference/scVelo.SeuratToAnndata.html">scVelo.SeuratToAnndata</a></span><span class="op">(</span><span class="va">seu</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<p>This initialization sequence prevents memory-related crashes and
+allows all scVelo-related functions to work properly.</p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="q-does-seuratextend-support-apple-silicon-m1m2m3m4-macs">Q: Does SeuratExtend support Apple Silicon (M1/M2/M3/M4) Macs?<a class="anchor" aria-label="anchor" href="#q-does-seuratextend-support-apple-silicon-m1m2m3m4-macs"></a>
+</h3>
+<p>Yes, as of SeuratExtend v1.2.0, Apple Silicon/M-series processors are
+fully supported. The <code><a href="../reference/create_condaenv_seuratextend.html">create_condaenv_seuratextend()</a></code>
+function automatically detects Apple Silicon and uses the appropriate
+configuration.</p>
+<p>However, due to memory management issues between R and Python on
+Apple Silicon, you must follow the initialization sequence described
+above to prevent crashes.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="custom-databases">Updating or Creating Custom GO/Reactome Databases<a class="anchor" aria-label="anchor" href="#custom-databases"></a>
+</h2>
+<div class="section level3">
+<h3 id="q-how-can-i-update-the-go-and-reactome-databases-as-they-get-updated-in-the-future">Q: How can I update the GO and Reactome databases as they get
+updated in the future?<a class="anchor" aria-label="anchor" href="#q-how-can-i-update-the-go-and-reactome-databases-as-they-get-updated-in-the-future"></a>
+</h3>
+<p>The GO and Reactome databases in SeuratExtend are included via the
+SeuratExtendData package, which provides comprehensive documentation for
+creating and updating databases:</p>
+<ul>
+<li><a href="https://github.com/huayc09/SeuratExtendData" class="external-link">SeuratExtendData
+GitHub Repository</a></li>
+<li><a href="https://github.com/huayc09/SeuratExtendData/blob/main/inst/db_creation/README_GO_Data.md" class="external-link">Creating
+GO Data</a></li>
+<li><a href="https://github.com/huayc09/SeuratExtendData/blob/main/inst/db_creation/README_Reactome_Data.md" class="external-link">Creating
+Reactome Data</a></li>
+</ul>
+<p>For quick reference, here are the steps to update both databases:</p>
+<div class="section level4">
+<h4 id="quick-start-updating-go-database-human-and-mouse">Quick Start: Updating GO Database (Human and Mouse)<a class="anchor" aria-label="anchor" href="#quick-start-updating-go-database-human-and-mouse"></a>
+</h4>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create working directory</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="st">"GO_data_creation"</span>, showWarnings <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">setwd</a></span><span class="op">(</span><span class="st">"GO_data_creation"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Download helper scripts</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span></span>
+<span>  <span class="st">"https://raw.githubusercontent.com/huayc09/SeuratExtendData/main/data-raw/create_GO_Data.R"</span>,</span>
+<span>  <span class="st">"create_GO_Data.R"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span></span>
+<span>  <span class="st">"https://raw.githubusercontent.com/huayc09/SeuratExtendData/main/data-raw/fix_gaf.R"</span>,</span>
+<span>  <span class="st">"fix_gaf.R"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create directory for downloads</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="st">"your-download-path"</span>, showWarnings <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Download data files (Human and Mouse example)</span></span>
+<span><span class="co"># GO ontology</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span></span>
+<span>  <span class="st">"https://purl.obolibrary.org/obo/go/go-basic.obo"</span>,</span>
+<span>  <span class="st">"your-download-path/go-basic.obo"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Human GAF file</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span></span>
+<span>  <span class="st">"https://current.geneontology.org/annotations/goa_human.gaf.gz"</span>,</span>
+<span>  <span class="st">"your-download-path/goa_human.gaf.gz"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu">R.utils</span><span class="fu">::</span><span class="fu"><a href="https://henrikbengtsson.github.io/R.utils/reference/compressFile.html" class="external-link">gunzip</a></span><span class="op">(</span><span class="st">"your-download-path/goa_human.gaf.gz"</span>, remove <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Mouse GAF file</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span></span>
+<span>  <span class="st">"https://current.geneontology.org/annotations/mgi.gaf.gz"</span>,</span>
+<span>  <span class="st">"your-download-path/mgi.gaf.gz"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu">R.utils</span><span class="fu">::</span><span class="fu"><a href="https://henrikbengtsson.github.io/R.utils/reference/compressFile.html" class="external-link">gunzip</a></span><span class="op">(</span><span class="st">"your-download-path/mgi.gaf.gz"</span>, remove <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Configure paths and run</span></span>
+<span><span class="va">GO_ontology_path</span> <span class="op">&lt;-</span> <span class="st">"your-download-path/go-basic.obo"</span></span>
+<span><span class="va">species_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  human <span class="op">=</span> <span class="st">"your-download-path/goa_human.gaf"</span>,</span>
+<span>  mouse <span class="op">=</span> <span class="st">"your-download-path/mgi.gaf"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">output_dir</span> <span class="op">&lt;-</span> <span class="st">"."</span>  <span class="co"># Current directory</span></span>
+<span></span>
+<span><span class="co"># Source and run the script</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="st">"create_GO_Data.R"</span><span class="op">)</span></span>
+<span><span class="co"># The script will create GO_Data.rds and GO_ontology.rds in your current directory</span></span>
+<span></span>
+<span><span class="co"># Load and use your custom GO data</span></span>
+<span><span class="va">custom_GO_Data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"GO_Data.rds"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Use with SeuratExtend:</span></span>
+<span><span class="co"># Simply assign to the global environment</span></span>
+<span><span class="va">GO_Data</span> <span class="op">&lt;-</span> <span class="va">custom_GO_Data</span></span>
+<span></span>
+<span><span class="co"># Run your analysis with SeuratExtend functions</span></span>
+<span><span class="co"># seu &lt;- GeneSetAnalysisGO(seu, parent = "immune_system_process")</span></span>
+<span></span>
+<span><span class="co"># When done, restore the original data by removing the global variable</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">GO_Data</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="quick-start-updating-reactome-database-human-and-mouse">Quick Start: Updating Reactome Database (Human and Mouse)<a class="anchor" aria-label="anchor" href="#quick-start-updating-reactome-database-human-and-mouse"></a>
+</h4>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create working directory</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="st">"Reactome_data_creation"</span>, showWarnings <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">setwd</a></span><span class="op">(</span><span class="st">"Reactome_data_creation"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Download the Reactome data creation script</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span></span>
+<span>  <span class="st">"https://raw.githubusercontent.com/huayc09/SeuratExtendData/main/data-raw/create_Reactome_Data.R"</span>,</span>
+<span>  <span class="st">"create_Reactome_Data.R"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create directory for downloads</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="st">"your-download-path"</span>, showWarnings <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Download Reactome data files</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span></span>
+<span>  <span class="st">"https://reactome.org/download/current/Ensembl2Reactome_PE_All_Levels.txt"</span>,</span>
+<span>  <span class="st">"your-download-path/Ensembl2Reactome_PE_All_Levels.txt"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span></span>
+<span>  <span class="st">"https://reactome.org/download/current/ReactomePathwaysRelation.txt"</span>,</span>
+<span>  <span class="st">"your-download-path/ReactomePathwaysRelation.txt"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Configure paths and run</span></span>
+<span><span class="va">reactome_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  ensembl2reactome <span class="op">=</span> <span class="st">"your-download-path/Ensembl2Reactome_PE_All_Levels.txt"</span>,</span>
+<span>  pathways_relation <span class="op">=</span> <span class="st">"your-download-path/ReactomePathwaysRelation.txt"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Specify which species to process</span></span>
+<span><span class="va">species_to_process</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"human"</span>, <span class="st">"mouse"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Set output directory</span></span>
+<span><span class="va">output_dir</span> <span class="op">&lt;-</span> <span class="st">"."</span>  <span class="co"># Current directory</span></span>
+<span></span>
+<span><span class="co"># Source and run the script</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/source.html" class="external-link">source</a></span><span class="op">(</span><span class="st">"create_Reactome_Data.R"</span><span class="op">)</span></span>
+<span><span class="co"># The script will create Reactome_Data.rds in your current directory</span></span>
+<span></span>
+<span><span class="co"># Load and use your custom Reactome data</span></span>
+<span><span class="va">custom_Reactome_Data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"Reactome_Data.rds"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Use with SeuratExtend:</span></span>
+<span><span class="co"># Simply assign to the global environment</span></span>
+<span><span class="va">Reactome_Data</span> <span class="op">&lt;-</span> <span class="va">custom_Reactome_Data</span></span>
+<span></span>
+<span><span class="co"># Run your analysis with SeuratExtend functions</span></span>
+<span><span class="co"># seu &lt;- GeneSetAnalysisReactome(seu, parent = "Immune System")</span></span>
+<span></span>
+<span><span class="co"># When done, restore the original data by removing the global variable</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/rm.html" class="external-link">rm</a></span><span class="op">(</span><span class="va">Reactome_Data</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level3">
+<h3 id="q-can-i-use-seuratextend-with-custom-databases-for-other-model-organisms">Q: Can I use SeuratExtend with custom databases for other model
+organisms?<a class="anchor" aria-label="anchor" href="#q-can-i-use-seuratextend-with-custom-databases-for-other-model-organisms"></a>
+</h3>
+<p>Yes, SeuratExtend supports using custom databases for any organism of
+interest. The workflow is similar to updating the databases as described
+above, but you’ll need to:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Obtain organism-specific GAF files</strong> for GO
+analysis or create appropriate gene-to-pathway mappings for other
+databases.</p></li>
+<li>
+<p><strong>Set up the data structure</strong> following the format
+in the SeuratExtendData package:</p>
+<ul>
+<li>For GO data: A list with species names as keys, each containing
+<code>GO_ontology</code>, <code>GO2Gene</code>, and other required
+components</li>
+<li>For Reactome data: A similar list structure with pathway hierarchies
+and gene mappings</li>
+</ul>
+</li>
+<li><p><strong>Use your custom data</strong> as shown in the examples
+above.</p></li>
+</ol>
+<p>For detailed instructions on creating custom databases, see the
+comprehensive guides in the SeuratExtendData repository: - <a href="https://github.com/huayc09/SeuratExtendData/blob/main/inst/db_creation/README_GO_Data.md" class="external-link">Creating
+GO Data</a> - <a href="https://github.com/huayc09/SeuratExtendData/blob/main/inst/db_creation/README_Reactome_Data.md" class="external-link">Creating
+Reactome Data</a></p>
+</div>
+<div class="section level3">
+<h3 id="q-how-do-i-specify-versions-when-installing-seuratextenddata">Q: How do I specify versions when installing SeuratExtendData?<a class="anchor" aria-label="anchor" href="#q-how-do-i-specify-versions-when-installing-seuratextenddata"></a>
+</h3>
+<p>You can install specific versions of SeuratExtendData using the
+<code><a href="../reference/install_SeuratExtendData.html">install_SeuratExtendData()</a></code> function:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SeuratExtend</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Install the latest version</span></span>
+<span><span class="fu"><a href="../reference/install_SeuratExtendData.html">install_SeuratExtendData</a></span><span class="op">(</span><span class="st">"latest"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Install the stable version (January 2020)</span></span>
+<span><span class="fu"><a href="../reference/install_SeuratExtendData.html">install_SeuratExtendData</a></span><span class="op">(</span><span class="st">"stable"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Install specific versions</span></span>
+<span><span class="fu"><a href="../reference/install_SeuratExtendData.html">install_SeuratExtendData</a></span><span class="op">(</span><span class="st">"v0.2.1"</span><span class="op">)</span>  <span class="co"># January 2020 datasets</span></span>
+<span><span class="fu"><a href="../reference/install_SeuratExtendData.html">install_SeuratExtendData</a></span><span class="op">(</span><span class="st">"v0.3.0"</span><span class="op">)</span>  <span class="co"># April 2025 datasets</span></span></code></pre></div>
+<p>This is useful when you need to ensure compatibility with specific
+analysis workflows or when you want to use a specific version of the
+databases.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="scvelo-usage">Working with scVelo in SeuratExtend<a class="anchor" aria-label="anchor" href="#scvelo-usage"></a>
+</h2>
+<div class="section level3">
+<h3 id="q-how-do-i-use-the-cell-id-match-table-parameter-in-scvelo-seurattoanndata-when-integrating-multiple-loom-files">Q: How do I use the <code>cell.id.match.table</code> parameter in
+<code>scVelo.SeuratToAnndata</code> when integrating multiple loom
+files?<a class="anchor" aria-label="anchor" href="#q-how-do-i-use-the-cell-id-match-table-parameter-in-scvelo-seurattoanndata-when-integrating-multiple-loom-files"></a>
+</h3>
+<p>There are two main approaches to handle cell ID matching between
+Seurat and velocyto loom files:</p>
+<ol style="list-style-type: decimal">
+<li>Using prefix/postfix (simpler approach)</li>
+<li>Using cell.id.match.table (more flexible approach)</li>
+</ol>
+<p>Here’s a detailed explanation with a concrete example using the
+example data:</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat" class="external-link">Seurat</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SeuratExtend</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Download the example Seurat Object</span></span>
+<span><span class="va">mye_small</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/connections.html" class="external-link">url</a></span><span class="op">(</span><span class="st">"https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds"</span>, <span class="st">"rb"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Download the example velocyto loom file</span></span>
+<span><span class="va">loom_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"pbmc10k_mye_small.loom"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/download.file.html" class="external-link">download.file</a></span><span class="op">(</span><span class="st">"https://zenodo.org/records/10944066/files/pbmc10k_mye_small.loom"</span>, </span>
+<span>              <span class="va">loom_path</span>,</span>
+<span>              mode <span class="op">=</span> <span class="st">"wb"</span><span class="op">)</span>  <span class="co"># Use binary mode for Windows compatibility</span></span>
+<span></span>
+<span><span class="co"># Set up the path for saving the AnnData object in the HDF5 (h5ad) format</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="va">.Platform</span><span class="op">$</span><span class="va">OS.type</span> <span class="op">==</span> <span class="st">"windows"</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">adata_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html" class="external-link">normalizePath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"mye_small.h5ad"</span><span class="op">)</span>, winslash <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span></span>
+<span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="va">adata_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"mye_small.h5ad"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># First, let's look at the cell IDs in both objects</span></span>
+<span><span class="co"># Seurat cell IDs</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">mye_small</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "sample1_GAGTCATGTACCCGCA-1" "sample1_TGGAGGAGTGTATACC-1" "sample1_CCCGGAAGTTGGCTAT-1"</span></span>
+<span><span class="co">#&gt; [4] "sample1_CTGAGGCAGTCAGGGT-1" "sample1_GCCAACGTCCCGTGTT-1" "sample1_TCAAGCAGTGTGGTCC-1"</span></span>
+<span></span>
+<span><span class="co"># Velocyto cell IDs</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://hhoeflin.github.io/hdf5r/" class="external-link">hdf5r</a></span><span class="op">)</span></span>
+<span><span class="va">loom</span> <span class="op">&lt;-</span> <span class="va"><a href="http://hhoeflin.github.io/hdf5r/reference/H5File-class.html" class="external-link">H5File</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="va">loom_path</span>, mode <span class="op">=</span> <span class="st">"r"</span><span class="op">)</span></span>
+<span><span class="va">velocyto_cells</span> <span class="op">&lt;-</span> <span class="va">loom</span><span class="op">[[</span><span class="st">"col_attrs/CellID"</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="op">]</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">velocyto_cells</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "pbmc10k_10X:AAACGCTCATACGCATx" "pbmc10k_10X:AAACGAATCTCGACCTx" "pbmc10k_10X:AAAGGTAGTCGCATGCx"</span></span>
+<span><span class="co">#&gt; [4] "pbmc10k_10X:AAAGAACCAGGTTCGCx" "pbmc10k_10X:AAACCCAAGGCCCAAAx" "pbmc10k_10X:AAAGGGCTCTTTGCTAx"</span></span>
+<span><span class="va">loom</span><span class="op">$</span><span class="fu">close_all</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Extract barcodes from velocyto IDs and create corresponding Seurat-style IDs</span></span>
+<span><span class="va">velocyto_barcodes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">".*:"</span>, <span class="st">""</span>, <span class="va">velocyto_cells</span><span class="op">)</span> <span class="co"># Remove everything before ":"</span></span>
+<span><span class="va">velocyto_barcodes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">sub</a></span><span class="op">(</span><span class="st">"x$"</span>, <span class="st">""</span>, <span class="va">velocyto_barcodes</span><span class="op">)</span> <span class="co"># Remove trailing "x"</span></span>
+<span><span class="va">seurat_style_ids</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"sample1_"</span>, <span class="va">velocyto_barcodes</span>, <span class="st">"-1"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create the matching table</span></span>
+<span><span class="va">cell_match_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  cellid.seurat <span class="op">=</span> <span class="va">seurat_style_ids</span>,</span>
+<span>  cellid.velocyto <span class="op">=</span> <span class="va">velocyto_cells</span>,</span>
+<span>  velocyto.loompath <span class="op">=</span> <span class="va">loom_path</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># View the table structure</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cell_match_df</span><span class="op">)</span></span>
+<span><span class="co">#                cellid.seurat               cellid.velocyto                      velocyto.loompath</span></span>
+<span><span class="co"># 1 sample1_AAACGCTCATACGCAT-1 pbmc10k_10X:AAACGCTCATACGCATx /tmp/RtmpWaN5N2/pbmc10k_mye_small.loom</span></span>
+<span><span class="co"># 2 sample1_AAACGAATCTCGACCT-1 pbmc10k_10X:AAACGAATCTCGACCTx /tmp/RtmpWaN5N2/pbmc10k_mye_small.loom</span></span>
+<span><span class="co"># 3 sample1_AAAGGTAGTCGCATGC-1 pbmc10k_10X:AAAGGTAGTCGCATGCx /tmp/RtmpWaN5N2/pbmc10k_mye_small.loom</span></span>
+<span><span class="co"># 4 sample1_AAAGAACCAGGTTCGC-1 pbmc10k_10X:AAAGAACCAGGTTCGCx /tmp/RtmpWaN5N2/pbmc10k_mye_small.loom</span></span>
+<span><span class="co"># 5 sample1_AAACCCAAGGCCCAAA-1 pbmc10k_10X:AAACCCAAGGCCCAAAx /tmp/RtmpWaN5N2/pbmc10k_mye_small.loom</span></span>
+<span><span class="co"># 6 sample1_AAAGGGCTCTTTGCTA-1 pbmc10k_10X:AAAGGGCTCTTTGCTAx /tmp/RtmpWaN5N2/pbmc10k_mye_small.loom</span></span>
+<span></span>
+<span><span class="co"># Use the table in scVelo.SeuratToAnndata</span></span>
+<span><span class="fu"><a href="../reference/scVelo.SeuratToAnndata.html">scVelo.SeuratToAnndata</a></span><span class="op">(</span></span>
+<span>  seu <span class="op">=</span> <span class="va">mye_small</span>,</span>
+<span>  filename <span class="op">=</span> <span class="st">"output.h5ad"</span>,</span>
+<span>  velocyto.loompath <span class="op">=</span> <span class="va">loom_path</span>,</span>
+<span>  cell.id.match.table <span class="op">=</span> <span class="va">cell_match_df</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="q-how-do-i-handle-different-cell-barcodes-and-features-between-seurat-and-loom-files">Q: How do I handle different cell barcodes and features between
+Seurat and loom files?<a class="anchor" aria-label="anchor" href="#q-how-do-i-handle-different-cell-barcodes-and-features-between-seurat-and-loom-files"></a>
+</h3>
+<p>Different feature numbers between Seurat and loom files is normal -
+the function will automatically handle this by finding common features.
+For cell barcodes, you have two options:</p>
+<ol style="list-style-type: decimal">
+<li>Use <code>cell.id.match.table</code> to explicitly map the different
+formats</li>
+<li>Use <code>prefix</code>/<code>postfix</code> to transform the
+barcodes (e.g., prefix=“sample1_”, postfix=“-1”)</li>
+</ol>
+<p>The <code>cell.id.match.table</code> approach is more versatile and
+can handle various data types (10X, SmartSeq2, etc.), but it’s more
+complex to set up. For 10X Genomics data, the prefix/postfix method is
+usually simpler and recommended. Here’s how to determine the correct
+prefix/postfix from your Seurat object:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Look at the cell IDs in your Seurat object</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">mye_small</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "sample1_GAGTCATGTACCCGCA-1" "sample1_TGGAGGAGTGTATACC-1" "sample1_CCCGGAAGTTGGCTAT-1"</span></span></code></pre></div>
+<p>We can see that: - The prefix is “sample1_” (typically defined when
+you create your Seurat object) - The postfix is “-1” (default value in
+most cases)</p>
+<p>For multiple samples, you can provide vectors for prefix and
+postfix:</p>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/scVelo.SeuratToAnndata.html">scVelo.SeuratToAnndata</a></span><span class="op">(</span></span>
+<span>  seu <span class="op">=</span> <span class="va">your_seurat_object</span>,</span>
+<span>  filename <span class="op">=</span> <span class="st">"output.h5ad"</span>,</span>
+<span>  velocyto.loompath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"/path/to/sample1.loom"</span>, <span class="st">"/path/to/sample2.loom"</span><span class="op">)</span>,</span>
+<span>  prefix <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sample1_"</span>, <span class="st">"sample2_"</span><span class="op">)</span>,  <span class="co"># One prefix per loom file</span></span>
+<span>  postfix <span class="op">=</span> <span class="st">"-1"</span>  <span class="co"># Same postfix for all samples</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="q-how-can-i-access-and-use-python-functionality-after-running-scvelo-seurattoanndata">Q: How can I access and use Python functionality after running
+scVelo.SeuratToAnndata?<a class="anchor" aria-label="anchor" href="#q-how-can-i-access-and-use-python-functionality-after-running-scvelo-seurattoanndata"></a>
+</h3>
+<p>The wrapper functions in SeuratExtend provide convenient interfaces
+to Python-based tools but don’t cover all possible functionalities.
+After running <code>scVelo.SeuratToAnndata</code>, you have several
+options to access the full power of Python:</p>
+<ol style="list-style-type: decimal">
+<li>
+<p>The <code>adata</code> object is already available in the Python
+environment. If you’re using RStudio, you can create a Python document
+and write code directly:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># In RStudio Python document</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="im">import</span> scvelo <span class="im">as</span> scv</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="im">import</span> scanpy <span class="im">as</span> sc</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co"># Access the adata object that's already in memory</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>scv.pl.velocity_embedding_stream(adata, basis<span class="op">=</span><span class="st">'umap_cell_embeddings'</span>)</span></code></pre></div>
+</li>
+<li>
+<p>You can use <code><a href="https://rstudio.github.io/reticulate/reference/repl_python.html" class="external-link">reticulate::repl_python()</a></code> to enter
+Python mode from your R session:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># In R session</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">repl_python</span>()</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co"># Now in Python mode</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>import scvelo as scv</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="fu">scv.pl.velocity_embedding_stream</span>(adata, <span class="at">basis=</span><span class="st">'umap_cell_embeddings'</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co"># Exit with 'exit' command</span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>exit</span></code></pre></div>
+</li>
+</ol>
+<p>This approach retains all your Seurat information (UMAP coordinates,
+metadata, etc.) while giving you full access to Python
+functionality.</p>
+</div>
+</div>
+<div class="section level2">
+<h2 id="conda-installation">Installing SeuratExtend Using Conda<a class="anchor" aria-label="anchor" href="#conda-installation"></a>
+</h2>
+<div class="section level3">
+<h3 id="q-how-can-i-install-seuratextend-through-conda">Q: How can I install SeuratExtend through Conda?<a class="anchor" aria-label="anchor" href="#q-how-can-i-install-seuratextend-through-conda"></a>
+</h3>
+<p>While the <code><a href="../reference/create_condaenv_seuratextend.html">create_condaenv_seuratextend()</a></code> function
+manages Python dependencies for tools like scVelo, you may prefer to use
+Conda to manage the R environment for SeuratExtend itself. This approach
+can help resolve dependency issues, especially on systems where
+installing R packages with system-level dependencies is challenging.</p>
+</div>
+<div class="section level3">
+<h3 id="solution-2">Solution:<a class="anchor" aria-label="anchor" href="#solution-2"></a>
+</h3>
+<p>Here’s the recommended approach to install SeuratExtend using
+Conda:</p>
+<ol style="list-style-type: decimal">
+<li>First, create and activate a new Conda environment:</li>
+</ol>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="ex">conda</span> create <span class="at">-n</span> newenv</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="ex">conda</span> activate newenv</span></code></pre></div>
+<ol start="2" style="list-style-type: decimal">
+<li>Install the dependencies through conda-forge:</li>
+</ol>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge r-seurat r-hdf5r r-remotes r-ggpubr r-mosaic r-terra r-harmony r-xml r-biocmanager r-spatstat.univar</span></code></pre></div>
+<ol start="3" style="list-style-type: decimal">
+<li>Optionally, if you plan to use Jupyter notebooks:</li>
+</ol>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a><span class="ex">conda</span> install <span class="at">-c</span> conda-forge jupyterlab</span></code></pre></div>
+<ol start="4" style="list-style-type: decimal">
+<li>Finally, launch R and install SeuratExtend:</li>
+</ol>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"huayc09/SeuratExtend"</span><span class="op">)</span></span></code></pre></div>
+<p>This approach ensures all system-level dependencies are properly
+handled through Conda before installing SeuratExtend. After
+installation, you can proceed with creating the Python environment for
+scVelo and other tools as described in the <a href="#conda-env">Creating
+‘seuratextend’ Conda Environment</a> section.</p>
 </div>
 </div>
   </div>

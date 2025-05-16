@@ -51,7 +51,28 @@ download.file("https://zenodo.org/records/10944066/files/pbmc10k_mye_small.loom"
 
 `scVelo` requires an `AnnData` object from Python's `Scanpy` library for its analyses. `SeuratExtend` makes this process seamless by integrating a Seurat object and a velocyto loom file into a new `AnnData` object, serving as a bridge between R and Python.
 
-**Note**: If this is your first time running Python-related functions (`scVelo`, `Palantir`, etc.) in `SeuratExtend`, it will prompt you to install a conda environment named "seuratextend". This environment automatically installs all required Python packages. It is currently supported and tested on Windows, Intel-based macOS (not Apple Silicon/M1/M2), and Linux (Ubuntu 20.04) systems. Users with Apple Silicon devices who are interested in contributing to the development of M1/M2 support are welcome to reach out via GitHub Issues. More details on managing the `Anndata` object and Python dependencies are provided here: [Integration of Seurat with Python Tools](#integration-of-seurat-with-python-tools).
+**Note**: If this is your first time running Python-related functions (`scVelo`, `Palantir`, etc.) in `SeuratExtend`, it will prompt you to install a conda environment named "seuratextend". This environment automatically installs all required Python packages. It is currently supported and tested on Windows, macOS (both Intel-based and Apple Silicon/M-series), and Linux (Ubuntu 20.04) systems.
+
+**macOS-Specific Considerations**: 
+
+* **Intel Macs**: When using R Markdown in RStudio with Python tools like scVelo, the R session may crash. To work around this issue, use regular .R script files instead of R Markdown files.
+
+* **Apple Silicon (M1/M2/M3/M4)** *(new in v1.2.0)*: Testing on M4 chips has revealed memory management issues between R and Python. If any R objects are loaded in the session before calling Python functions (particularly operations like PCA on AnnData objects), the R session may crash.
+
+  **Solution**: Start with a fresh R session and call `activate_python()` at the beginning of your workflow before loading any R objects:
+  
+  ```r
+  # Run at the beginning of your session on macOS
+  library(SeuratExtend)
+  activate_python()
+  
+  # Then load your data and proceed with analysis
+  seu <- readRDS("path/to/seurat_object.rds")
+  ```
+  
+  After this initialization, all scVelo-related functions should work properly.
+
+More details on managing the `Anndata` object and Python dependencies are provided here: [Integration of Seurat with Python Tools](#integration-of-seurat-with-python-tools).
 
 ```{r, message=FALSE, warning=FALSE}
 
@@ -175,7 +196,7 @@ head(ps)
 colnames(ps)[3:4] <- c("fate1", "fate2")
 mye_small@meta.data[,colnames(ps)] <- ps
 DimPlot2(mye_small, features = colnames(ps), reduction = "ms", 
-         cols = list(Entropy = "D"), theme = NoAxes())
+         cols = list(continuous = "A", Entropy = "D"), theme = NoAxes())
 ```
 
 ## MAGIC for Denoising and Smoothing Gene Expression {#magic-for-denoising-and-smoothing-gene-expression}
@@ -351,7 +372,22 @@ If you prefer to initiate the conda environment installation step manually, you 
 create_condaenv_seuratextend()
 ```
 
-This function automatically detects your operating system and sets up the environment accordingly. It is currently supported and tested on Windows, Intel-based macOS (not Apple Silicon/M1/M2), and Linux (Ubuntu 20.04) systems. Users with Apple Silicon devices who are interested in contributing to the development of M1/M2 support are welcome to reach out via GitHub Issues.
+This function automatically detects your operating system and sets up the environment accordingly. It is currently supported and tested on Windows, macOS (both Intel-based and Apple Silicon/M-series), and Linux (Ubuntu 20.04) systems.
+
+**Important for macOS Users**: 
+
+* **Intel Macs**: Using R Markdown in RStudio may cause crashes when calling Python functions. If you encounter this issue, switch to using regular .R script files.
+
+* **Apple Silicon (M1/M2/M3/M4)** *(new in v1.2.0)*: Testing on M4 chips has shown that memory management issues between R and Python can cause crashes, particularly when performing operations like PCA on AnnData objects after loading R objects. To prevent this:
+
+  ```r
+  # Run this at the START of your session on macOS (before loading any objects)
+  library(SeuratExtend)
+  activate_python()
+  
+  # Only then load your data and proceed with analysis
+  seu <- readRDS("path/to/seurat_object.rds")
+  ```
 
 ### Integrating Seurat with AnnData
 

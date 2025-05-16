@@ -61,9 +61,9 @@ FeaturePlot3.grid(
   pbmc,
   features = c("CD3D", "CD14", "CD79A", "FCGR3A", NA, "LYZ"),
   color = "rgb",
-  pt.size = 1, 
-  dark.theme = TRUE, 
-  legend = TRUE, 
+  pt.size = 1,
+  dark.theme = TRUE,
+  legend = TRUE,
   color.range = c(0.1, 1)
 )
 

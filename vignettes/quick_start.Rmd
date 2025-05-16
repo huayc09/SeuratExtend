@@ -102,7 +102,7 @@ VolcanoPlot(pbmc,
 
 Examining all the pathways of the immune process in the Gene Ontology (GO) database, and visualizing by a heatmap that displays the top pathways of each cluster across multiple cell types:
 
-```{r, fig.width=11, fig.height=5.5, message=FALSE, warning=FALSE}
+```{r, fig.width=9.5, fig.height=5.5, message=FALSE, warning=FALSE}
 options(spe = "human")
 pbmc <- GeneSetAnalysisGO(pbmc, parent = "immune_system_process", n.min = 5)
 matr <- RenameGO(pbmc@misc$AUCell$GO$immune_system_process)
@@ -143,7 +143,7 @@ pbmc <- ImportPyscenicLoom(scenic_loom_path, seu = pbmc)
 DimPlot2(
   pbmc,
   features = c("cluster", "orig.ident", "CEBPA", "tf_CEBPA"),
-  cols = list("tf_CEBPA" = "D"),
+  cols = list("tf_CEBPA" = "OrRd"),
   theme = NoAxes()
 ) + theme_umap_arrows()
 ```
@@ -203,7 +203,7 @@ DimPlot2(
   mye_small,
   features = colnames(ps),
   reduction = "ms",
-  cols = list(Entropy = "D"),
+  cols = list(continuous = "A", Entropy = "D"),
   theme = NoAxes())
 ```
 

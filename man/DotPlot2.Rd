@@ -12,7 +12,7 @@ DotPlot2(
   split.by.method = "border",
   nudge_factor = 0.35,
   color_scheme = "A",
-  split.by.colors = "default",
+  split.by.colors = "bright",
   center_color = NULL,
   angle = NULL,
   hjust = NULL,
@@ -67,7 +67,7 @@ DotPlot2(
 \item{split.by.colors}{Colors for split groups. When split.by.method is "border", this sets the border colors; when split.by.method is "color", this sets the dot colors.
 Flexible color settings for the plot, accepting a variety of inputs:
 
-    - Seven color_pro styles: "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple".
+    - Eight color_pro styles: "default", "light", "pro_red", "pro_yellow", "pro_green", "pro_blue", "pro_purple", "bright" (default).
 
     - Five color_iwh styles: "iwh_default", "iwh_intense", "iwh_pastel", "iwh_all", "iwh_all_hard".
 

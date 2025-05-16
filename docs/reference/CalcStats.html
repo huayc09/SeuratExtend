@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SeuratExtend</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
       </span>
     </div>
 
@@ -216,7 +216,7 @@ For log-normalized data's LogFC computation, it's advised to set `exp.transform`
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SeuratExtend</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Using a Seurat object as input. First, select some genes for calculation:</span></span>
-<span><span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">]</span></span>
+<span><span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">]</span></span>
 <span></span>
 <span><span class="co"># Calculate zscore, grouping by the default 'ident' (cluster):</span></span>
 <span><span class="va">genes.zscore</span> <span class="op">&lt;-</span> <span class="fu">CalcStats</span><span class="op">(</span><span class="va">pbmc</span>, features <span class="op">=</span> <span class="va">genes</span>, method <span class="op">=</span> <span class="st">"zscore"</span><span class="op">)</span></span>
@@ -227,7 +227,7 @@ For log-normalized data's LogFC computation, it's advised to set `exp.transform`
 <span></span>
 <span><span class="co"># Select more genes and retain the top 4 genes of each cluster, sorted by p-value.</span></span>
 <span><span class="co"># This can be a convenient method to display the top marker genes of each cluster:</span></span>
-<span><span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span></span>
+<span><span class="va">genes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span></span>
 <span><span class="va">genes.zscore</span> <span class="op">&lt;-</span> <span class="fu">CalcStats</span><span class="op">(</span></span>
 <span>  <span class="va">pbmc</span>, features <span class="op">=</span> <span class="va">genes</span>, method <span class="op">=</span> <span class="st">"zscore"</span>, group.by <span class="op">=</span> <span class="st">"cluster"</span>,</span>
 <span>  order <span class="op">=</span> <span class="st">"p"</span>, n <span class="op">=</span> <span class="fl">4</span><span class="op">)</span></span>

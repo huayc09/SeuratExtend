@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SeuratExtend</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
       </span>
     </div>
 
@@ -121,7 +121,7 @@
       <h1 data-toc-skip>Trajectory and Pseudotime Analysis</h1>
                         <h4 data-toc-skip class="author">Yichao Hua</h4>
             
-            <h4 data-toc-skip class="date">2024-11-28</h4>
+            <h4 data-toc-skip class="date">2025-05-16</h4>
       
       
       <div class="hidden name"><code>Trajectory.Rmd</code></div>
@@ -209,14 +209,38 @@ Python-related functions (<code>scVelo</code>, <code>Palantir</code>,
 etc.) in <code>SeuratExtend</code>, it will prompt you to install a
 conda environment named “seuratextend”. This environment automatically
 installs all required Python packages. It is currently supported and
-tested on Windows, Intel-based macOS (not Apple Silicon/M1/M2), and
-Linux (Ubuntu 20.04) systems. Users with Apple Silicon devices who are
-interested in contributing to the development of M1/M2 support are
-welcome to reach out via GitHub Issues. More details on managing the
-<code>Anndata</code> object and Python dependencies are provided here:
-<a href="#integration-of-seurat-with-python-tools">Integration of Seurat
-with Python Tools</a>.</p>
+tested on Windows, macOS (both Intel-based and Apple Silicon/M-series),
+and Linux (Ubuntu 20.04) systems.</p>
+<p><strong>macOS-Specific Considerations</strong>:</p>
+<ul>
+<li><p><strong>Intel Macs</strong>: When using R Markdown in RStudio
+with Python tools like scVelo, the R session may crash. To work around
+this issue, use regular .R script files instead of R Markdown
+files.</p></li>
+<li>
+<p><strong>Apple Silicon (M1/M2/M3/M4)</strong> <em>(new in
+v1.2.0)</em>: Testing on M4 chips has revealed memory management issues
+between R and Python. If any R objects are loaded in the session before
+calling Python functions (particularly operations like PCA on AnnData
+objects), the R session may crash.</p>
+<p><strong>Solution</strong>: Start with a fresh R session and call
+<code><a href="../reference/activate_python.html">activate_python()</a></code> at the beginning of your workflow before
+loading any R objects:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Run at the beginning of your session on macOS</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SeuratExtend</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/activate_python.html">activate_python</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Then load your data and proceed with analysis</span></span>
+<span><span class="va">seu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"path/to/seurat_object.rds"</span><span class="op">)</span></span></code></pre></div>
+<p>After this initialization, all scVelo-related functions should work
+properly.</p>
+</li>
+</ul>
+<p>More details on managing the <code>Anndata</code> object and Python
+dependencies are provided here: <a href="#integration-of-seurat-with-python-tools">Integration of Seurat
+with Python Tools</a>.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Set up the path for saving the AnnData object in the HDF5 (h5ad) format</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="va">.Platform</span><span class="op">$</span><span class="va">OS.type</span> <span class="op">==</span> <span class="st">"windows"</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">adata_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html" class="external-link">normalizePath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"mye_small.h5ad"</span><span class="op">)</span>, winslash <span class="op">=</span> <span class="st">"/"</span><span class="op">)</span></span>
@@ -233,7 +257,7 @@ with Python Tools</a>.</p>
 <span>  prefix <span class="op">=</span> <span class="st">"sample1_"</span>, <span class="co"># Prefix for cell IDs in the Seurat object</span></span>
 <span>  postfix <span class="op">=</span> <span class="st">"-1"</span> <span class="co"># Postfix for cell IDs in the Seurat object</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Running scvelo 0.3.0 (python 3.10.12) on 2024-11-28 17:07.</span></span>
+<pre><code><span><span class="co">## scVelo version: 0.3.0</span></span>
 <span><span class="co">## Filtered out 10891 genes that are detected 20 counts (shared).</span></span>
 <span><span class="co">## Normalized count data: X, spliced, unspliced.</span></span>
 <span><span class="co">## Extracted 2000 highly variable genes.</span></span>
@@ -252,13 +276,14 @@ with Python Tools</a>.</p>
 <span><span class="co">## or disable the progress bar using `show_progress_bar=False`.</span></span>
 <span><span class="co">##     finished (0:00:01) --&gt; added </span></span>
 <span><span class="co">##     'velocity_graph', sparse matrix with cosine correlations (adata.uns)</span></span></code></pre>
+<pre><code><span><span class="co">## NULL</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="generating-scvelo-plots">Generating scVelo Plots<a class="anchor" aria-label="anchor" href="#generating-scvelo-plots"></a>
 </h3>
 <p>Now, you’re ready to generate scVelo plots. The default dimension
 reduction method is typically UMAP, colored by cluster.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/scVelo.SeuratToAnndata.html">scVelo.Plot</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"cluster"</span>, save <span class="op">=</span> <span class="st">"umap1.png"</span>, figsize <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/scvelo_umap1.png" width="700"></p>
 <p><code>SeuratExtend</code> supports most commonly used parameters for
@@ -267,7 +292,7 @@ method, color palette, displayed clusters, and more. For more detailed
 information on customization and advanced features, refer to the
 function documentation or the <a href="https://scvelo.readthedocs.io/en/stable/scvelo.pl.velocity_embedding_stream.html?highlight=stream" class="external-link">official
 scVelo documentation</a>.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/scVelo.SeuratToAnndata.html">scVelo.Plot</a></span><span class="op">(</span></span>
 <span>  style <span class="op">=</span> <span class="st">"scatter"</span>,</span>
 <span>  color <span class="op">=</span> <span class="st">"cluster"</span>,</span>
@@ -298,7 +323,7 @@ storing the results in a Seurat object for streamlined analysis.</p>
 <p>We will use a subset of myeloid cells from the
 <code>pbmc10k_10X</code> dataset available on the <a href="https://www.10xgenomics.com/datasets" class="external-link">10X Genomics website</a>. If
 you have already loaded the Seurat object, you can skip this step.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://satijalab.org/seurat" class="external-link">Seurat</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SeuratExtend</span><span class="op">)</span></span>
 <span></span>
@@ -314,10 +339,10 @@ calculating the diffusion map. This is done in Python via
 Seurat (e.g., PCA, harmony). The diffusion map (<code>dm</code>) and
 multiscale space (<code>ms</code>) embeddings are then added back to the
 Seurat object.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mye_small</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Palantir-Methods.html">Palantir.RunDM</a></span><span class="op">(</span><span class="va">mye_small</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Determing nearest neighbor graph...</span></span></code></pre>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View the new dimensional reductions "dm" and "ms" in the Seurat Object:</span></span>
 <span><span class="va">mye_small</span><span class="op">@</span><span class="va">reductions</span></span></code></pre></div>
 <pre><code><span><span class="co">## $pca</span></span>
@@ -351,7 +376,7 @@ Seurat object.</p>
 <span><span class="co">##  Projected dimensional reduction calculated:  FALSE </span></span>
 <span><span class="co">##  Jackstraw run: FALSE </span></span>
 <span><span class="co">##  Computed using assay: RNA</span></span></code></pre>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># View the first 2 ms dimensions:</span></span>
 <span><span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">mye_small</span>, reduction <span class="op">=</span> <span class="st">"ms"</span>, group.by <span class="op">=</span> <span class="st">"cluster"</span>, label <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Trajectory_files/figure-html/run-diffusion-map-1.png" width="700"></p>
@@ -369,7 +394,7 @@ more comprehensible display in a two-dimensional plot, especially when
 dealing with a higher-dimensional ‘ms’ space. The following code,
 although not run in this tutorial, illustrates how to implement UMAP on
 ‘ms’ with hypothetical ten dimensions and visualize the result:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Assuming 'ms' has 10 dimensions:</span></span>
 <span><span class="co"># mye_small &lt;- RunUMAP(mye_small, reduction = "ms", dims = 1:10)</span></span>
 <span><span class="co"># DimPlot2(mye_small, group.by = "cluster", label = TRUE, reduction = "umap")</span></span></code></pre></div>
@@ -383,7 +408,7 @@ AnnData<a class="anchor" aria-label="anchor" href="#optional-incorporating-newly
 environment. If you wish to incorporate the dimension reductions
 calculated by Palantir (such as ‘ms’) into this <code>adata</code> and
 use it for visualization, you can do so with the following commands:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Add the 'ms' dimension reduction to the existing AnnData object</span></span>
 <span><span class="fu"><a href="../reference/adata.Load.html">adata.AddDR</a></span><span class="op">(</span><span class="va">mye_small</span>, dr <span class="op">=</span> <span class="st">"ms"</span>, scv.graph <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
@@ -397,18 +422,18 @@ use it for visualization, you can do so with the following commands:</p>
 </h3>
 <p>To predict cell fates and calculate pseudotime, You can manually
 select “start cells” using the <code>CellSelector</code> function.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/DimPlot.html" class="external-link">DimPlot</a></span><span class="op">(</span><span class="va">mye_small</span>, reduction <span class="op">=</span> <span class="st">"ms"</span>, group.by <span class="op">=</span> <span class="st">"cluster"</span><span class="op">)</span></span>
 <span><span class="va">cells</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/CellSelector.html" class="external-link">CellSelector</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span></code></pre></div>
 <p>Then, calculate pseudotime. Results are stored in
 <code>SeuratObj@misc$Palantir$Pseudotime</code>.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mye_small</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Palantir-Methods.html">Palantir.Pseudotime</a></span><span class="op">(</span><span class="va">mye_small</span>, start_cell <span class="op">=</span> <span class="st">"sample1_GAGAGGTAGCAGTACG-1"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Sampling and flocking waypoints...</span></span>
-<span><span class="co">## Time for determining waypoints: 0.0011072675387064615 minutes</span></span>
+<span><span class="co">## Time for determining waypoints: 0.001110819975535075 minutes</span></span>
 <span><span class="co">## Determining pseudotime...</span></span>
 <span><span class="co">## Shortest path distances using 30-nearest neighbor graph...</span></span>
-<span><span class="co">## Time for shortest paths: 0.10401349465052287 minutes</span></span>
+<span><span class="co">## Time for shortest paths: 0.014655212561289469 minutes</span></span>
 <span><span class="co">## Iteratively refining the pseudotime...</span></span>
 <span><span class="co">## Correlation at iteration 1: 1.0000</span></span>
 <span><span class="co">## Entropy and branch probabilities...</span></span>
@@ -416,7 +441,7 @@ select “start cells” using the <code>CellSelector</code> function.</p>
 <span><span class="co">## Identification of terminal states...</span></span>
 <span><span class="co">## Computing fundamental matrix and absorption probabilities...</span></span>
 <span><span class="co">## Project results to all cells...</span></span></code></pre>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ps</span> <span class="op">&lt;-</span> <span class="va">mye_small</span><span class="op">@</span><span class="va">misc</span><span class="op">$</span><span class="va">Palantir</span><span class="op">$</span><span class="va">Pseudotime</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">ps</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                            Pseudotime   Entropy sample1_AAACCCAAGGCCCAAA.1</span></span>
@@ -433,14 +458,12 @@ select “start cells” using the <code>CellSelector</code> function.</p>
 <span><span class="co">## sample1_CTGAGGCAGTCAGGGT-1                  0.1943283</span></span>
 <span><span class="co">## sample1_GCCAACGTCCCGTGTT-1                  0.3033798</span></span>
 <span><span class="co">## sample1_TCAAGCAGTGTGGTCC-1                  0.2975652</span></span></code></pre>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualize cell fate on UMAP</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">ps</span><span class="op">)</span><span class="op">[</span><span class="fl">3</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fate1"</span>, <span class="st">"fate2"</span><span class="op">)</span></span>
 <span><span class="va">mye_small</span><span class="op">@</span><span class="va">meta.data</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">ps</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">ps</span></span>
 <span><span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">mye_small</span>, features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">ps</span><span class="op">)</span>, reduction <span class="op">=</span> <span class="st">"ms"</span>, </span>
-<span>         cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>Entropy <span class="op">=</span> <span class="st">"D"</span><span class="op">)</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Loading required package: viridis</span></span></code></pre>
-<pre><code><span><span class="co">## Loading required package: viridisLite</span></span></code></pre>
+<span>         cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>continuous <span class="op">=</span> <span class="st">"A"</span>, Entropy <span class="op">=</span> <span class="st">"D"</span><span class="op">)</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Trajectory_files/figure-html/calculate-pseudotime-1.png" width="700"></p>
 </div>
 </div>
@@ -579,7 +602,7 @@ across pseudotime and for specific lineages:</p>
 <code class="sourceCode R"><span><span class="co"># Creating a gene trend heatmap</span></span>
 <span><span class="fu"><a href="../reference/GeneTrendHeatmap-Methods.html">GeneTrendHeatmap.Palantir</a></span><span class="op">(</span></span>
 <span>  <span class="va">mye_small</span>, </span>
-<span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD14"</span>, <span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">mye_small</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span><span class="op">)</span>, </span>
+<span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD14"</span>, <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">mye_small</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span><span class="op">)</span>, </span>
 <span>  pseudotime.data <span class="op">=</span> <span class="va">ps</span>, </span>
 <span>  magic <span class="op">=</span> <span class="cn">FALSE</span>, </span>
 <span>  lineage <span class="op">=</span> <span class="st">"fate1"</span></span>
@@ -646,7 +669,7 @@ lineages:</p>
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/GeneTrendHeatmap-Methods.html">GeneTrendHeatmap.Slingshot</a></span><span class="op">(</span></span>
 <span>  <span class="va">mye_small</span>, </span>
-<span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD14"</span>, <span class="fu"><a href="https://mojaveazure.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">mye_small</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span><span class="op">)</span>, </span>
+<span>  features <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"CD14"</span>, <span class="fu"><a href="https://satijalab.github.io/seurat-object/reference/VariableFeatures.html" class="external-link">VariableFeatures</a></span><span class="op">(</span><span class="va">mye_small</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">]</span><span class="op">)</span>, </span>
 <span>  lineage <span class="op">=</span> <span class="st">"slingPseudotime_2"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Using id as id variables</span></span></code></pre>
@@ -721,10 +744,28 @@ manually, you can easily do so by running:</p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_condaenv_seuratextend.html">create_condaenv_seuratextend</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p>This function automatically detects your operating system and sets up
 the environment accordingly. It is currently supported and tested on
-Windows, Intel-based macOS (not Apple Silicon/M1/M2), and Linux (Ubuntu
-20.04) systems. Users with Apple Silicon devices who are interested in
-contributing to the development of M1/M2 support are welcome to reach
-out via GitHub Issues.</p>
+Windows, macOS (both Intel-based and Apple Silicon/M-series), and Linux
+(Ubuntu 20.04) systems.</p>
+<p><strong>Important for macOS Users</strong>:</p>
+<ul>
+<li><p><strong>Intel Macs</strong>: Using R Markdown in RStudio may
+cause crashes when calling Python functions. If you encounter this
+issue, switch to using regular .R script files.</p></li>
+<li>
+<p><strong>Apple Silicon (M1/M2/M3/M4)</strong> <em>(new in
+v1.2.0)</em>: Testing on M4 chips has shown that memory management
+issues between R and Python can cause crashes, particularly when
+performing operations like PCA on AnnData objects after loading R
+objects. To prevent this:</p>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Run this at the START of your session on macOS (before loading any objects)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">SeuratExtend</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/activate_python.html">activate_python</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Only then load your data and proceed with analysis</span></span>
+<span><span class="va">seu</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">readRDS</a></span><span class="op">(</span><span class="st">"path/to/seurat_object.rds"</span><span class="op">)</span></span></code></pre></div>
+</li>
+</ul>
 </div>
 <div class="section level3">
 <h3 id="integrating-seurat-with-anndata">Integrating Seurat with AnnData<a class="anchor" aria-label="anchor" href="#integrating-seurat-with-anndata"></a>
@@ -741,7 +782,7 @@ dimension reduction data.</p>
 <p>First, we convert a <code>Seurat</code> object to a <code>loom</code>
 file which can then be used to create an <code>AnnData</code>
 object:</p>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert Seurat object to loom file and save it locally</span></span>
 <span><span class="va">pbmc_loom_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"pbmc3k_small.loom"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/adata.Load.html">Seu2Loom</a></span><span class="op">(</span><span class="va">pbmc</span>, filename <span class="op">=</span> <span class="va">pbmc_loom_path</span>, add.normdata <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -751,7 +792,7 @@ object:</p>
 </h4>
 <p>Next, we import the <code>loom</code> file into an
 <code>AnnData</code> object, which is handled by Python:</p>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load the loom file into an AnnData object</span></span>
 <span><span class="fu"><a href="../reference/adata.Load.html">adata.LoadLoom</a></span><span class="op">(</span>loompath <span class="op">=</span> <span class="va">pbmc_loom_path</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -760,11 +801,11 @@ object:</p>
 </h4>
 <p>To view the newly created <code>AnnData</code> object, we use
 <code>reticulate</code> to execute Python code:</p>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Print the AnnData object details</span></span>
-<span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/py_run.html" class="external-link">py_run_string</a></span><span class="op">(</span><span class="st">"print(adata)"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">py_run_string</span><span class="op">(</span><span class="st">"print(adata)"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## AnnData object with n_obs × n_vars = 500 × 12627</span></span>
-<span><span class="co">##     obs: 'RNA_snn_res.0.5', 'cluster', 'nCount_RNA', 'nFeature_RNA', 'orig.ident', 'percent.mt', 'seurat_clusters'</span></span>
+<span><span class="co">##     obs: 'RNA_snn_res.0.5', 'cluster', 'condition', 'nCount_RNA', 'nFeature_RNA', 'orig.ident', 'percent.mt', 'sample_id', 'seurat_clusters'</span></span>
 <span><span class="co">##     layers: 'counts'</span></span></code></pre>
 </div>
 <div class="section level4">
@@ -773,13 +814,13 @@ object:</p>
 <p><code>AnnData</code> objects can store more than just gene expression
 and metadata; here we add dimension reduction data from
 <code>Seurat</code>:</p>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Add dimension reduction data from Seurat to AnnData</span></span>
 <span><span class="fu"><a href="../reference/adata.Load.html">adata.AddDR</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span></span>
 <span><span class="co"># Print the updated AnnData object</span></span>
-<span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/py_run.html" class="external-link">py_run_string</a></span><span class="op">(</span><span class="st">"print(adata)"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">py_run_string</span><span class="op">(</span><span class="st">"print(adata)"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## AnnData object with n_obs × n_vars = 500 × 12627</span></span>
-<span><span class="co">##     obs: 'RNA_snn_res.0.5', 'cluster', 'nCount_RNA', 'nFeature_RNA', 'orig.ident', 'percent.mt', 'seurat_clusters'</span></span>
+<span><span class="co">##     obs: 'RNA_snn_res.0.5', 'cluster', 'condition', 'nCount_RNA', 'nFeature_RNA', 'orig.ident', 'percent.mt', 'sample_id', 'seurat_clusters'</span></span>
 <span><span class="co">##     obsm: 'X_pca', 'X_umap'</span></span>
 <span><span class="co">##     layers: 'counts'</span></span></code></pre>
 </div>
@@ -789,7 +830,7 @@ and metadata; here we add dimension reduction data from
 <p>For a streamlined conversion that includes the steps of
 <code><a href="../reference/adata.Load.html">Seu2Loom()</a></code>, <code><a href="../reference/adata.Load.html">adata.LoadLoom()</a></code> and
 <code><a href="../reference/adata.Load.html">adata.AddDR()</a></code>, you can use a single function:</p>
-<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Directly convert Seurat object to AnnData object</span></span>
 <span><span class="fu"><a href="../reference/adata.Load.html">Seu2Adata</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -798,14 +839,14 @@ and metadata; here we add dimension reduction data from
 </h4>
 <p>If new metadata columns are added to the <code>Seurat</code> object,
 they can also be incorporated into the <code>AnnData</code> object:</p>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Add new metadata column to AnnData</span></span>
 <span><span class="va">pbmc</span><span class="op">$</span><span class="va">cluster2</span> <span class="op">&lt;-</span> <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span></span>
 <span><span class="fu"><a href="../reference/adata.Load.html">adata.AddMetadata</a></span><span class="op">(</span><span class="va">pbmc</span>, col <span class="op">=</span> <span class="st">"cluster2"</span><span class="op">)</span></span>
 <span><span class="co"># Print the updated AnnData object</span></span>
-<span><span class="fu"><a href="https://rstudio.github.io/reticulate/reference/py_run.html" class="external-link">py_run_string</a></span><span class="op">(</span><span class="st">"print(adata)"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">py_run_string</span><span class="op">(</span><span class="st">"print(adata)"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## AnnData object with n_obs × n_vars = 500 × 12627</span></span>
-<span><span class="co">##     obs: 'RNA_snn_res.0.5', 'cluster', 'nCount_RNA', 'nFeature_RNA', 'orig.ident', 'percent.mt', 'seurat_clusters', 'cluster2'</span></span>
+<span><span class="co">##     obs: 'RNA_snn_res.0.5', 'cluster', 'condition', 'nCount_RNA', 'nFeature_RNA', 'orig.ident', 'percent.mt', 'sample_id', 'seurat_clusters', 'cluster2'</span></span>
 <span><span class="co">##     obsm: 'X_pca', 'X_umap'</span></span>
 <span><span class="co">##     layers: 'counts'</span></span></code></pre>
 </div>
@@ -814,23 +855,23 @@ they can also be incorporated into the <code>AnnData</code> object:</p>
 </h4>
 <p>You can save the <code>AnnData</code> object to a local file for
 future use:</p>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Save the AnnData object to a local file</span></span>
 <span><span class="va">pbmc_adata_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"pbmc3k_small.h5ad"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/adata.Load.html">adata.Save</a></span><span class="op">(</span><span class="va">pbmc_adata_path</span><span class="op">)</span></span></code></pre></div>
 <p>And load it back when needed:</p>
-<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load an existing AnnData object from file</span></span>
 <span><span class="fu"><a href="../reference/adata.Load.html">adata.Load</a></span><span class="op">(</span><span class="va">pbmc_adata_path</span><span class="op">)</span></span></code></pre></div>
 <p>If you have completed the scVelo tutorial and saved the results, you
 can load the <code>AnnData</code> object and directly generate
 plots:</p>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load the scVelo tutorial results and generate a plot</span></span>
 <span><span class="fu"><a href="../reference/adata.Load.html">adata.Load</a></span><span class="op">(</span><span class="va">adata_path</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/scVelo.SeuratToAnndata.html">scVelo.Plot</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"cluster"</span>, figsize <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>,<span class="fl">4</span><span class="op">)</span>, save <span class="op">=</span> <span class="st">"umap4_load_adata.png"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="figures/scvelo_umap4_load_adata.png" width="700"></p>
-<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## R version 4.4.0 (2024-04-24)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu</span></span>
@@ -869,8 +910,8 @@ plots:</p>
 <span><span class="co">## [21] viridisLite_0.4.2           cowplot_1.1.3              </span></span>
 <span><span class="co">## [23] RColorBrewer_1.1-3          ggplot2_3.5.1              </span></span>
 <span><span class="co">## [25] reticulate_1.38.0           glue_1.7.0                 </span></span>
-<span><span class="co">## [27] hdf5r_1.3.11                SeuratExtend_1.1.0         </span></span>
-<span><span class="co">## [29] SeuratExtendData_0.2.1      Seurat_5.1.0               </span></span>
+<span><span class="co">## [27] hdf5r_1.3.11                SeuratExtend_1.2.0         </span></span>
+<span><span class="co">## [29] SeuratExtendData_0.3.0      Seurat_5.2.1               </span></span>
 <span><span class="co">## [31] SeuratObject_5.0.2          sp_2.1-4                   </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
@@ -892,51 +933,50 @@ plots:</p>
 <span><span class="co">##  [31] listenv_0.9.1             spatstat.utils_3.0-5     </span></span>
 <span><span class="co">##  [33] goftest_1.2-3             RSpectra_0.16-1          </span></span>
 <span><span class="co">##  [35] spatstat.random_3.2-3     fitdistrplus_1.2-1       </span></span>
-<span><span class="co">##  [37] parallelly_1.37.1         DelayedMatrixStats_1.26.0</span></span>
-<span><span class="co">##  [39] pkgdown_2.0.7             leiden_0.4.3.1           </span></span>
-<span><span class="co">##  [41] codetools_0.2-20          DelayedArray_0.30.1      </span></span>
-<span><span class="co">##  [43] tidyselect_1.2.1          UCSC.utils_1.0.0         </span></span>
-<span><span class="co">##  [45] farver_2.1.2              spatstat.explore_3.2-7   </span></span>
-<span><span class="co">##  [47] jsonlite_1.8.8            progressr_0.14.0         </span></span>
-<span><span class="co">##  [49] ggridges_0.5.6            survival_3.7-0           </span></span>
-<span><span class="co">##  [51] systemfonts_1.1.0         ragg_1.3.2               </span></span>
-<span><span class="co">##  [53] ica_1.0-3                 Rcpp_1.0.13              </span></span>
-<span><span class="co">##  [55] gridExtra_2.3             SparseArray_1.4.8        </span></span>
-<span><span class="co">##  [57] xfun_0.45                 withr_3.0.0              </span></span>
-<span><span class="co">##  [59] fastmap_1.2.0             fansi_1.0.6              </span></span>
-<span><span class="co">##  [61] digest_0.6.36             R6_2.5.1                 </span></span>
-<span><span class="co">##  [63] mime_0.12                 textshaping_0.4.0        </span></span>
-<span><span class="co">##  [65] colorspace_2.1-0          scattermore_1.2          </span></span>
-<span><span class="co">##  [67] tensor_1.5                spatstat.data_3.1-2      </span></span>
-<span><span class="co">##  [69] utf8_1.2.4                tidyr_1.3.1              </span></span>
-<span><span class="co">##  [71] generics_0.1.3            data.table_1.15.4        </span></span>
-<span><span class="co">##  [73] httr_1.4.7                htmlwidgets_1.6.4        </span></span>
-<span><span class="co">##  [75] S4Arrays_1.4.1            uwot_0.2.2               </span></span>
-<span><span class="co">##  [77] pkgconfig_2.0.3           gtable_0.3.5             </span></span>
-<span><span class="co">##  [79] lmtest_0.9-40             XVector_0.44.0           </span></span>
-<span><span class="co">##  [81] htmltools_0.5.8.1         dotCall64_1.1-1          </span></span>
-<span><span class="co">##  [83] png_0.1-8                 knitr_1.48               </span></span>
-<span><span class="co">##  [85] rstudioapi_0.16.0         cachem_1.1.0             </span></span>
-<span><span class="co">##  [87] zoo_1.8-12                stringr_1.5.1            </span></span>
-<span><span class="co">##  [89] KernSmooth_2.23-24        parallel_4.4.0           </span></span>
-<span><span class="co">##  [91] miniUI_0.1.1.1            desc_1.4.3               </span></span>
-<span><span class="co">##  [93] pillar_1.9.0              grid_4.4.0               </span></span>
-<span><span class="co">##  [95] vctrs_0.6.5               RANN_2.6.1               </span></span>
-<span><span class="co">##  [97] promises_1.3.0            xtable_1.8-4             </span></span>
-<span><span class="co">##  [99] cluster_2.1.6             evaluate_0.24.0          </span></span>
-<span><span class="co">## [101] cli_3.6.3                 compiler_4.4.0           </span></span>
-<span><span class="co">## [103] crayon_1.5.3              future.apply_1.11.2      </span></span>
-<span><span class="co">## [105] labeling_0.4.3            plyr_1.8.9               </span></span>
-<span><span class="co">## [107] fs_1.6.4                  stringi_1.8.4            </span></span>
-<span><span class="co">## [109] deldir_2.0-4              munsell_0.5.1            </span></span>
-<span><span class="co">## [111] lazyeval_0.2.2            spatstat.geom_3.2-9      </span></span>
-<span><span class="co">## [113] Matrix_1.7-0              RcppHNSW_0.6.0           </span></span>
-<span><span class="co">## [115] patchwork_1.2.0           sparseMatrixStats_1.16.0 </span></span>
-<span><span class="co">## [117] bit64_4.0.5               future_1.33.2            </span></span>
-<span><span class="co">## [119] shiny_1.8.1.1             highr_0.11               </span></span>
-<span><span class="co">## [121] ROCR_1.0-11               igraph_2.0.3             </span></span>
-<span><span class="co">## [123] memoise_2.0.1             bslib_0.4.2              </span></span>
-<span><span class="co">## [125] bit_4.0.5</span></span></code></pre>
+<span><span class="co">##  [37] parallelly_1.37.1         pkgdown_2.0.7            </span></span>
+<span><span class="co">##  [39] DelayedMatrixStats_1.26.0 codetools_0.2-20         </span></span>
+<span><span class="co">##  [41] DelayedArray_0.30.1       tidyselect_1.2.1         </span></span>
+<span><span class="co">##  [43] UCSC.utils_1.0.0          farver_2.1.2             </span></span>
+<span><span class="co">##  [45] spatstat.explore_3.2-7    jsonlite_1.8.8           </span></span>
+<span><span class="co">##  [47] progressr_0.14.0          ggridges_0.5.6           </span></span>
+<span><span class="co">##  [49] survival_3.7-0            systemfonts_1.1.0        </span></span>
+<span><span class="co">##  [51] ragg_1.3.2                ica_1.0-3                </span></span>
+<span><span class="co">##  [53] Rcpp_1.0.13               gridExtra_2.3            </span></span>
+<span><span class="co">##  [55] SparseArray_1.4.8         xfun_0.45                </span></span>
+<span><span class="co">##  [57] withr_3.0.0               fastmap_1.2.0            </span></span>
+<span><span class="co">##  [59] fansi_1.0.6               digest_0.6.36            </span></span>
+<span><span class="co">##  [61] R6_2.5.1                  mime_0.12                </span></span>
+<span><span class="co">##  [63] textshaping_0.4.0         colorspace_2.1-0         </span></span>
+<span><span class="co">##  [65] scattermore_1.2           tensor_1.5               </span></span>
+<span><span class="co">##  [67] spatstat.data_3.1-2       utf8_1.2.4               </span></span>
+<span><span class="co">##  [69] tidyr_1.3.1               generics_0.1.3           </span></span>
+<span><span class="co">##  [71] data.table_1.15.4         httr_1.4.7               </span></span>
+<span><span class="co">##  [73] htmlwidgets_1.6.4         S4Arrays_1.4.1           </span></span>
+<span><span class="co">##  [75] uwot_0.2.2                pkgconfig_2.0.3          </span></span>
+<span><span class="co">##  [77] gtable_0.3.5              lmtest_0.9-40            </span></span>
+<span><span class="co">##  [79] XVector_0.44.0            htmltools_0.5.8.1        </span></span>
+<span><span class="co">##  [81] dotCall64_1.1-1           png_0.1-8                </span></span>
+<span><span class="co">##  [83] knitr_1.48                rstudioapi_0.16.0        </span></span>
+<span><span class="co">##  [85] cachem_1.1.0              zoo_1.8-12               </span></span>
+<span><span class="co">##  [87] stringr_1.5.1             KernSmooth_2.23-24       </span></span>
+<span><span class="co">##  [89] parallel_4.4.0            miniUI_0.1.1.1           </span></span>
+<span><span class="co">##  [91] desc_1.4.3                pillar_1.9.0             </span></span>
+<span><span class="co">##  [93] grid_4.4.0                vctrs_0.6.5              </span></span>
+<span><span class="co">##  [95] RANN_2.6.1                promises_1.3.0           </span></span>
+<span><span class="co">##  [97] xtable_1.8-4              cluster_2.1.6            </span></span>
+<span><span class="co">##  [99] evaluate_0.24.0           cli_3.6.3                </span></span>
+<span><span class="co">## [101] compiler_4.4.0            crayon_1.5.3             </span></span>
+<span><span class="co">## [103] future.apply_1.11.2       labeling_0.4.3           </span></span>
+<span><span class="co">## [105] plyr_1.8.9                fs_1.6.4                 </span></span>
+<span><span class="co">## [107] stringi_1.8.4             deldir_2.0-4             </span></span>
+<span><span class="co">## [109] munsell_0.5.1             lazyeval_0.2.2           </span></span>
+<span><span class="co">## [111] spatstat.geom_3.2-9       Matrix_1.7-0             </span></span>
+<span><span class="co">## [113] RcppHNSW_0.6.0            patchwork_1.2.0          </span></span>
+<span><span class="co">## [115] sparseMatrixStats_1.16.0  bit64_4.0.5              </span></span>
+<span><span class="co">## [117] future_1.33.2             shiny_1.8.1.1            </span></span>
+<span><span class="co">## [119] highr_0.11                ROCR_1.0-11              </span></span>
+<span><span class="co">## [121] igraph_2.0.3              memoise_2.0.1            </span></span>
+<span><span class="co">## [123] bslib_0.4.2               bit_4.0.5</span></span></code></pre>
 </div>
 </div>
 </div>
