@@ -708,7 +708,13 @@ statistically significant differences (small p-values) even when the
 biological effect size is minimal. We recommend being cautious with
 statistical interpretations, especially when visual differences are
 subtle. Consider examining log fold changes (logFC) between groups to
-better assess the magnitude of biological differences. For a
+better assess the magnitude of biological differences. Additionally, the 
+percentage of cells expressing a marker (similar to the pct.1 and pct.2 
+values in Seurat's FindMarkers) is an important metric - if the difference 
+in percentage between groups is minimal, the expression difference may 
+be biologically negligible despite a significant p-value. Parameters l
+ike min.pct in differential expression analysis can help filter out 
+features with low expression prevalence. For a
 comprehensive visualization of differences between two groups,
 <code><a href="../reference/WaterfallPlot.html">WaterfallPlot()</a></code> (see <a href="#generate-a-waterfall-plot">Generate a Waterfall Plot</a>) can
 provide logFC values along with statistical significance. By default,

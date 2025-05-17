@@ -640,7 +640,13 @@ VlnPlot2(matr[1:3,], f = pbmc$cluster, ncol = 1)
 > minimal. We recommend being cautious with statistical interpretations,
 > especially when visual differences are subtle. Consider examining log
 > fold changes (logFC) between groups to better assess the magnitude of
-> biological differences. For a comprehensive visualization of
+> biological differences. Additionally, the percentage of cells expressing 
+> a marker (similar to the pct.1 and pct.2 values in Seurat's FindMarkers) 
+> is an important metric - if the difference in percentage between groups 
+> is minimal, the expression difference may be biologically negligible 
+> despite a significant p-value. Parameters like min.pct in differential 
+> expression analysis can help filter out features with low expression 
+> prevalence. For a comprehensive visualization of
 > differences between two groups, `WaterfallPlot()` (see [Generate a
 > Waterfall Plot](#generate-a-waterfall-plot)) can provide logFC values
 > along with statistical significance. By default, `VlnPlot2` uses the
