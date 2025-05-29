@@ -288,7 +288,7 @@ mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_
 #### Diffusion Map Calculation
 
 Palantir uses diffusion maps for dimensionality reduction to infer
-trajectories. Here’s how to compute and visualize them:
+trajectories. Here's how to compute and visualize them:
 
 ``` r
 # Compute diffusion map
@@ -466,7 +466,9 @@ Explore cutting-edge techniques including trajectory analysis with scVelo/Palant
 
 ## License
 
-GPL (>= 3)
+The SeuratExtend R package code is licensed under GPL-3.0.
+
+The data files (*.rda files in the 'data' folder) are released under CC0 1.0 Universal (CC0 1.0) Public Domain Dedication, meaning they are in the public domain and can be used without any restrictions.
 
 ## Publications Using SeuratExtend
 

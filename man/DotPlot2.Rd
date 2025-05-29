@@ -26,6 +26,7 @@ DotPlot2(
   flip = FALSE,
   free_space = TRUE,
   show_grid = TRUE,
+  scale_percent = TRUE,
   ...
 )
 }
@@ -101,6 +102,8 @@ Flexible color settings for the plot, accepting a variety of inputs:
 
 \item{show_grid}{Whether to show grid lines. Default: TRUE.}
 
+\item{scale_percent}{Whether to scale the percentage values to 0-100 range (TRUE) or keep them in 0-1 range (FALSE). Default: TRUE.}
+
 \item{...}{Additional arguments passed to theme().}
 }
 \value{
@@ -138,4 +141,7 @@ DotPlot2(pbmc, features = genes, group.by = "cluster", split.by = "orig.ident", 
 
 # Custom settings
 DotPlot2(pbmc, features = genes, color_scheme = "OrRd", show_grid = FALSE, border = FALSE, flip = TRUE)
+
+# Keep percentage values in 0-1 range
+DotPlot2(pbmc, features = genes, scale_percent = FALSE)
 }

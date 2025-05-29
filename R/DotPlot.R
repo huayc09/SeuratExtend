@@ -52,6 +52,7 @@
 #' @param flip Whether to flip the coordinates of the plot. Default: FALSE.
 #' @param free_space Whether to allow free space in facets. Default: TRUE.
 #' @param show_grid Whether to show grid lines. Default: TRUE.
+#' @param scale_percent Whether to scale the percentage values to 0-100 range (TRUE) or keep them in 0-1 range (FALSE). Default: TRUE.
 #' @param ... Additional arguments passed to theme().
 #' @return A ggplot object representing the dot plot.
 #' @details
@@ -82,6 +83,9 @@
 #'
 #' # Custom settings
 #' DotPlot2(pbmc, features = genes, color_scheme = "OrRd", show_grid = FALSE, border = FALSE, flip = TRUE)
+#'
+#' # Keep percentage values in 0-1 range
+#' DotPlot2(pbmc, features = genes, scale_percent = FALSE)
 #' @rdname DotPlot2
 #' @export
 
@@ -107,6 +111,7 @@ DotPlot2 <- function(
     flip = FALSE,
     free_space = TRUE,
     show_grid = TRUE,
+    scale_percent = TRUE,
     ...
 ) {
   library(ggplot2)
@@ -151,6 +156,9 @@ DotPlot2 <- function(
   }
 
   pct <- feature_percent(seu, tp, group.by = calc_group.by)
+  if (scale_percent) {
+    pct <- pct * 100
+  }
   pct.m <- melt(pct, value.name = "pct")
   if(ncol(pct) == 1) {
     warning("Only one identity present, the mean expression values will be used")
