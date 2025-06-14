@@ -53,6 +53,7 @@
 #' @param free_space Whether to allow free space in facets. Default: TRUE.
 #' @param show_grid Whether to show grid lines. Default: TRUE.
 #' @param scale_percent Whether to scale the percentage values to 0-100 range (TRUE) or keep them in 0-1 range (FALSE). Default: TRUE.
+#' @param legend_order Order of legends in the plot. Default: NULL (uses ggplot2 default order). When specified, must exactly match the available legend types for the current plot configuration. Use get_available_legends() helper function to see available options.
 #' @param ... Additional arguments passed to theme().
 #' @return A ggplot object representing the dot plot.
 #' @details
@@ -86,6 +87,10 @@
 #'
 #' # Keep percentage values in 0-1 range
 #' DotPlot2(pbmc, features = genes, scale_percent = FALSE)
+#'
+#' # Control legend order
+#' DotPlot2(pbmc, features = genes, legend_order = c("fill", "size"))
+#'
 #' @rdname DotPlot2
 #' @export
 
@@ -112,6 +117,7 @@ DotPlot2 <- function(
     free_space = TRUE,
     show_grid = TRUE,
     scale_percent = TRUE,
+    legend_order = NULL,
     ...
 ) {
   library(ggplot2)
@@ -308,6 +314,38 @@ DotPlot2 <- function(
     p <- p + coord_flip()
   }
 
+  # Apply custom legend order if specified
+  if (!is.null(legend_order)) {
+    available_legends <- get_available_legends(split.by, split.by.method, border)
+    
+    # Strict validation: must exactly match available_legends
+    if (!identical(sort(legend_order), sort(available_legends))) {
+      stop("legend_order must exactly match available legend types: ", 
+           paste(available_legends, collapse = ", "), 
+           ". You provided: ", paste(legend_order, collapse = ", "))
+    }
+    
+    # Apply user-specified order
+    guide_list <- list()
+    for (i in seq_along(legend_order)) {
+      legend_type <- legend_order[i]
+      if (legend_type == "size") {
+        guide_list[[legend_type]] <- guide_legend(order = i)
+      } else if (legend_type == "fill") {
+        guide_list[[legend_type]] <- guide_colorbar(order = i)
+      } else if (legend_type == "color") {
+        if (is.null(split.by)) {
+          guide_list[[legend_type]] <- guide_colorbar(order = i)
+        } else {
+          guide_list[[legend_type]] <- guide_legend(order = i)
+        }
+      } else if (legend_type == "alpha") {
+        guide_list[[legend_type]] <- guide_legend(order = i)
+      }
+    }
+    p <- p + do.call(guides, guide_list)
+  }
+
   return(p)
 }
 
@@ -382,5 +420,40 @@ validate_features <- function(features, seu) {
     }
 
     return(existing)
+  }
+}
+
+#' @title Get Available Legend Types for DotPlot2
+#' @description Helper function to determine which legend types are available for the current DotPlot2 configuration.
+#' @param split.by Split variable (same as in DotPlot2)
+#' @param split.by.method Split method: "border" or "color" (same as in DotPlot2)
+#' @param border Whether borders are used (same as in DotPlot2)
+#' @return Character vector of available legend types
+#' @examples
+#' # No split, with border
+#' get_available_legends(split.by = NULL, split.by.method = "border", border = TRUE)
+#' # Returns: c("size", "fill")
+#'
+#' # Split by variable, using border method
+#' get_available_legends(split.by = "condition", split.by.method = "border", border = TRUE)
+#' # Returns: c("size", "fill", "color")
+#'
+#' # Split by variable, using color method
+#' get_available_legends(split.by = "condition", split.by.method = "color", border = TRUE)
+#' # Returns: c("size", "color", "alpha")
+#' @export
+get_available_legends <- function(split.by, split.by.method, border) {
+  if (is.null(split.by)) {
+    if (border) {
+      return(c("size", "fill"))
+    } else {
+      return(c("size", "color"))
+    }
+  } else {
+    if (split.by.method == "border") {
+      return(c("size", "fill", "color"))
+    } else if (split.by.method == "color") {
+      return(c("size", "color", "alpha"))
+    }
   }
 }

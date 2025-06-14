@@ -476,7 +476,7 @@ scVelo.SeuratToLoom <- function(
   unspliced <- unspliced[cells,]
 
   seu.new <- subset(seu, cells = cells, features = genes)
-  seu.new <- CreateSeuratObject(GetAssayData(seu.new, slot = "counts"), meta.data = seu.new@meta.data)
+  seu.new <- CreateSeuratObject(.get_assay_data_compat(seu.new, slot = "counts"), meta.data = seu.new@meta.data)
   # if(add.reduction) {
   #   seu.new <- NormalizeData(seu.new)
   #   seu.new <- FindVariableFeatures(seu.new)

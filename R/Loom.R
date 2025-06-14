@@ -60,11 +60,11 @@ Seu2Loom <- function(
   layers_group <- file$create_group("layers")
 
   # Extract count matrix and transpose to have cells as rows and genes as columns
-  count_matrix <- t(as.matrix(GetAssayData(seu, slot = "counts")))
+  count_matrix <- t(as.matrix(.get_assay_data_compat(seu, slot = "counts")))
 
   # If add.normdata is TRUE, extract normalized data and set it as the main matrix
   if (isTRUE(add.normdata)) {
-    norm_matrix <- t(as.matrix(GetAssayData(seu, slot = "data")))
+    norm_matrix <- t(as.matrix(.get_assay_data_compat(seu, slot = "data")))
     file$create_dataset("matrix", norm_matrix)
     layers_group$create_dataset("counts", count_matrix)
   } else {

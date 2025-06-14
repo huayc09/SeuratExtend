@@ -179,3 +179,13 @@ message_only_once <- function(title, message) {
     options(setNames(list(FALSE), option.title))
   }
 }
+
+# Helper function to handle GetAssayData compatibility between Seurat v4 and v5
+.get_assay_data_compat <- function(object, slot = "data", assay = NULL) {
+  # Check if we're using SeuratObject v5 or later
+  if (utils::packageVersion("SeuratObject") >= "5.0.0") {
+    return(GetAssayData(object, layer = slot, assay = assay))
+  } else {
+    return(GetAssayData(object, slot = slot, assay = assay))
+  }
+}

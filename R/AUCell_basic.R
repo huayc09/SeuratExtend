@@ -85,7 +85,7 @@ BuildAUCRank <- function(seu, slot = "counts", assay = "RNA", verbose = TRUE){
     seu@misc$AUCell<-list()
     seu@misc$AUCell[["cells_rankings"]] <-
       .AUCell_buildRankings(
-        exprMat = GetAssayData(seu, slot = slot, assay = assay))
+        exprMat = .get_assay_data_compat(seu, slot = slot, assay = assay))
     return(seu)
   }
 }

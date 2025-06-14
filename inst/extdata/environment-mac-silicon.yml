@@ -387,4 +387,3 @@ dependencies:
       - mellon==1.6.0
       - palantir==1.3.6
       - texttable==1.7.0
-prefix: /Users/frambow/Library/r-miniconda-arm64/envs/seuratextend
