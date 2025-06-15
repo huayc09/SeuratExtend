@@ -640,18 +640,18 @@ VlnPlot2(matr[1:3,], f = pbmc$cluster, ncol = 1)
 > minimal. We recommend being cautious with statistical interpretations,
 > especially when visual differences are subtle. Consider examining log
 > fold changes (logFC) between groups to better assess the magnitude of
-> biological differences. Additionally, the percentage of cells expressing 
-> a marker (similar to the pct.1 and pct.2 values in Seurat's FindMarkers) 
-> is an important metric - if the difference in percentage between groups 
-> is minimal, the expression difference may be biologically negligible 
-> despite a significant p-value. Parameters like min.pct in differential 
-> expression analysis can help filter out features with low expression 
-> prevalence. For a comprehensive visualization of
-> differences between two groups, `WaterfallPlot()` (see [Generate a
-> Waterfall Plot](#generate-a-waterfall-plot)) can provide logFC values
-> along with statistical significance. By default, `VlnPlot2` uses the
-> Holm method (`p.adjust.method = "holm"`) to adjust p-values for
-> multiple comparisons.
+> biological differences. Additionally, the percentage of cells
+> expressing a marker (similar to the pct.1 and pct.2 values in Seurat’s
+> FindMarkers) is an important metric - if the difference in percentage
+> between groups is minimal, the expression difference may be
+> biologically negligible despite a significant p-value. Parameters like
+> min.pct in differential expression analysis can help filter out
+> features with low expression prevalence. For a comprehensive
+> visualization of differences between two groups, `WaterfallPlot()`
+> (see [Generate a Waterfall Plot](#generate-a-waterfall-plot)) can
+> provide logFC values along with statistical significance. By default,
+> `VlnPlot2` uses the Holm method (`p.adjust.method = "holm"`) to adjust
+> p-values for multiple comparisons.
 
 ## Visualize Cluster Distribution in Samples
 
@@ -1513,6 +1513,13 @@ color_iwh(30, 5)  # all_hard
 
 Visual comparison of `color_iwh` palettes:
 
+    ## 
+    ## Attaching package: 'hyc'
+
+    ## The following object is masked from 'package:SeuratExtend':
+    ## 
+    ##     show_col2
+
 ![](Visualization_files/figure-gfm/unnamed-chunk-84-1.png)<!-- -->
 
 ### Viridis and RColorBrewer Palettes
@@ -1622,24 +1629,53 @@ sessionInfo()
     ## LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
     ## 
     ## locale:
-    ##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=de_BE.UTF-8        LC_COLLATE=en_US.UTF-8    
-    ##  [5] LC_MONETARY=de_BE.UTF-8    LC_MESSAGES=en_US.UTF-8    LC_PAPER=de_BE.UTF-8       LC_NAME=C                 
-    ##  [9] LC_ADDRESS=C               LC_TELEPHONE=C             LC_MEASUREMENT=de_BE.UTF-8 LC_IDENTIFICATION=C       
+    ##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=de_BE.UTF-8       
+    ##  [4] LC_COLLATE=en_US.UTF-8     LC_MONETARY=de_BE.UTF-8    LC_MESSAGES=en_US.UTF-8   
+    ##  [7] LC_PAPER=de_BE.UTF-8       LC_NAME=C                  LC_ADDRESS=C              
+    ## [10] LC_TELEPHONE=C             LC_MEASUREMENT=de_BE.UTF-8 LC_IDENTIFICATION=C       
     ## 
     ## time zone: Europe/Brussels
     ## tzcode source: system (glibc)
     ## 
     ## attached base packages:
-    ##  [1] tools     parallel  grid      stats4    stats     graphics  grDevices utils     datasets  methods   base     
+    ## [1] stats4    grid      stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ##  [1] slingshot_2.12.0            TrajectoryUtils_1.12.0      SingleCellExperiment_1.26.0 SummarizedExperiment_1.34.0
-    ##  [5] Biobase_2.64.0              GenomicRanges_1.56.1        GenomeInfoDb_1.40.1         princurve_2.1.6            
-    ##  [9] mgcv_1.9-1                  nlme_3.1-165                reticulate_1.38.0           glue_1.7.0                 
-    ##  [ reached getOption("max.print") -- omitted 56 entries ]
+    ##  [1] hyc_0.1.7                 DelayedMatrixStats_1.26.0 DelayedArray_0.30.1       SparseArray_1.4.8        
+    ##  [5] S4Arrays_1.4.1            abind_1.4-5               IRanges_2.38.1            S4Vectors_0.42.1         
+    ##  [9] MatrixGenerics_1.16.0     matrixStats_1.3.0         BiocGenerics_0.50.0       ggbeeswarm_0.7.2         
+    ## [13] rlang_1.1.4               mosaic_1.9.1              mosaicData_0.20.4         ggformula_0.12.0         
+    ## [17] Matrix_1.7-0              lattice_0.22-6            ggtext_0.1.2              magrittr_2.0.3           
+    ## [21] ggpubr_0.6.0              reshape2_1.4.4            ggrepel_0.9.5             cowplot_1.1.3            
+    ## [25] RColorBrewer_1.1-3        viridis_0.6.5             viridisLite_0.4.2         scales_1.3.0             
+    ## [29] ggplot2_3.5.1             tidyr_1.3.1               rlist_0.4.6.2             dplyr_1.1.4              
+    ## [33] Seurat_5.2.1              SeuratExtend_1.2.3        SeuratObject_5.0.2        sp_2.1-4                 
+    ## [37] SeuratExtendData_0.3.0   
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] fs_1.6.4              spatstat.sparse_3.1-0 bitops_1.0-7          httr_1.4.7            sctransform_0.4.1    
-    ##  [6] backports_1.5.0       utf8_1.2.4            lazyeval_0.2.2        uwot_0.2.2            withr_2.5.0          
-    ## [11] gridExtra_2.3         progressr_0.14.0     
-    ##  [ reached getOption("max.print") -- omitted 124 entries ]
+    ##   [1] RcppAnnoy_0.0.22       splines_4.4.0          later_1.3.2            tibble_3.2.1          
+    ##   [5] polyclip_1.10-6        fastDummies_1.7.3      lifecycle_1.0.4        rstatix_0.7.2         
+    ##   [9] globals_0.16.3         MASS_7.3-61            backports_1.5.0        plotly_4.10.4         
+    ##  [13] rmarkdown_2.29         yaml_2.3.9             httpuv_1.6.15          sctransform_0.4.1     
+    ##  [17] spam_2.10-0            spatstat.sparse_3.1-0  reticulate_1.38.0      pbapply_1.7-2         
+    ##  [21] zlibbioc_1.50.0        Rtsne_0.17             purrr_1.0.2            labelled_2.13.0       
+    ##  [25] irlba_2.3.5.1          listenv_0.9.1          spatstat.utils_3.0-5   goftest_1.2-3         
+    ##  [29] RSpectra_0.16-1        spatstat.random_3.2-3  fitdistrplus_1.2-1     parallelly_1.37.1     
+    ##  [33] pkgdown_2.0.7          commonmark_1.9.1       codetools_0.2-20       xml2_1.3.6            
+    ##  [37] tidyselect_1.2.1       farver_2.1.2           spatstat.explore_3.2-7 jsonlite_1.8.8        
+    ##  [41] progressr_0.14.0       ggridges_0.5.6         survival_3.7-0         tools_4.4.0           
+    ##  [45] ica_1.0-3              Rcpp_1.0.13            glue_1.7.0             gridExtra_2.3         
+    ##  [49] xfun_0.45              usethis_2.2.3          withr_2.5.0            fastmap_1.2.0         
+    ##  [53] fansi_1.0.6            digest_0.6.36          R6_2.5.1               mime_0.12             
+    ##  [57] colorspace_2.1-0       scattermore_1.2        tensor_1.5             markdown_1.13         
+    ##  [61] spatstat.data_3.1-2    utf8_1.2.4             generics_0.1.3         data.table_1.15.4     
+    ##  [65] httr_1.4.7             htmlwidgets_1.6.4      uwot_0.2.2             pkgconfig_2.0.3       
+    ##  [69] gtable_0.3.5           lmtest_0.9-40          XVector_0.44.0         htmltools_0.5.8.1     
+    ##  [73] carData_3.0-5          dotCall64_1.1-1        png_0.1-8              knitr_1.48            
+    ##  [77] rstudioapi_0.16.0      nlme_3.1-165           cachem_1.1.0           zoo_1.8-12            
+    ##  [81] stringr_1.5.1          KernSmooth_2.23-24     parallel_4.4.0         miniUI_0.1.1.1        
+    ##  [85] vipor_0.4.7            pillar_1.9.0           vctrs_0.6.5            RANN_2.6.1            
+    ##  [89] promises_1.3.0         car_3.1-2              xtable_1.8-4           cluster_2.1.6         
+    ##  [93] beeswarm_0.4.0         evaluate_0.24.0        cli_3.6.3              compiler_4.4.0        
+    ##  [97] crayon_1.5.3           future.apply_1.11.2    ggsignif_0.6.4         labeling_0.4.3        
+    ##  [ reached getOption("max.print") -- omitted 22 entries ]

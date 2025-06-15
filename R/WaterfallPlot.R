@@ -241,7 +241,7 @@ WaterfallPlot_Calc <- function(
   # Validate log.base at the beginning of the function
   valid_bases <- c("e", "2", "10")
   use_natural_log <- FALSE
-  
+
   # Convert log.base to numeric if it's a numeric string
   if (is.character(log.base) && !(log.base %in% valid_bases)) {
     # Try to convert to numeric
@@ -252,7 +252,7 @@ WaterfallPlot_Calc <- function(
       use_natural_log <- TRUE
     }
   }
-  
+
   # Validate if it's a non-character, non-numeric value
   if (!is.character(log.base) && !is.numeric(log.base)) {
     warning("Invalid log.base type provided, using natural log (base e)")
@@ -264,22 +264,22 @@ WaterfallPlot_Calc <- function(
   ident.1 <- ident.1 %||% levels(f)[1]
   cell.1 <- (f == ident.1)
   cell.2 <- if(is.null(ident.2)) f != ident.1 else f == ident.2
-  
+
   # Check if logFC calculation will be used
   will_use_logfc <- "logFC" %in% c(length, color)
-  
+
   # Prepare matrix for analysis
   if(exp.transform) {
     original_matr <- matr
     matr <- expm1(matr)
   }
-  
+
   # Automatically determine pseudocount if not provided and logFC will be used
   if (is.null(pseudocount) && will_use_logfc) {
     # Check the range on the transformed matrix if applicable
     check_matr <- if(exp.transform) matr else matr
     data_range <- range(check_matr, na.rm = TRUE)
-    
+
     if (data_range[1] >= 0 && data_range[2] <= 1) {
       # 0-1 range data (like AUCell)
       pseudocount <- 0.01
@@ -289,7 +289,7 @@ WaterfallPlot_Calc <- function(
       pseudocount <- 1
       message("Using pseudocount = 1 for logFC calculation.")
     }
-    
+
     # Check for negative values and warn if found
     if (data_range[1] < 0) {
       warning("Negative values detected in data. LogFC calculation may be affected.")
@@ -381,13 +381,14 @@ WaterfallPlot_Plot <- function(
 ) {
   library(ggplot2)
   library(scales)
-  
-  # Score preprocessing
-  scores$rank <- factor(scores$rank, levels = unique(scores$rank))
+
+  # Remove the manual reversal when flip=TRUE
   if(flip){
     scores <- scores[nrow(scores):1, ]
   }
-  
+  # Score preprocessing
+  scores$rank <- factor(scores$rank, levels = unique(scores$rank))
+
   # Auto-determine angle, hjust, and vjust if not provided
   if (is.null(angle)) {
     max_label_length <- max(nchar(as.character(scores$rank)))
@@ -397,11 +398,11 @@ WaterfallPlot_Plot <- function(
       angle <- if (max_label_length <= 2) 0 else -90  # Vertical for longer labels
     }
   }
-  
+
   if (abs(angle) > 90) {
     warning("Angle should be between -90 and 90 degrees for optimal readability.")
   }
-  
+
   if (is.null(hjust)) {
     if (angle > 0) {
       hjust <- 1  # Right align
@@ -411,7 +412,7 @@ WaterfallPlot_Plot <- function(
       hjust <- 0.5  # Center align
     }
   }
-  
+
   if (is.null(vjust)) {
     if (abs(angle) == 90) {
       vjust <- 0.5
@@ -419,7 +420,7 @@ WaterfallPlot_Plot <- function(
       vjust <- 1
     }
   }
-  
+
   # Set fill label
   if(color == "p") lab_fill <- "-log10(p)" else lab_fill <- color
 
@@ -457,7 +458,7 @@ WaterfallPlot_Title <- function(f, ident.1, ident.2, title, length_label, y.labe
   ident.1 <- ident.1 %||% levels(f)[1]
   ident.2 <- ident.2 %||% paste0("non-", ident.1)
   title <- title %||% paste0(ident.1, " vs. ", ident.2)
-  
+
   # Validate log.base for display
   valid_bases <- c("e", "2", "10")
   if (is.character(log.base) && !(log.base %in% valid_bases)) {
@@ -468,7 +469,7 @@ WaterfallPlot_Title <- function(f, ident.1, ident.2, title, length_label, y.labe
       log.base <- "e"
     }
   }
-  
+
   # Create a formatted label for logFC that includes the base
   if (length_label == "logFC") {
     if (log.base == "e") {
@@ -492,7 +493,7 @@ WaterfallPlot_Title <- function(f, ident.1, ident.2, title, length_label, y.labe
   } else {
     formatted_label <- length_label
   }
-  
+
   if(is.null(y.label)) {
     y.label <- formatted_label
     if(isTRUE(flip)) {

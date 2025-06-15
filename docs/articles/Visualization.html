@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SeuratExtend</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.2.3</span>
       </span>
     </div>
 
@@ -50,7 +50,7 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/News.html">What's New in v1.1.0</a>
+      <a href="../articles/News.html">What's New in v1.2.0</a>
     </li>
     <li class="divider">
     </li>
@@ -121,7 +121,7 @@
       <h1 data-toc-skip>Enhanced Visualization</h1>
                         <h4 data-toc-skip class="author">Yichao Hua</h4>
             
-            <h4 data-toc-skip class="date">2025-05-16</h4>
+            <h4 data-toc-skip class="date">2025-06-15</h4>
       
       
       <div class="hidden name"><code>Visualization.Rmd</code></div>
@@ -472,7 +472,7 @@ the plot by adjusting the <code>plot.margin</code> parameter. For
 example, to add more space, you can specify a larger value for the left
 margin (<code>l</code>) like this:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/Heatmap.html">Heatmap</a></span><span class="op">(</span><span class="va">toplot</span>, lab_fill <span class="op">=</span> <span class="st">"zscore"</span>, plot.margin <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">margin</a></span><span class="op">(</span>l <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/Heatmap.html">Heatmap</a></span><span class="op">(</span><span class="va">toplot</span>, lab_fill <span class="op">=</span> <span class="st">"zscore"</span>, plot.margin <span class="op">=</span> <span class="fu">margin</span><span class="op">(</span>l <span class="op">=</span> <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Visualization_files/figure-html/unnamed-chunk-20-1.png" width="528"></p>
 <p>For dense matrices with many features, you might want to show only a
 subset of gene names:</p>
@@ -488,7 +488,7 @@ subset of gene names:</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gene_groups</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"group1"</span>, <span class="st">"group2"</span>, <span class="st">"group3"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">toplot2</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/Heatmap.html">Heatmap</a></span><span class="op">(</span><span class="va">toplot2</span>, lab_fill <span class="op">=</span> <span class="st">"zscore"</span>, facet_row <span class="op">=</span> <span class="va">gene_groups</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">theme</span><span class="op">(</span>axis.text.y <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Visualization_files/figure-html/unnamed-chunk-22-1.png" width="480"></p>
 </div>
 </div>
@@ -708,14 +708,14 @@ statistically significant differences (small p-values) even when the
 biological effect size is minimal. We recommend being cautious with
 statistical interpretations, especially when visual differences are
 subtle. Consider examining log fold changes (logFC) between groups to
-better assess the magnitude of biological differences. Additionally, the 
-percentage of cells expressing a marker (similar to the pct.1 and pct.2 
-values in Seurat's FindMarkers) is an important metric - if the difference 
-in percentage between groups is minimal, the expression difference may 
-be biologically negligible despite a significant p-value. Parameters l
-ike min.pct in differential expression analysis can help filter out 
-features with low expression prevalence. For a
-comprehensive visualization of differences between two groups,
+better assess the magnitude of biological differences. Additionally, the
+percentage of cells expressing a marker (similar to the pct.1 and pct.2
+values in Seurat’s FindMarkers) is an important metric - if the
+difference in percentage between groups is minimal, the expression
+difference may be biologically negligible despite a significant p-value.
+Parameters like min.pct in differential expression analysis can help
+filter out features with low expression prevalence. For a comprehensive
+visualization of differences between two groups,
 <code><a href="../reference/WaterfallPlot.html">WaterfallPlot()</a></code> (see <a href="#generate-a-waterfall-plot">Generate a Waterfall Plot</a>) can
 provide logFC values along with statistical significance. By default,
 <code>VlnPlot2</code> uses the Holm method
@@ -1241,7 +1241,7 @@ different visualization needs:</p>
 <span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, cols <span class="op">=</span> <span class="st">"default"</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, cols <span class="op">=</span> <span class="st">"default"</span>, flip <span class="op">=</span> <span class="cn">FALSE</span>, border <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu">theme</span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="Visualization_files/figure-html/unnamed-chunk-58-1.png" width="720"></p>
 <div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
@@ -1249,7 +1249,7 @@ different visualization needs:</p>
 <span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, cols <span class="op">=</span> <span class="st">"light"</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, cols <span class="op">=</span> <span class="st">"light"</span>, flip <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu">theme</span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="Visualization_files/figure-html/unnamed-chunk-59-1.png" width="720"></p>
 <p>For visualizations requiring more vibrant colors with high contrast
@@ -1395,7 +1395,7 @@ in your function calls.</p>
 <span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span>, cols <span class="op">=</span> <span class="st">"default"</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, flip <span class="op">=</span> <span class="cn">FALSE</span>, cols <span class="op">=</span> <span class="st">"default"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu">theme</span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="Visualization_files/figure-html/unnamed-chunk-68-1.png" width="720"></p>
 </div>
@@ -1411,7 +1411,7 @@ for visibility.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, label <span class="op">=</span> <span class="cn">TRUE</span>, repel <span class="op">=</span> <span class="cn">TRUE</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, cols <span class="op">=</span> <span class="st">"light"</span>, flip <span class="op">=</span> <span class="cn">FALSE</span>, border <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu">theme</span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="Visualization_files/figure-html/unnamed-chunk-69-1.png" width="720"></p>
 </div>
@@ -1432,7 +1432,7 @@ and harmonious without being overwhelming.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, cols <span class="op">=</span> <span class="st">"pro_red"</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, cols <span class="op">=</span> <span class="st">"pro_red"</span>, flip <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu">theme</span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="Visualization_files/figure-html/unnamed-chunk-70-1.png" width="720"></p>
 </div>
@@ -1444,7 +1444,7 @@ and harmonious without being overwhelming.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, cols <span class="op">=</span> <span class="st">"pro_yellow"</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, cols <span class="op">=</span> <span class="st">"pro_yellow"</span>, flip <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu">theme</span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="Visualization_files/figure-html/unnamed-chunk-71-1.png" width="720"></p>
 </div>
@@ -1456,7 +1456,7 @@ and harmonious without being overwhelming.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, cols <span class="op">=</span> <span class="st">"pro_green"</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, cols <span class="op">=</span> <span class="st">"pro_green"</span>, flip <span class="op">=</span> <span class="cn">FALSE</span>, border <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu">theme</span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="Visualization_files/figure-html/unnamed-chunk-72-1.png" width="720"></p>
 </div>
@@ -1468,7 +1468,7 @@ and harmonious without being overwhelming.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, cols <span class="op">=</span> <span class="st">"pro_blue"</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, cols <span class="op">=</span> <span class="st">"pro_blue"</span>, flip <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu">theme</span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="Visualization_files/figure-html/unnamed-chunk-73-1.png" width="720"></p>
 </div>
@@ -1480,7 +1480,7 @@ and harmonious without being overwhelming.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://wilkelab.org/cowplot/reference/plot_grid.html" class="external-link">plot_grid</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/DimPlot2.html">DimPlot2</a></span><span class="op">(</span><span class="va">pbmc</span>, cols <span class="op">=</span> <span class="st">"pro_purple"</span>, theme <span class="op">=</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoAxes</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://satijalab.org/seurat/reference/SeuratTheme.html" class="external-link">NoLegend</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/ClusterDistrBar.html">ClusterDistrBar</a></span><span class="op">(</span><span class="va">pbmc</span><span class="op">$</span><span class="va">orig.ident</span>, <span class="va">pbmc</span><span class="op">$</span><span class="va">cluster</span>, cols <span class="op">=</span> <span class="st">"pro_purple"</span>, flip <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu">theme</span><span class="op">(</span>axis.title.x <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="Visualization_files/figure-html/unnamed-chunk-74-1.png" width="720"></p>
 </div>
@@ -1720,7 +1720,7 @@ your Seurat object:</p>
 <span><span class="co">## [8] methods   base     </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
-<span><span class="co">##  [1] hyc_0.1.6                 tidyr_1.3.1              </span></span>
+<span><span class="co">##  [1] hyc_0.1.7                 tidyr_1.3.1              </span></span>
 <span><span class="co">##  [3] DelayedMatrixStats_1.26.0 DelayedArray_0.30.1      </span></span>
 <span><span class="co">##  [5] SparseArray_1.4.8         S4Arrays_1.4.1           </span></span>
 <span><span class="co">##  [7] abind_1.4-5               IRanges_2.38.1           </span></span>
@@ -1736,7 +1736,7 @@ your Seurat object:</p>
 <span><span class="co">## [27] ggrepel_0.9.5             viridis_0.6.5            </span></span>
 <span><span class="co">## [29] viridisLite_0.4.2         cowplot_1.1.3            </span></span>
 <span><span class="co">## [31] RColorBrewer_1.1-3        ggplot2_3.5.1            </span></span>
-<span><span class="co">## [33] SeuratExtend_1.2.0        SeuratExtendData_0.3.0   </span></span>
+<span><span class="co">## [33] SeuratExtend_1.2.3        SeuratExtendData_0.3.0   </span></span>
 <span><span class="co">## [35] Seurat_5.2.1              SeuratObject_5.0.2       </span></span>
 <span><span class="co">## [37] sp_2.1-4                 </span></span>
 <span><span class="co">## </span></span>

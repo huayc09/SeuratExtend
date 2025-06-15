@@ -51,8 +51,8 @@ head(matr, 2:3)
 
     ##                                           cells
     ## gene sets                                  CTATAAGATCGTTT-1 GTGATTCTGGTTCA-1 ACGTTGGACCGTAA-1
-    ##   GO:0002376 immune system process (3276g)       0.21388594       0.22779795        0.2343026
-    ##   GO:0001776 leukocyte homeostasis (122g)        0.03322664       0.02562289        0.0456579
+    ##   GO:0002376 immune system process (3276g)       0.21597725       0.22490923       0.25025577
+    ##   GO:0001776 leukocyte homeostasis (122g)        0.03165284       0.01844353       0.04300543
 
 For the “parent” argument, you can input any term from the GO database,
 be it a GO ID or a pathway name. To get a glimpse of commonly used GO
@@ -62,10 +62,12 @@ categories, you can run `GeneSetAnalysisGO()` without any arguments:
 GeneSetAnalysisGO()
 ```
 
-    ##                 immune_system_process                  response_to_stimulus                             signaling 
-    ##                          "GO:0002376"                          "GO:0050896"                          "GO:0023052" 
-    ##                     metabolic_process regulation_of_vasculature_development                   signal_transduction 
-    ##                          "GO:0008152"                          "GO:1901342"                          "GO:0007165"
+    ##                 immune_system_process                  response_to_stimulus 
+    ##                          "GO:0002376"                          "GO:0050896" 
+    ##                             signaling                     metabolic_process 
+    ##                          "GO:0023052"                          "GO:0008152" 
+    ## regulation_of_vasculature_development                   signal_transduction 
+    ##                          "GO:1901342"                          "GO:0007165"
 
 Here are some suggested visualization methods:
 
@@ -119,14 +121,18 @@ database:
 GeneSetAnalysisReactome()
 ```
 
-    ##                           R-HSA-109582                           R-HSA-112316                          R-HSA-1266738 
-    ##                           "Hemostasis"                      "Neuronal System"                "Developmental Biology" 
-    ##                          R-HSA-1430728                          R-HSA-1474165                          R-HSA-1474244 
-    ##                           "Metabolism"                         "Reproduction"    "Extracellular matrix organization" 
-    ##                          R-HSA-1500931                           R-HSA-162582                          R-HSA-1640170 
-    ##              "Cell-Cell communication"                  "Signal Transduction"                           "Cell Cycle" 
-    ##                          R-HSA-1643685                           R-HSA-168256                          R-HSA-1852241 
-    ##                              "Disease"                        "Immune System" "Organelle biogenesis and maintenance" 
+    ##                           R-HSA-109582                           R-HSA-112316 
+    ##                           "Hemostasis"                      "Neuronal System" 
+    ##                          R-HSA-1266738                          R-HSA-1430728 
+    ##                "Developmental Biology"                           "Metabolism" 
+    ##                          R-HSA-1474165                          R-HSA-1474244 
+    ##                         "Reproduction"    "Extracellular matrix organization" 
+    ##                          R-HSA-1500931                           R-HSA-162582 
+    ##              "Cell-Cell communication"                  "Signal Transduction" 
+    ##                          R-HSA-1640170                          R-HSA-1643685 
+    ##                           "Cell Cycle"                              "Disease" 
+    ##                           R-HSA-168256                          R-HSA-1852241 
+    ##                        "Immune System" "Organelle biogenesis and maintenance" 
     ##  [ reached getOption("max.print") -- omitted 17 entries ]
 
 ### Managing and Customizing GO/Reactome Databases (New in v1.2.0)
@@ -214,10 +220,12 @@ Here’s how you can view the available collections:
 names(SeuratExtendData::Genesets_data$human$GSEA)
 ```
 
-    ##  [1] "positional gene sets"                 "all curated gene sets"                "chemical and genetic perturbations"  
-    ##  [4] "BioCarta gene sets"                   "KEGG gene sets"                       "PID gene sets"                       
-    ##  [7] "all canonical pathways"               "all motif gene sets"                  "transcription factor targets"        
-    ## [10] "all computational gene sets"          "all immunologic signatures gene sets" "hallmark gene sets"
+    ##  [1] "positional gene sets"                 "all curated gene sets"               
+    ##  [3] "chemical and genetic perturbations"   "BioCarta gene sets"                  
+    ##  [5] "KEGG gene sets"                       "PID gene sets"                       
+    ##  [7] "all canonical pathways"               "all motif gene sets"                 
+    ##  [9] "transcription factor targets"         "all computational gene sets"         
+    ## [11] "all immunologic signatures gene sets" "hallmark gene sets"
 
 Furthermore, for cluster annotations, the `SeuratExtend::PanglaoDB_data`
 contains a valuable resource: marker lists for 178 distinct cell types,
@@ -366,8 +374,8 @@ result <- SearchDatabase("CD3D", return = "ID")
 result
 ```
 
-    ##  [1] "GO:0001775" "GO:0002250" "GO:0002253" "GO:0002376" "GO:0002429" "GO:0002521" "GO:0002682" "GO:0002684" "GO:0002757"
-    ## [10] "GO:0002764" "GO:0002768" "GO:0003674"
+    ##  [1] "GO:0001775" "GO:0002250" "GO:0002253" "GO:0002376" "GO:0002429" "GO:0002521" "GO:0002682" "GO:0002684"
+    ##  [9] "GO:0002757" "GO:0002764" "GO:0002768" "GO:0003674"
     ##  [ reached getOption("max.print") -- omitted 94 entries ]
 
 Alternatively, if you need the output as a gene list formatted for
@@ -395,9 +403,9 @@ glimpse(result)
 
     ## Rows: 106
     ## Columns: 3
-    ## $ SetID   <chr> "GO:0001775", "GO:0002250", "GO:0002253", "GO:0002376", "GO:0002429", "GO:0002521", "GO:0002682", "GO:0002…
-    ## $ SetName <chr> "cell activation", "adaptive immune response", "activation of immune response", "immune system process", "…
-    ## $ Genes   <chr> "TRBC2,DAPL1,IRGM,TESPA1,TMEM131L,PSMB11,CCDC88B,MFSD2B,LILRA5,TARM1,TRDC,GPR89A,il18-il18r1_human,il35 re…
+    ## $ SetID   <chr> "GO:0001775", "GO:0002250", "GO:0002253", "GO:0002376", "GO:0002429", "GO:0002521", "GO:00…
+    ## $ SetName <chr> "cell activation", "adaptive immune response", "activation of immune response", "immune sy…
+    ## $ Genes   <chr> "TRBC2,DAPL1,IRGM,TESPA1,TMEM131L,PSMB11,CCDC88B,MFSD2B,LILRA5,TARM1,TRDC,GPR89A,il18-il18…
 
 ### Filtering a Customized Gene Set
 
@@ -411,12 +419,13 @@ SearchPathways(genesets = hall50$human, item = c("CD3D", "interferon"))
 ```
 
     ## $HALLMARK_INTERFERON_ALPHA_RESPONSE
-    ##  [1] "MX1"        "ISG15"      "AC004551.1" "IFIT3"      "IFI44"      "IFI35"      "IRF7"       "RSAD2"      "IFI44L"    
-    ## [10] "IFITM1"     "IFI27"      "IRF9"      
+    ##  [1] "MX1"        "ISG15"      "AC004551.1" "IFIT3"      "IFI44"      "IFI35"      "IRF7"       "RSAD2"     
+    ##  [9] "IFI44L"     "IFITM1"     "IFI27"      "IRF9"      
     ##  [ reached getOption("max.print") -- omitted 85 entries ]
     ## 
     ## $HALLMARK_INTERFERON_GAMMA_RESPONSE
-    ##  [1] "STAT1"   "ISG15"   "IFIT1"   "MX1"     "IFIT3"   "IFI35"   "IRF7"    "IFIT2"   "OAS2"    "TAP1"    "EIF2AK2" "RSAD2"  
+    ##  [1] "STAT1"   "ISG15"   "IFIT1"   "MX1"     "IFIT3"   "IFI35"   "IRF7"    "IFIT2"   "OAS2"    "TAP1"   
+    ## [11] "EIF2AK2" "RSAD2"  
     ##  [ reached getOption("max.print") -- omitted 188 entries ]
     ## 
     ## $HALLMARK_ALLOGRAFT_REJECTION
@@ -478,12 +487,18 @@ terms <- FilterGOTerms(parent = "GO:0002376")
 RenameGO(terms)
 ```
 
-    ##  [1] "GO:0001773 myeloid dendritic cell activation (32g)"        "GO:0001774 microglial cell activation (57g)"              
-    ##  [3] "GO:0001776 leukocyte homeostasis (122g)"                   "GO:0001777 T cell homeostatic proliferation (4g)"         
-    ##  [5] "GO:0001779 natural killer cell differentiation (27g)"      "GO:0001780 neutrophil homeostasis (23g)"                  
-    ##  [7] "GO:0001782 B cell homeostasis (37g)"                       "GO:0001787 natural killer cell proliferation (19g)"       
-    ##  [9] "GO:0001788 antibody-dependent cellular cytotoxicity (10g)" "GO:0001794 type IIa hypersensitivity (12g)"               
-    ## [11] "GO:0001802 type III hypersensitivity (3g)"                 "GO:0001806 type IV hypersensitivity (5g)"                 
+    ##  [1] "GO:0001773 myeloid dendritic cell activation (32g)"       
+    ##  [2] "GO:0001774 microglial cell activation (57g)"              
+    ##  [3] "GO:0001776 leukocyte homeostasis (122g)"                  
+    ##  [4] "GO:0001777 T cell homeostatic proliferation (4g)"         
+    ##  [5] "GO:0001779 natural killer cell differentiation (27g)"     
+    ##  [6] "GO:0001780 neutrophil homeostasis (23g)"                  
+    ##  [7] "GO:0001782 B cell homeostasis (37g)"                      
+    ##  [8] "GO:0001787 natural killer cell proliferation (19g)"       
+    ##  [9] "GO:0001788 antibody-dependent cellular cytotoxicity (10g)"
+    ## [10] "GO:0001794 type IIa hypersensitivity (12g)"               
+    ## [11] "GO:0001802 type III hypersensitivity (3g)"                
+    ## [12] "GO:0001806 type IV hypersensitivity (5g)"                 
     ##  [ reached getOption("max.print") -- omitted 420 entries ]
 
 - **By Gene Count:** If you’re interested in pathways of a specific size
@@ -498,12 +513,18 @@ terms2 <- FilterGOTerms(term = terms, n.min = 10, n.max = 1000)
 RenameGO(terms2)
 ```
 
-    ##  [1] "GO:0001773 myeloid dendritic cell activation (32g)"        "GO:0001774 microglial cell activation (57g)"              
-    ##  [3] "GO:0001776 leukocyte homeostasis (122g)"                   "GO:0001779 natural killer cell differentiation (27g)"     
-    ##  [5] "GO:0001780 neutrophil homeostasis (23g)"                   "GO:0001782 B cell homeostasis (37g)"                      
-    ##  [7] "GO:0001787 natural killer cell proliferation (19g)"        "GO:0001788 antibody-dependent cellular cytotoxicity (10g)"
-    ##  [9] "GO:0001794 type IIa hypersensitivity (12g)"                "GO:0001865 NK T cell differentiation (11g)"               
-    ## [11] "GO:0001866 NK T cell proliferation (14g)"                  "GO:0001867 complement activation, lectin pathway (21g)"   
+    ##  [1] "GO:0001773 myeloid dendritic cell activation (32g)"       
+    ##  [2] "GO:0001774 microglial cell activation (57g)"              
+    ##  [3] "GO:0001776 leukocyte homeostasis (122g)"                  
+    ##  [4] "GO:0001779 natural killer cell differentiation (27g)"     
+    ##  [5] "GO:0001780 neutrophil homeostasis (23g)"                  
+    ##  [6] "GO:0001782 B cell homeostasis (37g)"                      
+    ##  [7] "GO:0001787 natural killer cell proliferation (19g)"       
+    ##  [8] "GO:0001788 antibody-dependent cellular cytotoxicity (10g)"
+    ##  [9] "GO:0001794 type IIa hypersensitivity (12g)"               
+    ## [10] "GO:0001865 NK T cell differentiation (11g)"               
+    ## [11] "GO:0001866 NK T cell proliferation (14g)"                 
+    ## [12] "GO:0001867 complement activation, lectin pathway (21g)"   
     ##  [ reached getOption("max.print") -- omitted 234 entries ]
 
 - **End-Level Pathways:** If you prefer to look at only the end-level
@@ -589,56 +610,58 @@ sessionInfo()
     ## LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
     ## 
     ## locale:
-    ##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=de_BE.UTF-8        LC_COLLATE=en_US.UTF-8    
-    ##  [5] LC_MONETARY=de_BE.UTF-8    LC_MESSAGES=en_US.UTF-8    LC_PAPER=de_BE.UTF-8       LC_NAME=C                 
-    ##  [9] LC_ADDRESS=C               LC_TELEPHONE=C             LC_MEASUREMENT=de_BE.UTF-8 LC_IDENTIFICATION=C       
+    ##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=de_BE.UTF-8       
+    ##  [4] LC_COLLATE=en_US.UTF-8     LC_MONETARY=de_BE.UTF-8    LC_MESSAGES=en_US.UTF-8   
+    ##  [7] LC_PAPER=de_BE.UTF-8       LC_NAME=C                  LC_ADDRESS=C              
+    ## [10] LC_TELEPHONE=C             LC_MEASUREMENT=de_BE.UTF-8 LC_IDENTIFICATION=C       
     ## 
     ## time zone: Europe/Brussels
     ## tzcode source: system (glibc)
     ## 
     ## attached base packages:
-    ##  [1] tools     grid      parallel  stats4    stats     graphics  grDevices utils     datasets  methods   base     
+    ##  [1] parallel  stats4    grid      stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ##  [1] glue_1.7.0                mgcv_1.9-1                nlme_3.1-165              reticulate_1.38.0        
-    ##  [5] loomR_0.2.1.9000          hdf5r_1.3.11              R6_2.5.1                  ggrepel_0.9.5            
-    ##  [9] cowplot_1.1.3             ggpubr_0.6.0              tidyr_1.3.1               rlist_0.4.6.2            
-    ## [13] RColorBrewer_1.1-3        viridis_0.6.5             viridisLite_0.4.2         mosaic_1.9.1             
-    ## [17] mosaicData_0.20.4         ggformula_0.12.0          lattice_0.22-6            rlang_1.1.4              
-    ## [21] scales_1.3.0              reshape2_1.4.4            ggplot2_3.5.1             doMC_1.3.8               
-    ## [25] iterators_1.0.14          foreach_1.5.2             DelayedMatrixStats_1.26.0 DelayedArray_0.30.1      
-    ## [29] SparseArray_1.4.8         S4Arrays_1.4.1            abind_1.4-5               IRanges_2.38.1           
-    ## [33] S4Vectors_0.42.1          MatrixGenerics_1.16.0     matrixStats_1.3.0         BiocGenerics_0.50.0      
-    ## [37] Matrix_1.7-0              dplyr_1.1.4               Seurat_5.2.1              SeuratExtend_1.2.0       
-    ## [41] SeuratObject_5.0.2        sp_2.1-4                  SeuratExtendData_0.3.0   
+    ##  [1] doMC_1.3.8                iterators_1.0.14          foreach_1.5.2             hyc_0.1.7                
+    ##  [5] DelayedMatrixStats_1.26.0 DelayedArray_0.30.1       SparseArray_1.4.8         S4Arrays_1.4.1           
+    ##  [9] abind_1.4-5               IRanges_2.38.1            S4Vectors_0.42.1          MatrixGenerics_1.16.0    
+    ## [13] matrixStats_1.3.0         BiocGenerics_0.50.0       ggbeeswarm_0.7.2          rlang_1.1.4              
+    ## [17] mosaic_1.9.1              mosaicData_0.20.4         ggformula_0.12.0          Matrix_1.7-0             
+    ## [21] lattice_0.22-6            ggtext_0.1.2              magrittr_2.0.3            ggpubr_0.6.0             
+    ## [25] reshape2_1.4.4            ggrepel_0.9.5             cowplot_1.1.3             RColorBrewer_1.1-3       
+    ## [29] viridis_0.6.5             viridisLite_0.4.2         scales_1.3.0              ggplot2_3.5.1            
+    ## [33] tidyr_1.3.1               rlist_0.4.6.2             dplyr_1.1.4               Seurat_5.2.1             
+    ## [37] SeuratExtend_1.2.3        SeuratObject_5.0.2        sp_2.1-4                  SeuratExtendData_0.3.0   
     ## 
     ## loaded via a namespace (and not attached):
     ##   [1] RcppAnnoy_0.0.22         splines_4.4.0            later_1.3.2              tibble_3.2.1            
     ##   [5] polyclip_1.10-6          fastDummies_1.7.3        lifecycle_1.0.4          rstatix_0.7.2           
-    ##   [9] globals_0.16.3           MASS_7.3-61              backports_1.5.0          magrittr_2.0.3          
-    ##  [13] plotly_4.10.4            rmarkdown_2.29           yaml_2.3.9               httpuv_1.6.15           
-    ##  [17] sctransform_0.4.1        spam_2.10-0              spatstat.sparse_3.1-0    pbapply_1.7-2           
-    ##  [21] zlibbioc_1.50.0          Rtsne_0.17               purrr_1.0.2              rappdirs_0.3.3          
-    ##  [25] labelled_2.13.0          irlba_2.3.5.1            listenv_0.9.1            spatstat.utils_3.0-5    
-    ##  [29] goftest_1.2-3            RSpectra_0.16-1          spatstat.random_3.2-3    fitdistrplus_1.2-1      
-    ##  [33] parallelly_1.37.1        pkgdown_2.0.7            codetools_0.2-20         tidyselect_1.2.1        
-    ##  [37] farver_2.1.2             spatstat.explore_3.2-7   jsonlite_1.8.8           progressr_0.14.0        
-    ##  [41] ggridges_0.5.6           survival_3.7-0           ica_1.0-3                Rcpp_1.0.13             
-    ##  [45] gridExtra_2.3            xfun_0.45                usethis_2.2.3            withr_3.0.0             
-    ##  [49] BiocManager_1.30.23      fastmap_1.2.0            fansi_1.0.6              digest_0.6.36           
-    ##  [53] mime_0.12                colorspace_2.1-0         scattermore_1.2          tensor_1.5              
-    ##  [57] spatstat.data_3.1-2      utf8_1.2.4               generics_0.1.3           data.table_1.15.4       
-    ##  [61] httr_1.4.7               htmlwidgets_1.6.4        uwot_0.2.2               pkgconfig_2.0.3         
-    ##  [65] gtable_0.3.5             rsconnect_1.3.1          lmtest_0.9-40            XVector_0.44.0          
-    ##  [69] htmltools_0.5.8.1        carData_3.0-5            dotCall64_1.1-1          png_0.1-8               
-    ##  [73] knitr_1.48               rstudioapi_0.16.0        cachem_1.1.0             zoo_1.8-12              
-    ##  [77] stringr_1.5.1            KernSmooth_2.23-24       miniUI_0.1.1.1           pillar_1.9.0            
-    ##  [81] vctrs_0.6.5              RANN_2.6.1               promises_1.3.0           car_3.1-2               
-    ##  [85] xtable_1.8-4             cluster_2.1.6            evaluate_0.24.0          cli_3.6.3               
-    ##  [89] compiler_4.4.0           crayon_1.5.3             future.apply_1.11.2      ggsignif_0.6.4          
-    ##  [93] labeling_0.4.3           plyr_1.8.9               forcats_1.0.0            fs_1.6.4                
-    ##  [97] stringi_1.8.4            deldir_2.0-4             munsell_0.5.1            lazyeval_0.2.2          
-    ## [101] spatstat.geom_3.2-9      mosaicCore_0.9.4.0       RcppHNSW_0.6.0           hms_1.1.3               
-    ## [105] patchwork_1.2.0          bit64_4.0.5              sparseMatrixStats_1.16.0 future_1.33.2           
-    ## [109] shiny_1.8.1.1            highr_0.11               haven_2.5.4              ROCR_1.0-11             
-    ## [113] igraph_2.0.3             broom_1.0.6              memoise_2.0.1            bit_4.0.5
+    ##   [9] globals_0.16.3           MASS_7.3-61              backports_1.5.0          plotly_4.10.4           
+    ##  [13] rmarkdown_2.29           yaml_2.3.9               httpuv_1.6.15            sctransform_0.4.1       
+    ##  [17] spam_2.10-0              spatstat.sparse_3.1-0    reticulate_1.38.0        pbapply_1.7-2           
+    ##  [21] zlibbioc_1.50.0          Rtsne_0.17               purrr_1.0.2              labelled_2.13.0         
+    ##  [25] irlba_2.3.5.1            listenv_0.9.1            spatstat.utils_3.0-5     goftest_1.2-3           
+    ##  [29] RSpectra_0.16-1          spatstat.random_3.2-3    fitdistrplus_1.2-1       parallelly_1.37.1       
+    ##  [33] pkgdown_2.0.7            commonmark_1.9.1         codetools_0.2-20         xml2_1.3.6              
+    ##  [37] tidyselect_1.2.1         farver_2.1.2             spatstat.explore_3.2-7   jsonlite_1.8.8          
+    ##  [41] progressr_0.14.0         ggridges_0.5.6           survival_3.7-0           tools_4.4.0             
+    ##  [45] ica_1.0-3                Rcpp_1.0.13              glue_1.7.0               gridExtra_2.3           
+    ##  [49] xfun_0.45                usethis_2.2.3            withr_2.5.0              fastmap_1.2.0           
+    ##  [53] fansi_1.0.6              digest_0.6.36            R6_2.5.1                 mime_0.12               
+    ##  [57] colorspace_2.1-0         scattermore_1.2          tensor_1.5               markdown_1.13           
+    ##  [61] spatstat.data_3.1-2      utf8_1.2.4               generics_0.1.3           data.table_1.15.4       
+    ##  [65] httr_1.4.7               htmlwidgets_1.6.4        uwot_0.2.2               pkgconfig_2.0.3         
+    ##  [69] gtable_0.3.5             rsconnect_1.3.1          lmtest_0.9-40            XVector_0.44.0          
+    ##  [73] htmltools_0.5.8.1        carData_3.0-5            dotCall64_1.1-1          png_0.1-8               
+    ##  [77] knitr_1.48               rstudioapi_0.16.0        nlme_3.1-165             cachem_1.1.0            
+    ##  [81] zoo_1.8-12               stringr_1.5.1            KernSmooth_2.23-24       miniUI_0.1.1.1          
+    ##  [85] vipor_0.4.7              pillar_1.9.0             vctrs_0.6.5              RANN_2.6.1              
+    ##  [89] promises_1.3.0           car_3.1-2                xtable_1.8-4             cluster_2.1.6           
+    ##  [93] beeswarm_0.4.0           evaluate_0.24.0          cli_3.6.3                compiler_4.4.0          
+    ##  [97] crayon_1.5.3             future.apply_1.11.2      ggsignif_0.6.4           labeling_0.4.3          
+    ## [101] plyr_1.8.9               forcats_1.0.0            fs_1.6.4                 stringi_1.8.4           
+    ## [105] deldir_2.0-4             munsell_0.5.1            lazyeval_0.2.2           spatstat.geom_3.2-9     
+    ## [109] mosaicCore_0.9.4.0       RcppHNSW_0.6.0           hms_1.1.3                patchwork_1.2.0         
+    ## [113] sparseMatrixStats_1.16.0 future_1.33.2            shiny_1.8.1.1            highr_0.11              
+    ## [117] haven_2.5.4              ROCR_1.0-11              gridtext_0.1.5           igraph_2.0.3            
+    ## [121] broom_1.0.6              memoise_2.0.1
