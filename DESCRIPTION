@@ -1,7 +1,7 @@
 Package: SeuratExtend
 Type: Package
 Title: SeuratExtend
-Version: 1.2.3
+Version: 1.2.4
 Author: Yichao Hua
 Maintainer: Yichao Hua <yichao.hua@uk-essen.de>
 Description: SeuratExtend is an R package designed to improve and simplify the analysis of scRNA-seq data using the Seurat object. It provides an array of enhanced visualization tools, an integrated functional and pathway analysis pipeline, seamless integration with popular Python tools, and a suite of utility functions to aid in data manipulation and presentation.

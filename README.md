@@ -21,7 +21,7 @@
 
 If you use SeuratExtend in your research, please cite:
 
-Hua, Y., Weng, L., Zhao, F., and Rambow, F. (2024). SeuratExtend: Streamlining Single-Cell RNA-Seq Analysis Through an Integrated and Intuitive Framework. bioRxiv, 2024.08.01.606144. https://doi.org/10.1101/2024.08.01.606144
+Hua, Y., Weng, L., Zhao, F., and Rambow, F. (2025). SeuratExtend: streamlining single-cell RNA-seq analysis through an integrated and intuitive framework. Gigascience 14, giaf076. https://doi.org/10.1093/gigascience/giaf076.
 
 ## Installation
 
