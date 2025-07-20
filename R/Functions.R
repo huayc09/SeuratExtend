@@ -7,6 +7,7 @@
 #' @param ident cluster name, Default: all clusters
 #' @param group.by A variable name in meta.data to group by, if you don't want to use
 #' default Idents of Seurat object
+#' @param cells Cell identifiers to be used. Defaults to all cells.
 #' @param DefaultAssay Assay to use, Default: NULL (uses object's default assay)
 #' @param above Above which value will be considered as positive cell, Default: 0
 #' @param total If to calculate proportion in total cells of selected clusters, Default: F
@@ -29,6 +30,10 @@
 #' # Group by a different variable
 #' feature_percent(pbmc, feature = genes, group.by = "orig.ident")
 #'
+#' # Use specific cells only
+#' b_cells <- colnames(pbmc)[pbmc$cluster == "B cell"]
+#' feature_percent(pbmc, feature = genes, cells = b_cells)
+#'
 #' # Also check the proportion of expressed cells in total clusters
 #' feature_percent(pbmc, feature = genes, total = T)
 #'
@@ -43,6 +48,7 @@ feature_percent <- function(
   feature,
   ident = NULL,
   group.by = NULL,
+  cells = NULL,
   DefaultAssay = NULL,
   above = 0,
   total = F,
@@ -62,18 +68,50 @@ feature_percent <- function(
 
   DefaultAssay(seu) <- DefaultAssay
 
-  if(is.null(group.by)){
-    f <- Idents(seu)
+  # Handle cells parameter (similar to Seu2Matr implementation)
+  cells <- cells %||% colnames(seu)
+  if(is.logical(cells)) {
+    if(length(cells) != ncol(seu)) {
+      stop("Logical value of 'cells' should be the same length as cells in ",
+           "Seurat object")
+    } else {
+      cells.l <- cells
+      cells <- colnames(seu)[cells]
+    }
   } else {
-    f <- factor(seu@meta.data[,group.by])
+    if(all(!cells %in% colnames(seu))) {
+      stop("'cells' not found in Seurat object")
+    }else if(any(!cells %in% colnames(seu))) {
+      cells.out <- setdiff(cells, colnames(seu))
+      stop(length(cells.out), " cell(s) not found in Seurat object: '",
+           cells.out[1], "'...")
+    }
+    cells.l <- colnames(seu) %in% cells
   }
-  ident <- ident %||% levels(f)
-  cells <- colnames(seu)[f %in% ident]
+
+  # Get grouping factor and filter by cells
+  if(is.null(group.by)){
+    f <- Idents(seu)[cells]
+  } else {
+    f <- factor(seu@meta.data[cells, group.by])
+  }
+  
+  # Filter by ident if specified
+  if(!is.null(ident)) {
+    ident_filter <- f %in% ident
+    cells <- cells[ident_filter]
+    f <- f[ident_filter]
+  }
+  f <- factor(f)
+  
+  # Fetch data for the selected cells
   m <- FetchData(seu, vars = feature, cells = cells)
-  f2 <- f[f %in% ident]
-  f2 <- factor(f2)
-  m2 <- split(m, f2)
+  
+  # Split data by grouping factor
+  m2 <- split(m, f)
   if(total) m2[["total"]] <- m
+  
+  # Calculate proportions
   m2 <- lapply(m2, function(x){
     apply(x, 2, function(y) sum(y > above)) / nrow(x)
   })

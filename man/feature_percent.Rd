@@ -9,6 +9,7 @@ feature_percent(
   feature,
   ident = NULL,
   group.by = NULL,
+  cells = NULL,
   DefaultAssay = NULL,
   above = 0,
   total = F,
@@ -26,6 +27,8 @@ retreived by FetchData)}
 
 \item{group.by}{A variable name in meta.data to group by, if you don't want to use
 default Idents of Seurat object}
+
+\item{cells}{Cell identifiers to be used. Defaults to all cells.}
 
 \item{DefaultAssay}{Assay to use, Default: NULL (uses object's default assay)}
 
@@ -61,6 +64,10 @@ feature_percent(pbmc, feature = genes, ident = c("B cell", "CD8 T cell"))
 
 # Group by a different variable
 feature_percent(pbmc, feature = genes, group.by = "orig.ident")
+
+# Use specific cells only
+b_cells <- colnames(pbmc)[pbmc$cluster == "B cell"]
+feature_percent(pbmc, feature = genes, cells = b_cells)
 
 # Also check the proportion of expressed cells in total clusters
 feature_percent(pbmc, feature = genes, total = T)

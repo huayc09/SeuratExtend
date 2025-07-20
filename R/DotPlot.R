@@ -3,6 +3,7 @@
 #' @param seu A Seurat object.
 #' @param features A vector of gene names or a list of named vectors for grouped features.
 #' @param group.by Column name in seu@meta.data for grouping cells. Default: NULL (uses current Idents).
+#' @param cells Cell identifiers to be used. Defaults to all cells.
 #' @param split.by Column name in seu@meta.data for splitting the groups. Default: NULL.
 #' @param split.by.method Method for visualizing the split groups. Options are "border" or "color". Default: "border".
 #'   - "border": Uses different border colors to represent different split groups, while the fill color represents the expression level.
@@ -82,6 +83,10 @@
 #' # Split visualization using colors instead of borders
 #' DotPlot2(pbmc, features = genes, group.by = "cluster", split.by = "orig.ident", split.by.method = "color", show_grid = FALSE)
 #'
+#' # Use specific cells only
+#' b_cells <- colnames(pbmc)[pbmc$cluster == "B cell"]
+#' DotPlot2(pbmc, features = genes, cells = b_cells)
+#'
 #' # Custom settings
 #' DotPlot2(pbmc, features = genes, color_scheme = "OrRd", show_grid = FALSE, border = FALSE, flip = TRUE)
 #'
@@ -98,6 +103,7 @@ DotPlot2 <- function(
     seu,
     features,
     group.by = NULL,
+    cells = NULL,
     split.by = NULL,
     split.by.method = "border",
     nudge_factor = 0.35,
@@ -138,16 +144,43 @@ DotPlot2 <- function(
     feature_groups <- NULL
   }
 
-  if (is.null(group.by)) {
-    groups <- Idents(seu)
-    group_levels <- levels(groups)
+  # Handle cells parameter for metadata subsetting
+  if (!is.null(cells)) {
+    # Validate cells parameter (similar to feature_percent implementation)
+    if(is.logical(cells)) {
+      if(length(cells) != ncol(seu)) {
+        stop("Logical value of 'cells' should be the same length as cells in Seurat object")
+      } else {
+        cells <- colnames(seu)[cells]
+      }
+    } else {
+      if(all(!cells %in% colnames(seu))) {
+        stop("'cells' not found in Seurat object")
+      }else if(any(!cells %in% colnames(seu))) {
+        cells.out <- setdiff(cells, colnames(seu))
+        stop(length(cells.out), " cell(s) not found in Seurat object: '",
+             cells.out[1], "'...")
+      }
+    }
   } else {
-    group_levels <- levels(factor(seu@meta.data[[group.by]]))
+    cells <- colnames(seu)
+  }
+
+  # Determine group levels based on the selected cells
+  if (is.null(group.by)) {
+    groups_subset <- Idents(seu)[cells]
+    group_levels <- levels(factor(groups_subset))
+  } else {
+    group_values_subset <- seu@meta.data[cells, group.by]
+    group_levels <- levels(factor(group_values_subset))
   }
 
   # Create combined group if split.by is provided
   if (!is.null(split.by)) {
-    split_levels <- levels(factor(seu@meta.data[[split.by]]))
+    # Only consider the specified cells when determining split levels
+    split_values_subset <- seu@meta.data[cells, split.by]
+    split_levels <- levels(factor(split_values_subset))
+    
     # Handle NULL group.by by using current Idents for combined group
     if (is.null(group.by)) {
       group_values <- as.character(Idents(seu))
@@ -161,17 +194,17 @@ DotPlot2 <- function(
     calc_group.by <- group.by
   }
 
-  pct <- feature_percent(seu, tp, group.by = calc_group.by)
+  pct <- feature_percent(seu, tp, group.by = calc_group.by, cells = cells)
   if (scale_percent) {
     pct <- pct * 100
   }
   pct.m <- melt(pct, value.name = "pct")
   if(ncol(pct) == 1) {
     warning("Only one identity present, the mean expression values will be used")
-    z <- CalcStats(seu, tp, group.by = calc_group.by, method = "mean") %>% as.matrix %>% melt(value.name = "zscore")
+    z <- CalcStats(seu, tp, group.by = calc_group.by, cells = cells, method = "mean") %>% as.matrix %>% melt(value.name = "zscore")
     lab_value <- "Average Expression"
   } else {
-    z <- CalcStats(seu, tp, group.by = calc_group.by) %>% as.matrix %>% melt(value.name = "zscore")
+    z <- CalcStats(seu, tp, group.by = calc_group.by, cells = cells) %>% as.matrix %>% melt(value.name = "zscore")
     lab_value <- "zscore"
   }
 

@@ -8,6 +8,7 @@ DotPlot2(
   seu,
   features,
   group.by = NULL,
+  cells = NULL,
   split.by = NULL,
   split.by.method = "border",
   nudge_factor = 0.35,
@@ -37,6 +38,8 @@ DotPlot2(
 \item{features}{A vector of gene names or a list of named vectors for grouped features.}
 
 \item{group.by}{Column name in seu@meta.data for grouping cells. Default: NULL (uses current Idents).}
+
+\item{cells}{Cell identifiers to be used. Defaults to all cells.}
 
 \item{split.by}{Column name in seu@meta.data for splitting the groups. Default: NULL.}
 
@@ -141,6 +144,10 @@ DotPlot2(pbmc, features = genes, group.by = "cluster", split.by = "orig.ident", 
 
 # Split visualization using colors instead of borders
 DotPlot2(pbmc, features = genes, group.by = "cluster", split.by = "orig.ident", split.by.method = "color", show_grid = FALSE)
+
+# Use specific cells only
+b_cells <- colnames(pbmc)[pbmc$cluster == "B cell"]
+DotPlot2(pbmc, features = genes, cells = b_cells)
 
 # Custom settings
 DotPlot2(pbmc, features = genes, color_scheme = "OrRd", show_grid = FALSE, border = FALSE, flip = TRUE)

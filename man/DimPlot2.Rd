@@ -151,8 +151,30 @@ Default: FALSE.}
 \item{label.size}{Size of the text labels used for clusters or features.
 Default: 4.}
 
-\item{theme}{Allows customization of ggplot themes, for example, to remove axes or adjust text.
-Default: NULL.}
+\item{theme}{Customizes ggplot themes and other plot elements. Since DimPlot2 returns a combined plot object (using plot_grid), standard ggplot syntax like \code{+ theme()} cannot be applied directly. This parameter provides flexible ways to customize plot appearance:
+
+  \strong{Single theme elements:}
+  \itemize{
+    \item \code{theme = NoAxes()} - Remove axes (Seurat function)
+    \item \code{theme = labs(title = "My Title", color = "Expression")} - Add labels
+    \item \code{theme = theme_minimal()} - Apply ggplot2 themes
+  }
+
+  \strong{Simple combinations (limited cases):}
+  \itemize{
+    \item \code{theme = NoAxes() + NoLegend()} - Works for some Seurat theme functions
+  }
+
+  \strong{Complex combinations (recommended for multiple elements):}
+
+  For multiple theme elements that cannot be directly combined with \code{+}, provide a list:
+  \itemize{
+    \item \code{theme = list(NoAxes(), labs(title = "My Title", color = "Expression"))}
+    \item \code{theme = list(theme_minimal(), labs(color = "Gene Expression"), theme(legend.position = "bottom"))}
+  }
+
+  Each element in the list will be applied sequentially to individual ggplot objects before combining.
+  Default: NULL.}
 
 \item{cells.highlight}{A vector of cell names to highlight; simpler input than Seurat's approach, focusing on ease of use.
 Default: NULL.}
@@ -217,6 +239,22 @@ DimPlot2(
 
 # Enhance the plot with labels and bounding boxes
 DimPlot2(pbmc, label = TRUE, box = TRUE, label.color = "black", repel = TRUE, theme = NoLegend())
+
+# Use multiple theme elements together
+DimPlot2(
+  pbmc,
+  features = c("CD14", "CD3D"),
+  theme = list(NoAxes(), labs(title = "Gene Expression", color = "Expression Level")))
+
+# Complex theme customization
+DimPlot2(
+  pbmc,
+  features = c("cluster", "CD14"),
+  theme = list(
+    theme_minimal(),
+    labs(color = "Expression"),
+    theme(legend.position = "bottom", plot.title = element_text(size = 16))
+  ))
 
 # Use indices instead of long cluster names to simplify labels in the plot
 DimPlot2(pbmc, index.title = "C", box = TRUE, label.color = "black")

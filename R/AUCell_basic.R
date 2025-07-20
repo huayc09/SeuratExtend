@@ -30,10 +30,21 @@
     colNames <- colnames(exprMat)
     exprMat <- -exprMat
 
-    exprMat <- do.call(cbind, blockApply(
-      DelayedArray(exprMat),
-      FUN = colRanks, ties.method = "random",
-      preserveShape = TRUE, BPPARAM = BPPARAM, grid = colAutoGrid(exprMat)))
+    # Check matrixStats version for useNames parameter compatibility
+    matrixStats_version <- utils::packageVersion("matrixStats")
+    if (matrixStats_version >= "0.60.0") {
+      # For matrixStats >= 0.60.0, useNames parameter is available
+      exprMat <- do.call(cbind, blockApply(
+        DelayedArray(exprMat),
+        FUN = colRanks, ties.method = "random", useNames = FALSE,
+        preserveShape = TRUE, BPPARAM = BPPARAM, grid = colAutoGrid(exprMat)))
+    } else {
+      # For older versions, useNames parameter doesn't exist
+      exprMat <- do.call(cbind, blockApply(
+        DelayedArray(exprMat),
+        FUN = colRanks, ties.method = "random",
+        preserveShape = TRUE, BPPARAM = BPPARAM, grid = colAutoGrid(exprMat)))
+    }
 
     rownames(exprMat) <- rowNames
     colnames(exprMat) <- colNames
