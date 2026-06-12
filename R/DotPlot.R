@@ -232,17 +232,17 @@ DotPlot2 <- function(
     calc_group.by <- group.by
   }
 
-  pct <- feature_percent(seu, tp, group.by = calc_group.by, cells = cells)
+  pct <- feature_percent(seu, feature = tp, group.by = calc_group.by, cells = cells)
   if (scale_percent) {
     pct <- pct * 100
   }
   pct.m <- melt(pct, value.name = "pct")
   if(ncol(pct) == 1) {
     warning("Only one identity present, the mean expression values will be used")
-    z <- CalcStats(seu, tp, group.by = calc_group.by, cells = cells, method = "mean") %>% as.matrix %>% melt(value.name = "zscore")
+    z <- CalcStats(seu, features = tp, group.by = calc_group.by, cells = cells, method = "mean") %>% as.matrix %>% melt(value.name = "zscore")
     lab_value <- "Average Expression"
   } else {
-    z <- CalcStats(seu, tp, group.by = calc_group.by, cells = cells) %>% as.matrix %>% melt(value.name = "zscore")
+    z <- CalcStats(seu, features = tp, group.by = calc_group.by, cells = cells) %>% as.matrix %>% melt(value.name = "zscore")
     lab_value <- "zscore"
   }
 
@@ -269,7 +269,7 @@ DotPlot2 <- function(
       ToPlot$nudge <- nudge_values[ToPlot$split]
     }
   } else {
-    ToPlot$group <- ToPlot$Var2
+    ToPlot$group <- factor(ToPlot$Var2, levels = colnames(pct))
     ToPlot$split <- NA
     ToPlot$nudge <- 0
   }
@@ -292,10 +292,11 @@ DotPlot2 <- function(
   # Determine default angle based on label lengths
   if (is.null(angle)) {
     if (flip) {
-      max_label_length <- max(nchar(levels(ToPlot$Var1)))
+      grp_levels <- levels(ToPlot$Var1)
     } else {
-      max_label_length <- max(nchar(levels(ToPlot$group)))
+      grp_levels <- levels(ToPlot$group)
     }
+    max_label_length <- if (length(grp_levels) > 0) max(nchar(grp_levels)) else 0
     angle <- if (max_label_length <= 2) 0 else 45
   }
 
@@ -328,24 +329,24 @@ DotPlot2 <- function(
   if (!is.null(split.by)) {
     if (split.by.method == "border") {
       p <- ggplot(ToPlot, aes(x = group, y = Var1, size = pct, fill = zscore, color = split)) +
-        geom_point(shape = 21, stroke = border.width, position = position_nudge(x = ToPlot$nudge))
+        geom_point(shape = 21, stroke = border.width, position = position_nudge(x = ToPlot$nudge)) +
+        labs(fill = lab_value, color = split.by)
       color_scale <- scale_fill_cont_auto(color_scheme, center_color = center_color, value_range = value_range)
       split_scale <- scale_color_disc_auto(split.by.colors, n_splits)
-      color_lab <- lab_value
     } else if (split.by.method == "annotation") {
       # For annotation method, use both color (zscore) and fill (split) but make fill invisible
       p <- ggplot(ToPlot, aes(x = group, y = Var1, size = pct, color = zscore, fill = split)) +
-        geom_point(position = position_nudge(x = ToPlot$nudge))
+        geom_point(position = position_nudge(x = ToPlot$nudge)) +
+        labs(color = lab_value, fill = split.by)
       color_scale <- scale_color_cont_auto(color_scheme, center_color = center_color, value_range = value_range)
       split_scale <- scale_fill_disc_auto(split.by.colors, n_splits)
-      color_lab <- lab_value
 
     } else if (split.by.method == "color") {
       p <- ggplot(ToPlot, aes(x = group, y = Var1, size = pct, color = split, alpha = zscore)) +
-        geom_point(position = position_nudge(x = ToPlot$nudge))
+        geom_point(position = position_nudge(x = ToPlot$nudge)) +
+        labs(color = split.by, alpha = lab_value)
       color_scale <- scale_color_disc_auto(split.by.colors, n_splits)
       alpha_scale <- scale_alpha(range = c(0.1, 1))
-      color_lab <- split.by
 
     } else if (split.by.method == "facet") {
       # Facet method: separate panels for each split group
@@ -353,26 +354,27 @@ DotPlot2 <- function(
       # But still respect border parameter
       if (border) {
         p <- ggplot(ToPlot, aes(x = group, y = Var1, size = pct, fill = zscore)) +
-          geom_point(shape = 21, color = "black", stroke = border.width)
+          geom_point(shape = 21, color = "black", stroke = border.width) +
+          labs(fill = lab_value)
         color_scale <- scale_fill_cont_auto(color_scheme, center_color = center_color, value_range = value_range)
       } else {
         p <- ggplot(ToPlot, aes(x = group, y = Var1, size = pct, color = zscore)) +
-          geom_point()
+          geom_point() +
+          labs(color = lab_value)
         color_scale <- scale_color_cont_auto(color_scheme, center_color = center_color, value_range = value_range)
       }
-      color_lab <- lab_value
     }
   } else {
     if (border) {
       p <- ggplot(ToPlot, aes(x = group, y = Var1, size = pct, fill = zscore)) +
-        geom_point(shape = 21, color = "black", stroke = border.width)
+        geom_point(shape = 21, color = "black", stroke = border.width) +
+        labs(fill = lab_value)
       color_scale <- scale_fill_cont_auto(color_scheme, center_color = center_color, value_range = value_range)
-      color_lab <- lab_value
     } else {
       p <- ggplot(ToPlot, aes(x = group, y = Var1, size = pct, color = zscore)) +
-        geom_point()
+        geom_point() +
+        labs(color = lab_value)
       color_scale <- scale_color_cont_auto(color_scheme, center_color = center_color, value_range = value_range)
-      color_lab <- lab_value
     }
   }
 
@@ -386,16 +388,15 @@ DotPlot2 <- function(
       strip.placement = strip.placement,
       legend.position = legend_position
     ) +
-    labs(size = "Percent\nexpressed", color = color_lab, fill = color_lab) +
     theme(...) +
     color_scale
 
   if (!is.null(split.by) && split.by.method == "border") {
-    p <- p + labs(color = split.by) + split_scale
+    p <- p + split_scale
   }
 
   if (!is.null(split.by) && split.by.method == "annotation") {
-    p <- p + labs(fill = split.by) + split_scale +
+    p <- p + split_scale +
       guides(fill = guide_legend(override.aes = list(alpha = 1, color = NA, size = 4, shape = 22)))
   }
 
@@ -669,6 +670,12 @@ get_available_legends <- function(split.by, split.by.method, border) {
       return(c("size", "color", "alpha"))
     } else if (split.by.method == "annotation") {
       return(c("size", "color", "fill"))
+    } else if (split.by.method == "facet") {
+      if (border) {
+        return(c("size", "fill"))
+      } else {
+        return(c("size", "color"))
+      }
     }
   }
 }

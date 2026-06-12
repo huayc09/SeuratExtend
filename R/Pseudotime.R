@@ -67,7 +67,7 @@ GeneTrendCurve.Palantir <- function(
   pseudotime_df <- extract_pseudotime_data(seu, pseudotime.data, "Palantir", required_cols = c("Pseudotime", "Entropy"))
   fate_names <- setdiff(colnames(pseudotime_df), c("Pseudotime", "Entropy"))
 
-  df <- cbind(pseudotime_df, FetchData(seu, vars = features))
+  df <- cbind(pseudotime_df, FetchData(seu, vars = features, clean = "none"))
 
   # Melt the dataframe to get the desired format
   df_melt_gene <- melt(
@@ -181,7 +181,7 @@ GeneTrendHeatmap.Palantir <- function(
   }
 
   pseudotime_df2 <- pseudotime_df[,c("Pseudotime",lineage),drop = F]
-  df <- cbind(pseudotime_df2, FetchData(seu, vars = features))
+  df <- cbind(pseudotime_df2, FetchData(seu, vars = features, clean = "none"))
 
   # Melt the dataframe to get the desired format
   df_melt_gene <- melt(
@@ -334,8 +334,6 @@ GeneTrendHeatmap.Slingshot <- function(
   pseudotime_df <- as.data.frame(pseudotime_df)
   fate_names <- colnames(pseudotime_df)
 
-  df <- cbind(pseudotime_df, FetchData(seu, vars = features))
-
   # If the lineage parameter is not provided, default to the first cell fate name
   if (is.null(lineage)) {
     lineage <- fate_names[1]
@@ -347,7 +345,7 @@ GeneTrendHeatmap.Slingshot <- function(
   }
 
   pseudotime_df2 <- pseudotime_df[,lineage,drop = F]
-  df <- cbind(pseudotime_df2, FetchData(seu, vars = features))
+  df <- cbind(pseudotime_df2, FetchData(seu, vars = features, clean = "none"))
 
   # Melt the dataframe to get the desired format
   df_melt_gene <- melt(
@@ -440,18 +438,35 @@ perform_gam_analysis <- function(df_melt, features, fate_names) {
     for (fate in fate_names) {
       subset_df <- df_melt[df_melt$Gene == gene & df_melt$cell_fate == fate,]
 
+      # Remove NAs before fitting
+      subset_df <- subset_df[!is.na(subset_df$Pseudotime) & !is.na(subset_df$Expression),]
+
+      if (nrow(subset_df) < 4) {
+        warning(paste("Skipping GAM fit for gene", gene, "in fate", fate, ": insufficient data points (", nrow(subset_df), ")"))
+        next
+      }
+
       # Fit the GAM model using the Pseudotime column
-      model <- gam(Expression ~ s(Pseudotime), data = subset_df)
+      tryCatch({
+        model <- gam(Expression ~ s(Pseudotime), data = subset_df)
 
-      # Create a grid for pseudotime based on the range of the current fate
-      pseudo_seq <- seq(min(subset_df$Pseudotime), max(subset_df$Pseudotime), length.out = 200)
-      grid_df <- data.frame(Pseudotime = pseudo_seq, Gene = gene, cell_fate = fate, Expression = NA)
+        # Create a grid for pseudotime based on the range of the current fate
+        pseudo_seq <- seq(min(subset_df$Pseudotime), max(subset_df$Pseudotime), length.out = 200)
+        grid_df <- data.frame(Pseudotime = pseudo_seq, Gene = gene, cell_fate = fate, Expression = NA)
 
-      # Predict values and add to the predictions dataframe
-      grid_df$Predicted <- predict(model, newdata = grid_df)
-      predictions <- rbind(predictions, grid_df)
+        # Predict values and add to the predictions dataframe
+        grid_df$Predicted <- predict(model, newdata = grid_df)
+        predictions <- rbind(predictions, grid_df)
+      }, error = function(e) {
+        warning(paste("GAM fitting failed for gene", gene, "in fate", fate, ":", e$message))
+      })
     }
   }
+
+  if (nrow(predictions) == 0) {
+    stop("GAM fitting failed for all gene/fate combinations. Please check your data.")
+  }
+
   predictions$Gene <- factor(predictions$Gene, levels = unique(predictions$Gene))
 
   return(predictions)

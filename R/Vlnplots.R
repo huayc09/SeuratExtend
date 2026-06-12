@@ -557,10 +557,32 @@ vlnplot2_Stat <- function(
       stat.test <- filter(stat.test, groups %in% level_comparisons)
     }
     stat.test <- vlnplot2_Stat_add_y(stat.test, scores = scores, step.increase = step.increase)
+
+    # Ensure label column exists for compatibility with different ggpubr versions
+    label_col <- label[1]
+    if (!label_col %in% colnames(stat.test)) {
+      # Fallback: try to find a suitable label column
+      if ("p.signif" %in% colnames(stat.test)) {
+        label_col <- "p.signif"
+      } else if ("p.adj" %in% colnames(stat.test)) {
+        label_col <- "p.adj"
+      } else if ("p.format" %in% colnames(stat.test)) {
+        label_col <- "p.format"
+      } else if ("p" %in% colnames(stat.test)) {
+        label_col <- "p"
+      }
+    }
+
+    # Add annotation column for compatibility with newer ggpubr versions
+    # that use geom_bracket which requires the annotation aesthetic
+    if (!"annotation" %in% colnames(stat.test) && label_col %in% colnames(stat.test)) {
+      stat.test$annotation <- stat.test[[label_col]]
+    }
+
     p <- p +
       stat_pvalue_manual(
         stat.test,
-        label = label[1],
+        label = label_col,
         tip.length = tip.length,
         ...)
   }
