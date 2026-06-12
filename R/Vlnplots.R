@@ -33,6 +33,7 @@ VlnPlot2.Seurat <- function(
   lab_fill = "group",
   scales = "free_y",
   style = c("fill", "outline"),
+  sort = FALSE,
   violin = T,
   box = T,
   width = 0.9,
@@ -87,6 +88,7 @@ VlnPlot2.Seurat <- function(
     lab_fill = lab_fill,
     scales = scales,
     style = style,
+    sort = sort,
     violin = violin,
     box = box,
     width = width,
@@ -133,6 +135,10 @@ VlnPlot2.Seurat <- function(
 #' @param lab_fill Label for the figure legend. Default: 'group'.
 #' @param scales Scales parameter passed to \code{\link[ggplot2:facet_wrap]{ggplot2::facet_wrap()}}. Default: 'free_y'.
 #' @param style Plot style: "fill" (default) uses filled violins with group colors, "outline" uses white fill with colored outlines.
+#' @param sort Sort groups by expression level of the first feature. Default: FALSE (original order).
+#'   - FALSE: No sorting, use original group order.
+#'   - TRUE or "median": Sort by median expression (descending).
+#'   - "mean": Sort by mean expression (descending).
 #' @param violin Indicates whether to generate a violin plot. Default: TRUE.
 #' @param box Indicates whether to depict a box plot. Default: TRUE.
 #' @param width Width of the box plot. Default: 0.9.
@@ -170,6 +176,7 @@ VlnPlot2.default <- function(
   lab_fill = "group",
   scales = "free_y",
   style = c("fill", "outline"),
+  sort = FALSE,
   violin = T,
   box = T,
   width = 0.9,
@@ -212,6 +219,29 @@ VlnPlot2.default <- function(
     features = features,
     t = t
   )
+
+  # Sort groups by expression if requested
+  if (!isFALSE(sort)) {
+    sort_method <- if (isTRUE(sort)) "median" else sort
+    if (!sort_method %in% c("median", "mean")) {
+      stop("sort must be FALSE, TRUE, 'median', or 'mean'")
+    }
+
+    # Determine which column to sort by (f or f2)
+    group_col <- if ("f2" %in% colnames(scores)) "f2" else "f"
+
+    # Use the first feature for sorting
+    first_feature <- levels(scores$feature)[1]
+    subset_scores <- scores[scores$feature == first_feature, ]
+
+    # Calculate summary statistic per group
+    sort_stat <- if (sort_method == "median") median else mean
+    group_stats <- tapply(subset_scores$value, subset_scores[[group_col]], sort_stat, na.rm = TRUE)
+
+    # Reorder levels by descending expression
+    new_levels <- names(sort(group_stats, decreasing = TRUE))
+    scores[[group_col]] <- factor(scores[[group_col]], levels = new_levels)
+  }
 
   p <- VlnPlot2_Plot(
     scores = scores,

@@ -4,7 +4,8 @@
 #' @param feature.1 The name of the first feature (gene or other variable) to be plotted. Default: NA.
 #' @param feature.2 The name of the second feature. Default: NA.
 #' @param feature.3 The name of the third feature. Default: NA.
-#' @param color The color model used to blend the expression data of the three features. Options include "ryb" (red-yellow-blue) and "rgb" (red-green-blue), affecting how expression intensities are represented through color. Default: c("ryb", "rgb").
+#' @param color The color model used to blend the expression data of the three features. Options include "ryb" (red-yellow-blue), "rgb" (red-green-blue), or "custom" (user-defined colors via custom.colors parameter). Default: c("ryb", "rgb", "custom").
+#' @param custom.colors A character vector of 3 colors to use when color = "custom". Each color corresponds to one feature (feature.1, feature.2, feature.3). Example: c("navy", "gold", "firebrick"). Supports any valid R color specification (hex, name, rgb). Default: NULL.
 #' @param color.range The range of expression intensity that is represented by the color spectrum in the plot, helping to enhance visibility of lower expressions and prevent oversaturation at high expression levels. Default: c(0.1, 0.9).
 #' @param reduction The type of dimension reduction used to display the data, such as 'umap' or 'tsne'. This choice determines the underlying plot layout. Default: 'umap'.
 #' @param order A logical value indicating whether to plot cells with higher expressions on top of those with lower expressions, which can help prevent significant data points from being obscured in dense areas of the plot. Default: TRUE.
@@ -45,7 +46,8 @@ FeaturePlot3 <- function(
   feature.1 = NA,
   feature.2 = NA,
   feature.3 = NA,
-  color = c("ryb","rgb"),
+  color = c("ryb","rgb","custom"),
+  custom.colors = NULL,
   color.range = c(0.1,0.9),
   reduction = "umap",
   order = T,
@@ -75,7 +77,14 @@ FeaturePlot3 <- function(
       rgb(l,h,l),
       rgb(l,l,h),
       rgb(l,l,l)
-    )
+    ),
+    "custom" = {
+      if (is.null(custom.colors) || length(custom.colors) < 3) {
+        stop("When color='custom', custom.colors must be a vector of 3 colors.")
+      }
+      # Use custom colors for features, with a light gray as background
+      c(custom.colors[1], custom.colors[2], custom.colors[3], "grey90")
+    }
   )
   lgd <- function(title, col) {
     value = tp[,title]
@@ -115,7 +124,22 @@ FeaturePlot3 <- function(
     col <- switch(
       color,
       "ryb" = ryb2rgb(x),
-      "rgb" = rgb(x[1],x[2],x[3]))
+      "rgb" = rgb(x[1],x[2],x[3]),
+      "custom" = {
+        # Blend custom colors using weighted average in RGB space
+        # x[1:3] are the normalized expression values for each feature
+        # x[4] is the background (not used in blending)
+        bg_col <- col2rgb(colors[4]) / 255
+        feat_cols <- lapply(1:3, function(i) col2rgb(colors[i]) / 255)
+        # Weighted blend: each feature contributes proportionally to its expression
+        total <- sum(x[1:3])
+        if (total == 0) {
+          rgb(bg_col[1], bg_col[2], bg_col[3])
+        } else {
+          blended <- rowSums(sapply(1:3, function(i) feat_cols[[i]] * x[i])) / total
+          rgb(blended[1], blended[2], blended[3])
+        }
+      })
     return(col)
   })
   tp.c <- cbind(Embeddings(seu, reduction = reduction), tp.c)
