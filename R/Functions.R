@@ -59,14 +59,15 @@ feature_percent <- function(
   library(rlist)
 
   # Handle default assay and warning
+  # Use explicit Seurat:: namespace to avoid shadowing by the parameter name
   if (is.null(DefaultAssay)) {
-    DefaultAssay <- DefaultAssay(seu)
+    DefaultAssay <- Seurat::DefaultAssay(seu)
   }
   if (DefaultAssay == "TF") {
     warning("Current assay is set to 'TF'. If you want to examine gene expression, consider changing to 'RNA' assay.")
   }
 
-  DefaultAssay(seu) <- DefaultAssay
+  Seurat::DefaultAssay(seu) <- DefaultAssay
 
   # Handle cells parameter (similar to Seu2Matr implementation)
   cells <- cells %||% colnames(seu)
