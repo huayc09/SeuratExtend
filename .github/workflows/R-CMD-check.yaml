@@ -1,0 +1,37 @@
+name: R-CMD-check
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  R-CMD-check:
+    runs-on: ubuntu-latest
+    name: ubuntu-latest (R release)
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: release
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: |
+            any::rcmdcheck
+            any::testthat
+            huayc09/SeuratExtendData
+            local::.
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          args: 'c("--no-manual")'
+          error-on: '"error"'
