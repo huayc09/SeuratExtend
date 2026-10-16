@@ -136,22 +136,25 @@ test_that("install_SeuratExtendData errors gracefully without a package name", {
 
 # --- dependency declarations (checklist L2-1 G1) ---------------------------
 
-test_that("GeneSetAnalysis calls DelayedArray without declaring it", {
-  # KNOWN-ISSUE (GS-1, P1) -- the main path calls
+test_that("GeneSetAnalysis's DelayedArray use is Suggests-declared but still unguarded on the main path", {
+  # KNOWN-ISSUE (GS-1, P1) -- partially resolved 2026-10-16 (work order
+  # test-infra-landing): BOTH packages are now declared in DESCRIPTION Suggests
+  # (CI/check environments covered). REMAINING issue (清单 P1): the main
+  # computation path still calls
   #   DelayedArray::blockApply / colAutoGrid / DelayedArray()  R/GeneSetAnalysis.R:96-109
-  #   DelayedMatrixStats::colRanks                             R/AUCell_basic.R:7-8, :37-46
-  # while DESCRIPTION declares NEITHER in Imports / Suggests / Depends, and
-  # NAMESPACE imports neither -- so on a machine that lacks them the call dies
-  # inside import()'s interactive prompt and surfaces as the unhelpful
-  # `could not find function "blockApply"`. This is the same "undeclared
-  # hidden dependency" family as RunBasicSeurat's harmony.
+  #   DelayedMatrixStats::colRanks                             R/AUCell_basic.R:7-8
+  # unconditionally while they are only in Suggests -- a minimal install (no
+  # Suggests) still dies inside import()'s interactive prompt, surfacing as the
+  # unhelpful `could not find function "blockApply"`. NAMESPACE still imports
+  # neither. The real fix (requireNamespace guard + clear error) belongs to the
+  # P1 dependency-declaration batch; this pin flips fully when that lands.
   root <- file.path("..", "..")
   skip_if_not(dir.exists(file.path(root, "R")), "source tree not reachable")
 
   desc <- paste(readLines(file.path(root, "DESCRIPTION"), warn = FALSE),
                 collapse = " ")
-  expect_false(grepl("DelayedArray", desc, fixed = TRUE))
-  expect_false(grepl("DelayedMatrixStats", desc, fixed = TRUE))
+  expect_true(grepl("DelayedArray", desc, fixed = TRUE))
+  expect_true(grepl("DelayedMatrixStats", desc, fixed = TRUE))
 
   ns <- paste(readLines(file.path(root, "NAMESPACE"), warn = FALSE),
               collapse = " ")
