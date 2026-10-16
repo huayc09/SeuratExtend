@@ -41,6 +41,8 @@ test_that("FeaturePlot3.grid renders a feature grid", {
   # statically. (Same family as the show_col2()/Functions.R:213 case pinned in
   # test-Colors.R.)
   root <- file.path("..", "..")
+  skip_if_not(file.exists(file.path(root, "NAMESPACE")),
+              "dev-layout source inspection only (not available under R CMD check)")
   ns_lines <- readLines(file.path(root, "NAMESPACE"), warn = FALSE)
   expect_false(any(grepl("rlist", ns_lines, fixed = TRUE)))
   fn_lines <- readLines(file.path(root, "R", "FeaturePlot.R"), warn = FALSE)

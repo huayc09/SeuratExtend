@@ -111,7 +111,9 @@ print(ens_ids)
 back_to_symbols <- EnsemblToGenesymbol(ens_ids, spe = "human", keep.seq = TRUE)
 print(back_to_symbols)
 
+\dontrun{
 # Fetch Ensembl IDs using an online BioMart database when local conversion is not sufficient
 online_ens_ids <- GenesymbolToEnsembl(human_genes, spe = "human", local.mode = FALSE, keep.seq = TRUE)
 print(online_ens_ids)
+}
 }
