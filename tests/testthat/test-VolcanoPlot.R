@@ -68,12 +68,12 @@ test_that("VolcanoPlot validates y but not x", {
 })
 
 test_that("VolcanoPlot reaches ggrepel through a bare library() call", {
-  # KNOWN-ISSUE (VP-1, P1) -- R/VolcanoPlot.R:183 attaches ggrepel with a bare
-  # library() (not import()) and :226 then calls geom_text_repel(), while
-  # ggrepel appears in NO field of DESCRIPTION. On a machine without it the
-  # function dies on "there is no package called 'ggrepel'" -- it does not
-  # degrade, it stops working entirely. (On this machine Seurat's dependency
-  # closure happens to provide it, which is why the tests still pass.)
+  # KNOWN-ISSUE (VP-1, P1) -- partially resolved 2026-10-16 (work order
+  # test-infra-landing): ggrepel is now declared in DESCRIPTION Suggests, so
+  # check/CI environments see it. REMAINING issue (清单 P1): R/VolcanoPlot.R:183
+  # still attaches ggrepel with a bare library() instead of
+  # requireNamespace()/`::` -- a minimal install stays fragile. The full fix
+  # belongs to the P1 dependency-declaration batch; this pin flips fully then.
   root <- file.path("..", "..")
   skip_if_not(dir.exists(file.path(root, "R")), "source tree not reachable")
   src <- paste(readLines(file.path(root, "R", "VolcanoPlot.R"), warn = FALSE),
@@ -82,5 +82,5 @@ test_that("VolcanoPlot reaches ggrepel through a bare library() call", {
   expect_true(grepl("geom_text_repel", src, fixed = TRUE))
   desc <- paste(readLines(file.path(root, "DESCRIPTION"), warn = FALSE),
                 collapse = " ")
-  expect_false(grepl("ggrepel", desc, fixed = TRUE))
+  expect_true(grepl("ggrepel", desc, fixed = TRUE))
 })
