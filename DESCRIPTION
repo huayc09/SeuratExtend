@@ -16,7 +16,7 @@ Imports:
 Suggests:
     rgl, GSVA, GSVAdata, slingshot, AUCell, biomaRt, ontologyIndex, viridis,
     doMC, doRNG, doParallel, foreach, mgsa, GSEABase, egg, loomR, mgsa, 
-    knitr, rmarkdown, RColorBrewer
+    knitr, rmarkdown, RColorBrewer, testthat (>= 3.0.0)
 Depends: 
     R (>= 3.6), SeuratExtendData, SeuratObject
 Remotes: 
@@ -53,3 +53,4 @@ Collate:
     'import.R'
     'runGSVA.R'
     'scVelo.R'
+Config/testthat/edition: 3
