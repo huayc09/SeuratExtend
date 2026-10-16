@@ -128,11 +128,13 @@ GeneSetAnalysis <- function(
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Install the latest version
 #' install_SeuratExtendData("latest")
 #'
 #' # Install the stable version
 #' install_SeuratExtendData("stable")
+#' }
 install_SeuratExtendData <- function(version = "latest") {
   if (!requireNamespace("remotes", quietly = TRUE)) {
     install.packages("remotes")
