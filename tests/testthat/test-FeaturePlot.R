@@ -29,6 +29,7 @@ test_that("FeaturePlot3 stops when no feature given", {
 })
 
 test_that("FeaturePlot3.grid renders a feature grid", {
+  skip_if_not_installed("ggtext")
   data(pbmc)
   # KNOWN-ISSUE (R/FeaturePlot.R:305, not yet in any checklist): the grid
   # pipeline ends in `tp.c <- list.rbind(tp.c)` WITHOUT the rlist:: prefix,

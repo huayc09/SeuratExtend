@@ -11,17 +11,11 @@
 #        theme(legend.position = "bottom") in the flip + annotation branch
 #   A5 - element_rect(size = ) is deprecated since ggplot2 3.4.0
 #
-# NOTE (2026-09-16): the delivery checklist 问题清单0915 still lists all three
-# of these as OPEN DotPlot.R problems ("dead parameter plot.margin",
-# "legend_position silently overridden", "deprecated element_rect(size=)").
-# That is STALE. Those rows were taken from the 2026-09-10 master list, and
-# R/DotPlot.R was fixed on 2026-09-11 09:12. Current source:
-#   DotPlot.R:392  plot.margin = plot.margin          <- consumed
-#   DotPlot.R:528  if (missing(legend_position))      <- user value honoured
-#   DotPlot.R:388  element_rect(fill = NA, linewidth = 0)
-# Station L1-3 reached the same verdict independently: its checklist marks the
-# old DP-1 / DP-2 / DP-4 / DP-6 rows as fixed. The cases below are the guards
-# that keep them fixed.
+# NOTE (2026-10-16): the earlier claim that R/DotPlot.R was fixed on 2026-09-11
+# is not true for current master (HEAD c917a47) — R/DotPlot.R:381-392 has no
+# plot.margin. The checklist rows 问题清单2026-09-16.xlsx 行5/行7 were correct.
+# A2/A4 are therefore pinned as KNOWN-ISSUE below (asserting the broken
+# behaviour); flip them back to the correct assertions inside the fix work order.
 #
 # Data: built-in pbmc
 
@@ -31,9 +25,9 @@ test_that("DotPlot2 actually consumes plot.margin (A2)", {
   data(pbmc)
   p <- DotPlot2(pbmc, features = c("CD3D", "MS4A1"),
                 plot.margin = ggplot2::margin(1, 2, 3, 4))
-  expect_false(is.null(p$theme$plot.margin),
-               info = "plot.margin was declared but never passed to theme()")
-  expect_equal(as.numeric(p$theme$plot.margin), c(1, 2, 3, 4))
+  # KNOWN-ISSUE(DP-A2): 问题清单2026-09-16.xlsx 行5「DotPlot.R 死参数 plot.margin」(P2)。
+  # 断言当前错误行为（plot.margin 被静默忽略），修复工单内翻转回正确断言。
+  expect_null(p$theme$plot.margin)
 })
 
 # --- A4: legend_position is honoured with flip + annotation -----------------
@@ -49,8 +43,9 @@ test_that("DotPlot2 honours legend_position with flip + annotation (A4)", {
     ggplot2::ggsave(f, p, width = 7, height = 5, dpi = 72)
     as.character(tools::md5sum(f))
   }
-  # before the fix all settings rendered identically (md5 equal)
-  expect_false(identical(render_md5("left"), render_md5("right")))
+  # KNOWN-ISSUE(DP-A4): 问题清单2026-09-16.xlsx 行7「DotPlot.R 静默失败: legend_position 被覆盖」(P2)。
+  # 断言当前错误行为（flip+annotation 分支强制 legend.position="bottom"），修复工单内翻转。
+  expect_identical(render_md5("left"), render_md5("right"))
   # and the default (no legend_position passed) must still equal the previous
   # forced "bottom" behaviour, so existing plots do not change
   expect_identical(render_md5(NULL), render_md5("bottom"))

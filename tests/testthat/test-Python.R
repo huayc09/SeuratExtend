@@ -96,6 +96,8 @@ test_that("is_windows() agrees with the running platform", {
 })
 
 test_that("normalizePathWindows() hands back a forward-slash path", {
+  skip_if_not(unname(Sys.info()["sysname"]) == "Windows",
+              "normalizePathWindows() only transforms paths on Windows (R/Python.R:197-200)")
   p <- SeuratExtend:::normalizePathWindows("C:\\a\\b")
   expect_type(p, "character")
   expect_false(grepl("\\", p, fixed = TRUE))
