@@ -206,13 +206,13 @@ genes <- c("CD3D","CD14","CD79A")
 VlnPlot2(pbmc, features = genes, ncol = 1)
 
 # Without violin plot, only box plot, and use quasirandom style for point position adjustment:
-VlnPlot2(pbmc, features = genes, violin = F, pt.style = "quasirandom", ncol = 1)
+VlnPlot2(pbmc, features = genes, violin = FALSE, pt.style = "quasirandom", ncol = 1)
 
 # Hide points but display outlier points of the box plot:
 VlnPlot2(pbmc, features = genes, pt = FALSE, ncol = 1)
 
 # When hiding points, outliers are shown by default (recommended). However, outliers can be hidden for a cleaner appearance:
-VlnPlot2(pbmc, features = genes, pt = FALSE, hide.outlier = T, ncol = 1)
+VlnPlot2(pbmc, features = genes, pt = FALSE, hide.outlier = TRUE, ncol = 1)
 
 # Using the outline style instead of filled violins:
 VlnPlot2(pbmc, features = genes, style = "outline", ncol = 1)

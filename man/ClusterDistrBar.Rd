@@ -57,20 +57,20 @@ See example
 ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster)
 
 # absolute cell count
-ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, percent = F)
+ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, percent = FALSE)
 
 # reverse x and y axis, normalized by sample size
-ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, rev = T, normalize = T)
+ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, rev = TRUE, normalize = TRUE)
 
 # reverse x and y axis, not normalized by sample size
-ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, rev = T, normalize = F)
+ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, rev = TRUE, normalize = FALSE)
 
 # vertical bar plot, and keep the default stacking order
-ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, flip = F, reverse_order = F)
+ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, flip = FALSE, reverse_order = FALSE)
 
 # not stacking bars
 ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, flip = FALSE, stack = FALSE)
 
 # export matrix
-ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, plot = F)
+ClusterDistrBar(origin = pbmc$orig.ident, cluster = pbmc$cluster, plot = FALSE)
 }

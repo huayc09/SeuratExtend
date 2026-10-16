@@ -54,3 +54,9 @@ data-raw/2024-4-5 color pro from i want hue
 # Claude Code files
 .claude/
 CLAUDE.md
+
+# K4 workflow archives (local-only work orders, evidence, reports)
+runs/
+
+# OMO (oh-my-openagent) runtime state
+.omo/

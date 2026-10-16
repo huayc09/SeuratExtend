@@ -6,3 +6,9 @@
 ^docs$
 ^pkgdown$
 ^LICENSE\.md$
+^tmp$
+^runs$
+^\.github$
+^\.claude$
+^\.omo$
+^CLAUDE\.md$

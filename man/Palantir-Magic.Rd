@@ -36,6 +36,7 @@ MAGIC uses a graph-based approach to infer and smooth gene expression across sim
 library(Seurat)
 library(SeuratExtend)
 
+\dontrun{
 # Download the example Seurat Object
 mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds", "rb"))
 
@@ -44,5 +45,5 @@ mye_small <- Palantir.Magic(mye_small)
 
 # Visualizing the effects of MAGIC on selected genes
 DimPlot2(mye_small, features = c("CD14", "magic_CD14", "FLT3", "magic_FLT3"))
-
+}
 }

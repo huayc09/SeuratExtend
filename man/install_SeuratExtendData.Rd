@@ -21,9 +21,11 @@ Invisible TRUE if successful
 This function allows users to select which version of SeuratExtendData to install.
 }
 \examples{
+\dontrun{
 # Install the latest version
 install_SeuratExtendData("latest")
 
 # Install the stable version
 install_SeuratExtendData("stable")
+}
 }

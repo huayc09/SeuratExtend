@@ -73,6 +73,7 @@ GeneTrendCurve.Palantir() and GeneTrendCurve.Slingshot() are designed for resear
 library(Seurat)
 library(SeuratExtend)
 
+\dontrun{
 # Load an example Seurat Object
 mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds", "rb"))
 
@@ -93,5 +94,5 @@ mye_small <- RunSlingshot(mye_small, group.by = "cluster", start.clus = "Mono CD
 
 # Using Slingshot for similar visualizations
 GeneTrendCurve.Slingshot(mye_small, features = c("CD14", "FCGR3A"))
-
+}
 }

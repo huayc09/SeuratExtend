@@ -10,6 +10,7 @@
 #' library(Seurat)
 #' library(SeuratExtend)
 #'
+#' \dontrun{
 #' # Download the example Seurat Object
 #' mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds", "rb"))
 #'
@@ -39,6 +40,7 @@
 #' mye_small@meta.data[,colnames(ps)] <- ps
 #' DimPlot2(mye_small, features = colnames(ps), reduction = "ms",
 #'          cols = list(Entropy = "D"))
+#' }
 #' @rdname Palantir-Methods
 #' @export
 
@@ -271,6 +273,7 @@ result_df.to_csv('{subfolder}/pr_res.csv')
 #' library(Seurat)
 #' library(SeuratExtend)
 #'
+#' \dontrun{
 #' # Download the example Seurat Object
 #' mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds", "rb"))
 #'
@@ -279,7 +282,7 @@ result_df.to_csv('{subfolder}/pr_res.csv')
 #'
 #' # Visualizing the effects of MAGIC on selected genes
 #' DimPlot2(mye_small, features = c("CD14", "magic_CD14", "FLT3", "magic_FLT3"))
-#'
+#' }
 #' @rdname Palantir-Magic
 #' @export
 

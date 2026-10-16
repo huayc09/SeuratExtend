@@ -36,6 +36,7 @@ Slingshot is a flexible tool for trajectory analysis that uses cluster-based min
 library(Seurat)
 library(SeuratExtend)
 
+\dontrun{
 # Load an example Seurat Object
 mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds", "rb"))
 
@@ -47,5 +48,5 @@ sling <- mye_small@misc$slingshot$PCA$SlingPseudotime
 print(head(sling))
 mye_small@meta.data[,colnames(sling)] <- as.data.frame(sling)
 DimPlot2(mye_small, features = colnames(sling), cols = "C")
-
+}
 }
