@@ -42,10 +42,12 @@ conda_available <- function() {
 # package recurse into themselves on non-vector input (RenameGO,
 # RenameReactome, the GenesymbolConversion converters), so capture the error
 # with an explicit tryCatch instead. Verified with R 4.6.1.
+# R raises different recursion-limit messages depending on session state (first
+# deep recursion -> node stack overflow; later ones -> expressions limit).
 expect_stack_overflow <- function(expr) {
   msg <- tryCatch({ force(expr); "no condition raised" },
                   error = function(e) conditionMessage(e))
-  expect_match(msg, "node stack overflow")
+  expect_match(msg, "node stack overflow|evaluation nested too deeply|C stack usage.*too close")
 }
 
 # Red-line guard: tests must not write files into the package working
