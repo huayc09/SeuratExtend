@@ -103,6 +103,7 @@ Multiple lineages are supported, with each lineage drawn as a separate curve. Co
 library(Seurat)
 library(SeuratExtend)
 
+\dontrun{
 # Load an example Seurat Object
 mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds", "rb"))
 
@@ -128,4 +129,5 @@ DimPlot.Slingshot(mye_small, curve.color = c("blue", "red"))
 mye_small <- RunSlingshot(mye_small, group.by = "cluster", start.clus = "Mono CD14", reducedDim = "umap")
 DimPlot.Slingshot(mye_small, reduction = "umap", theme = NoAxes())
 
+}
 }

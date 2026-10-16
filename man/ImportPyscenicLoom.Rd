@@ -24,6 +24,7 @@ This function is designed to ease the integration of SCENIC analysis into Seurat
 # Example of importing a SCENIC loom file with an existing Seurat object
 library(SeuratExtend)
 scenic_loom_path <- file.path(tempdir(), "pyscenic_integrated-output.loom")
+\dontrun{
 download.file("https://zenodo.org/records/10944066/files/pbmc3k_small_pyscenic_integrated-output.loom", scenic_loom_path)
 pbmc <- ImportPyscenicLoom(scenic_loom_path, seu = pbmc)
 
@@ -36,4 +37,5 @@ head(tf_auc, 3:4)
 tf_gene_list <- pbmc@misc$SCENIC$Regulons
 head(tf_gene_list, 5)
 
+}
 }

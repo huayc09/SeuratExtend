@@ -113,6 +113,7 @@ If you are using macOS, be aware of the following:
 library(Seurat)
 library(SeuratExtend)
 
+\dontrun{
 # Download the example Seurat Object
 mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds", "rb"))
 
@@ -144,4 +145,5 @@ scVelo.Plot(
   xlim = c(0, 10), ylim = c(0, 10),
   save = "umap2_specified_area.png"
 )
+}
 }

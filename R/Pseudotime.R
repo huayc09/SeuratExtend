@@ -18,6 +18,7 @@
 #' library(Seurat)
 #' library(SeuratExtend)
 #'
+#' \dontrun{
 #' # Load an example Seurat Object
 #' mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds", "rb"))
 #'
@@ -38,7 +39,7 @@
 #'
 #' # Using Slingshot for similar visualizations
 #' GeneTrendCurve.Slingshot(mye_small, features = c("CD14", "FCGR3A"))
-#'
+#' }
 #' @rdname GeneTrendCurve-Methods
 #' @export
 
@@ -119,6 +120,7 @@ GeneTrendCurve.Palantir <- function(
 #' library(Seurat)
 #' library(SeuratExtend)
 #'
+#' \dontrun{
 #' # Load an example Seurat Object
 #' mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds", "rb"))
 #'
@@ -145,7 +147,7 @@ GeneTrendCurve.Palantir <- function(
 #'   features = c("CD14", VariableFeatures(mye_small)[1:10]),
 #'   lineage = "slingPseudotime_2"
 #' )
-#'
+#' }
 #' @rdname GeneTrendHeatmap-Methods
 #' @export
 
@@ -614,6 +616,7 @@ compute_gradient <- function(row, n=10) {
 #' library(Seurat)
 #' library(SeuratExtend)
 #'
+#' \dontrun{
 #' # Load an example Seurat Object
 #' mye_small <- readRDS(url("https://zenodo.org/records/10944066/files/pbmc10k_mye_small_velocyto.rds", "rb"))
 #'
@@ -638,7 +641,7 @@ compute_gradient <- function(row, n=10) {
 #' # Run Slingshot on UMAP and visualize
 #' mye_small <- RunSlingshot(mye_small, group.by = "cluster", start.clus = "Mono CD14", reducedDim = "umap")
 #' DimPlot.Slingshot(mye_small, reduction = "umap", theme = NoAxes())
-#'
+#' }
 #' @rdname DimPlot.Slingshot
 #' @export
 
