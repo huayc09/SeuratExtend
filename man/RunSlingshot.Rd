@@ -48,6 +48,5 @@ sling <- mye_small@misc$slingshot$PCA$SlingPseudotime
 print(head(sling))
 mye_small@meta.data[,colnames(sling)] <- as.data.frame(sling)
 DimPlot2(mye_small, features = colnames(sling), cols = "C")
-
 }
 }

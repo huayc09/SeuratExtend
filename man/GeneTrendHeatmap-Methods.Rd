@@ -88,6 +88,5 @@ GeneTrendHeatmap.Slingshot(
   features = c("CD14", VariableFeatures(mye_small)[1:10]),
   lineage = "slingPseudotime_2"
 )
-
 }
 }

@@ -36,6 +36,5 @@ tf_auc <- pbmc@misc$SCENIC$RegulonsAUC
 head(tf_auc, 3:4)
 tf_gene_list <- pbmc@misc$SCENIC$Regulons
 head(tf_gene_list, 5)
-
 }
 }

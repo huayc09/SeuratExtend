@@ -94,6 +94,5 @@ mye_small <- RunSlingshot(mye_small, group.by = "cluster", start.clus = "Mono CD
 
 # Using Slingshot for similar visualizations
 GeneTrendCurve.Slingshot(mye_small, features = c("CD14", "FCGR3A"))
-
 }
 }

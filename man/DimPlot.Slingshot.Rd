@@ -128,6 +128,5 @@ DimPlot.Slingshot(mye_small, curve.color = c("blue", "red"))
 # Run Slingshot on UMAP and visualize
 mye_small <- RunSlingshot(mye_small, group.by = "cluster", start.clus = "Mono CD14", reducedDim = "umap")
 DimPlot.Slingshot(mye_small, reduction = "umap", theme = NoAxes())
-
 }
 }

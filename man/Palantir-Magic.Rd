@@ -45,6 +45,5 @@ mye_small <- Palantir.Magic(mye_small)
 
 # Visualizing the effects of MAGIC on selected genes
 DimPlot2(mye_small, features = c("CD14", "magic_CD14", "FLT3", "magic_FLT3"))
-
 }
 }
