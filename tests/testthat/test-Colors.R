@@ -70,6 +70,8 @@ test_that("show_col2 returns a ggplot grid of palettes", {
   # after test-ClusterDistrBar.R -> green. That is a test-order dependency on
   # top of the source bug, so the check below is static (order-independent).
   root <- file.path("..", "..")
+  skip_if_not(file.exists(file.path(root, "NAMESPACE")),
+              "dev-layout source inspection only")
   ns_lines <- readLines(file.path(root, "NAMESPACE"), warn = FALSE)
   expect_false(any(grepl("rlist", ns_lines, fixed = TRUE)))
   fn_lines <- readLines(file.path(root, "R", "Functions.R"), warn = FALSE)

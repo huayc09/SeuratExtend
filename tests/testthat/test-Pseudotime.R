@@ -434,6 +434,8 @@ test_that("DimPlot.Slingshot() draws curves with the deprecated size aesthetic",
   # catchable from inside the construction frame), so it is pinned at the
   # object level instead: the value lands in aes_params under "size".
   # Source: R/Pseudotime.R:797-804.
+  skip_if_not(file.exists(file.path("..", "..", "R", "Pseudotime.R")),
+              "dev-layout source inspection only (not available under R CMD check)")
   src <- readLines(file.path("..", "..", "R", "Pseudotime.R"), warn = FALSE)
   expect_true(any(grepl("size = curve.size", src, fixed = TRUE)))
   expect_true(any(grepl("linewidth = line.size", src, fixed = TRUE)))

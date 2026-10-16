@@ -35,10 +35,10 @@
 #' feature_percent(pbmc, feature = genes, cells = b_cells)
 #'
 #' # Also check the proportion of expressed cells in total clusters
-#' feature_percent(pbmc, feature = genes, total = T)
+#' feature_percent(pbmc, feature = genes, total = TRUE)
 #'
 #' # only show logical value; 'TRUE' if more than 20% cells are positive
-#' feature_percent(pbmc, feature = genes, if.expressed = T, min.pct = 0.2)
+#' feature_percent(pbmc, feature = genes, if.expressed = TRUE, min.pct = 0.2)
 #'
 #' @rdname feature_percent
 #' @export

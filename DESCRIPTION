@@ -16,7 +16,8 @@ Imports:
 Suggests:
     rgl, GSVA, GSVAdata, slingshot, AUCell, biomaRt, ontologyIndex, viridis,
     doMC, doRNG, doParallel, foreach, mgsa, GSEABase, egg, loomR, mgsa, 
-    knitr, rmarkdown, RColorBrewer, testthat (>= 3.0.0)
+    knitr, rmarkdown, RColorBrewer, testthat (>= 3.0.0),
+    DelayedArray, DelayedMatrixStats, mgcv, scattermore
 Depends: 
     R (>= 3.6), SeuratExtendData, SeuratObject
 Remotes: 
