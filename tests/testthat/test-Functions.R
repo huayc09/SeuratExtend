@@ -162,9 +162,8 @@ test_that("show_col2 relies on symbols the package namespace cannot see", {
   expect_false(any(grepl("magrittr", ns, fixed = TRUE)))
   expect_false(any(grepl("rlist", ns, fixed = TRUE)))
 
-  desc_path <- file.path("..", "..", "DESCRIPTION")
-  skip_if_not(file.exists(desc_path), "DESCRIPTION not reachable")
-  desc_txt <- paste(readLines(desc_path, warn = FALSE), collapse = " ")
+  desc_txt <- paste(readLines(system.file("DESCRIPTION", package = "SeuratExtend"),
+                              warn = FALSE), collapse = " ")
   expect_true(grepl("magrittr", desc_txt, fixed = TRUE))
   expect_true(grepl("rlist", desc_txt, fixed = TRUE))
 })

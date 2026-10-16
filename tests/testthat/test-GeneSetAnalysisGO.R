@@ -151,13 +151,12 @@ test_that("GeneSetAnalysisGO calls plyr and library() without declaring them", {
   # :187, :218) rewrite the caller's search path, while NAMESPACE carries only
   # two imports total (import(ggplot2), importFrom(reshape2, melt)).
   src_path <- file.path("..", "..", "R", "GeneSetAnalysisGO.R")
-  desc_path <- file.path("..", "..", "DESCRIPTION")
-  skip_if_not(file.exists(src_path) && file.exists(desc_path),
-              "source tree not reachable")
+  skip_if_not(file.exists(src_path), "source tree not reachable")
   src <- readLines(src_path, warn = FALSE)
   expect_true(any(grepl("plyr::revalue", src, fixed = TRUE)))
   expect_gte(sum(grepl("^\\s*library\\(", src)), 6)
-  desc <- paste(readLines(desc_path, warn = FALSE), collapse = " ")
+  desc <- paste(readLines(system.file("DESCRIPTION", package = "SeuratExtend"),
+                          warn = FALSE), collapse = " ")
   # NB: use a word boundary -- a plain grepl("plyr", ...) matches "dplyr",
   # which IS declared in Imports and would make this assertion always fail.
   expect_false(grepl("\\bplyr\\b", desc))

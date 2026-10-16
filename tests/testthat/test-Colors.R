@@ -259,9 +259,8 @@ test_that("scale_cont_auto() depends on viridis for every colour path", {
   expect_true(grepl("scale_color_viridis", body_txt, fixed = TRUE))
   expect_true(grepl("import(\"viridis\")", body_txt, fixed = TRUE))
 
-  desc_path <- file.path("..", "..", "DESCRIPTION")
-  skip_if_not(file.exists(desc_path), "DESCRIPTION not reachable")
-  desc <- readLines(desc_path, warn = FALSE)
+  desc <- readLines(system.file("DESCRIPTION", package = "SeuratExtend"),
+                    warn = FALSE)
   imports_from <- grep("^Imports:", desc)
   suggests_at <- grep("^Suggests:", desc)
   imports <- paste(desc[imports_from:(suggests_at - 1)], collapse = " ")
@@ -340,9 +339,8 @@ test_that("the discrete builders also require RColorBrewer (Suggests only)", {
   expect_true(grepl("library(RColorBrewer)", body_txt, fixed = TRUE))
   expect_true(grepl("brewer.pal.info", body_txt, fixed = TRUE))
 
-  desc_path <- file.path("..", "..", "DESCRIPTION")
-  skip_if_not(file.exists(desc_path), "DESCRIPTION not reachable")
-  desc <- readLines(desc_path, warn = FALSE)
+  desc <- readLines(system.file("DESCRIPTION", package = "SeuratExtend"),
+                    warn = FALSE)
   imports_from <- grep("^Imports:", desc)
   suggests_at <- grep("^Suggests:", desc)
   imports <- paste(desc[imports_from:(suggests_at - 1)], collapse = " ")

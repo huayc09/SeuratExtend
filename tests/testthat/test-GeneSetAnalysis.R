@@ -151,8 +151,8 @@ test_that("GeneSetAnalysis's DelayedArray use is Suggests-declared but still ung
   root <- file.path("..", "..")
   skip_if_not(dir.exists(file.path(root, "R")), "source tree not reachable")
 
-  desc <- paste(readLines(file.path(root, "DESCRIPTION"), warn = FALSE),
-                collapse = " ")
+  desc <- paste(readLines(system.file("DESCRIPTION", package = "SeuratExtend"),
+                          warn = FALSE), collapse = " ")
   expect_true(grepl("DelayedArray", desc, fixed = TRUE))
   expect_true(grepl("DelayedMatrixStats", desc, fixed = TRUE))
 

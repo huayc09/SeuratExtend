@@ -80,7 +80,7 @@ test_that("VolcanoPlot reaches ggrepel through a bare library() call", {
                collapse = "\n")
   expect_true(grepl("library(ggrepel)", src, fixed = TRUE))
   expect_true(grepl("geom_text_repel", src, fixed = TRUE))
-  desc <- paste(readLines(file.path(root, "DESCRIPTION"), warn = FALSE),
-                collapse = " ")
+  desc <- paste(readLines(system.file("DESCRIPTION", package = "SeuratExtend"),
+                          warn = FALSE), collapse = " ")
   expect_true(grepl("ggrepel", desc, fixed = TRUE))
 })

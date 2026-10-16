@@ -32,8 +32,8 @@ test_that("RunBasicSeurat reaches harmony through an undeclared import()", {
   # (This is the same family as GeneSetAnalysis's DelayedArray hole.)
   root <- file.path("..", "..")
   skip_if_not(dir.exists(file.path(root, "R")), "source tree not reachable")
-  desc <- paste(readLines(file.path(root, "DESCRIPTION"), warn = FALSE),
-                collapse = " ")
+  desc <- paste(readLines(system.file("DESCRIPTION", package = "SeuratExtend"),
+                          warn = FALSE), collapse = " ")
   expect_false(grepl("harmony", desc, fixed = TRUE))
   src <- paste(readLines(file.path(root, "R", "RunBasicSeurat.R"),
                          warn = FALSE), collapse = "\n")

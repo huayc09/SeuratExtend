@@ -28,6 +28,7 @@ jobs:
             any::testthat
             huayc09/SeuratExtendData
             local::.
+          needs: check
         env:
           GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
