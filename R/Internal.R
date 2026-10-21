@@ -40,6 +40,9 @@ Seu2Matr <-
     ext <- NULL
     ord <- NULL
     if (!is.null(external)) {
+      if (anyDuplicated(cells)) {
+        stop("'cells' contains duplicated cell names; each cell must be provided once")
+      }
       ext <- .external_validate(external, colnames(seu))
       E <- rownames(ext)
       conflicts <- intersect(E, union(rownames(seu), colnames(seu@meta.data)))
@@ -51,7 +54,7 @@ Seu2Matr <-
       ord <- .external_order(features, E)
       features <- ord$order
     } else if (is.null(features)) {
-      stop("'features' is required when 'external' is not provided")
+      stop("'features' must be provided")
     }
     fetch_features <- if (is.null(external)) features else ord$native
 
@@ -85,6 +88,9 @@ Seu2Matr <-
           native_df <- FetchData(object = seu, vars = ord$native, cells = cells,
                                  slot = slot)
         }
+      }
+      if (!is.null(native_df)) {
+        native_df <- .external_align_native(native_df, cells)
       }
       ext_df <- as.data.frame(t(ext[E, cells, drop = FALSE]))
       matr <- data.frame(row.names = cells)
@@ -175,6 +181,11 @@ Seu2Matr <-
 
   cn <- colnames(mat)
   if (!is.null(cn)) {
+    if (anyDuplicated(cn)) {
+      dups <- unique(cn[duplicated(cn)])
+      stop("'external' has duplicated column names: ",
+           paste(dups, collapse = ", "))
+    }
     if (identical(cn, cell_names)) {
       return(mat)
     }
@@ -203,7 +214,6 @@ Seu2Matr <-
 
 # Resolve the features x external interaction (F2/F3).
 #   native: features not present in the matrix, in features order
-#   ext:    features present in the matrix, in features order
 #   order:  features order first, then unmentioned matrix rows in matrix order
 .external_order <- function(features, E) {
   if (is.null(features)) {
@@ -212,9 +222,22 @@ Seu2Matr <-
   features <- unique(as.character(features))
   list(
     native = features[!features %in% E],
-    ext = features[features %in% E],
     order = c(features, E[!E %in% features])
   )
+}
+
+# Seatbelt for the external path: FetchData is expected to return rows in the
+# order of `cells`; if a future engine changes that, reorder by name or stop
+# rather than silently mixing cell values.
+.external_align_native <- function(native_df, cells) {
+  if (identical(rownames(native_df), cells)) {
+    return(native_df)
+  }
+  rn <- rownames(native_df)
+  if (!is.null(rn) && length(rn) == length(cells) && setequal(rn, cells)) {
+    return(native_df[cells, , drop = FALSE])
+  }
+  stop("Fetched data rows cannot be aligned to the requested cells by name")
 }
 
 # Check if ident.1 and ident.2 are in the factor levels and return

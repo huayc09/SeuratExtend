@@ -438,6 +438,9 @@ DimPlot2_GetData <- function(
   ext <- NULL
   ord <- NULL
   if (!is.null(external)) {
+    if (anyDuplicated(cells)) {
+      stop("'cells' contains duplicated cell names; each cell must be provided once")
+    }
     ext <- .external_validate(external, colnames(seu))
     E <- rownames(ext)
     conflicts <- intersect(E, union(rownames(seu), colnames(seu@meta.data)))
@@ -467,9 +470,13 @@ DimPlot2_GetData <- function(
       data.var <- FetchData(object = seu, vars = vars, cells = cells, slot = slot)
     }
     if (!is.null(ord)) {
+      if (length(vars) > 0) {
+        data.var <- .external_align_native(data.var, cells)
+      }
+      extra <- c(group.by, if (!is.null(cells.highlight)) "Selected_cells")
       ext_df <- as.data.frame(t(ext[E, cells, drop = FALSE]))
       data.ext <- data.frame(row.names = cells)
-      for (nm in ord$order) {
+      for (nm in c(ord$order, extra)) {
         if (nm %in% E) {
           data.ext[[nm]] <- ext_df[[nm]]
         } else {

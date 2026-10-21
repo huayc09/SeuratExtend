@@ -47,8 +47,8 @@ VlnPlot2(object, ...)
   angle = NULL,
   hjust = NULL,
   vjust = NULL,
-  ...,
-  external = NULL
+  external = NULL,
+  ...
 )
 
 \method{VlnPlot2}{default}(
@@ -182,7 +182,7 @@ When both are provided, \code{stats.method} takes precedence.}
 
 \item{vjust}{Vertical justification of labels. If NULL, automatically determined based on angle. Default: NULL.}
 
-\item{external}{Optional external numeric matrix (rows = features, columns = cells) used as an additional feature source, e.g. pathway scores. Its columns are aligned to the cells of `seu`; all of its rows are plotted unless `features` mentions a subset, and variables named in `features` take precedence for ordering. Only applicable for the Seurat method.}
+\item{external}{Optional external numeric matrix (rows = features, columns = cells) used as an additional feature source, e.g. pathway scores. Its columns are aligned to the cells of `seu`; all of its rows participate, while `features` only controls ordering. To plot a subset of the matrix, subset it before passing it in. Only applicable for the Seurat method.}
 
 \item{matr}{A matrix or data frame with rows as features and columns as cells.}
 

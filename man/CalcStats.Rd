@@ -40,7 +40,7 @@ CalcStats(object, ...)
 
 \item{seu}{A Seurat object. Only applicable when using the Seurat method.}
 
-\item{features}{Features for computation, including gene expression, metrics, PC scores, or any other data retrievable via `FetchData()`. Defaults to NULL, implying all features in the matrix. Only applicable for the Seurat method.}
+\item{features}{Features for computation, including gene expression, metrics, PC scores, or any other data retrievable via `FetchData()`. Only applicable for the Seurat method; `features` and `external` cannot both be NULL (pass `features` explicitly). For the matrix method, NULL means all features in the matrix.}
 
 \item{group.by}{A variable from `meta.data` for grouping or a character vector of equal length as the number of cells. Only applicable for the Seurat method.}
 

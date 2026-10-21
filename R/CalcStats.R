@@ -3,7 +3,7 @@
 NULL
 
 #' @param seu A Seurat object. Only applicable when using the Seurat method.
-#' @param features Features for computation, including gene expression, metrics, PC scores, or any other data retrievable via `FetchData()`. Defaults to NULL, implying all features in the matrix. Only applicable for the Seurat method.
+#' @param features Features for computation, including gene expression, metrics, PC scores, or any other data retrievable via `FetchData()`. Only applicable for the Seurat method; `features` and `external` cannot both be NULL (pass `features` explicitly). For the matrix method, NULL means all features in the matrix.
 #' @param group.by A variable from `meta.data` for grouping or a character vector of equal length as the number of cells. Only applicable for the Seurat method.
 #' @param cells Cell identifiers to be used. Defaults to all cells. Only applicable for the Seurat method.
 #' @param slot Slot from which to fetch feature data. Only applicable for the Seurat method.

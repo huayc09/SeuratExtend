@@ -265,3 +265,121 @@ test_that("features = NULL with external = NULL still errors", {
 test_that("GSEAplot has no external formal (scope freeze)", {
   expect_false("external" %in% names(formals(GSEAplot)))
 })
+
+# --- repair round r1: DimPlot2 companion panels --------------------------
+
+test_that("DimPlot2_GetData keeps group.by and cells.highlight with external", {
+  data(pbmc)
+  m <- ext_matrix(pbmc)
+
+  d <- DimPlot2_GetData(pbmc, features = c("CD3D", "pathA"),
+                        group.by = "cluster", external = m)
+  expect_equal(colnames(d$data.var),
+               c("CD3D", "pathA", "pathB", "pathC", "cluster"))
+  expect_equal(as.character(d$data.var$cluster), as.character(pbmc$cluster))
+
+  dh <- DimPlot2_GetData(pbmc, cells.highlight = colnames(pbmc)[1:10],
+                         external = m)
+  expect_equal(colnames(dh$data.var), c("pathA", "pathB", "pathC",
+                                        "Selected_cells"))
+  expect_equal(sum(dh$data.var$Selected_cells == "Selected"), 10)
+
+  expect_s3_class(
+    DimPlot2(pbmc, features = "CD3D", group.by = "cluster", external = m),
+    "ggplot"
+  )
+})
+
+# --- repair round r1: numeric correctness at the plot layer -------------
+
+test_that("VlnPlot2 external values match the source matrix per cell group", {
+  data(pbmc)
+  m <- ext_matrix(pbmc)
+  p <- VlnPlot2(pbmc, features = c("CD3D", "pathA"), external = m)
+  d <- p$data
+  expect_equal(sort(d$value[d$feature == "pathA"]),
+               sort(unname(m["pathA", ])))
+  for (grp in unique(as.character(pbmc$cluster))) {
+    cells <- colnames(pbmc)[pbmc$cluster == grp]
+    expect_equal(
+      mean(d$value[d$feature == "pathA" & as.character(d$f) == grp]),
+      mean(m["pathA", cells])
+    )
+  }
+})
+
+test_that("VolcanoPlot with external only uses matrix variables (F2 exception)", {
+  data(pbmc)
+  m <- ext_matrix(pbmc)
+  p <- VolcanoPlot(pbmc, external = m)
+  expect_s3_class(p, "ggplot")
+  # points are exactly the matrix rows, not rownames(seu)
+  expect_equal(nrow(p$data), nrow(m))
+  expect_equal(rownames(p$data), rownames(m))
+})
+
+test_that("pure-matrix WaterfallPlot and VolcanoPlot smoke", {
+  data(pbmc)
+  m <- ext_matrix(pbmc)
+  expect_s3_class(WaterfallPlot(pbmc, external = m), "ggplot")
+  expect_s3_class(VolcanoPlot(pbmc, external = m), "ggplot")
+})
+
+# --- repair round r1: conflict warning in DimPlot2 -----------------------
+
+test_that("DimPlot2 external conflict warns and keeps external values", {
+  data(pbmc)
+  m <- ext_matrix(pbmc)
+  rownames(m)[2] <- "CD3D"
+  expect_warning(
+    d <- DimPlot2_GetData(pbmc, external = m),
+    "CD3D"
+  )
+  expect_equal(unname(d$data.var[["CD3D"]]), unname(m["CD3D", ]))
+})
+
+# --- repair round r1: data.frame input and cell order --------------------
+
+test_that("numeric data.frame external equals matrix input", {
+  data(pbmc)
+  m <- ext_matrix(pbmc)
+  a <- CalcStats(pbmc, features = c("CD3D", "pathA"), external = m,
+                 group.by = "cluster", method = "mean")
+  b <- CalcStats(pbmc, features = c("CD3D", "pathA"),
+                 external = as.data.frame(m),
+                 group.by = "cluster", method = "mean")
+  expect_equal(a, b)
+})
+
+test_that("reversed/subset cells align external values by cell name", {
+  data(pbmc)
+  m <- ext_matrix(pbmc)
+  cells <- rev(colnames(pbmc)[seq(1, ncol(pbmc), by = 7)])
+  std <- SeuratExtend:::Seu2Matr(pbmc, external = m, cells = cells)
+  expect_equal(rownames(std$matr), cells)
+  expect_equal(unname(std$matr[, "pathA"]), unname(m["pathA", cells]))
+
+  d <- DimPlot2_GetData(pbmc, external = m, cells = cells)
+  expect_equal(rownames(d$data.var), cells)
+  expect_equal(unname(d$data.var[["pathB"]]), unname(m["pathB", cells]))
+})
+
+# --- repair round r1: input risk rules -----------------------------------
+
+test_that("duplicated external column names and duplicated cells are rejected", {
+  data(pbmc)
+  m <- ext_matrix(pbmc)
+  md <- m
+  colnames(md)[2] <- colnames(md)[1]
+  expect_error(SeuratExtend:::.external_validate(md, colnames(pbmc)),
+               "duplicated column names")
+  dup_cells <- rep(colnames(pbmc)[1], 2)
+  expect_error(SeuratExtend:::Seu2Matr(pbmc, external = m, cells = dup_cells),
+               "duplicated cell names")
+})
+
+test_that("tier-1 identical colnames emit no message through Seu2Matr", {
+  data(pbmc)
+  m <- ext_matrix(pbmc)
+  expect_silent(SeuratExtend:::Seu2Matr(pbmc, external = m))
+})

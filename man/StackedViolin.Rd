@@ -82,8 +82,8 @@ StackedViolin_v3(
   angle = NULL,
   hjust = NULL,
   vjust = NULL,
-  ...,
-  external = NULL
+  external = NULL,
+  ...
 )
 }
 \description{
