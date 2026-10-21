@@ -205,4 +205,5 @@ VolcanoPlot(
 m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
             dimnames = list(c("pathA", "pathB"), colnames(pbmc)))
 VolcanoPlot(pbmc, features = c("CD3D", "pathA"), external = m)
+
 }

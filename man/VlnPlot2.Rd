@@ -255,7 +255,10 @@ matr <- pbmc@misc$AUCell$genesets
 
 # Create violin plots for the first three pathways:
 VlnPlot2(matr[1:3,], f = pbmc$cluster, ncol = 1)
-# Mix a gene and an external matrix variable in one plot:
+
+# Mix a gene and an external matrix variable in one plot
+# (matrix rows = features, columns = cells; all matrix rows participate,
+# `features` only controls ordering):
 m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
             dimnames = list(c("pathA", "pathB"), colnames(pbmc)))
 VlnPlot2(pbmc, features = c("CD3D", "pathA"), external = m)

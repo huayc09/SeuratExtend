@@ -15,11 +15,6 @@ NULL
 #' @param angle Angle for label rotation. If NULL, automatically determined based on label length. Default: NULL.
 #' @param hjust Horizontal justification of labels. If NULL, automatically determined based on angle. Default: NULL.
 #' @param vjust Vertical justification of labels. If NULL, automatically determined based on angle. Default: NULL.
-#' @examples
-#' # Mix a gene and an external matrix variable in one plot:
-#' m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
-#'             dimnames = list(c("pathA", "pathB"), colnames(pbmc)))
-#' VlnPlot2(pbmc, features = c("CD3D", "pathA"), external = m)
 #' @rdname VlnPlot2
 #' @export
 

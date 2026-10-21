@@ -57,6 +57,13 @@
 #'
 #' # Create violin plots for the first three pathways:
 #' VlnPlot2(matr[1:3,], f = pbmc$cluster, ncol = 1)
+#'
+#' # Mix a gene and an external matrix variable in one plot
+#' # (matrix rows = features, columns = cells; all matrix rows participate,
+#' # `features` only controls ordering):
+#' m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
+#'             dimnames = list(c("pathA", "pathB"), colnames(pbmc)))
+#' VlnPlot2(pbmc, features = c("CD3D", "pathA"), external = m)
 #' @rdname VlnPlot2
 #' @export
 
@@ -101,6 +108,11 @@ VlnPlot2 <- function(object, ...) {
 #' # Next, we calculate the zscore, grouped by 'cluster':
 #' gsea.zscore <- CalcStats(matr, f = pbmc$cluster, method = "zscore")
 #' Heatmap(gsea.zscore, lab_fill = "zscore")
+#'
+#' # Mix a gene and an external matrix variable in one calculation:
+#' m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
+#'             dimnames = list(c("pathA", "pathB"), colnames(pbmc)))
+#' CalcStats(pbmc, features = c("CD3D", "pathA"), external = m)
 #'
 #' @rdname CalcStats
 #' @export
@@ -178,6 +190,11 @@ CalcStats <- function(object, ...) {
 #' WaterfallPlot(
 #'   matr, f = pbmc$cluster, ident.1 = "Mono CD14", ident.2 = "CD8 T cell",
 #'   length = "logFC", pseudocount = 0.001)
+#'
+#' # Mix a gene and an external matrix variable:
+#' m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
+#'             dimnames = list(c("pathA", "pathB"), colnames(pbmc)))
+#' WaterfallPlot(pbmc, features = c("CD3D", "pathA"), external = m)
 #' @rdname WaterfallPlot
 #' @export
 
@@ -279,6 +296,11 @@ WaterfallPlot <- function(object, ...) {
 #'   x.quantile = 0.8,
 #'   y.quantile = 0.8,
 #'   top.n = 5)
+#'
+#' # Mix a gene and an external matrix variable:
+#' m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
+#'             dimnames = list(c("pathA", "pathB"), colnames(pbmc)))
+#' VolcanoPlot(pbmc, features = c("CD3D", "pathA"), external = m)
 #'
 #' @rdname VolcanoPlot
 #' @export

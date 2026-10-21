@@ -240,6 +240,7 @@ WaterfallPlot(
 WaterfallPlot(
   matr, f = pbmc$cluster, ident.1 = "Mono CD14", ident.2 = "CD8 T cell",
   length = "logFC", pseudocount = 0.001)
+
 # Mix a gene and an external matrix variable:
 m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
             dimnames = list(c("pathA", "pathB"), colnames(pbmc)))

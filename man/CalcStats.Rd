@@ -116,4 +116,5 @@ Heatmap(gsea.zscore, lab_fill = "zscore")
 m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
             dimnames = list(c("pathA", "pathB"), colnames(pbmc)))
 CalcStats(pbmc, features = c("CD3D", "pathA"), external = m)
+
 }

@@ -13,11 +13,6 @@ NULL
 #' @param external Optional external numeric matrix (rows = features, columns = cells) used as an additional feature source. Its columns are aligned to the cells of `seu`; all rows participate, and `features` only controls ordering. Only applicable for the Seurat method.
 #' @param max.cells.per.ident Down sample each identity class to a max number of cells. Default is Inf (no downsampling). When set to a finite value, cells from each group (ident.1 and ident.2) will be randomly downsampled to this number if they exceed it, ensuring more balanced comparisons between groups of different sizes.
 #' @param random.seed Random seed for reproducible downsampling when max.cells.per.ident is used. Default: 1.
-#' @examples
-#' # Mix a gene and an external matrix variable:
-#' m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
-#'             dimnames = list(c("pathA", "pathB"), colnames(pbmc)))
-#' WaterfallPlot(pbmc, features = c("CD3D", "pathA"), external = m)
 #' @rdname WaterfallPlot
 #' @export
 
