@@ -449,7 +449,10 @@ DimPlot2_GetData <- function(
               paste(conflicts, collapse = ", "),
               "). Values from 'external' are used for these variables.")
     }
-    ord <- .external_order(features, E)
+    # `group.by` is an alias for `features` (see @param group.by), so the two
+    # are resolved as one concatenated block: user order is c(features, group.by)
+    # and unmentioned matrix rows are appended after all user-specified vars.
+    ord <- .external_order(c(features, group.by), E)
   }
 
   if(is.null(features) & is.null(group.by) & is.null(cells.highlight) &&
@@ -459,7 +462,8 @@ DimPlot2_GetData <- function(
     if (is.null(ord)) {
       vars <- c(features, group.by)
     } else {
-      vars <- c(ord$native, group.by)
+      # every native (non-matrix) user variable, features and group.by alike
+      vars <- ord$native
     }
     if(!is.null(cells.highlight)) vars = c(vars, "Selected_cells")
     if (length(vars) == 0) {
@@ -473,7 +477,7 @@ DimPlot2_GetData <- function(
       if (length(vars) > 0) {
         data.var <- .external_align_native(data.var, cells)
       }
-      extra <- c(group.by, if (!is.null(cells.highlight)) "Selected_cells")
+      extra <- if (!is.null(cells.highlight)) "Selected_cells"
       ext_df <- as.data.frame(t(ext[E, cells, drop = FALSE]))
       data.ext <- data.frame(row.names = cells)
       for (nm in c(ord$order, extra)) {

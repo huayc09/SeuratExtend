@@ -274,8 +274,10 @@ test_that("DimPlot2_GetData keeps group.by and cells.highlight with external", {
 
   d <- DimPlot2_GetData(pbmc, features = c("CD3D", "pathA"),
                         group.by = "cluster", external = m)
+  # D4: group.by is an alias for features, so the user block keeps its order
+  # c(features, group.by) and unmentioned matrix rows come after it.
   expect_equal(colnames(d$data.var),
-               c("CD3D", "pathA", "pathB", "pathC", "cluster"))
+               c("CD3D", "pathA", "cluster", "pathB", "pathC"))
   expect_equal(as.character(d$data.var$cluster), as.character(pbmc$cluster))
 
   dh <- DimPlot2_GetData(pbmc, cells.highlight = colnames(pbmc)[1:10],
@@ -382,4 +384,60 @@ test_that("tier-1 identical colnames emit no message through Seu2Matr", {
   data(pbmc)
   m <- ext_matrix(pbmc)
   expect_silent(SeuratExtend:::Seu2Matr(pbmc, external = m))
+})
+
+# --- fix round r2: group.by is an alias for features (D4) ----------------
+
+test_that("D4: features and group.by are interchangeable matrix variable sources", {
+  data(pbmc)
+  m <- ext_matrix(pbmc)
+
+  # 1. alias swap: the roles are swapped, the user block keeps its order
+  d <- DimPlot2_GetData(pbmc, features = "cluster", group.by = "CD3D",
+                        external = m)
+  expect_equal(colnames(d$data.var),
+               c("cluster", "CD3D", "pathA", "pathB", "pathC"))
+  expect_equal(as.character(d$data.var$cluster), as.character(pbmc$cluster))
+  expect_equal(unname(d$data.var$CD3D),
+               unname(DimPlot2_GetData(pbmc, features = "CD3D")$data.var$CD3D))
+
+  # 2. a matrix variable named only through group.by is read from `external`
+  #    and never sent to FetchData (which would error: variable not found)
+  expect_silent(
+    dm <- DimPlot2_GetData(pbmc, group.by = "pathA", external = m)
+  )
+  expect_equal(colnames(dm$data.var), c("pathA", "pathB", "pathC"))
+  expect_equal(rownames(dm$data.var), colnames(pbmc))
+  expect_equal(unname(dm$data.var[["pathA"]]), unname(m["pathA", ]))
+
+  # 3. mixed alias: the whole user block precedes unmentioned matrix rows
+  dx <- DimPlot2_GetData(pbmc, features = c("CD3D", "pathA"),
+                         group.by = "cluster", external = m)
+  expect_equal(colnames(dx$data.var),
+               c("CD3D", "pathA", "cluster", "pathB", "pathC"))
+
+  # group.by order is honoured too: c(features = "cluster", group.by = "pathB")
+  dy <- DimPlot2_GetData(pbmc, features = "cluster", group.by = "pathB",
+                         external = m)
+  expect_equal(colnames(dy$data.var),
+               c("cluster", "pathB", "pathA", "pathC"))
+  expect_equal(unname(dy$data.var[["pathB"]]), unname(m["pathB", ]))
+})
+
+test_that("D4: cells.highlight keeps Selected_cells last after the alias block", {
+  data(pbmc)
+  m <- ext_matrix(pbmc)
+  hl <- colnames(pbmc)[1:10]
+
+  dh <- DimPlot2_GetData(pbmc, cells.highlight = hl, external = m)
+  expect_equal(colnames(dh$data.var),
+               c("pathA", "pathB", "pathC", "Selected_cells"))
+  expect_equal(sum(dh$data.var$Selected_cells == "Selected"), 10)
+
+  da <- DimPlot2_GetData(pbmc, features = "CD3D", group.by = "cluster",
+                         cells.highlight = hl, external = m)
+  expect_equal(colnames(da$data.var),
+               c("CD3D", "cluster", "pathA", "pathB", "pathC",
+                 "Selected_cells"))
+  expect_equal(tail(colnames(da$data.var), 1), "Selected_cells")
 })
