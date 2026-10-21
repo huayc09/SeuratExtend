@@ -42,7 +42,8 @@ DimPlot2(
   combine = TRUE,
   align = "hv",
   col.min = NULL,
-  col.max = NULL
+  col.max = NULL,
+  external = NULL
 )
 }
 \arguments{
@@ -205,6 +206,8 @@ Default: 'hv'.}
 \item{col.min}{Minimum cutoff value for color scale. Values below this threshold will be set to col.min. Default: NULL (no lower limit).}
 
 \item{col.max}{Maximum cutoff value for color scale. Values above this threshold will be set to col.max. Default: NULL (no upper limit).}
+
+\item{external}{Optional external numeric matrix (rows = features, columns = cells) used as an additional feature source. Its columns are aligned to the cells of `seu`; all rows are plotted, and `features` only controls ordering. Matrix variables are colored as continuous values. Default: NULL.}
 }
 \value{
 A ggplot object if `combine` is TRUE; otherwise, a list of ggplot objects, allowing for flexible plot arrangements or combined visualizations.
@@ -267,4 +270,9 @@ DimPlot2(pbmc, index.title = "C", box = TRUE, label.color = "black")
 
 # Limit color scale range to avoid extreme values
 DimPlot2(pbmc, features = c("CD14", "CD3D"), col.min = 0, col.max = 3)
+
+# Mix a gene and an external matrix variable:
+m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
+            dimnames = list(c("pathA", "pathB"), colnames(pbmc)))
+DimPlot2(pbmc, features = c("CD3D", "pathA"), external = m)
 }

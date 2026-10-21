@@ -19,7 +19,7 @@ CalcScoreGeneral(
 
 CalcScoreGeneral_v3(
   seu,
-  features,
+  features = NULL,
   group.by = NULL,
   cells = NULL,
   slot = "data",
@@ -29,7 +29,8 @@ CalcScoreGeneral_v3(
   order = NULL,
   n = Inf,
   p.threshold = 0.05,
-  priority = c("expr", "none")
+  priority = c("expr", "none"),
+  external = NULL
 )
 
 ScoreAndOrder(

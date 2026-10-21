@@ -10,7 +10,7 @@ VlnPlot2(object, ...)
 
 \method{VlnPlot2}{Seurat}(
   seu,
-  features,
+  features = NULL,
   group.by = NULL,
   split.by = NULL,
   cells = NULL,
@@ -24,6 +24,7 @@ VlnPlot2(object, ...)
   lab_fill = "group",
   scales = "free_y",
   style = c("fill", "outline"),
+  sort = FALSE,
   violin = T,
   box = T,
   width = 0.9,
@@ -46,7 +47,8 @@ VlnPlot2(object, ...)
   angle = NULL,
   hjust = NULL,
   vjust = NULL,
-  ...
+  ...,
+  external = NULL
 )
 
 \method{VlnPlot2}{default}(
@@ -61,6 +63,7 @@ VlnPlot2(object, ...)
   lab_fill = "group",
   scales = "free_y",
   style = c("fill", "outline"),
+  sort = FALSE,
   violin = T,
   box = T,
   width = 0.9,
@@ -129,6 +132,11 @@ VlnPlot2(object, ...)
 
 \item{style}{Plot style: "fill" (default) uses filled violins with group colors, "outline" uses white fill with colored outlines.}
 
+\item{sort}{Sort groups by expression level of the first feature. Default: FALSE (original order).
+- FALSE: No sorting, use original group order.
+- TRUE or "median": Sort by median expression (descending).
+- "mean": Sort by mean expression (descending).}
+
 \item{violin}{Indicates whether to generate a violin plot. Default: TRUE.}
 
 \item{box}{Indicates whether to depict a box plot. Default: TRUE.}
@@ -173,6 +181,8 @@ When both are provided, \code{stats.method} takes precedence.}
 \item{hjust}{Horizontal justification of labels. If NULL, automatically determined based on angle. Default: NULL.}
 
 \item{vjust}{Vertical justification of labels. If NULL, automatically determined based on angle. Default: NULL.}
+
+\item{external}{Optional external numeric matrix (rows = features, columns = cells) used as an additional feature source, e.g. pathway scores. Its columns are aligned to the cells of `seu`; all of its rows are plotted unless `features` mentions a subset, and variables named in `features` take precedence for ordering. Only applicable for the Seurat method.}
 
 \item{matr}{A matrix or data frame with rows as features and columns as cells.}
 
@@ -245,4 +255,8 @@ matr <- pbmc@misc$AUCell$genesets
 
 # Create violin plots for the first three pathways:
 VlnPlot2(matr[1:3,], f = pbmc$cluster, ncol = 1)
+# Mix a gene and an external matrix variable in one plot:
+m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
+            dimnames = list(c("pathA", "pathB"), colnames(pbmc)))
+VlnPlot2(pbmc, features = c("CD3D", "pathA"), external = m)
 }

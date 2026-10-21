@@ -10,7 +10,7 @@ VolcanoPlot(object, ...)
 
 \method{VolcanoPlot}{Seurat}(
   seu,
-  features = rownames(seu),
+  features = NULL,
   group.by = NULL,
   cell = NULL,
   cells = NULL,
@@ -30,7 +30,8 @@ VolcanoPlot(object, ...)
   color = c("grey20", "grey50", "red3"),
   title = NULL,
   log.base = "e",
-  pseudocount = NULL
+  pseudocount = NULL,
+  external = NULL
 )
 
 \method{VolcanoPlot}{default}(
@@ -98,6 +99,8 @@ the second for points passing single threshold, and the third for points passing
 \item{log.base}{The base for logarithmic calculations when using logFC. Can be "e" (natural logarithm, default), "2" (log2), or "10" (log10).}
 
 \item{pseudocount}{Pseudocount to be added to the data before transformation. Only applicable for the Seurat method.}
+
+\item{external}{Optional external numeric matrix (rows = features, columns = cells) used as an additional feature source. Its columns are aligned to the cells of `seu`; all rows participate, and `features` only controls ordering. In this case the `rownames(seu)` default for `features` is not applied. Only applicable for the Seurat method.}
 
 \item{matr}{A matrix or data frame where rows represent features and columns represent cells.}
 
@@ -198,4 +201,8 @@ VolcanoPlot(
   y.quantile = 0.8,
   top.n = 5)
 
+# Mix a gene and an external matrix variable:
+m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
+            dimnames = list(c("pathA", "pathB"), colnames(pbmc)))
+VolcanoPlot(pbmc, features = c("CD3D", "pathA"), external = m)
 }

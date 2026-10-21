@@ -9,13 +9,19 @@ NULL
 #' @param slot Slot from which to fetch feature data. Only applicable for the Seurat method.
 #' @param assay Name of the assay to use. Defaults to the active assay. Only applicable for the Seurat method.
 #' @param priority If set to "expr", fetches data from the expression matrix over `meta.data`. Only applicable for the Seurat method.
+#' @param external Optional external numeric matrix (rows = features, columns = cells) used as an additional feature source. Its columns are aligned to the cells of `seu`; all rows participate, and `features` only controls ordering. Only applicable for the Seurat method.
+#' @examples
+#' # Mix a gene and an external matrix variable in one calculation:
+#' m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
+#'             dimnames = list(c("pathA", "pathB"), colnames(pbmc)))
+#' CalcStats(pbmc, features = c("CD3D", "pathA"), external = m)
 #' @rdname CalcStats
 #' @export
 
 CalcStats.Seurat <-
   function(
     seu,
-    features,
+    features = NULL,
     group.by = NULL,
     cells = NULL,
     slot = "data",
@@ -25,7 +31,8 @@ CalcStats.Seurat <-
     order = NULL,
     n = Inf,
     p.threshold = 0.05,
-    priority = c("expr","none")
+    priority = c("expr","none"),
+    external = NULL
   ) {
     Std.matr <- Seu2Matr(
       seu = seu,
@@ -34,7 +41,8 @@ CalcStats.Seurat <-
       cells = cells,
       slot = slot,
       assay = assay,
-      priority = priority
+      priority = priority,
+      external = external
     )
 
     scores <- CalcStats.default(

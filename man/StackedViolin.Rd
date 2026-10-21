@@ -17,6 +17,7 @@ StackedViolin(
   lab_fill = "group",
   scales = "free_y",
   style = c("fill", "outline"),
+  sort = FALSE,
   violin = T,
   box = T,
   width = 0.9,
@@ -44,7 +45,7 @@ StackedViolin(
 
 StackedViolin_v3(
   seu,
-  features,
+  features = NULL,
   group.by = NULL,
   split.by = NULL,
   cells = NULL,
@@ -58,6 +59,7 @@ StackedViolin_v3(
   lab_fill = "group",
   scales = "free_y",
   style = c("fill", "outline"),
+  sort = FALSE,
   violin = T,
   box = T,
   width = 0.9,
@@ -80,7 +82,8 @@ StackedViolin_v3(
   angle = NULL,
   hjust = NULL,
   vjust = NULL,
-  ...
+  ...,
+  external = NULL
 )
 }
 \description{

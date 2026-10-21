@@ -123,6 +123,7 @@
 #'   Default: 'hv'.
 #' @param col.min Minimum cutoff value for color scale. Values below this threshold will be set to col.min. Default: NULL (no lower limit).
 #' @param col.max Maximum cutoff value for color scale. Values above this threshold will be set to col.max. Default: NULL (no upper limit).
+#' @param external Optional external numeric matrix (rows = features, columns = cells) used as an additional feature source. Its columns are aligned to the cells of `seu`; all rows are plotted, and `features` only controls ordering. Matrix variables are colored as continuous values. Default: NULL.
 #' @return A ggplot object if `combine` is TRUE; otherwise, a list of ggplot objects, allowing for flexible plot arrangements or combined visualizations.
 #' @details `DimPlot2` extends the functionality of Seurat's visualization tools by combining the features of `DimPlot` and `FeaturePlot` into a single, more versatile function. It automatically recognizes whether the input features are discrete or continuous, adjusting the visualization accordingly. This makes `DimPlot2` ideal for exploring complex scRNA-seq data without the need to switch between different plotting functions based on variable types. The function also offers advanced customization options for colors, themes, and labeling, making it highly adaptable to various data visualization needs.
 #' @examples
@@ -177,6 +178,11 @@
 #'
 #' # Limit color scale range to avoid extreme values
 #' DimPlot2(pbmc, features = c("CD14", "CD3D"), col.min = 0, col.max = 3)
+#'
+#' # Mix a gene and an external matrix variable:
+#' m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
+#'             dimnames = list(c("pathA", "pathB"), colnames(pbmc)))
+#' DimPlot2(pbmc, features = c("CD3D", "pathA"), external = m)
 #' @rdname DimPlot2
 #' @export
 
@@ -218,7 +224,8 @@ DimPlot2 <- function(
     combine = TRUE,
     align = "hv",
     col.min = NULL,
-    col.max = NULL
+    col.max = NULL,
+    external = NULL
 ) {
   plot_data <- DimPlot2_GetData(
     seu = seu,
@@ -232,7 +239,8 @@ DimPlot2 <- function(
     reduction = reduction,
     shape.by = shape.by,
     alpha.by = alpha.by,
-    cells.highlight = cells.highlight
+    cells.highlight = cells.highlight,
+    external = external
   )
 
   data.dim <- plot_data$data.dim
@@ -381,7 +389,8 @@ DimPlot2_GetData <- function(
     reduction = NULL,
     shape.by = NULL,
     alpha.by = NULL,
-    cells.highlight = NULL
+    cells.highlight = NULL,
+    external = NULL
 ) {
   if(!require(SeuratObject)) library(Seurat)
 
@@ -426,15 +435,48 @@ DimPlot2_GetData <- function(
       levels = c("Unselected","Selected")
     )
   }
-  if(is.null(features) & is.null(group.by) & is.null(cells.highlight)) {
+  ext <- NULL
+  ord <- NULL
+  if (!is.null(external)) {
+    ext <- .external_validate(external, colnames(seu))
+    E <- rownames(ext)
+    conflicts <- intersect(E, union(rownames(seu), colnames(seu@meta.data)))
+    if (length(conflicts) > 0) {
+      warning("Variables found in both 'external' and the Seurat object (",
+              paste(conflicts, collapse = ", "),
+              "). Values from 'external' are used for these variables.")
+    }
+    ord <- .external_order(features, E)
+  }
+
+  if(is.null(features) & is.null(group.by) & is.null(cells.highlight) &&
+     is.null(external)) {
     data.var <- data.frame(Idents = factor(Idents(seu)[cells]))
   } else {
-    vars <- c(features, group.by)
+    if (is.null(ord)) {
+      vars <- c(features, group.by)
+    } else {
+      vars <- c(ord$native, group.by)
+    }
     if(!is.null(cells.highlight)) vars = c(vars, "Selected_cells")
-    if (utils::packageVersion("SeuratObject") >= "5.0.0") {
+    if (length(vars) == 0) {
+      data.var <- data.frame(row.names = cells)
+    } else if (utils::packageVersion("SeuratObject") >= "5.0.0") {
       data.var <- FetchData(object = seu, vars = vars, cells = cells, layer = slot, clean = "none")
     } else {
       data.var <- FetchData(object = seu, vars = vars, cells = cells, slot = slot)
+    }
+    if (!is.null(ord)) {
+      ext_df <- as.data.frame(t(ext[E, cells, drop = FALSE]))
+      data.ext <- data.frame(row.names = cells)
+      for (nm in ord$order) {
+        if (nm %in% E) {
+          data.ext[[nm]] <- ext_df[[nm]]
+        } else {
+          data.ext[[nm]] <- data.var[[nm]]
+        }
+      }
+      data.var <- data.ext
     }
   }
 

@@ -10,13 +10,19 @@ NULL
 #' @param slot Slot from which to retrieve feature data. Only applicable for the Seurat method.
 #' @param assay Name of the assay to use. If not specified, the active assay will be used. Only applicable for the Seurat method.
 #' @param priority If set to "expr", the function will fetch data from the expression matrix rather than `meta.data`. Only applicable for the Seurat method.
+#' @param external Optional external numeric matrix (rows = features, columns = cells) used as an additional feature source. Its columns are aligned to the cells of `seu`; all rows participate, and `features` only controls ordering. In this case the `rownames(seu)` default for `features` is not applied. Only applicable for the Seurat method.
 #' @param pseudocount Pseudocount to be added to the data before transformation. Only applicable for the Seurat method.
+#' @examples
+#' # Mix a gene and an external matrix variable:
+#' m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
+#'             dimnames = list(c("pathA", "pathB"), colnames(pbmc)))
+#' VolcanoPlot(pbmc, features = c("CD3D", "pathA"), external = m)
 #' @rdname VolcanoPlot
 #' @export
 
 VolcanoPlot.Seurat <- function(
     seu,
-    features = rownames(seu),
+    features = NULL,
     group.by = NULL,
     cell = NULL,
     cells = NULL,
@@ -36,8 +42,10 @@ VolcanoPlot.Seurat <- function(
     color = c("grey20", "grey50", "red3"),
     title = NULL,
     log.base = "e",
-    pseudocount = NULL
+    pseudocount = NULL,
+    external = NULL
 ) {
+  if (is.null(features) && is.null(external)) features <- rownames(seu)
 
   # Use cells if provided, otherwise fall back to cell
   cell_subset <- cells %||% cell
@@ -49,7 +57,8 @@ VolcanoPlot.Seurat <- function(
     cells = cell_subset,
     slot = slot,
     assay = assay,
-    priority = priority
+    priority = priority,
+    external = external
   )
 
   p <- VolcanoPlot.default(

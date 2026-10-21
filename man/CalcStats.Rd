@@ -10,7 +10,7 @@ CalcStats(object, ...)
 
 \method{CalcStats}{Seurat}(
   seu,
-  features,
+  features = NULL,
   group.by = NULL,
   cells = NULL,
   slot = "data",
@@ -20,7 +20,8 @@ CalcStats(object, ...)
   order = NULL,
   n = Inf,
   p.threshold = 0.05,
-  priority = c("expr", "none")
+  priority = c("expr", "none"),
+  external = NULL
 )
 
 \method{CalcStats}{default}(
@@ -60,6 +61,8 @@ CalcStats(object, ...)
 \item{p.threshold}{Rows with p-value greater than this threshold are omitted when `order = "p"`.}
 
 \item{priority}{If set to "expr", fetches data from the expression matrix over `meta.data`. Only applicable for the Seurat method.}
+
+\item{external}{Optional external numeric matrix (rows = features, columns = cells) used as an additional feature source. Its columns are aligned to the cells of `seu`; all rows participate, and `features` only controls ordering. Only applicable for the Seurat method.}
 
 \item{matr}{A matrix or data frame with rows as features and columns as cells.}
 
@@ -109,4 +112,8 @@ matr <- pbmc@misc$AUCell$genesets
 gsea.zscore <- CalcStats(matr, f = pbmc$cluster, method = "zscore")
 Heatmap(gsea.zscore, lab_fill = "zscore")
 
+# Mix a gene and an external matrix variable in one calculation:
+m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
+            dimnames = list(c("pathA", "pathB"), colnames(pbmc)))
+CalcStats(pbmc, features = c("CD3D", "pathA"), external = m)
 }

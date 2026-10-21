@@ -6,7 +6,7 @@
 \usage{
 WaterfallPlot_v3(
   seu,
-  features,
+  features = NULL,
   group.by = NULL,
   cell = NULL,
   cells = NULL,
@@ -35,7 +35,8 @@ WaterfallPlot_v3(
   log.base = "e",
   pseudocount = NULL,
   max.cells.per.ident = Inf,
-  random.seed = 1
+  random.seed = 1,
+  external = NULL
 )
 }
 \description{
