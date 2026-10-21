@@ -50,7 +50,9 @@ Seu2Loom <- function(
 
   # Create and set attributes
   file$create_group("attrs")
-  h5attr(file, "LOOM_SPEC_VERSION") <- "3.0.0"
+  version_attr <- file$create_attr("LOOM_SPEC_VERSION", robj = "3.0.0",
+                                   space = H5S$new("scalar"), dtype = utf8_string_type)
+  version_attr$close()
 
   # Create necessary groups
   row_attrs <- file$create_group("row_attrs")

@@ -65,26 +65,32 @@ test_that("Seu2Loom() add.metadata = FALSE writes only CellID", {
 })
 
 test_that("Seu2Loom() writes LOOM_SPEC_VERSION as a scalar file attribute", {
-  # CellWeave A1: loom 3.0 puts the version at the FILE level, and loompy 3.0.6
-  # get_loom_spec_version reads /attrs/LOOM_SPEC_VERSION FIRST -- so the old
-  # array dataset under /attrs/ broke validate=True in pyscenic. The /attrs
-  # group itself is kept (empty), matching the CellWeave step0b artifact.
-  # Source: R/Loom.R:52-53 (create_group + h5attr assignment).
+  # CellWeave A1 / audit D1-D2: loom 3.0 puts the version at the FILE level,
+  # and loompy 3.0.6 get_loom_spec_version reads /attrs/LOOM_SPEC_VERSION
+  # FIRST. A plain h5attr()-style write lands as a 1x1x1 SIMPLE dataspace,
+  # which hdf5r folds back into a length-1 character but loompy sees as an
+  # ndarray, so compare_loom_spec_version()/ds.ca writes still raise
+  # AttributeError. Assert the real dataspace: 0 == H5S_SCALAR.
+  # Source: R/Loom.R:52-55 (create_group + create_attr(space = H5S$new("scalar"))).
   skip_if_not_installed("hdf5r")
   data(pbmc)
   f <- loom_tmp("test-seu2loom-specversion.loom")
   unlink(f)
-  on.exit(unlink(f), add = TRUE)
 
   expect_no_error(Seu2Loom(pbmc, f))
   expect_true("attrs" %in% h5names(f))
   expect_false("LOOM_SPEC_VERSION" %in% h5names(f, "attrs"))
 
-  # Empirical shape (checked in this work order, see evidence/01-impl/
-  # hdf5r-attr-shape.txt): h5attributes() returns a named list whose element is
-  # a length-1 character "3.0.0".
   h5 <- hdf5r::H5File$new(f, mode = "r")
-  on.exit(h5$close_all(), add = TRUE)
+  spec <- h5$attr_open_by_name("LOOM_SPEC_VERSION", ".")
+  on.exit(spec$close(), add = TRUE)
+  # Single handler, close before unlink (Windows-friendly; audit D5).
+  on.exit({ h5$close_all(); unlink(f) }, add = TRUE)
+
+  # hdf5r returns a factor_ext here, so compare by its HDF5 name.
+  expect_identical(as.character(spec$get_space()$get_simple_extent_type()),
+                   "H5S_SCALAR")
+
   attrs <- hdf5r::h5attributes(h5)
   expect_true("LOOM_SPEC_VERSION" %in% names(attrs))
   expect_type(attrs$LOOM_SPEC_VERSION, "character")
@@ -92,36 +98,48 @@ test_that("Seu2Loom() writes LOOM_SPEC_VERSION as a scalar file attribute", {
   expect_identical(unname(attrs$LOOM_SPEC_VERSION), "3.0.0")
 })
 
-test_that("Seu2Loom() output opens in loompy with validation on", {
-  # Same CellWeave A1 regression from the consumer side: loompy.connect()
-  # defaults to validate=True, which is exactly the path pyscenic takes.
+test_that("Seu2Loom() output satisfies loompy's version/attribute contract", {
+  # Consumer-side regression for CellWeave A1 / audit D3: connect(validate =
+  # TRUE) alone passes even on the non-scalar defect (LoomValidator only
+  # compares), so assert the semantics pyscenic actually exercises:
+  # get_loom_spec_version() returns a str, compare_loom_spec_version() == 0,
+  # and a mode = "r+" session can append a col_attr (the AUCell path).
   # No conda env / no loompy -> SKIP; those skips go to the settlement
   # uncovered list.
   skip_if_not_installed("hdf5r")
   skip_if_not_installed("reticulate")
-  skip_if_not(py_available_for_test())
-  env_ok <- tryCatch({
-    reticulate::use_condaenv(
-      "seuratextend",
-      conda = "/home/hyc/.local/share/r-miniconda/bin/conda",
-      required = FALSE)
-    TRUE
-  }, error = function(e) FALSE)
-  skip_if_not(env_ok)
+  if (!reticulate::py_available(initialize = FALSE)) {
+    reticulate::use_condaenv("seuratextend", required = FALSE)
+  }
+  if (!reticulate::py_available(initialize = TRUE)) skip("no usable Python")
   skip_if_not(reticulate::py_module_available("loompy"))
   data(pbmc)
   f <- loom_tmp("test-seu2loom-loompy.loom")
   unlink(f)
-  on.exit(unlink(f), add = TRUE)
-
   expect_no_error(Seu2Loom(pbmc, f))
+
+  h5py <- reticulate::import("h5py")
   loompy <- reticulate::import("loompy")
-  ds <- NULL
-  expect_no_error(ds <- loompy$connect(f, mode = "r"))
-  if (!is.null(ds)) {
-    on.exit(ds$close(), add = TRUE)
-    expect_equal(ds$shape[1], ncol(pbmc))
-  }
+  np <- reticulate::import("numpy")
+
+  fh <- h5py$File(f, "r")
+  on.exit(fh$close(), add = TRUE)
+  ver <- loompy$utils$get_loom_spec_version(fh)
+  expect_type(ver, "character")
+  expect_identical(ver, "3.0.0")
+  expect_equal(loompy$utils$compare_loom_spec_version(fh, "3.0.0"), 0L)
+  # h5py holds a read lock: release it before opening the same file r+.
+  fh$close()
+
+  ds <- loompy$connect(f, mode = "r+")
+  on.exit(ds$close(), add = TRUE)
+  # Close the Python connections before unlinking (audit D5).
+  on.exit(unlink(f), add = TRUE)
+  # loom stores genes x cells; reticulate hands the tuple back as a list.
+  expect_equal(as.integer(unlist(ds$shape)), c(nrow(pbmc), ncol(pbmc)))
+  expect_no_error({
+    ds$ca[["RegulonsAUC"]] <- np$zeros(c(ncol(pbmc), 3L))
+  })
 })
 
 # --- KNOWN-ISSUE: the layer guard -----------------------------------------
