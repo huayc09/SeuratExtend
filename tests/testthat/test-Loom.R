@@ -64,6 +64,66 @@ test_that("Seu2Loom() add.metadata = FALSE writes only CellID", {
   expect_identical(h5names(f, "col_attrs"), "CellID")
 })
 
+test_that("Seu2Loom() writes LOOM_SPEC_VERSION as a scalar file attribute", {
+  # CellWeave A1: loom 3.0 puts the version at the FILE level, and loompy 3.0.6
+  # get_loom_spec_version reads /attrs/LOOM_SPEC_VERSION FIRST -- so the old
+  # array dataset under /attrs/ broke validate=True in pyscenic. The /attrs
+  # group itself is kept (empty), matching the CellWeave step0b artifact.
+  # Source: R/Loom.R:52-53 (create_group + h5attr assignment).
+  skip_if_not_installed("hdf5r")
+  data(pbmc)
+  f <- loom_tmp("test-seu2loom-specversion.loom")
+  unlink(f)
+  on.exit(unlink(f), add = TRUE)
+
+  expect_no_error(Seu2Loom(pbmc, f))
+  expect_true("attrs" %in% h5names(f))
+  expect_false("LOOM_SPEC_VERSION" %in% h5names(f, "attrs"))
+
+  # Empirical shape (checked in this work order, see evidence/01-impl/
+  # hdf5r-attr-shape.txt): h5attributes() returns a named list whose element is
+  # a length-1 character "3.0.0".
+  h5 <- hdf5r::H5File$new(f, mode = "r")
+  on.exit(h5$close_all(), add = TRUE)
+  attrs <- hdf5r::h5attributes(h5)
+  expect_true("LOOM_SPEC_VERSION" %in% names(attrs))
+  expect_type(attrs$LOOM_SPEC_VERSION, "character")
+  expect_length(attrs$LOOM_SPEC_VERSION, 1)
+  expect_identical(unname(attrs$LOOM_SPEC_VERSION), "3.0.0")
+})
+
+test_that("Seu2Loom() output opens in loompy with validation on", {
+  # Same CellWeave A1 regression from the consumer side: loompy.connect()
+  # defaults to validate=True, which is exactly the path pyscenic takes.
+  # No conda env / no loompy -> SKIP; those skips go to the settlement
+  # uncovered list.
+  skip_if_not_installed("hdf5r")
+  skip_if_not_installed("reticulate")
+  skip_if_not(py_available_for_test())
+  env_ok <- tryCatch({
+    reticulate::use_condaenv(
+      "seuratextend",
+      conda = "/home/hyc/.local/share/r-miniconda/bin/conda",
+      required = FALSE)
+    TRUE
+  }, error = function(e) FALSE)
+  skip_if_not(env_ok)
+  skip_if_not(reticulate::py_module_available("loompy"))
+  data(pbmc)
+  f <- loom_tmp("test-seu2loom-loompy.loom")
+  unlink(f)
+  on.exit(unlink(f), add = TRUE)
+
+  expect_no_error(Seu2Loom(pbmc, f))
+  loompy <- reticulate::import("loompy")
+  ds <- NULL
+  expect_no_error(ds <- loompy$connect(f, mode = "r"))
+  if (!is.null(ds)) {
+    on.exit(ds$close(), add = TRUE)
+    expect_equal(ds$shape[1], ncol(pbmc))
+  }
+})
+
 # --- KNOWN-ISSUE: the layer guard -----------------------------------------
 
 test_that("Seu2Loom() guards a NAMED layer whose dims are wrong", {

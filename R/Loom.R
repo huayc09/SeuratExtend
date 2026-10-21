@@ -50,7 +50,7 @@ Seu2Loom <- function(
 
   # Create and set attributes
   file$create_group("attrs")
-  file[["attrs"]]$create_dataset("LOOM_SPEC_VERSION", "3.0.0", dtype = utf8_string_type)
+  h5attr(file, "LOOM_SPEC_VERSION") <- "3.0.0"
 
   # Create necessary groups
   row_attrs <- file$create_group("row_attrs")

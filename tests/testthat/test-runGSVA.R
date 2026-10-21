@@ -44,35 +44,25 @@ test_that("GSEAplot() rejects a geneset with no overlap", {
                "No genes in 'geneset' found in expression matrix")
 })
 
-# --- KNOWN-ISSUE: the width crash -----------------------------------------
+# --- regression: the width crash (GSV-1, fixed) ----------------------------
 
-test_that("GSEAplot() crashes when 256 or fewer genes survive filtering", {
-  # KNOWN-ISSUE (GSV-1, P1): `width` is only assigned inside the
-  # `if (nrow(scores) > 256)` branch (:116-121) but is then used
-  # unconditionally as `width = width + 1` at :125. Any dataset that yields
-  # <= 256 ranked genes -- a small panel, a heavily subset object -- dies with
-  # a message that never mentions GSV-1's real cause.
-  #
-  # The MESSAGE depends on the session, so the assertion accepts either shape
-  # (note that in the second case the name `width` appears only in the call
-  # expression, NOT in conditionMessage, so it cannot be matched):
-  #   * plain session (Seurat + SeuratExtend)  -> "object 'width' not found"
-  #   * with any Bioconductor package attached -> BiocGenerics exports an S4
-  #     generic also called `width`, so the lookup succeeds and the failure
-  #     turns into "non-numeric argument to binary operator" thrown from
-  #     geom_tile() at :122.
-  # Both were observed for real: the first with the single-file runner, the
-  # second in the full test_dir() run (test-RunSlingshot.R attaches slingshot,
-  # which pulls in SingleCellExperiment -> BiocGenerics). Pinning the exact
-  # message would make this test pass or fail depending on file order.
-  # Source: R/runGSVA.R:116-121 (assignment) / :125 (use).
+test_that("GSEAplot() works when 256 or fewer genes survive filtering", {
+  # GSV-1 (P1) was FIXED in work order
+  # runs/2026-10-21-cellweave-loom-gseaplot (reported by CellWeave): R/runGSVA.R
+  # now initializes `width <- 0` before the `if (nrow(scores) > 256)` branch.
+  # Previously `width` was assigned only inside that branch and then used
+  # unconditionally as `width = width + 1`, so any dataset yielding <= 256
+  # ranked genes died ("object 'width' not found", or "non-numeric argument to
+  # binary operator" when BiocGenerics' `width` generic was attached). The local
+  # initialization shadows any attached generic, so both paths are gone.
+  # Source: R/runGSVA.R: width <- 0 immediately before the branch.
   skip_if_not_installed("ggpubr")
   data(pbmc)
   small <- subset(pbmc, features = rownames(pbmc)[1:200])
-  expect_error(
+  p <- expect_no_error(
     suppressWarnings(GSEAplot(small, ident.1 = "CD4 T Naive", title = "T",
-                              geneset = rownames(small)[1:50])),
-    "width|non-numeric argument to binary operator")
+                              geneset = rownames(small)[1:50])))
+  expect_true(inherits(p, "ggplot"))
 })
 
 test_that("GSEAplot() is fine once the gene count clears 256", {

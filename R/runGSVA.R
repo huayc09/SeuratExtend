@@ -113,6 +113,7 @@ GSEAplot <-
       scale_x_continuous(expand = c(0, 0), limits = c(0, nrow(scores))) +
       ggtitle(title)
 
+    width <- 0
     if(nrow(scores) > 256) {
       n <- 256
       width <- ceiling(nrow(scores) / n)
