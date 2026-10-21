@@ -10,7 +10,7 @@ WaterfallPlot(object, ...)
 
 \method{WaterfallPlot}{Seurat}(
   seu,
-  features,
+  features = NULL,
   group.by = NULL,
   cell = NULL,
   cells = NULL,
@@ -39,7 +39,8 @@ WaterfallPlot(object, ...)
   log.base = "e",
   pseudocount = NULL,
   max.cells.per.ident = Inf,
-  random.seed = 1
+  random.seed = 1,
+  external = NULL
 )
 
 \method{WaterfallPlot}{default}(
@@ -142,6 +143,8 @@ such as z-scores or log fold changes.}
 
 \item{random.seed}{Random seed for reproducible downsampling when max.cells.per.ident is used. Default: 1.}
 
+\item{external}{Optional external numeric matrix (rows = features, columns = cells) used as an additional feature source. Its columns are aligned to the cells of `seu`; all rows participate, and `features` only controls ordering. Only applicable for the Seurat method.}
+
 \item{matr}{A matrix or data frame where rows represent features and columns represent cells.}
 
 \item{f}{A factor or vector indicating the identity of each cell. The length should match the number of columns in `matr`.}
@@ -237,4 +240,9 @@ WaterfallPlot(
 WaterfallPlot(
   matr, f = pbmc$cluster, ident.1 = "Mono CD14", ident.2 = "CD8 T cell",
   length = "logFC", pseudocount = 0.001)
+
+# Mix a gene and an external matrix variable:
+m <- matrix(rnorm(2 * ncol(pbmc)), nrow = 2,
+            dimnames = list(c("pathA", "pathB"), colnames(pbmc)))
+WaterfallPlot(pbmc, features = c("CD3D", "pathA"), external = m)
 }

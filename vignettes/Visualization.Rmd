@@ -739,6 +739,28 @@ VolcanoPlot(
   top.n = 5)
 ```
 
+## Using External Matrices as Feature Sources (New in v1.3.0)
+
+`VlnPlot2()`, `CalcStats()`, `WaterfallPlot()`, `VolcanoPlot()` and `DimPlot2()` accept an `external` matrix (rows = features, columns = cells) as an additional feature source. Matrix rows always participate; `features` only controls ordering, so genes and matrix variables can be mixed freely.
+
+```{r, message=FALSE, warning=FALSE, fig.width=7, fig.height=4}
+# A small external matrix (e.g. pathway scores); columns must follow the cells
+m <- matrix(rnorm(3 * ncol(pbmc)), nrow = 3,
+            dimnames = list(c("pathA", "pathB", "pathC"), colnames(pbmc)))
+
+# Mixed selection: CD3D comes from the Seurat object, pathA from the matrix.
+# Unmentioned matrix rows (pathB, pathC) are appended in matrix order.
+VlnPlot2(pbmc, features = c("CD3D", "pathA"), external = m)
+
+# Pure matrix input, grouped like the matrix method:
+CalcStats(pbmc, external = m, group.by = "cluster", method = "mean")
+
+# Continuous coloring on the UMAP:
+DimPlot2(pbmc, features = c("CD3D", "pathA"), external = m)
+```
+
+The matrix is never trimmed: to plot only some of its rows, subset it before passing it in (`external = m[c("pathA", "pathB"), , drop = FALSE]`). Columns are matched to the Seurat cells by name (reordered with a message if needed); a matrix without column names is aligned positionally and must already follow the Seurat cell order.
+
 ## Tips: Choosing the Right Visualization
 
 When visualizing gene expression or pathway activity data, different plot types serve different purposes. Here's a guide to help you choose:

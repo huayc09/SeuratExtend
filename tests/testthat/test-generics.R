@@ -7,8 +7,11 @@
 # Regression issues: combined-audit checklist (9 items: 5x P2 / 4x P3)
 # Data: built-in pbmc
 #
-# The documentation assertions read the INSTALLED Rd database (tools::Rd_db),
-# so they verify what users actually see, not the roxygen source text.
+# Unless noted otherwise, the documentation assertions read the INSTALLED Rd
+# database (tools::Rd_db), so they verify what users actually see, not the
+# roxygen source text. GEN-5 is the exception: it asserts source-tree doc sync
+# by reading ../../man/*.Rd directly, because the installed package lags the
+# working tree under devtools::load_all()/test().
 
 rd_tag_of <- function(x) {
   t <- attr(x, "Rd_tag")
@@ -138,17 +141,35 @@ test_that("CalcStats documents `object` but not `...`", {
 
 # --- the VlnPlot2 help page ------------------------------------------------
 
-test_that("VlnPlot2's usage section is missing the `sort` argument", {
-  # KNOWN-ISSUE (GEN-5, P2): R/Vlnplots.R:36 added `sort = FALSE` to the
-  # method but the Rd was never regenerated, so the usage block lists one
-  # argument fewer and therefore shifts from that position on.
-  # Source: man/VlnPlot2.Rd usage block; trigger at R/Vlnplots.R:36.
-  usage <- rd_flat("VlnPlot2.Rd", "\\usage")
-  expect_false(grepl("\\bsort\\b", usage))
-  # the neighbours it is sandwiched between are present, proving the shift
+# Source-tree Rd reader for GEN-5: dev-layout gated, environment-independent.
+rd_source_usage <- function(rd_name) {
+  path <- file.path("..", "..", "man", rd_name)
+  skip_if_not(file.exists(path),
+              paste("source Rd not available:", path))
+  lines <- readLines(path, warn = FALSE)
+  start <- grep("^\\\\usage\\{", lines)
+  if (length(start) == 0) return(NA_character_)
+  start <- start[1]
+  end <- which(seq_along(lines) > start & lines == "}")[1]
+  paste(lines[start:end], collapse = "\n")
+}
+
+test_that("VlnPlot2's usage section now includes the `sort` argument", {
+  # RESOLVED (GEN-5, P2): the Rd drift is gone -- man/VlnPlot2.Rd and
+  # man/StackedViolin.Rd were regenerated in the external-matrix work order and
+  # now list `sort`, matching the method signature.
+  # Source: man/VlnPlot2.Rd + man/StackedViolin.Rd usage blocks.
+  usage <- rd_source_usage("VlnPlot2.Rd")
+  expect_true(grepl("\\bsort\\b", usage))
+  # the neighbours it is sandwiched between are still present
   expect_true(grepl("\\bviolin\\b", usage))
   expect_true(grepl("\\bbox\\b", usage))
-  # contrast: the code really does have it
+
+  # the StackedViolin page embeds the VlnPlot2 method usage too, and is synced
+  stacked_usage <- rd_source_usage("StackedViolin.Rd")
+  expect_true(grepl("\\bsort\\b", stacked_usage))
+
+  # contrast: the code really has it
   expect_true("sort" %in% names(formals(
     get("VlnPlot2.Seurat", envir = asNamespace("SeuratExtend")))))
 })

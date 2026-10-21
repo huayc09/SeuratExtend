@@ -9,6 +9,7 @@ NULL
 #' @param slot Slot to retrieve feature data from. Only applicable for the Seurat method.
 #' @param assay Name of the assay to employ. Defaults to the active assay. Only applicable for the Seurat method.
 #' @param priority If set to "expr", extracts data from the expression matrix over `meta.data`. Only applicable for the Seurat method.
+#' @param external Optional external numeric matrix (rows = features, columns = cells) used as an additional feature source, e.g. pathway scores. Its columns are aligned to the cells of `seu`; all of its rows participate, while `features` only controls ordering. To plot a subset of the matrix, subset it before passing it in. Only applicable for the Seurat method.
 #' @param load.cols When TRUE, automatically loads pre-stored color information for variables from `seu@misc[["var_colors"]]`.
 #' @param style Plot style: "fill" (default) uses filled violins with group colors, "outline" uses white fill with colored outlines.
 #' @param angle Angle for label rotation. If NULL, automatically determined based on label length. Default: NULL.
@@ -19,7 +20,7 @@ NULL
 
 VlnPlot2.Seurat <- function(
   seu,
-  features,
+  features = NULL,
   group.by = NULL,
   split.by = NULL,
   cells = NULL,
@@ -56,6 +57,7 @@ VlnPlot2.Seurat <- function(
   angle = NULL,
   hjust = NULL,
   vjust = NULL,
+  external = NULL,
   ...
 ) {
   Std.matr <- Seu2Matr(
@@ -66,7 +68,8 @@ VlnPlot2.Seurat <- function(
     cells = cells,
     slot = slot,
     assay = assay,
-    priority = priority
+    priority = priority,
+    external = external
   )
 
   cols <- VlnPlot2_SelColDisc(

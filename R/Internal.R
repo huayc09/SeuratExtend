@@ -3,14 +3,15 @@
 Seu2Matr <-
   function(
     seu,
-    features,
+    features = NULL,
     group.by = NULL,
     split.by = NULL,
     cells = NULL,
     slot = "data",
     assay = NULL,
     priority = c("expr","none"),
-    verbose = TRUE
+    verbose = TRUE,
+    external = NULL
   ) {
     if(!require(SeuratObject)) library(Seurat)
 
@@ -36,10 +37,31 @@ Seu2Matr <-
       cells.l <- colnames(seu) %in% cells
     }
 
+    ext <- NULL
+    ord <- NULL
+    if (!is.null(external)) {
+      if (anyDuplicated(cells)) {
+        stop("'cells' contains duplicated cell names; each cell must be provided once")
+      }
+      ext <- .external_validate(external, colnames(seu))
+      E <- rownames(ext)
+      conflicts <- intersect(E, union(rownames(seu), colnames(seu@meta.data)))
+      if (length(conflicts) > 0) {
+        warning("Variables found in both 'external' and the Seurat object (",
+                paste(conflicts, collapse = ", "),
+                "). Values from 'external' are used for these variables.")
+      }
+      ord <- .external_order(features, E)
+      features <- ord$order
+    } else if (is.null(features)) {
+      stop("'features' must be provided")
+    }
+    fetch_features <- if (is.null(external)) features else ord$native
+
     if(priority[1] == "expr") {
       check.rep <- intersect(rownames(seu), colnames(seu@meta.data))
-      if(any(features %in% check.rep)) {
-        feature.rep <- intersect(features, check.rep)
+      if(any(fetch_features %in% check.rep)) {
+        feature.rep <- intersect(fetch_features, check.rep)
         if(verbose) {
           warning("'Features' found in both expression matrix and 'meta.data' (",
                   feature.rep[1],
@@ -50,10 +72,35 @@ Seu2Matr <-
       }
     }
 
-    if (utils::packageVersion("SeuratObject") >= "5.0.0") {
-      matr <- FetchData(object = seu, vars = features, cells = cells, layer = slot, clean = "none")
+    if (is.null(external)) {
+      if (utils::packageVersion("SeuratObject") >= "5.0.0") {
+        matr <- FetchData(object = seu, vars = features, cells = cells, layer = slot, clean = "none")
+      } else {
+        matr <- FetchData(object = seu, vars = features, cells = cells, slot = slot)
+      }
     } else {
-      matr <- FetchData(object = seu, vars = features, cells = cells, slot = slot)
+      native_df <- NULL
+      if (length(ord$native) > 0) {
+        if (utils::packageVersion("SeuratObject") >= "5.0.0") {
+          native_df <- FetchData(object = seu, vars = ord$native, cells = cells,
+                                 layer = slot, clean = "none")
+        } else {
+          native_df <- FetchData(object = seu, vars = ord$native, cells = cells,
+                                 slot = slot)
+        }
+      }
+      if (!is.null(native_df)) {
+        native_df <- .external_align_native(native_df, cells)
+      }
+      ext_df <- as.data.frame(t(ext[E, cells, drop = FALSE]))
+      matr <- data.frame(row.names = cells)
+      for (nm in ord$order) {
+        if (nm %in% E) {
+          matr[[nm]] <- ext_df[[nm]]
+        } else {
+          matr[[nm]] <- native_df[[nm]]
+        }
+      }
     }
 
     if(is.null(group.by)) {
@@ -95,6 +142,103 @@ Seu2Matr <-
     }
     return(list(matr = matr, f = f, f2 = f2))
   }
+
+# Validate an external feature matrix (rows = features, columns = cells) and
+# align it to the cell order of the Seurat object.
+#
+# Checks, in order: accepted classes -> numeric content -> non-empty -> row
+# names present and unique -> cell-axis alignment (4-tier rule). Returns a
+# dense numeric matrix whose columns follow `cell_names`. Never intersects
+# cells silently: a partial name match is an error.
+.external_validate <- function(external, cell_names) {
+  if (is.data.frame(external)) {
+    nonnum <- names(external)[!vapply(external, is.numeric, logical(1))]
+    if (length(nonnum) > 0) {
+      stop("'external' data.frame contains non-numeric column(s): ",
+           paste(nonnum, collapse = ", "))
+    }
+    mat <- as.matrix(external)
+  } else if (is.matrix(external) || inherits(external, "Matrix")) {
+    mat <- as.matrix(external)
+  } else {
+    stop("'external' must be a matrix, data.frame or sparse Matrix; got class '",
+         paste(class(external), collapse = "/"), "'")
+  }
+  if (!is.numeric(mat)) {
+    stop("'external' must be numeric; got a ", class(mat)[1], " matrix")
+  }
+  if (nrow(mat) == 0 || ncol(mat) == 0) {
+    stop("'external' matrix must have at least one row and one column")
+  }
+  rn <- rownames(mat)
+  if (is.null(rn)) {
+    stop("'external' must have row names (the row names are the variable names)")
+  }
+  if (anyDuplicated(rn)) {
+    dups <- unique(rn[duplicated(rn)])
+    stop("'external' has duplicated row names: ", paste(dups, collapse = ", "))
+  }
+
+  cn <- colnames(mat)
+  if (!is.null(cn)) {
+    if (anyDuplicated(cn)) {
+      dups <- unique(cn[duplicated(cn)])
+      stop("'external' has duplicated column names: ",
+           paste(dups, collapse = ", "))
+    }
+    if (identical(cn, cell_names)) {
+      return(mat)
+    }
+    if (length(cn) == length(cell_names) && setequal(cn, cell_names)) {
+      message("'external' columns were reordered by cell name to match the ",
+              "cell order of the Seurat object")
+      return(mat[, cell_names, drop = FALSE])
+    }
+    n_missing <- sum(!cell_names %in% cn)
+    n_extra <- sum(!cn %in% cell_names)
+    stop("'external' cell names do not match the Seurat object: ",
+         n_missing, " Seurat cell(s) missing from 'external', ",
+         n_extra, " extra cell(s) in 'external'")
+  }
+  if (ncol(mat) == length(cell_names)) {
+    message("'external' matrix has no cell names; positional alignment to the ",
+            "Seurat cell order is assumed. Please make sure the columns are ",
+            "consistent.")
+    colnames(mat) <- cell_names
+    return(mat)
+  }
+  stop("'external' has no column names and ", ncol(mat),
+       " column(s), which does not match the ", length(cell_names),
+       " cell(s) in the Seurat object")
+}
+
+# Resolve the features x external interaction (F2/F3).
+#   native: features not present in the matrix, in features order
+#   order:  features order first, then unmentioned matrix rows in matrix order
+.external_order <- function(features, E) {
+  if (is.null(features)) {
+    features <- E
+  }
+  features <- unique(as.character(features))
+  list(
+    native = features[!features %in% E],
+    order = c(features, E[!E %in% features])
+  )
+}
+
+# Seatbelt for the external path: FetchData is expected to return rows in the
+# order of `cells`; if a future engine changes that, reorder by name or stop
+# rather than silently mixing cell values.
+.external_align_native <- function(native_df, cells) {
+  if (identical(rownames(native_df), cells)) {
+    return(native_df)
+  }
+  rn <- rownames(native_df)
+  if (!is.null(rn) && length(rn) == length(cells) && setequal(rn, cells)) {
+    return(native_df[cells, , drop = FALSE])
+  }
+  stop("Fetched data rows cannot be aligned to the requested cells by name")
+}
 
 # Check if ident.1 and ident.2 are in the factor levels and return
 # logical vectors

@@ -1,13 +1,29 @@
 ---
-title: "What's New in v1.2.0"
+title: "What's New in v1.3.0"
 author: "Yichao Hua"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{What's New in v1.2.0}
+  %\VignetteIndexEntry{What's New in v1.3.0}
   %\VignetteEngine{knitr::rmarkdown}
   \usepackage[utf8]{inputenc}
 ---
+
+## New Features and Enhancements in v1.3.0
+
+### External Matrices as Feature Sources
+
+`VlnPlot2()`, `CalcStats()`, `WaterfallPlot()`, `VolcanoPlot()` and `DimPlot2()` gain an `external` parameter accepting a numeric matrix (rows = features, columns = cells). Matrix rows always participate and `features` only controls ordering, so genes, metadata and external variables can be mixed in one call:
+
+```{r, message=FALSE, warning=FALSE, eval=FALSE}
+m <- matrix(rnorm(3 * ncol(pbmc)), nrow = 3,
+            dimnames = list(c("pathA", "pathB", "pathC"), colnames(pbmc)))
+VlnPlot2(pbmc, features = c("CD3D", "pathA"), external = m)
+```
+
+- Cell columns are aligned to the Seurat object by name (reordered with a message when needed); unnamed matrices are aligned positionally with a message, and any partial name mismatch raises an error rather than silently intersecting.
+- Variables named both in `external` and in the Seurat object resolve to the external values with a warning naming the conflicts.
+- Sparse matrices (`Matrix` package) are accepted and give results identical to their dense equivalent.
 
 ## New Features and Enhancements in v1.2.0
 

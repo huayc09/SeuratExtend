@@ -3,19 +3,20 @@
 NULL
 
 #' @param seu A Seurat object. Only applicable when using the Seurat method.
-#' @param features Features for computation, including gene expression, metrics, PC scores, or any other data retrievable via `FetchData()`. Defaults to NULL, implying all features in the matrix. Only applicable for the Seurat method.
+#' @param features Features for computation, including gene expression, metrics, PC scores, or any other data retrievable via `FetchData()`. Only applicable for the Seurat method; `features` and `external` cannot both be NULL (pass `features` explicitly). For the matrix method, NULL means all features in the matrix.
 #' @param group.by A variable from `meta.data` for grouping or a character vector of equal length as the number of cells. Only applicable for the Seurat method.
 #' @param cells Cell identifiers to be used. Defaults to all cells. Only applicable for the Seurat method.
 #' @param slot Slot from which to fetch feature data. Only applicable for the Seurat method.
 #' @param assay Name of the assay to use. Defaults to the active assay. Only applicable for the Seurat method.
 #' @param priority If set to "expr", fetches data from the expression matrix over `meta.data`. Only applicable for the Seurat method.
+#' @param external Optional external numeric matrix (rows = features, columns = cells) used as an additional feature source. Its columns are aligned to the cells of `seu`; all rows participate, and `features` only controls ordering. Only applicable for the Seurat method.
 #' @rdname CalcStats
 #' @export
 
 CalcStats.Seurat <-
   function(
     seu,
-    features,
+    features = NULL,
     group.by = NULL,
     cells = NULL,
     slot = "data",
@@ -25,7 +26,8 @@ CalcStats.Seurat <-
     order = NULL,
     n = Inf,
     p.threshold = 0.05,
-    priority = c("expr","none")
+    priority = c("expr","none"),
+    external = NULL
   ) {
     Std.matr <- Seu2Matr(
       seu = seu,
@@ -34,7 +36,8 @@ CalcStats.Seurat <-
       cells = cells,
       slot = slot,
       assay = assay,
-      priority = priority
+      priority = priority,
+      external = external
     )
 
     scores <- CalcStats.default(

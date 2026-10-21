@@ -10,6 +10,7 @@ NULL
 #' @param slot Slot from which to retrieve feature data. Only applicable for the Seurat method.
 #' @param assay Name of the assay to use. If not specified, the active assay will be used. Only applicable for the Seurat method.
 #' @param priority If set to "expr", the function will fetch data from the expression matrix rather than `meta.data`. Only applicable for the Seurat method.
+#' @param external Optional external numeric matrix (rows = features, columns = cells) used as an additional feature source. Its columns are aligned to the cells of `seu`; all rows participate, and `features` only controls ordering. Only applicable for the Seurat method.
 #' @param max.cells.per.ident Down sample each identity class to a max number of cells. Default is Inf (no downsampling). When set to a finite value, cells from each group (ident.1 and ident.2) will be randomly downsampled to this number if they exceed it, ensuring more balanced comparisons between groups of different sizes.
 #' @param random.seed Random seed for reproducible downsampling when max.cells.per.ident is used. Default: 1.
 #' @rdname WaterfallPlot
@@ -17,7 +18,7 @@ NULL
 
 WaterfallPlot.Seurat <- function(
     seu,
-    features,
+    features = NULL,
     group.by = NULL,
     cell = NULL,
     cells = NULL,
@@ -46,7 +47,8 @@ WaterfallPlot.Seurat <- function(
     log.base = "e",
     pseudocount = NULL,
     max.cells.per.ident = Inf,
-    random.seed = 1
+    random.seed = 1,
+    external = NULL
 ) {
   style <- match.arg(style)
 
@@ -60,7 +62,8 @@ WaterfallPlot.Seurat <- function(
     cells = cell_subset,
     slot = slot,
     assay = assay,
-    priority = priority
+    priority = priority,
+    external = external
   )
 
   p <- WaterfallPlot.default(
