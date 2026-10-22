@@ -29,8 +29,8 @@ load_condaenv <- function(conda_env) {
       # on readline() or aborting with a cryptic downstream error.
       if (!interactive()) {
         message("conda environment 'seuratextend' is required but does not exist.\n",
-                "Create it interactively with: create_condaenv_seuratextend()\n",
-                "or manually: conda create -n seuratextend python=3.10 scanpy cellrank scvelo palantir")
+                "Create it in an interactive R session with: create_condaenv_seuratextend()\n",
+                "(it uses the version-pinned spec at system.file('extdata', 'environment-<platform>.yml', package = 'SeuratExtend'))")
         stop("conda environment 'seuratextend' does not exist and this session is non-interactive; cannot prompt for creation.", call. = FALSE)
       }
 
