@@ -5,8 +5,8 @@
 #
 # SCOPE: the defunct contract of scVelo.SeuratToLoom (it must fail loudly and
 # name its replacement), the export surface, the signatures of all four entry
-# points, and scVelo.SeuratToAnndata's loom-path validation, which runs before
-# the Python step.
+# points, and scVelo.SeuratToAnndata's pre-Python failure behavior (conda-env
+# check precedes the loom-path guards — see the L3-4 pin below).
 #
 # STYLE: characterisation tests - see test-Internal.R for the convention.
 

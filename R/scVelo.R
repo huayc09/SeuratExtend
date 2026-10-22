@@ -361,7 +361,7 @@ adata.write("{filename}")
 #' @param prefix Optional prefix added to Seurat cell IDs, typically used to include sample names. Default: NULL
 #' @param postfix Optional postfix added to Seurat cell IDs, typically used to denote unique identifiers such as '-1'. Default: NULL
 #' @return This function is defunct and always raises an error; use `scVelo.SeuratToAnndata` instead.
-#' @details This function is defunct: the loom backend dependency it relied on has been removed from the package, so it can no longer build an integrated loom file. Use `scVelo.SeuratToAnndata` instead, which directly integrates Seurat objects with scVelo analysis in Python's Scanpy library. `scVelo.RunBasic` is still available, but only for loom files that carry the `norm_data` and `scale_data` layers expected by its Python code; such files were produced by the now-defunct `scVelo.SeuratToLoom` (or an equivalent external tool), not by a plain velocyto run.
+#' @details This function is defunct: the loom backend dependency it relied on has been removed from the package, so it can no longer build an integrated loom file. Use `scVelo.SeuratToAnndata` instead, which directly integrates Seurat objects with scVelo analysis in Python's Scanpy library. `scVelo.RunBasic` is still available, but only for loom files that carry the `norm_data` and `scale_data` layers expected by its Python code; such files were produced by historical versions of the loom-export workflow (or equivalent external tools), not by a plain velocyto run.
 #' @seealso \code{\link[SeuratExtend:scVelo.SeuratToAnndata]{scVelo.SeuratToAnndata}} for the recommended method of preparing data for scVelo analysis.
 #' @rdname scVelo-SeuratToLoom-and-RunBasic
 #' @export
@@ -386,7 +386,7 @@ scVelo.SeuratToLoom <- function(
   )
 }
 
-#' @param loom Path to a loom file whose `/layers` contain `norm_data` and `scale_data` (the layout produced by the now-defunct `scVelo.SeuratToLoom`, or by an equivalent external tool). A plain velocyto loom (only `spliced`/`unspliced`) lacks these layers and will fail in the Python step.
+#' @param loom Path to a loom file whose `/layers` contain `norm_data` and `scale_data` (such files were produced by historical versions of the scVelo loom-export workflow, or by equivalent external tools). A plain velocyto loom (only `spliced`/`unspliced`) lacks these layers and will fail in the Python step.
 #' @param save.adata Name and path where the AnnData object should be saved, typically ending in '.h5ad'. Default: 'adata.obj'
 #' @rdname scVelo-SeuratToLoom-and-RunBasic
 #' @export
