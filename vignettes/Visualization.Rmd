@@ -1166,41 +1166,6 @@ color_iwh(30, 5)  # all_hard
 Visual comparison of `color_iwh` palettes:
 
 ```{r, echo=FALSE, fig.width=7.5, fig.height=3}
-# Local stand-in for the package-private show_col2() this chunk used to load
-# from an external helper package: draw one labelled row of colour swatches per
-# palette. Multi-palette side-by-side layout only -- this is the sole feature
-# this vignette needs (scales::show_col() cannot draw rows).
-show_col2 <- function(palettes, ncol = 10) {
-  n_pal <- length(palettes)
-  n_cells <- max(ncol, vapply(palettes, length, integer(1)))
-  grid::grid.newpage()
-  grid::pushViewport(grid::plotViewport(margins = c(0.5, 0.5, 0.5, 0.5)))
-  for (i in seq_len(n_pal)) {
-    cols <- palettes[[i]]
-    y <- 1 - (i - 0.5) / n_pal
-    grid::pushViewport(grid::viewport(
-      x = 0, y = y, width = 1, height = 1 / n_pal,
-      just = c("left", "center"),
-      layout = grid::grid.layout(
-        1, n_cells + 1,
-        widths = grid::unit(c(8, rep(1, n_cells)),
-                            c("lines", rep("null", n_cells)))
-      )
-    ))
-    grid::pushViewport(grid::viewport(layout.pos.row = 1, layout.pos.col = 1))
-    grid::grid.text(names(palettes)[i],
-                    x = grid::unit(1, "npc") - grid::unit(1, "mm"),
-                    just = "right")
-    grid::popViewport()
-    for (j in seq_along(cols)) {
-      grid::pushViewport(grid::viewport(layout.pos.row = 1, layout.pos.col = j + 1))
-      grid::grid.rect(gp = grid::gpar(fill = cols[j], col = NA))
-      grid::popViewport()
-    }
-    grid::popViewport()
-  }
-  grid::popViewport()
-}
 palette_list <- list(
   "default" = color_iwh(10, 1),
   "intense" = color_iwh(10, 2),
