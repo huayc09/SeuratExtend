@@ -27,14 +27,21 @@
 ImportPyscenicLoom <- function(loom.path, seu = NULL) {
   library(Seurat)
 
-  lfile <- hdf5r::H5File$new(loom.path, mode = "r")
+  lfile <- tryCatch(
+    hdf5r::H5File$new(loom.path, mode = "r"),
+    error = function(e) {
+      stop("Cannot open loom file '", loom.path, "': ", conditionMessage(e),
+           call. = FALSE)
+    }
+  )
   on.exit(lfile$close_all(), add = TRUE)
 
   # pySCENIC stores the regulon activity and membership matrices as 2D
   # compound datasets under col_attrs/row_attrs. hdf5r reads them as
   # data frames with cells/genes as rows and regulons as columns, which is
   # the layout the rest of this function expects.
-  required.datasets <- c("col_attrs/RegulonsAUC", "row_attrs/Regulons")
+  required.datasets <- c("col_attrs/CellID", "col_attrs/RegulonsAUC",
+                         "row_attrs/Gene", "row_attrs/Regulons")
   missing.datasets <- required.datasets[!vapply(required.datasets, function(path) {
     parts <- strsplit(path, "/", fixed = TRUE)[[1]]
     lfile$exists(parts[1]) && lfile[[parts[1]]]$exists(parts[2])

@@ -1,12 +1,12 @@
 # Test file for R/scVelo.R
 #
-# scVelo.R is the longest file in the package (618 lines, 4 exports) and
+# scVelo.R is the longest file in the package (511 lines, 4 exports) and
 # bridges Seurat objects to scVelo's Python side.
 #
-# SCOPE: the export surface, the three different ways a loom path is supplied,
-# and the loud failure when those paths do not exist. The file-path validation
-# happens *before* any Python call, so unlike most of the Python bridge it can
-# be exercised on a stock install.
+# SCOPE: the defunct contract of scVelo.SeuratToLoom (it must fail loudly and
+# name its replacement), the export surface, the signatures of all four entry
+# points, and scVelo.SeuratToAnndata's loom-path validation, which runs before
+# the Python step.
 #
 # STYLE: characterisation tests - see test-Internal.R for the convention.
 

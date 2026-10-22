@@ -33,7 +33,7 @@ scVelo.RunBasic(loom, save.adata = "adata.obj")
 
 \item{postfix}{Optional postfix added to Seurat cell IDs, typically used to denote unique identifiers such as '-1'. Default: NULL}
 
-\item{loom}{Path to the loom file created by `scVelo.SeuratToLoom`.}
+\item{loom}{Path to a loom file whose `/layers` contain `norm_data` and `scale_data` (the layout produced by the now-defunct `scVelo.SeuratToLoom`, or by an equivalent external tool). A plain velocyto loom (only `spliced`/`unspliced`) lacks these layers and will fail in the Python step.}
 
 \item{save.adata}{Name and path where the AnnData object should be saved, typically ending in '.h5ad'. Default: 'adata.obj'}
 }
@@ -44,7 +44,7 @@ This function is defunct and always raises an error; use `scVelo.SeuratToAnndata
 This function is defunct. It formerly converted a Seurat object and associated Velocyto loom files into a single loom file that integrates both spliced and unspliced RNA matrices, but it relied on a third-party loom backend package, which has been removed as a dependency. It was already soft deprecated in favor of `scVelo.SeuratToAnndata`; use that function instead.
 }
 \details{
-This function is defunct: the loom backend dependency it relied on has been removed from the package, so it can no longer build an integrated loom file. Use `scVelo.SeuratToAnndata` instead, which directly integrates Seurat objects with scVelo analysis in Python's Scanpy library. `scVelo.RunBasic` remains available for running scVelo from an existing loom file.
+This function is defunct: the loom backend dependency it relied on has been removed from the package, so it can no longer build an integrated loom file. Use `scVelo.SeuratToAnndata` instead, which directly integrates Seurat objects with scVelo analysis in Python's Scanpy library. `scVelo.RunBasic` is still available, but only for loom files that carry the `norm_data` and `scale_data` layers expected by its Python code; such files were produced by the now-defunct `scVelo.SeuratToLoom` (or an equivalent external tool), not by a plain velocyto run.
 }
 \seealso{
 \code{\link[SeuratExtend:scVelo.SeuratToAnndata]{scVelo.SeuratToAnndata}} for the recommended method of preparing data for scVelo analysis.

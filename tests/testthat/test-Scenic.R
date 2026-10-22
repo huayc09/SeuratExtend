@@ -26,7 +26,16 @@ test_that("ImportPyscenicLoom() closes the loom handle it opens", {
   # full path needs a real loom fixture.
   body_txt <- deparse(body(SeuratExtend::ImportPyscenicLoom))
   expect_true(any(grepl("close_all", body_txt, fixed = TRUE)))
-  expect_true(any(grepl("on.exit", body_txt, fixed = TRUE)))
+  # the handle must be registered for closing immediately after it is opened,
+  # and before any dataset is read, otherwise an error in between leaks it
+  idx_open   <- grep("H5File\\$new", body_txt)
+  idx_on_exit <- grep("on.exit", body_txt, fixed = TRUE)
+  idx_read   <- grep('CellID <- lfile\\[\\["col_attrs"\\]\\]', body_txt)
+  expect_length(idx_open, 1)
+  expect_length(idx_on_exit, 1)
+  expect_length(idx_read, 1)
+  expect_true(idx_open < idx_on_exit)
+  expect_true(idx_on_exit < idx_read)
   # row attributes carry the gene names used to build the regulon list
   expect_true(any(grepl("row_attrs", body_txt, fixed = TRUE)))
   expect_true(any(grepl("Gene", body_txt, fixed = TRUE)))
