@@ -1,12 +1,4 @@
 package_data <- list(
-  "loomR" = list(
-    website = "https://github.com/mojaveazure/loomR",
-    tutorial = "https://satijalab.org/loomR/loomR_tutorial.html",
-    install_info = 'install.packages("hdf5r")\nremotes::install_github(repo = "mojaveazure/loomR")',
-    install = function(){
-      remotes::install_github(repo = 'mojaveazure/loomR', ref = 'develop')
-    }
-  ),
   "nichenetr" = list(
     website = "https://github.com/saeyslab/nichenetr",
     tutorial = "https://github.com/saeyslab/nichenetr",

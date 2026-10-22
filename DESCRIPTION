@@ -15,7 +15,7 @@ Imports:
     ggpubr, BiocManager, reticulate, glue, hdf5r
 Suggests:
     rgl, GSVA, GSVAdata, slingshot, biomaRt, ontologyIndex, viridis,
-    doMC, doRNG, doParallel, foreach, mgsa, GSEABase, egg, loomR, 
+    doMC, doRNG, doParallel, foreach, mgsa, GSEABase, egg, 
     knitr, rmarkdown, RColorBrewer, testthat (>= 3.0.0),
     DelayedArray, DelayedMatrixStats, mgcv, scattermore,
     ggbeeswarm, ggrepel, ggtext, Matrix

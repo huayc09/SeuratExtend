@@ -3,7 +3,7 @@
 \name{scVelo.SeuratToLoom}
 \alias{scVelo.SeuratToLoom}
 \alias{scVelo.RunBasic}
-\title{(Deprecated) Export Seurat Object and Velocyto Data to Loom for scVelo Analysis}
+\title{(Defunct) Export Seurat Object and Velocyto Data to Loom for scVelo Analysis}
 \usage{
 scVelo.SeuratToLoom(
   seu,
@@ -33,18 +33,18 @@ scVelo.RunBasic(loom, save.adata = "adata.obj")
 
 \item{postfix}{Optional postfix added to Seurat cell IDs, typically used to denote unique identifiers such as '-1'. Default: NULL}
 
-\item{loom}{Path to the loom file created by `scVelo.SeuratToLoom`.}
+\item{loom}{Path to a loom file whose `/layers` contain `norm_data` and `scale_data` (such files were produced by historical versions of the scVelo loom-export workflow, or by equivalent external tools). A plain velocyto loom (only `spliced`/`unspliced`) lacks these layers and will fail in the Python step.}
 
 \item{save.adata}{Name and path where the AnnData object should be saved, typically ending in '.h5ad'. Default: 'adata.obj'}
 }
 \value{
-Generates a loom file that integrates Seurat and Velocyto data, stored in the specified export path.
+This function is defunct and always raises an error; use `scVelo.SeuratToAnndata` instead.
 }
 \description{
-This function converts a Seurat object and associated Velocyto loom files into a single loom file that integrates both spliced and unspliced RNA matrices. It is part of an older workflow and is soft deprecated in favor of `scVelo.SeuratToAnndata`. However, it is preserved for reproducibility of earlier work that cited its use.
+This function is defunct. It formerly converted a Seurat object and associated Velocyto loom files into a single loom file that integrates both spliced and unspliced RNA matrices, but it relied on a third-party loom backend package, which has been removed as a dependency. It was already soft deprecated in favor of `scVelo.SeuratToAnndata`; use that function instead.
 }
 \details{
-This set of functions supports the transition from Seurat objects to an integrated loom file via `scVelo.SeuratToLoom`, and from loom files to AnnData objects via `scVelo.RunBasic`, ready for basic to advanced scVelo analysis in Python. This older method is preserved for compatibility with previous studies and publications, ensuring reproducibility of earlier work. This older method is preserved for compatibility with previous studies and publications, but users are encouraged to transition to `scVelo.SeuratToAnndata` for a more streamlined and updated approach that directly integrates Seurat objects with scVelo analysis in Python's Scanpy library.
+This function is defunct: the loom backend dependency it relied on has been removed from the package, so it can no longer build an integrated loom file. Use `scVelo.SeuratToAnndata` instead, which directly integrates Seurat objects with scVelo analysis in Python's Scanpy library. `scVelo.RunBasic` is still available, but only for loom files that carry the `norm_data` and `scale_data` layers expected by its Python code; such files were produced by historical versions of the loom-export workflow (or equivalent external tools), not by a plain velocyto run.
 }
 \seealso{
 \code{\link[SeuratExtend:scVelo.SeuratToAnndata]{scVelo.SeuratToAnndata}} for the recommended method of preparing data for scVelo analysis.

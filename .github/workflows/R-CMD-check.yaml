@@ -27,7 +27,6 @@ jobs:
             any::rcmdcheck
             any::testthat
             huayc09/SeuratExtendData
-            mojaveazure/loomR
             local::.
           needs: check
         env:
