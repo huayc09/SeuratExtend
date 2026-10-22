@@ -51,10 +51,10 @@ test_that("Cellrank.Compute() refuses to run without a time_key", {
 
 test_that("Cellrank.Plot() fails loudly when the Python stack is unusable", {
   # Environment-independent by construction: with no conda binary the failure
-  # is raised by load_condaenv() ("Unable to find conda binary"); with conda
-  # present but the environment/packages missing it moves on to reticulate and
-  # fails there (no `adata` / no cellrank). Either way it must raise an R
-  # error rather than silently returning or wedging the session.
+  # is raised by load_condaenv(); with conda present but the
+  # environment/packages missing it moves on to reticulate and fails there
+  # (no `adata` / no cellrank). Either way it must raise an R error rather
+  # than silently returning or wedging the session.
   # Baseline recorded on: R 4.6.1 / Windows / no conda visible to reticulate.
   expect_error(suppressMessages(Cellrank.Plot(basis = "ms")))
 })

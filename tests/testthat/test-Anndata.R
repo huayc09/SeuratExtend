@@ -21,11 +21,12 @@
 test_that("adata.AddDR validates the Python environment before it validates 'dr'", {
   data(pbmc)
   # KNOWN-ISSUE (AND-2, P1) -- the issue #53 guard sits at R/Anndata.R:134,
-  # but load_condaenv() runs earlier, at :125. On a machine without conda the
-  # call therefore dies with "Unable to find conda binary. Is Anaconda
-  # installed?" -- an environment error that never mentions the reduction the
-  # caller asked for, so the friendly "Dimension reduction(s) ... not found"
-  # message is unreachable exactly where it would be most useful.
+  # but load_condaenv() runs earlier, at :125. When the Python environment is
+  # unusable the call therefore dies with an environment error raised by
+  # load_condaenv() before the #53 guard is reached -- an error that never
+  # mentions the reduction the caller asked for, so the friendly
+  # "Dimension reduction(s) ... not found" message is unreachable exactly
+  # where it would be most useful.
   err <- tryCatch({
     adata.AddDR(pbmc, dr = "r_fake")
     "no condition raised"

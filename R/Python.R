@@ -16,7 +16,8 @@ load_condaenv <- function(conda_env) {
       if (!interactive()) {
         message("conda is not available but is required for Python integration.\n",
                 "Install Miniconda, then run: create_condaenv_seuratextend()")
-        stop("conda binary not found and this session is non-interactive; cannot proceed.", call. = FALSE)
+        stop("conda binary not found and this session is non-interactive; cannot proceed. ",
+             conditionMessage(e), call. = FALSE)
       }
       stop(e)
     }
