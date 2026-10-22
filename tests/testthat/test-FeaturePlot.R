@@ -68,7 +68,7 @@ test_that("FeaturePlot3.grid orders by expression with a >2-dim reduction", {
   tp <- as.data.frame(lapply(feats, function(f) Seurat::FetchData(pbmc, f)[, 1]))
   rownames(tp) <- colnames(pbmc)
   scaled <- sapply(tp, function(x) {
-    if (max(x) == min(x)) rep(0.1, length(x)) else 0.1 + 0.8 * (x - min(x)) / (max(x) - min(x))
+    if (max(x) == min(x)) rep(0.1, length(x)) else 0.1 + 0.85 * (x - min(x)) / (max(x) - min(x))
   })
   ordered_expr <- rownames(tp)[order(rowMeans(scaled))]
   plotted <- rownames(p$data)[p$data$index == 1]

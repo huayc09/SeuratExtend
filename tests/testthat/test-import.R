@@ -19,10 +19,20 @@ test_that("package_data describes every optional backend", {
   # every entry must carry at least a website and an installer
   expect_true(all(vapply(pd, function(x) "website" %in% names(x), TRUE)))
   expect_true(all(vapply(pd, function(x) "install" %in% names(x), TRUE)))
-  # KNOWN-ISSUE (L2-7 AUC10 family / L3-2, L3-4): `slingshot` is the one entry
-  # with no `install_info`, so import() prints no "Recommended installation"
-  # line for it. Source: R/import.R:74-80.
-  expect_false("install_info" %in% names(pd[["slingshot"]]))
+  # FIXED (D4, audit 03b-audit.md) in fix round of work order
+  # runs/2026-10-22-deps-guard-silentfix: `slingshot` used to be the one entry
+  # without `install_info`, so import_required() would fall back to
+  # install.packages("slingshot") for a Bioconductor-only package. It now
+  # carries the same BiocManager hint as the DelayedArray entry.
+  expect_true("install_info" %in% names(pd[["slingshot"]]))
+  expect_identical(pd[["slingshot"]]$install_info,
+                   'BiocManager::install("slingshot")')
+  # registry completeness: every Bioconductor entry must carry an
+  # install_info, otherwise the helper's CRAN fallback would be wrong.
+  bioc <- vapply(pd, function(x) grepl("bioconductor.org", x$website,
+                                       fixed = TRUE), logical(1))
+  expect_true(all(vapply(pd[bioc], function(x) "install_info" %in% names(x),
+                         logical(1))))
 })
 
 test_that("import() returns TRUE for a package that is already installed", {

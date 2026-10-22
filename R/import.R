@@ -58,6 +58,7 @@ package_data <- list(
   "slingshot" = list(
     website = "https://bioconductor.org/packages/release/bioc/html/slingshot.html",
     tutorial = "https://bioconductor.org/packages/release/bioc/html/slingshot.html",
+    install_info = 'BiocManager::install("slingshot")',
     install = function(){
       BiocManager::install("slingshot")
     }

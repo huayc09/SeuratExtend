@@ -111,19 +111,22 @@ test_that("ClusterDistrPlot with condition returns boxplot ggplot", {
   # install hint; ggbeeswarm is declared in DESCRIPTION Suggests. The old
   # conditional skip (and its order-dependent green) is gone -- the path is
   # asserted directly when the optional package is installed.
-  skip_if_not_installed("ggbeeswarm")
-  p <- ClusterDistrPlot(origin = pbmc$sample_id, cluster = pbmc$cluster,
-                        condition = pbmc$condition)
-  expect_s3_class(p, "ggplot")
-  expect_true(length(p$layers) >= 1)
-  save_for_review(p, "ClusterDistrPlot boxplot by condition")
-
+  #
+  # Source-level assertions run BEFORE the ggbeeswarm gate: they are the part
+  # that matters most in an environment where the optional package is absent.
   root <- file.path("..", "..")
   skip_if_not(dir.exists(file.path(root, "R")), "source tree not reachable")
   src <- paste(readLines(file.path(root, "R", "Vlnplots.R"), warn = FALSE),
                collapse = "\n")
   expect_true(grepl('import_required("ggbeeswarm")', src, fixed = TRUE))
   expect_false(grepl('import("ggbeeswarm")', src, fixed = TRUE))
+
+  skip_if_not_installed("ggbeeswarm")
+  p <- ClusterDistrPlot(origin = pbmc$sample_id, cluster = pbmc$cluster,
+                        condition = pbmc$condition)
+  expect_s3_class(p, "ggplot")
+  expect_true(length(p$layers) >= 1)
+  save_for_review(p, "ClusterDistrPlot boxplot by condition")
 })
 
 test_that("ClusterDistrPlot rejects rev with condition", {

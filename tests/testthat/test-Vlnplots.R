@@ -192,7 +192,7 @@ test_that("VlnPlot2 draws the mean line when box = FALSE", {
   expect_length(colour_scales, 1)
 })
 
-test_that("VlnPlot2 filters comparisons without reporting the bad names", {
+test_that("VlnPlot2 reports dropped comparisons and an empty result", {
   data(pbmc)
   # FIXED (VLN-3) in work order runs/2026-10-22-deps-guard-silentfix:
   # comparisons referencing group names that do not exist used to be dropped

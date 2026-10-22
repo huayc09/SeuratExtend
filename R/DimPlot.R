@@ -468,13 +468,21 @@ DimPlot2_GetData <- function(
       vars <- ord$native
     }
     if(!is.null(cells.highlight)) vars = c(vars, "Selected_cells")
+    restore_meta <- NULL
     if (priority[1] == "expr") {
       # Mirror Seu2Matr(): when a requested variable exists in both the
-      # expression matrix and meta.data, drop the meta.data column so the
-      # FetchData call below returns the expression values.
+      # expression matrix and meta.data, use the expression values. The
+      # meta.data columns are removed only around the FetchData call below and
+      # restored afterwards, so later shape.by/split.by/alpha.by lookups still
+      # find them.
       check.rep <- intersect(rownames(seu), colnames(seu@meta.data))
       feature.rep <- intersect(vars, check.rep)
       if (length(feature.rep) > 0) {
+        warning("'Variables' found in both expression matrix and 'meta.data' (",
+                paste(feature.rep, collapse = ", "),
+                "). Using the expression values. If you need to fetch data from ",
+                "'meta.data' please set 'priority' to 'none'")
+        restore_meta <- seu@meta.data[, feature.rep, drop = FALSE]
         seu@meta.data[, feature.rep] <- NULL
       }
     }
@@ -484,6 +492,11 @@ DimPlot2_GetData <- function(
       data.var <- FetchData(object = seu, vars = vars, cells = cells, layer = slot, clean = "none")
     } else {
       data.var <- FetchData(object = seu, vars = vars, cells = cells, slot = slot)
+    }
+    if (!is.null(restore_meta)) {
+      for (nm in colnames(restore_meta)) {
+        seu@meta.data[[nm]] <- restore_meta[[nm]]
+      }
     }
     if (!is.null(ord)) {
       if (length(vars) > 0) {
