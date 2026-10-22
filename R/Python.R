@@ -10,9 +10,30 @@ load_condaenv <- function(conda_env) {
   # }
 
   # Check if the specified Conda environment exists
-  envs <- conda_list()
+  envs <- tryCatch(
+    conda_list(),
+    error = function(e) {
+      if (!interactive()) {
+        message("conda is not available but is required for Python integration.\n",
+                "Install Miniconda, then run: create_condaenv_seuratextend()")
+        stop("conda binary not found and this session is non-interactive; cannot proceed. ",
+             conditionMessage(e), call. = FALSE)
+      }
+      stop(e)
+    }
+  )
   if (!conda_env %in% envs$name) {
     if (conda_env == "seuratextend") {
+      # A non-interactive session (Rscript, R CMD check, CI) cannot answer the
+      # creation prompt. Fail fast with actionable guidance instead of blocking
+      # on readline() or aborting with a cryptic downstream error.
+      if (!interactive()) {
+        message("conda environment 'seuratextend' is required but does not exist.\n",
+                "Create it in an interactive R session with: create_condaenv_seuratextend()\n",
+                "(it uses the version-pinned spec at system.file('extdata', 'environment-<platform>.yml', package = 'SeuratExtend'))")
+        stop("conda environment 'seuratextend' does not exist and this session is non-interactive; cannot prompt for creation.", call. = FALSE)
+      }
+
       # Ask the user for confirmation to create the 'seuratextend' environment
       message(paste(
         "Conda environment 'seuratextend' does not exist.\n",

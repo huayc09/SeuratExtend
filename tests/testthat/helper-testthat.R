@@ -1,10 +1,17 @@
 # Shared test helpers (auto-sourced by testthat before test files run)
 
-# Python availability probe (spec 2.7): python-integration tests only run
-# when a usable Python environment is present, otherwise they are skipped.
-py_available_for_test <- function() {
-  requireNamespace("reticulate", quietly = TRUE) &&
-    reticulate::py_available(initialize = FALSE)
+# Module-level probe: TRUE only when the 'seuratextend' conda env exists AND
+# the given module imports inside it. Probe errors mean "not available"
+# (fail-safe to skip). Keyed to env presence, not to this session's Python
+# init state — py_available(initialize = FALSE) is FALSE in fresh sessions
+# even on fully provisioned machines, which made the old probe under-detect.
+python_module_available_for_test <- function(module) {
+  tryCatch({
+    envs <- reticulate::conda_list()
+    if (!"seuratextend" %in% envs$name) return(FALSE)
+    reticulate::use_condaenv("seuratextend", required = FALSE)
+    reticulate::py_module_available(module)
+  }, error = function(e) FALSE)
 }
 
 # Test fixture helpers (small, explicit, no hidden state)

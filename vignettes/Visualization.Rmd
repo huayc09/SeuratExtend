@@ -1166,7 +1166,6 @@ color_iwh(30, 5)  # all_hard
 Visual comparison of `color_iwh` palettes:
 
 ```{r, echo=FALSE, fig.width=7.5, fig.height=3}
-library(hyc)
 palette_list <- list(
   "default" = color_iwh(10, 1),
   "intense" = color_iwh(10, 2),
