@@ -145,7 +145,7 @@ VlnPlot2.Seurat <- function(
 #' @param violin Indicates whether to generate a violin plot. Default: TRUE.
 #' @param box Indicates whether to depict a box plot. Default: TRUE.
 #' @param width Width of the box plot. Default: 0.9.
-#' @param show.mean Logical value indicating whether to show mean and median lines. This is particularly useful for genes with low expression levels where the median and box plot quartiles might overlap at zero, making it difficult to interpret differences between groups. Default is FALSE.
+#' @param show.mean Logical value indicating whether to show mean and median lines. When TRUE the mean and median crossbars are drawn independently of `box` — they overlay violins, box plots, or a bare violin when `box = FALSE`. This is particularly useful for genes with low expression levels where the median and box plot quartiles might overlap at zero, making it difficult to interpret differences between groups. Default is FALSE.
 #' @param mean_colors Vector of two colors for mean and median lines respectively. Default is c("red", "blue").
 #' @param pt Indicates if points should be plotted. Default: TRUE.
 #' @param hide.outlier Conceals outlier points from the box plot. Default: FALSE.
@@ -368,6 +368,28 @@ VlnPlot2_Plot <- function(
     style <- "fill"
   }
 
+  # Mean/median crossbars are shared by every show.mean path so that they are
+  # drawn whether or not a box plot is requested. Kept as a closure to add the
+  # two layers and their colour scale exactly once per plot.
+  add_mean_layers <- function(p, crossbar_width) {
+    p +
+      stat_summary(
+        fun = "mean",
+        geom = "crossbar",
+        aes(color = "Mean"),
+        width = crossbar_width) +
+      stat_summary(
+        fun = "median",
+        geom = "crossbar",
+        aes(color = "Median"),
+        width = crossbar_width) +
+      scale_colour_manual(
+        values = c(
+          Mean = mean_colors[1],
+          Median = mean_colors[2]),
+        name = "")
+  }
+
   # Auto-determine angle, hjust, and vjust if not provided
   if (is.null(angle)) {
     max_label_length <- max(nchar(levels(scores[[x]])))
@@ -428,24 +450,7 @@ VlnPlot2_Plot <- function(
     }
 
     # Add mean/median lines for box without violin
-    if(show.mean) {
-      p <- p +
-        stat_summary(
-          fun = "mean",
-          geom = "crossbar",
-          aes(color = "Mean"),
-          width = width) +
-        stat_summary(
-          fun = "median",
-          geom = "crossbar",
-          aes(color = "Median"),
-          width = width) +
-        scale_colour_manual(
-          values = c(
-            Mean = mean_colors[1],
-            Median = mean_colors[2]),
-          name = "")
-    }
+    if(show.mean) p <- add_mean_layers(p, width)
   }
 
   # Add points if requested
@@ -478,21 +483,11 @@ VlnPlot2_Plot <- function(
     }
 
     # Add mean/median lines for box with violin
-    if(show.mean) {
-      p <- p +
-        stat_summary(fun = "mean",
-                     geom = "crossbar",
-                     aes(color = "Mean"),
-                     width = box_width) +
-        stat_summary(fun = "median",
-                     geom = "crossbar",
-                     aes(color = "Median"),
-                     width = box_width) +
-        scale_colour_manual(values = c(Mean = mean_colors[1],
-                                       Median = mean_colors[2]),
-                            name = "")
-    }
+    if(show.mean) p <- add_mean_layers(p, box_width)
   }
+
+  # Add mean/median lines when no box plot is requested
+  if(show.mean && !box) p <- add_mean_layers(p, width)
 
   # Set color scales based on style
   if(style == "fill") {
@@ -587,7 +582,24 @@ vlnplot2_Stat <- function(
           stop("Invalid comparison type")
         }
       })
+      group_levels <- if (!"f2" %in% colnames(scores)) {
+        levels(factor(scores$f))
+      } else {
+        levels(factor(scores$f2))
+      }
+      matched <- vapply(level_comparisons, function(cmp) {
+        all(cmp %in% group_levels)
+      }, logical(1))
+      dropped <- level_comparisons[!matched]
       stat.test <- filter(stat.test, groups %in% level_comparisons)
+      if(length(dropped) > 0) {
+        message("Comparisons not found in the data were dropped: ",
+                paste(vapply(dropped, paste, character(1), collapse = " vs "),
+                      collapse = "; "))
+      }
+      if(nrow(stat.test) == 0) {
+        message("No valid comparisons found; no statistics are drawn.")
+      }
     }
     stat.test <- vlnplot2_Stat_add_y(stat.test, scores = scores, step.increase = step.increase)
 

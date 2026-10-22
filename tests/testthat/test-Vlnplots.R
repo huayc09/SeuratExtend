@@ -160,39 +160,60 @@ test_that("StackedViolin aliases VlnPlot2.default; _v3 aliases Seurat method", {
 
 # --- KNOWN-ISSUE pins (2026-09-16 recheck against 问题清单0915) ------------
 
-test_that("VlnPlot2 silently drops the mean line when box = FALSE", {
+test_that("VlnPlot2 draws the mean line when box = FALSE", {
   data(pbmc)
-  # KNOWN-ISSUE (VLN-5, P1) -- R/Vlnplots.R:428 / :478. The mean line is drawn
-  # by the boxplot path, so `show.mean = TRUE` has NO effect unless box = TRUE
-  # and the documentation at :145 does not mention the dependency. Measured:
+  # FIXED (VLN-5) in work order runs/2026-10-22-deps-guard-silentfix: the
+  # mean/median crossbars used to live inside the `box` branches of
+  # R/Vlnplots.R (VlnPlot2_Plot), so `show.mean = TRUE` was silently ignored
+  # unless box = TRUE. The crossbars are now added whenever show.mean = TRUE,
+  # independently of `box`. Measured before the fix:
   #   show.mean = TRUE, box = TRUE  -> GeomViolin, GeomPoint, GeomBoxplot,
   #                                    GeomCrossbar, GeomCrossbar
   #   show.mean = TRUE, box = FALSE -> GeomViolin, GeomPoint   (silently gone)
-  # This matters because the file's own parameter smoke passes exactly this
-  # combination (show.mean = TRUE together with box = FALSE) and asserts only
-  # the returned class.
   geoms <- function(p) sapply(p$layers, function(l) class(l$geom)[1])
+  crossbars <- function(p) Filter(function(l) inherits(l$geom, "GeomCrossbar"),
+                                  p$layers)
   p_box  <- VlnPlot2(pbmc, features = "CD3D", group.by = "cluster",
                      show.mean = TRUE, box = TRUE)
   p_none <- VlnPlot2(pbmc, features = "CD3D", group.by = "cluster",
                      show.mean = TRUE, box = FALSE)
   expect_true("GeomCrossbar" %in% geoms(p_box))
-  expect_false("GeomCrossbar" %in% geoms(p_none))
-  expect_length(p_none$layers, 2)   # violin + points only
+  expect_true("GeomCrossbar" %in% geoms(p_none))
+  expect_length(p_none$layers, 4)   # violin + points + mean + median
+
+  # box = TRUE still carries exactly one Mean and one Median layer, and a
+  # single colour scale for them (no duplicated layers / scales).
+  cb <- crossbars(p_box)
+  expect_length(cb, 2)
+  expect_setequal(vapply(cb, function(l) l$stat_params$fun, character(1)),
+                  c("mean", "median"))
+  colour_scales <- Filter(function(s) "colour" %in% s$aesthetics,
+                          p_box$scales$scales)
+  expect_length(colour_scales, 1)
 })
 
 test_that("VlnPlot2 filters comparisons without reporting the bad names", {
   data(pbmc)
-  # KNOWN-ISSUE (VLN-3, P1) -- R/Vlnplots.R:573-588. Comparisons referencing
-  # group names that do not exist are dropped, and nothing is reported: no
-  # error, no warning, no message. The caller gets a plot with no statistics
-  # on it. (Contrast: an empty `hide.ns` selection DOES produce a message.)
-  p <- VlnPlot2(pbmc, features = "CD3D", group.by = "cluster",
-                stat.method = "wilcox.test",
-                comparisons = list(c("B cell", "NO_SUCH_GROUP")))
+  # FIXED (VLN-3) in work order runs/2026-10-22-deps-guard-silentfix:
+  # comparisons referencing group names that do not exist used to be dropped
+  # silently (no error, warning or message), leaving the caller with a plot
+  # that carries no statistics (R/Vlnplots.R, vlnplot2_Stat). The filter now
+  # reports dropped comparisons and states when no valid comparison remains.
+  expect_message(
+    p <- VlnPlot2(pbmc, features = "CD3D", group.by = "cluster",
+                  stat.method = "wilcox.test",
+                  comparisons = list(c("B cell", "NO_SUCH_GROUP"))),
+    "NO_SUCH_GROUP"
+  )
+  expect_message(
+    VlnPlot2(pbmc, features = "CD3D", group.by = "cluster",
+             stat.method = "wilcox.test",
+             comparisons = list(c("B cell", "NO_SUCH_GROUP"))),
+    "No valid comparisons"
+  )
   expect_s3_class(p, "ggplot")
   geoms <- sapply(p$layers, function(l) class(l$geom)[1])
-  expect_false("GeomBracket" %in% geoms)   # silently nothing
+  expect_false("GeomBracket" %in% geoms)   # nothing to draw
 })
 
 test_that("VlnPlot2 reports a missing feature differently on its two paths", {

@@ -561,3 +561,28 @@ test_that("DimPlot2() rejects a discrete variable with more than 100 values", {
   expect_error(DimPlot2(s, features = "many"), "has > 100 values")
 })
 
+
+test_that("DimPlot2 honours priority when a gene and a meta column share a name", {
+  # FIXED (problems ledger row 11): `priority` was declared but never used by
+  # DimPlot2, so a meta.data column named like a gene always won and
+  # priority = "expr" was silently ignored. Wired in work order
+  # runs/2026-10-22-deps-guard-silentfix with the same semantics as Seu2Matr:
+  # the conflicting meta.data column is dropped before FetchData.
+  data(pbmc)
+  s <- pbmc
+  s@meta.data$CD3D <- factor(rep(c("low", "high"), length.out = ncol(s)))
+  continuous <- function(g) is.numeric(g$data$var) && !is.factor(g$data$var)
+
+  g_expr <- DimPlot2(s, features = "CD3D", priority = "expr",
+                     combine = FALSE)[[1]]
+  expect_true(continuous(g_expr))
+
+  g_meta <- DimPlot2(s, features = "CD3D", priority = "none",
+                     combine = FALSE)[[1]]
+  expect_false(continuous(g_meta))
+  expect_true(is.factor(g_meta$data$var))
+
+  # default is priority = c("expr", "none") -> expression wins
+  g_default <- DimPlot2(s, features = "CD3D", combine = FALSE)[[1]]
+  expect_true(continuous(g_default))
+})

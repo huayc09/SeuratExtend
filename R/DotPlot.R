@@ -386,7 +386,8 @@ DotPlot2 <- function(
       strip.background = element_rect(fill = NA, size = 0),
       panel.spacing = panel.spacing,
       strip.placement = strip.placement,
-      legend.position = legend_position
+      legend.position = legend_position,
+      plot.margin = plot.margin
     ) +
     theme(...) +
     color_scale
@@ -519,9 +520,6 @@ DotPlot2 <- function(
             panel.spacing = unit(0, "pt")
           )
       }
-
-      # Move legend to bottom for better layout with annotation bar on right
-      p <- p + theme(legend.position = "bottom")
 
       # Combine plots: main plot on left, annotation bar on right
       combined_plot <- plot_grid(p, anno_plot, ncol = 2, rel_widths = c(1, 0.03), align = "h")

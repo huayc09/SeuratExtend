@@ -237,6 +237,7 @@ DimPlot2 <- function(
     assay = assay,
     dims = dims,
     reduction = reduction,
+    priority = priority,
     shape.by = shape.by,
     alpha.by = alpha.by,
     cells.highlight = cells.highlight,
@@ -387,6 +388,7 @@ DimPlot2_GetData <- function(
     assay = NULL,
     dims = c(1, 2),
     reduction = NULL,
+    priority = c("expr", "none"),
     shape.by = NULL,
     alpha.by = NULL,
     cells.highlight = NULL,
@@ -466,6 +468,16 @@ DimPlot2_GetData <- function(
       vars <- ord$native
     }
     if(!is.null(cells.highlight)) vars = c(vars, "Selected_cells")
+    if (priority[1] == "expr") {
+      # Mirror Seu2Matr(): when a requested variable exists in both the
+      # expression matrix and meta.data, drop the meta.data column so the
+      # FetchData call below returns the expression values.
+      check.rep <- intersect(rownames(seu), colnames(seu@meta.data))
+      feature.rep <- intersect(vars, check.rep)
+      if (length(feature.rep) > 0) {
+        seu@meta.data[, feature.rep] <- NULL
+      }
+    }
     if (length(vars) == 0) {
       data.var <- data.frame(row.names = cells)
     } else if (utils::packageVersion("SeuratObject") >= "5.0.0") {

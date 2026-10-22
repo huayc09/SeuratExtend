@@ -404,13 +404,28 @@ WaterfallPlot_Calc <- function(
       abs(scores$color) > col.threshold,
   ]
 
-  if(order) {
-    scores <- arrange(scores, desc(length))
-  }
   if(!is.null(top.n)) {
     if(length(top.n) == 1) top.n <- c(top.n, top.n)
+    # Selection is always by score magnitude: the largest top.n[1] positive and
+    # the smallest top.n[2] negative values, regardless of `order`.
     scores2 <- split(scores, ifelse(scores$length > 0, "pos","neg"))
-    scores <- rbind( head(scores2[["pos"]], top.n[1]), tail(scores2[["neg"]], top.n[2]) )
+    pos <- scores2[["pos"]]
+    neg <- scores2[["neg"]]
+    if (!is.null(pos)) {
+      pos <- pos[order(pos$length, decreasing = TRUE), , drop = FALSE]
+    }
+    if (!is.null(neg)) {
+      neg <- neg[order(neg$length, decreasing = FALSE), , drop = FALSE]
+    }
+    sel.rank <- c(utils::head(pos$rank, top.n[1]),
+                  utils::head(neg$rank, top.n[2]))
+    # Subsetting preserves the existing row order, so order = FALSE keeps the
+    # caller's input order among the selected bars.
+    scores <- scores[scores$rank %in% sel.rank, , drop = FALSE]
+  }
+  # `order` only controls the final display arrangement.
+  if(order) {
+    scores <- arrange(scores, desc(length))
   }
   return(scores)
 }

@@ -49,3 +49,35 @@ test_that("FeaturePlot3.grid renders a feature grid", {
   expect_true(inherits(p, "ggplot"))
   save_for_review(p, "FeaturePlot3.grid multiple features")
 })
+
+test_that("FeaturePlot3.grid orders by expression with a >2-dim reduction", {
+  # FIXED (problems ledger, FeaturePlot P1): the ordering used hard-coded
+  # columns 3:5, which only hold the expression columns when Embeddings()
+  # returns two dimensions. With reduction = "pca" (50 dims) it ordered by
+  # PC_3..PC_5 instead of CD3D/MS4A1/LYZ. The expression columns are now
+  # located as ncol(emb) + 1:3 in both FeaturePlot3 and FeaturePlot3.grid.
+  skip_if_not_installed("ggtext")
+  data(pbmc)
+  feats <- c("CD3D", "MS4A1", "LYZ")
+  p <- suppressWarnings(FeaturePlot3.grid(pbmc, features = feats,
+                                          reduction = "pca"))
+  expect_true(inherits(p, "ggplot"))
+
+  # Row order in the plotting data must follow the mean scaled expression
+  # (same transformation as sca() with the default color.range).
+  tp <- as.data.frame(lapply(feats, function(f) Seurat::FetchData(pbmc, f)[, 1]))
+  rownames(tp) <- colnames(pbmc)
+  scaled <- sapply(tp, function(x) {
+    if (max(x) == min(x)) rep(0.1, length(x)) else 0.1 + 0.8 * (x - min(x)) / (max(x) - min(x))
+  })
+  ordered_expr <- rownames(tp)[order(rowMeans(scaled))]
+  plotted <- rownames(p$data)[p$data$index == 1]
+  expect_identical(plotted, ordered_expr)
+  # Monotone in mean expression.
+  expect_false(is.unsorted(rowMeans(scaled)[match(plotted, rownames(tp))]))
+
+  # Positive control: the old hard-coded 3:5 columns (PC_3..PC_5) give a
+  # different order, so the assertion above really exercises the fix.
+  emb <- Seurat::Embeddings(pbmc, reduction = "pca")
+  expect_false(identical(plotted, rownames(tp)[order(rowMeans(emb[, 3:5]))]))
+})

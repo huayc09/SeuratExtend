@@ -39,6 +39,11 @@ GSEAplot <-
     title = deparse(substitute(geneset))
   ) {
 
+    # Force the default title before `geneset` is reassigned below: otherwise
+    # deparse(substitute(geneset)) would capture the filtered gene vector
+    # instead of the caller's expression.
+    title <- force(title)
+
     library(ggplot2)
     library(ggpubr)
     library(scales)
