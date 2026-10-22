@@ -811,7 +811,7 @@ DimPlot.Slingshot <- function(
 
   # Combine plots if requested
   if (combine) {
-    import("cowplot")
+    import_required("cowplot")
     p_final <- plot_grid(plotlist = p_with_curves, ncol = ncol, nrow = nrow, align = "hv")
     return(p_final)
   } else {

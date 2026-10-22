@@ -31,29 +31,19 @@ test_that("FeaturePlot3 stops when no feature given", {
 test_that("FeaturePlot3.grid renders a feature grid", {
   skip_if_not_installed("ggtext")
   data(pbmc)
-  # KNOWN-ISSUE (R/FeaturePlot.R:305, not yet in any checklist): the grid
-  # pipeline ends in `tp.c <- list.rbind(tp.c)` WITHOUT the rlist:: prefix,
-  # while NAMESPACE only declares import(ggplot2) + importFrom(reshape2, melt).
-  # rlist is therefore reachable only because R/ClusterDistrBar.R:55 / :205 do a
-  # bare library(rlist) at run time -- this test used to pass purely because
-  # test-ClusterDistrBar.R happens to run first. Satisfy the prerequisite
-  # explicitly so the test is order-independent, and pin the missing import
-  # statically. (Same family as the show_col2()/Functions.R:213 case pinned in
-  # test-Colors.R.)
+  # FIXED by runs/2026-10-22-deps-guard-silentfix (same family as FUN-1): the
+  # grid pipeline's `tp.c <- list.rbind(tp.c)` had no rlist import in NAMESPACE
+  # and only worked because R/ClusterDistrBar.R happened to attach rlist first.
+  # NAMESPACE now declares importFrom(rlist, list.rbind) (added with the
+  # show_col2 roxygen exports), so the call resolves inside the package
+  # namespace, order-independently and without a manual library() shim.
   root <- file.path("..", "..")
   skip_if_not(file.exists(file.path(root, "NAMESPACE")),
               "dev-layout source inspection only (not available under R CMD check)")
   ns_lines <- readLines(file.path(root, "NAMESPACE"), warn = FALSE)
-  expect_false(any(grepl("rlist", ns_lines, fixed = TRUE)))
+  expect_true(any(grepl("importFrom(rlist,list.rbind)", ns_lines, fixed = TRUE)))
   fn_lines <- readLines(file.path(root, "R", "FeaturePlot.R"), warn = FALSE)
   expect_true(any(grepl("tp.c <- list.rbind(tp.c)", fn_lines, fixed = TRUE)))
-
-  had_rlist <- "package:rlist" %in% search()
-  if (!had_rlist) {
-    skip_if_not(requireNamespace("rlist", quietly = TRUE), "rlist absent")
-    library(rlist)
-    on.exit(detach("package:rlist", unload = FALSE), add = TRUE)
-  }
 
   p <- FeaturePlot3.grid(pbmc, features = c("CD3D", "MS4A1", "LYZ"))
   expect_true(inherits(p, "ggplot"))

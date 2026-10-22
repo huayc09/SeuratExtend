@@ -480,7 +480,7 @@ DotPlot2 <- function(
 
   # Create annotation bar if needed
   if (!is.null(split.by) && split.by.method == "annotation") {
-    library(cowplot)
+    import_required("cowplot")
 
     # Create annotation bar data
     annotation_data <- ToPlot %>%

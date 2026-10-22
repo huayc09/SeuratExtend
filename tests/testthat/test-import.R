@@ -83,3 +83,36 @@ test_that("import() failure is signalled by a return value, not by an error", {
       SeuratExtend:::import("seuratextend_nonexistent_probe_pkg")))
   )
 })
+
+# --- import_required(): the call-site guard ---------------------------------
+#
+# Batch-1 of runs/2026-10-22-deps-guard-silentfix replaced the call sites that
+# dropped import()'s return value with import_required(), which keeps the
+# interactive install prompt and then fails fast with an install hint.
+
+test_that("import_required() returns TRUE for an installed package", {
+  res <- quietly(SeuratExtend:::import_required("ggpubr"))
+  expect_identical(res, TRUE)
+})
+
+test_that("import_required() fails fast with an install hint when missing", {
+  # import() answers readline() with "" in a non-interactive session, so this
+  # exercises the exact path a script / knitr / CI run takes.
+  skip_if(interactive(), "would block on readline()")
+  pkg <- "seuratextend_nonexistent_probe_pkg"
+
+  expect_error(
+    quietly(SeuratExtend:::import_required(pkg)),
+    "required but not installed"
+  )
+
+  msg <- tryCatch(
+    { quietly(SeuratExtend:::import_required(pkg)); NULL },
+    error = function(e) conditionMessage(e)
+  )
+  # non-registry packages get the truthful CRAN route, naming the package
+  expect_match(msg, sprintf('install.packages\\("%s"\\)', pkg))
+
+  # contrast: the bare helper still returns FALSE rather than throwing
+  expect_false(suppressMessages(quietly(SeuratExtend:::import(pkg))))
+})

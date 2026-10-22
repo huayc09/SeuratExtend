@@ -454,7 +454,7 @@ VlnPlot2_Plot <- function(
     if(!pt.style %in% c("quasirandom", "jitter")) stop('"pt.style" shoule be "quasirandom" or "jitter"')
     if(pt.style == "jitter") p <- p + geom_jitter(width = width/2.2, height = 0, size = pt.size, alpha= pt.alpha)
     if(pt.style == "quasirandom") {
-      import("ggbeeswarm")
+      import_required("ggbeeswarm")
       p <- p + geom_quasirandom(size = pt.size, width = width/2, alpha= pt.alpha)
     }
   }

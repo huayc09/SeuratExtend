@@ -219,7 +219,7 @@ FeaturePlot3.grid <- function(
   library(dplyr)
   library(magrittr)
   library(rlist)
-  import("ggtext")
+  import_required("ggtext")
 
   # features
   add3 <- function(x) {

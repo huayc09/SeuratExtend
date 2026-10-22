@@ -136,18 +136,16 @@ test_that("install_SeuratExtendData errors gracefully without a package name", {
 
 # --- dependency declarations (checklist L2-1 G1) ---------------------------
 
-test_that("GeneSetAnalysis's DelayedArray use is Suggests-declared but still unguarded on the main path", {
-  # KNOWN-ISSUE (GS-1, P1) -- partially resolved 2026-10-16 (work order
-  # test-infra-landing): BOTH packages are now declared in DESCRIPTION Suggests
-  # (CI/check environments covered). REMAINING issue (清单 P1): the main
-  # computation path still calls
-  #   DelayedArray::blockApply / colAutoGrid / DelayedArray()  R/GeneSetAnalysis.R:96-109
-  #   DelayedMatrixStats::colRanks                             R/AUCell_basic.R:7-8
-  # unconditionally while they are only in Suggests -- a minimal install (no
-  # Suggests) still dies inside import()'s interactive prompt, surfacing as the
-  # unhelpful `could not find function "blockApply"`. NAMESPACE still imports
-  # neither. The real fix (requireNamespace guard + clear error) belongs to the
-  # P1 dependency-declaration batch; this pin flips fully when that lands.
+test_that("GeneSetAnalysis's DelayedArray dependencies are declared and guarded", {
+  # FIXED (GS-1, P1): BOTH packages were already declared in DESCRIPTION
+  # Suggests (work order test-infra-landing). This work order closes the
+  # remaining hole: the main computation path in R/AUCell_basic.R (reached
+  # from GeneSetAnalysis -> BuildAUCRank) now calls
+  #   import_required("DelayedArray") / import_required("DelayedMatrixStats")
+  # instead of dropping import()'s return value, so a minimal install gets a
+  # fail-fast error with a BiocManager install hint rather than the unhelpful
+  # `could not find function "blockApply"`. The packages stay out of NAMESPACE
+  # by design (optional at runtime, pulled in by the call site guard).
   root <- file.path("..", "..")
   skip_if_not(dir.exists(file.path(root, "R")), "source tree not reachable")
 
@@ -160,13 +158,11 @@ test_that("GeneSetAnalysis's DelayedArray use is Suggests-declared but still ung
               collapse = " ")
   expect_false(grepl("DelayedArray", ns, fixed = TRUE))
 
-  # ... and yet the calls really are on the main path. They live in
-  # AUCell_basic.R (reached from GeneSetAnalysis -> BuildAUCRank), where the
-  # dependency is pulled in through the package's own import() helper rather
-  # than through NAMESPACE.
   body_txt <- paste(readLines(file.path(root, "R", "AUCell_basic.R"),
                               warn = FALSE), collapse = "\n")
   expect_true(grepl("blockApply", body_txt, fixed = TRUE))
-  expect_true(grepl('import("DelayedArray")', body_txt, fixed = TRUE))
-  expect_true(grepl('import("DelayedMatrixStats")', body_txt, fixed = TRUE))
+  expect_true(grepl('import_required("DelayedArray")', body_txt, fixed = TRUE))
+  expect_true(grepl('import_required("DelayedMatrixStats")', body_txt, fixed = TRUE))
+  expect_false(grepl('import("DelayedArray")', body_txt, fixed = TRUE))
+  expect_false(grepl('import("DelayedMatrixStats")', body_txt, fixed = TRUE))
 })

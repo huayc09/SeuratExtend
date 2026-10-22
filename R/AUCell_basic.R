@@ -4,8 +4,8 @@
   function (exprMat, featureType = "genes",
             keepZeroesAsNA = FALSE, BPPARAM = NULL, plotStats = FALSE,
             verbose = TRUE) {
-    import("DelayedArray")
-    import("DelayedMatrixStats")
+    import_required("DelayedArray")
+    import_required("DelayedMatrixStats")
     if (keepZeroesAsNA) {
       zeroesCoords <- which(exprMat == 0, arr.ind = TRUE)
     }
@@ -154,9 +154,9 @@ getRanking <- function(object) {
   if (nCores > 1) {
     sysname <- Sys.info()[["sysname"]]
     if(sysname == "Windows") {
-      import("doParallel")
-      import("doRNG")
-      import("foreach")
+      import_required("doParallel")
+      import_required("doRNG")
+      import_required("foreach")
       cl <- makeCluster(nCores)
       registerDoParallel(cl)
       aucMatrix <- foreach(gSetName = names(geneSets)) %dopar% {
@@ -169,8 +169,8 @@ getRanking <- function(object) {
       aucMatrix <- setNames(aucMatrix, names(geneSets))
       aucMatrix <- rlist::list.rbind(aucMatrix)
     } else {
-      import("doMC")
-      import("foreach")
+      import_required("doMC")
+      import_required("foreach")
       registerDoMC(nCores)
       if (verbose)
         message("Using ", foreach::getDoParWorkers(),

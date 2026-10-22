@@ -367,7 +367,7 @@ DimPlot2 <- function(
   if(!combine) {
     return(p)
   } else {
-    import("cowplot")
+    import_required("cowplot")
     p <- plot_grid(plotlist = p, ncol = ncol, nrow = nrow, align = align)
     return(p)
   }
@@ -581,7 +581,7 @@ DimPlot2_PlotSingle <- function (
   if(istrue.cell.highlight) pt.size <- sizes.highlight
   plot <-
     if (isTRUE(x = raster)) {
-      import("scattermore")
+      import_required("scattermore")
       plot + geom_scattermore(pointsize = pt.size, pixels = raster.dpi)
     } else {
       plot + geom_point(size = pt.size)
@@ -603,7 +603,7 @@ DimPlot2_PlotSingle <- function (
   if("split.by" %in% colnames(data.plot)) {
     plot <- plot + facet_wrap(vars(split.by), nrow = nrow.each)
   }
-  import("cowplot")
+  import_required("cowplot")
   plot <- plot + theme_cowplot() + CenterTitle()
   
   # Apply theme elements
@@ -646,7 +646,7 @@ DimPlot2_LabelClusters <- function(
     position = "median",
     ...
 ) {
-  if(repel) import("ggrepel")
+  if(repel) import_required("ggrepel")
   xynames <- unlist(x = GetXYAesthetics(plot = plot, geom = geom), use.names = TRUE)
   if (!id %in% colnames(x = plot$data)) {
     stop("Cannot find variable ", id, " in plotting data")

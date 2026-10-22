@@ -22,21 +22,21 @@ test_that("RunBasicSeurat accepts cluster resolution parameter", {
 
 # --- KNOWN-ISSUE pin (2026-09-16 recheck against 问题清单0915) ------------
 
-test_that("RunBasicSeurat reaches harmony through an undeclared import()", {
-  # KNOWN-ISSUE (RBS-1, P1) -- R/RunBasicSeurat.R:98 calls import("harmony")
-  # and discards the return value, then :111 calls RunHarmony() directly.
-  # harmony is in NO field of DESCRIPTION, and import() needs an interactive
-  # answer when the package is missing -- so in a script / knitr / CI session
-  # the "auto install" branch cannot run and the call dies with
-  # `could not find function "RunHarmony"`, naming nothing the user can fix.
-  # (This is the same family as GeneSetAnalysis's DelayedArray hole.)
+test_that("RunBasicSeurat guards its harmony dependency explicitly", {
+  # FIXED (RBS-1, P1): R/RunBasicSeurat.R no longer drops import()'s return
+  # value. The call site is now import_required("harmony"), which keeps
+  # import()'s interactive install prompt and then fails fast with an install
+  # hint when the package is absent (script / knitr / CI sessions), instead of
+  # dying later at RunHarmony() with `could not find function "RunHarmony"`.
+  # harmony is declared in DESCRIPTION Suggests by this work order.
   root <- file.path("..", "..")
   skip_if_not(dir.exists(file.path(root, "R")), "source tree not reachable")
   desc <- paste(readLines(system.file("DESCRIPTION", package = "SeuratExtend"),
                           warn = FALSE), collapse = " ")
-  expect_false(grepl("harmony", desc, fixed = TRUE))
+  expect_true(grepl("harmony", desc, fixed = TRUE))
   src <- paste(readLines(file.path(root, "R", "RunBasicSeurat.R"),
                          warn = FALSE), collapse = "\n")
-  expect_true(grepl('import("harmony")', src, fixed = TRUE))
+  expect_true(grepl('import_required("harmony")', src, fixed = TRUE))
+  expect_false(grepl('import("harmony")', src, fixed = TRUE))
   expect_true(grepl("RunHarmony(", src, fixed = TRUE))
 })

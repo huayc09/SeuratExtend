@@ -95,7 +95,7 @@ RunBasicSeurat <- function(
   if (!is.null(harmony.by)) {
     # Check if Harmony should be run or if it has been run already
     if (force.RunHarmony || !"harmony" %in% names(seu@reductions) || run_pca) {
-      import("harmony")
+      import_required("harmony")
       # Determine if the harmony.by column is numeric or a factor of numeric values
       isnum_harmonyby <- (
         is.numeric(seu@meta.data[[harmony.by]]) || (

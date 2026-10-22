@@ -56,37 +56,21 @@ test_that("loaded var_colors drive DimPlot2 (save_colors pipeline)", {
 # --- show_col2 helper (documented export, #8) ------------------------------
 
 test_that("show_col2 returns a ggplot grid of palettes", {
-  # show_col2 calls NoAxes() (Seurat) internally without ::; attach Seurat.
-  skip_if_not(requireNamespace("Seurat", quietly = TRUE))
-
-  # KNOWN-ISSUE (R/Functions.R:213, not yet in any checklist): show_col2()
-  # calls list.rbind() WITHOUT the rlist:: prefix, but NAMESPACE only contains
-  # import(ggplot2) + importFrom(reshape2, melt) -- rlist is never imported.
-  # The unqualified name is reachable only because another source file attaches
-  # rlist at run time (R/ClusterDistrBar.R:55 and :205 do a bare
-  # library(rlist)). On a clean session the call therefore dies with
-  #   could not find function "list.rbind"
-  # Verified both ways: test-Colors.R alone -> error; test-Colors.R executed
-  # after test-ClusterDistrBar.R -> green. That is a test-order dependency on
-  # top of the source bug, so the check below is static (order-independent).
+  # FIXED (FUN-1, P1, same defect as the test-Functions.R pin): show_col2()
+  # called list.rbind()/`%>%`/NoAxes() without the package namespace importing
+  # them, so this case used to require a manual library(rlist) shim and was
+  # order-dependent on whichever neighbour test happened to attach the
+  # namespace. The roxygen block now imports all three, so no attach is needed.
   root <- file.path("..", "..")
   skip_if_not(file.exists(file.path(root, "NAMESPACE")),
               "dev-layout source inspection only")
   ns_lines <- readLines(file.path(root, "NAMESPACE"), warn = FALSE)
-  expect_false(any(grepl("rlist", ns_lines, fixed = TRUE)))
+  expect_true(any(grepl('importFrom(magrittr,"%>%")', ns_lines, fixed = TRUE)))
+  expect_true(any(grepl("importFrom(rlist,list.rbind)", ns_lines, fixed = TRUE)))
+  expect_true(any(grepl("importFrom(Seurat,NoAxes)", ns_lines, fixed = TRUE)))
   fn_lines <- readLines(file.path(root, "R", "Functions.R"), warn = FALSE)
   expect_true(any(grepl("pal_mtx <- list.rbind(", fn_lines, fixed = TRUE)))
 
-  # Satisfy the missing prerequisite explicitly instead of relying on the
-  # neighbour test file, and put the session back exactly as it was.
-  had_rlist <- "package:rlist" %in% search()
-  if (!had_rlist) {
-    skip_if_not(requireNamespace("rlist", quietly = TRUE), "rlist absent")
-    library(rlist)
-    on.exit(detach("package:rlist", unload = FALSE), add = TRUE)
-  }
-
-  library(Seurat)
   p <- show_col2(list(A = color_pro(5), B = color_iwh(5, 1)), ncol = 5)
   expect_true(inherits(p, "ggplot"))
 })

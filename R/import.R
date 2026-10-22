@@ -125,3 +125,21 @@ import <- function(package, hpc.mode = FALSE, detach = FALSE){
   }
 }
 
+# Guard for call sites whose following code uses the package unconditionally.
+# Keeps import()'s interactive install prompt intact: import() runs first, so
+# an interactive user is still asked, and only a refused/failed install (or a
+# non-interactive session) turns into a fail-fast error that names the package
+# and a real installation route.
+import_required <- function(pkg) {
+  ok <- import(pkg)
+  if (!isTRUE(ok)) {
+    hint <- if (pkg %in% names(package_data) && !is.null(package_data[[pkg]]$install_info)) {
+      package_data[[pkg]]$install_info
+    } else {
+      sprintf('Install it with install.packages("%s").', pkg)
+    }
+    stop(sprintf("Package '%s' is required but not installed. %s", pkg, hint), call. = FALSE)
+  }
+  invisible(TRUE)
+}
+

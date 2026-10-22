@@ -184,7 +184,7 @@ VolcanoPlot_Plot <- function(
     log.base = "e"
 ) {
   library(ggplot2)
-  library(ggrepel)
+  import_required("ggrepel")
   library(dplyr)
 
   # Auto-calculate thresholds if not provided
