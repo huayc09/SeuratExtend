@@ -26,25 +26,41 @@
 
 ImportPyscenicLoom <- function(loom.path, seu = NULL) {
   library(Seurat)
-  import("loomR")
 
-  lfile <- connect(loom.path, skip.validate = T)
-  if(is.null(seu)) {} else if(length(lfile$col.attrs$CellID[]) != length(colnames(seu))) {
+  lfile <- hdf5r::H5File$new(loom.path, mode = "r")
+  on.exit(lfile$close_all(), add = TRUE)
+
+  # pySCENIC stores the regulon activity and membership matrices as 2D
+  # compound datasets under col_attrs/row_attrs. hdf5r reads them as
+  # data frames with cells/genes as rows and regulons as columns, which is
+  # the layout the rest of this function expects.
+  required.datasets <- c("col_attrs/RegulonsAUC", "row_attrs/Regulons")
+  missing.datasets <- required.datasets[!vapply(required.datasets, function(path) {
+    parts <- strsplit(path, "/", fixed = TRUE)[[1]]
+    lfile$exists(parts[1]) && lfile[[parts[1]]]$exists(parts[2])
+  }, logical(1))]
+  if(length(missing.datasets) > 0) {
+    stop("Loom file is missing the pySCENIC dataset(s): ",
+         paste(missing.datasets, collapse = ", "),
+         " (is this a pySCENIC integrated-output loom file?)")
+  }
+
+  CellID <- lfile[["col_attrs"]][["CellID"]][]
+  if(is.null(seu)) {} else if(length(CellID) != length(colnames(seu))) {
     stop("Loom file and Seurat object have different cell numbers")
-  }else if(!identical(lfile$col.attrs$CellID[], colnames(seu))){
+  }else if(!identical(CellID, colnames(seu))){
     warning("Loom file and Seurat object have the same cell numbers but different cell names")
   }
 
-  RegulonsAUC <- lfile$col.attrs$RegulonsAUC[]
+  RegulonsAUC <- lfile[["col_attrs"]][["RegulonsAUC"]][]
   colnames(RegulonsAUC) <- sub("_(+)", "", colnames(RegulonsAUC), fixed = T)
-  rownames(RegulonsAUC) <- lfile$col.attrs$CellID[]
+  rownames(RegulonsAUC) <- CellID
 
-  Regulons <- lfile$row.attrs$Regulons[]
+  Regulons <- lfile[["row_attrs"]][["Regulons"]][]
   colnames(Regulons) <- sub("_(+)", "", colnames(Regulons), fixed = T)
-  genes <- lfile$row.attrs$Gene
+  genes <- lfile[["row_attrs"]][["Gene"]][]
   Regulons <- apply(Regulons, 2, function(x) genes[which(x==1)])
 
-  lfile$close_all()
   results <- list(RegulonsAUC = RegulonsAUC,
                   Regulons = Regulons)
 

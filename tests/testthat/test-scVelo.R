@@ -54,36 +54,25 @@ test_that("scVelo signatures and defaults are stable", {
   expect_identical(p$conda_env, "seuratextend")
 })
 
-test_that("scVelo.SeuratToLoom() lists every loom file it cannot find", {
+test_that("scVelo.SeuratToLoom() is defunct and names its replacement", {
+  # The function body is now .Defunct(): the loom backend dependency used to
+  # build an integrated loom was removed, so every call must fail loudly and
+  # point at the supported alternative instead of reaching for Python.
   data(pbmc)
   expect_error(
-    quietly(suppressMessages(scVelo.SeuratToLoom(
+    quietly(scVelo.SeuratToLoom(
       pbmc, export.name = "unused.loom",
-      velocyto.loom.filenames = "missing_one.loom"))),
-    "Loom file\\(s\\) not found"
+      velocyto.loom.filenames = "missing_one.loom")),
+    "defunct"
   )
-  # several files -> all of them are named, not just the first
   err <- tryCatch(
-    quietly(suppressMessages(scVelo.SeuratToLoom(
+    quietly(scVelo.SeuratToLoom(
       pbmc, export.name = "unused.loom",
-      velocyto.loom.filenames = c("missing_one.loom", "missing_two.loom")))),
+      velocyto.loom.filenames = "missing_one.loom")),
     error = function(e) conditionMessage(e)
   )
-  expect_match(err, "missing_one.loom")
-  expect_match(err, "missing_two.loom")
-})
-
-test_that("scVelo.SeuratToLoom() joins velocyto.loom.path onto the filenames", {
-  data(pbmc)
-  err <- tryCatch(
-    quietly(suppressMessages(scVelo.SeuratToLoom(
-      pbmc, export.name = "unused.loom", velocyto.loom.path = "some/dir",
-      velocyto.loom.filenames = "missing_one.loom"))),
-    error = function(e) conditionMessage(e)
-  )
-  # the reported path must keep the directory part, otherwise the user cannot
-  # tell which of several loom roots was searched
-  expect_match(err, "some[/\\\\]dir", perl = TRUE)
+  expect_match(err, "scVelo\\.SeuratToAnndata")
+  expect_match(err, "loom backend")
 })
 
 test_that("scVelo.SeuratToAnndata() validates its loom path before Python", {

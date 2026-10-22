@@ -13,8 +13,8 @@
 test_that("package_data describes every optional backend", {
   pd <- SeuratExtend:::package_data
   expect_type(pd, "list")
-  expect_true(length(pd) >= 9)
-  expect_true(all(c("loomR", "SeuratDisk", "AUCell", "slingshot",
+  expect_true(length(pd) >= 8)
+  expect_true(all(c("SeuratDisk", "slingshot",
                     "DelayedArray", "DelayedMatrixStats") %in% names(pd)))
   # every entry must carry at least a website and an installer
   expect_true(all(vapply(pd, function(x) "website" %in% names(x), TRUE)))

@@ -351,8 +351,8 @@ adata.write("{filename}")
   }
 }
 
-#' @title (Deprecated) Export Seurat Object and Velocyto Data to Loom for scVelo Analysis
-#' @description This function converts a Seurat object and associated Velocyto loom files into a single loom file that integrates both spliced and unspliced RNA matrices. It is part of an older workflow and is soft deprecated in favor of `scVelo.SeuratToAnndata`. However, it is preserved for reproducibility of earlier work that cited its use.
+#' @title (Defunct) Export Seurat Object and Velocyto Data to Loom for scVelo Analysis
+#' @description This function is defunct. It formerly converted a Seurat object and associated Velocyto loom files into a single loom file that integrates both spliced and unspliced RNA matrices, but it relied on a third-party loom backend package, which has been removed as a dependency. It was already soft deprecated in favor of `scVelo.SeuratToAnndata`; use that function instead.
 #' @param seu Seurat object containing single-cell RNA sequencing data.
 #' @param export.name Name of the resulting loom file to be created.
 #' @param velocyto.loom.path Directory containing the Velocyto loom files; defaults to the current working directory. Default: getwd()
@@ -360,8 +360,8 @@ adata.write("{filename}")
 #' @param fxn.convert.loomtoseurat.cellname (Experimental) Function to convert cell names in Velocyto loom files to Seurat object cell names, if they differ.
 #' @param prefix Optional prefix added to Seurat cell IDs, typically used to include sample names. Default: NULL
 #' @param postfix Optional postfix added to Seurat cell IDs, typically used to denote unique identifiers such as '-1'. Default: NULL
-#' @return Generates a loom file that integrates Seurat and Velocyto data, stored in the specified export path.
-#' @details This set of functions supports the transition from Seurat objects to an integrated loom file via `scVelo.SeuratToLoom`, and from loom files to AnnData objects via `scVelo.RunBasic`, ready for basic to advanced scVelo analysis in Python. This older method is preserved for compatibility with previous studies and publications, ensuring reproducibility of earlier work. This older method is preserved for compatibility with previous studies and publications, but users are encouraged to transition to `scVelo.SeuratToAnndata` for a more streamlined and updated approach that directly integrates Seurat objects with scVelo analysis in Python's Scanpy library.
+#' @return This function is defunct and always raises an error; use `scVelo.SeuratToAnndata` instead.
+#' @details This function is defunct: the loom backend dependency it relied on has been removed from the package, so it can no longer build an integrated loom file. Use `scVelo.SeuratToAnndata` instead, which directly integrates Seurat objects with scVelo analysis in Python's Scanpy library. `scVelo.RunBasic` remains available for running scVelo from an existing loom file.
 #' @seealso \code{\link[SeuratExtend:scVelo.SeuratToAnndata]{scVelo.SeuratToAnndata}} for the recommended method of preparing data for scVelo analysis.
 #' @rdname scVelo-SeuratToLoom-and-RunBasic
 #' @export
@@ -376,123 +376,14 @@ scVelo.SeuratToLoom <- function(
     prefix = NULL,
     postfix = NULL
 ){
-  library(Seurat)
-  library(rlist)
-  library(dplyr)
-  library(rlang)
-  import("loomR")
-  import("SeuratDisk")
-
-  check.metadata.na <- sapply(seu@meta.data, function(x) any(is.na(x)))
-  if(any(check.metadata.na)) {
-    message(paste0("NA(s) exist in meta data: ",
-                   paste0(check.metadata.na %>% names(.)[.], collapse = ", "),
-                   "\nColumn(s) removed"))
-    seu@meta.data[,check.metadata.na] <- NULL
-  }
-
-  if(!is.null(velocyto.loom.path)) {
-    loom.files <- file.path(velocyto.loom.path, velocyto.loom.filenames)
-  } else {
-    loom.files <- velocyto.loom.filenames
-  }
-  if(any(!file.exists(loom.files))) {
-    stop(paste0("Loom file(s) not found: ",
-                paste0(loom.files[!file.exists(loom.files)], collapse = ", ")
+  .Defunct(
+    "scVelo.SeuratToAnndata",
+    msg = paste0(
+      "scVelo.SeuratToLoom() is defunct. ",
+      "The loom backend dependency has been removed; ",
+      "use scVelo.SeuratToAnndata() for scVelo analysis."
     )
-    )
-  }
-
-  # orig.assay <- DefaultAssay(seu)
-  DefaultAssay(seu) <- "RNA"
-  genes <- rownames(seu)
-  cells <- colnames(seu)
-  seu.subset.genes <- F
-
-  lfiles <- list()
-  cellname <- list()
-  # ambiguous <- list()
-  spliced <- list()
-  unspliced <- list()
-
-  for (i in seq_along(velocyto.loom.filenames)) {
-    lfiles[[i]] <- connect(filename = loom.files[i],
-                           mode = "r+", skip.validate = T)
-
-    if(is.null(fxn.convert.loomtoseurat.cellname)){
-      cellname[[i]] <-
-        strsplit(lfiles[[i]][["col_attrs"]][["CellID"]][], split = ":", fixed = T) %>%
-        sapply(function(x) x[2])
-      cellname[[i]] <- paste0(prefix[i],sub("x", "", cellname[[i]]),postfix[i])
-    }else{
-      cellname[[i]] <- fxn.convert.loomtoseurat.cellname(
-        velocyto.loom.filenames = i,
-        loom.cellname = lfiles[[i]][["col_attrs"]][["CellID"]][])
-    }
-    if(!any(cellname[[i]] %in% cells)) stop(paste0(velocyto.loom.filenames[i],": wrong prefix/postfix?"))
-
-    g <- lfiles[[i]][["row_attrs"]][["Gene"]][] %>% make.unique()
-    n <- length(setdiff(genes, g))
-    if(n>0){
-      message("There are ", n, " genes in the Seurat object which cannot be found in the Velocyto output. ",
-              "Did you use different version of reference genome?")
-      genes <- intersect(genes, g)
-      seu.subset.genes <- T
-    }
-    # ambiguous[[i]] <-
-    #   lfiles[[i]][["layers"]][["ambiguous"]][,] %>%
-    #   `colnames<-`(g) %>%
-    #   `rownames<-`(cellname[[i]]) %>%
-    #   .[rownames(.) %in% cells, genes]
-    spliced[[i]] <-
-      lfiles[[i]][["layers"]][["spliced"]][,] %>%
-      `colnames<-`(g) %>%
-      `rownames<-`(cellname[[i]]) %>%
-      .[!is.na(rownames(.)),] %>%
-      .[rownames(.) %in% cells, genes]
-    unspliced[[i]] <-
-      lfiles[[i]][["layers"]][["unspliced"]][,] %>%
-      `colnames<-`(g) %>%
-      `rownames<-`(cellname[[i]]) %>%
-      .[rownames(.) %in% cells, genes]
-  }
-
-  # ambiguous <- ambiguous %>%
-  #   list.rbind() %>%
-  #   .[cells,]
-  # spliced <- spliced %>%
-  #   list.rbind() %>%
-  #   .[cells,]
-  # unspliced <- unspliced %>%
-  #   list.rbind() %>%
-  #   .[cells,]
-  spliced <- list.rbind(spliced)
-  unspliced <- list.rbind(unspliced)
-  cell.looms <- rownames(spliced)
-  nc <- length(setdiff(cells, cell.looms))
-  if(nc>0){
-    message("There are ", nc, " cells in the Seurat object which cannot be found in the Velocyto output. ")
-    cells <- intersect(cells, cell.looms)
-  }
-  spliced <- spliced[cells,]
-  unspliced <- unspliced[cells,]
-
-  seu.new <- subset(seu, cells = cells, features = genes)
-  seu.new <- CreateSeuratObject(.get_assay_data_compat(seu.new, slot = "counts"), meta.data = seu.new@meta.data)
-  # if(add.reduction) {
-  #   seu.new <- NormalizeData(seu.new)
-  #   seu.new <- FindVariableFeatures(seu.new)
-  #   seu.new <- ScaleData(seu.new)
-  #   for (i in names(seu@reductions)) {
-  #     seu.new[[i]] <- CreateDimReducObject(embeddings = Embeddings(seu, reduction = i))
-  #   }
-  # }
-  pfile <- as.loom(x = seu.new, filename = export.name, overwrite = T)
-
-  pfile$add_layer(x = t(spliced), name = "spliced")
-  pfile$add_layer(x = t(unspliced), name = "unspliced")
-
-  pfile$close_all()
+  )
 }
 
 #' @param loom Path to the loom file created by `scVelo.SeuratToLoom`.
