@@ -1,12 +1,17 @@
 # Shared test helpers (auto-sourced by testthat before test files run)
 
-# Module-level probe: TRUE only when reticulate sees a Python AND the given
-# module imports. Any probe error means "not available" (fail-safe to skip).
+# Module-level probe: TRUE only when the 'seuratextend' conda env exists AND
+# the given module imports inside it. Probe errors mean "not available"
+# (fail-safe to skip). Keyed to env presence, not to this session's Python
+# init state — py_available(initialize = FALSE) is FALSE in fresh sessions
+# even on fully provisioned machines, which made the old probe under-detect.
 python_module_available_for_test <- function(module) {
-  tryCatch(
-    reticulate::py_available(initialize = FALSE) && reticulate::py_module_available(module),
-    error = function(e) FALSE
-  )
+  tryCatch({
+    envs <- reticulate::conda_list()
+    if (!"seuratextend" %in% envs$name) return(FALSE)
+    reticulate::use_condaenv("seuratextend", required = FALSE)
+    reticulate::py_module_available(module)
+  }, error = function(e) FALSE)
 }
 
 # Test fixture helpers (small, explicit, no hidden state)
