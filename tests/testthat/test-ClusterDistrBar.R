@@ -112,14 +112,16 @@ test_that("ClusterDistrPlot with condition returns boxplot ggplot", {
   # conditional skip (and its order-dependent green) is gone -- the path is
   # asserted directly when the optional package is installed.
   #
-  # Source-level assertions run BEFORE the ggbeeswarm gate: they are the part
-  # that matters most in an environment where the optional package is absent.
+  # The source-level assertions are gated with if(), NOT skip_if_not(): under
+  # R CMD check the source tree is unreachable, and the behavioural assertions
+  # below must still run in that layout. Only the ggbeeswarm requirement skips.
   root <- file.path("..", "..")
-  skip_if_not(dir.exists(file.path(root, "R")), "source tree not reachable")
-  src <- paste(readLines(file.path(root, "R", "Vlnplots.R"), warn = FALSE),
-               collapse = "\n")
-  expect_true(grepl('import_required("ggbeeswarm")', src, fixed = TRUE))
-  expect_false(grepl('import("ggbeeswarm")', src, fixed = TRUE))
+  if (dir.exists(file.path(root, "R"))) {
+    src <- paste(readLines(file.path(root, "R", "Vlnplots.R"), warn = FALSE),
+                 collapse = "\n")
+    expect_true(grepl('import_required("ggbeeswarm")', src, fixed = TRUE))
+    expect_false(grepl('import("ggbeeswarm")', src, fixed = TRUE))
+  }
 
   skip_if_not_installed("ggbeeswarm")
   p <- ClusterDistrPlot(origin = pbmc$sample_id, cluster = pbmc$cluster,
