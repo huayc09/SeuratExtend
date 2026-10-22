@@ -5,11 +5,13 @@
 # when the requested reduction is missing — not a cryptic Python NameError
 # ("name 'r_umap' is not defined") raised later inside the Python runtime.
 #
-# NOTE on the gate: both cases below used to open with
-#   skip_if_not(py_available_for_test())
-# which made them skip on exactly the machines where the bug they guard is
-# observable -- the gate and the defect lived in the same place. They now run
-# everywhere and branch on the environment instead (checklist AND-2).
+# NOTE on the gate: both cases below used to skip whenever a bare Python
+# interpreter existed, which made them skip on exactly the machines where the
+# bug they guard is observable -- the gate and the defect lived in the same
+# place. They now run everywhere and branch on the environment instead
+# (checklist AND-2). The environment branch below probes for a *conda*
+# installation plus an importable scanpy module
+# (python_module_available_for_test()), not just an interpreter.
 #
 # The heavy python round trips (Seu2Adata full run) are still NOT executed
 # here; only the R-side guard is exercised. (conda_available() comes from
@@ -28,7 +30,7 @@ test_that("adata.AddDR validates the Python environment before it validates 'dr'
     "no condition raised"
   }, error = function(e) conditionMessage(e))
 
-  if (conda_available()) {
+  if (conda_available() && python_module_available_for_test("scanpy")) {
     # environment is ready -> the issue #53 guard is reached and speaks up
     expect_match(err, "not found")
   } else {

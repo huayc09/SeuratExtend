@@ -55,7 +55,7 @@ test_that("Palantir.Pseudotime() needs a multiscale space before it needs Python
 })
 
 test_that("PAL-1 pin: Palantir.RunDM currently returns without error (silent path unconfirmed)", {
-  skip_if_not(conda_available(), "PAL-1 pin is pinned against a conda-present machine")
+  skip_if_not(conda_available() && python_module_available_for_test("palantir"), "PAL-1 pin is pinned against a conda+palantir machine")
   data(pbmc)
   # Same reasoning as above: conda missing -> load_condaenv() errors; conda
   # present -> reticulate/palantir errors. It must not return silently.

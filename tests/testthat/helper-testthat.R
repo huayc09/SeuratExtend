@@ -1,10 +1,12 @@
 # Shared test helpers (auto-sourced by testthat before test files run)
 
-# Python availability probe (spec 2.7): python-integration tests only run
-# when a usable Python environment is present, otherwise they are skipped.
-py_available_for_test <- function() {
-  requireNamespace("reticulate", quietly = TRUE) &&
-    reticulate::py_available(initialize = FALSE)
+# Module-level probe: TRUE only when reticulate sees a Python AND the given
+# module imports. Any probe error means "not available" (fail-safe to skip).
+python_module_available_for_test <- function(module) {
+  tryCatch(
+    reticulate::py_available(initialize = FALSE) && reticulate::py_module_available(module),
+    error = function(e) FALSE
+  )
 }
 
 # Test fixture helpers (small, explicit, no hidden state)

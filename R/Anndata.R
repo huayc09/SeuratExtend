@@ -42,6 +42,7 @@
 #'
 #' These tools are integral for researchers employing hybrid workflows that leverage the strengths of both Seurat and Scanpy/AnnData environments, supporting a wide range of computational tasks from data preprocessing to advanced analyses.
 #' @examples
+#' \dontrun{
 #' library(Seurat)
 #' library(SeuratExtend)
 #' library(reticulate)
@@ -74,6 +75,7 @@
 #'
 #' # Load an existing AnnData object from file
 #' adata.Load(pbmc_adata_path)
+#' }
 #'
 #' @rdname adata.Load
 #' @export

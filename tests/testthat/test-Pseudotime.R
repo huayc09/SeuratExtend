@@ -86,7 +86,7 @@ test_that("DimPlot.Slingshot is exported and ggplot-based when runnable", {
 
 test_that("python-backed Seu2Adata requires python (issue #53 family)", {
   data(pbmc)
-  skip_if(py_available_for_test())
+  skip_if(python_module_available_for_test("scanpy"))
   # no python -> must fail on the R side, not hang or crash the session
   expect_error(Seu2Adata(pbmc))
 })
