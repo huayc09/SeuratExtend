@@ -14,7 +14,7 @@ Imports:
     Seurat, dplyr, remotes, rlist, mosaic, ggplot2, reshape2, purrr, magrittr, tidyr, scales, 
     ggpubr, BiocManager, reticulate, glue, hdf5r
 Suggests:
-    rgl, GSVA, GSVAdata, slingshot, AUCell, biomaRt, ontologyIndex, viridis,
+    rgl, GSVA, GSVAdata, slingshot, biomaRt, ontologyIndex, viridis,
     doMC, doRNG, doParallel, foreach, mgsa, GSEABase, egg, loomR, 
     knitr, rmarkdown, RColorBrewer, testthat (>= 3.0.0),
     DelayedArray, DelayedMatrixStats, mgcv, scattermore,

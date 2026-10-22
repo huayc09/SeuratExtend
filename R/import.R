@@ -31,14 +31,6 @@ package_data <- list(
       BiocManager::install("mgsa")
     }
   ),
-  "AUCell" = list(
-    website = "https://bioconductor.org/packages/release/bioc/html/AUCell.html",
-    tutorial = "https://bioconductor.org/packages/release/bioc/vignettes/AUCell/inst/doc/AUCell.html",
-    install_info = 'remotes::install_github("aertslab/AUCell")',
-    install = function(){
-      remotes::install_github("aertslab/AUCell")
-    }
-  ),
   "ComplexHeatmap" = list(
     website = "https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html",
     tutorial = "https://jokergoo.github.io/ComplexHeatmap-reference/book/",

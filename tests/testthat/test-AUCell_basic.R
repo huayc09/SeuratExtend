@@ -12,12 +12,14 @@
 # with their source line; when one of those is fixed, the tagged expectation
 # is expected to flip, which is the point of pinning it.
 #
-# This file needs the AUCell / DelayedArray / DelayedMatrixStats / matrixStats
-# stack. Without it the ranking fixture cannot be built and everything that
+# This file needs the DelayedArray / DelayedMatrixStats / matrixStats stack.
+# (The AUCell *package* is NOT required: R/AUCell_basic.R is a vendored,
+# modified copy of the AUCell v1.19 algorithm — no runtime call into AUCell.)
+# Without it the ranking fixture cannot be built and everything that
 # depends on it is skipped.
 
 auc_deps_available <- function() {
-  all(vapply(c("AUCell", "DelayedArray", "DelayedMatrixStats", "matrixStats"),
+  all(vapply(c("DelayedArray", "DelayedMatrixStats", "matrixStats"),
              requireNamespace, logical(1), quietly = TRUE))
 }
 
