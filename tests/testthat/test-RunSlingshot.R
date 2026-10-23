@@ -153,16 +153,28 @@ test_that("RunSlingshot() multi-column group.by error does not mention 'one colu
                "must equal length")
 })
 
-# --- KNOWN-ISSUE: pinned at the source level ------------------------------
+# --- source-level pins (RSS-7 fixed by the deps-guard work order, RSS-8 open)
 
-test_that("RunSlingshot() drops the return value of import() and uses bare library()", {
-  # KNOWN-ISSUE (RSS-7 + RSS-8, P3): import()'s FALSE is discarded, and the
-  # two bare library() calls attach Seurat and dplyr onto the caller's search
-  # path (Seurat is a real functional dependency here, dplyr provides %>%).
-  # Source: R/RunSlingshot.R:36 (import) / :37-38 (library).
+test_that("RunSlingshot() guards its slingshot dependency explicitly", {
+  # FIXED (RSS-7, P3): import()'s FALSE used to be discarded here, so a script
+  # / knitr / CI session continued past a refused or skipped install and died
+  # later inside slingshot()/SlingshotDataSet() with `could not find function`.
+  # The call site is now import_required("slingshot"), which keeps import()'s
+  # interactive install prompt and then fails fast with an install hint when
+  # the package is absent.
+  # Source: R/RunSlingshot.R:37 (import_required).
   body_txt <- paste(deparse(body(SeuratExtend::RunSlingshot)), collapse = "\n")
-  expect_true(grepl('import("slingshot")', body_txt, fixed = TRUE))
-  expect_false(grepl("<- import(", body_txt, fixed = TRUE))
+  expect_true(grepl('import_required("slingshot")', body_txt, fixed = TRUE))
+  expect_false(grepl('import("slingshot")', body_txt, fixed = TRUE))
+})
+
+test_that("RunSlingshot() uses bare library() to attach Seurat and dplyr", {
+  # KNOWN-ISSUE (RSS-8, P3): the two bare library() calls attach Seurat and
+  # dplyr onto the caller's search path (Seurat is a real functional dependency
+  # here, dplyr provides %>%). Deliberately unchanged by the deps-guard work
+  # order, so this part of the old combined pin still asserts current behaviour.
+  # Source: R/RunSlingshot.R:38-39 (library).
+  body_txt <- paste(deparse(body(SeuratExtend::RunSlingshot)), collapse = "\n")
   expect_true(grepl("library(Seurat)", body_txt, fixed = TRUE))
   expect_true(grepl("library(dplyr)", body_txt, fixed = TRUE))
 })

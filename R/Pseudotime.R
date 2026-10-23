@@ -676,7 +676,7 @@ DimPlot.Slingshot <- function(
 
   library(Seurat)
   library(ggplot2)
-  import("slingshot")
+  import_required("slingshot")
 
   # Helper function to find matching reduction (case-insensitive)
   find_matching_reduction <- function(query, available) {

@@ -224,24 +224,26 @@ test_that("DimPlot2_SelColCont() inherits the single-colour crash", {
   expect_no_error(DimPlot2(pbmc, features = "CD3D"))
 })
 
-test_that("scale_cont_auto() depends on viridis for every colour path", {
-  # KNOWN-ISSUE (L1 Colors.R, not yet in any checklist): viridis is listed only
-  # under Suggests, yet scale_cont_auto() builds its scale_func list
-  # unconditionally at the very top of the body (:252-266) -- including
+test_that("scale_cont_auto() guards its viridis dependency for every colour path", {
+  # FIXED (L1 Colors.R, unnumbered pin): viridis is listed only under Suggests,
+  # and scale_cont_auto() builds its scale_func list unconditionally at the very
+  # top of the body (:252-266) -- including
   #   viridis = scale_color_viridis
   # and that symbol comes from the viridis package (ggplot2 >= 3.0 only exports
-  # scale_color_viridis_c / _d). import("viridis") runs first (:250); when the
-  # package is missing, import() messages "Package installation skipped" and
-  # returns FALSE (the value is dropped), so the list() is evaluated with the
-  # symbol unresolvable. Verified: with viridis removed from the search path,
-  # evaluating exactly that list() raises
+  # scale_color_viridis_c / _d). The call site used to be a bare import() whose
+  # FALSE was dropped, so on a clean install the list() was evaluated with the
+  # symbol unresolvable and every continuous-colour call -- and therefore
+  # DimPlot2(seu, features = <gene>) -- failed with
   #   object 'scale_color_viridis' not found
-  # i.e. on a clean install every continuous-colour call -- and therefore
-  # DimPlot2(seu, features = <gene>) -- fails.
+  # It is now import_required("viridis"): import()'s interactive install prompt
+  # is preserved, and a refused/failed/skipped install fails fast with an
+  # install hint that names viridis instead of dying later at the list().
+  # Source: R/Colors.R:250 (import_required).
   body_txt <- paste(deparse(body(SeuratExtend:::scale_cont_auto)),
                     collapse = "\n")
   expect_true(grepl("scale_color_viridis", body_txt, fixed = TRUE))
-  expect_true(grepl("import(\"viridis\")", body_txt, fixed = TRUE))
+  expect_true(grepl('import_required("viridis")', body_txt, fixed = TRUE))
+  expect_false(grepl('import("viridis")', body_txt, fixed = TRUE))
 
   desc <- readLines(system.file("DESCRIPTION", package = "SeuratExtend"),
                     warn = FALSE)

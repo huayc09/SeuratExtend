@@ -247,7 +247,7 @@ scale_cont_auto <- function(
   type <- match.arg(type)
   if (is.null(color_scheme)) return(NULL)
   library(ggplot2)
-  import("viridis")
+  import_required("viridis")
 
   scale_func <- if(type == "fill") {
     list(
