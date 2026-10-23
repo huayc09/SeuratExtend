@@ -142,8 +142,12 @@ FeaturePlot3 <- function(
       })
     return(col)
   })
-  tp.c <- cbind(Embeddings(seu, reduction = reduction), tp.c)
-  if(order) tp.c <- tp.c[order(rowMeans(tp.c[3:5])), ]
+  emb <- Embeddings(seu, reduction = reduction)
+  tp.c <- cbind(emb, tp.c)
+  # Embeddings() returns every dimension of the reduction, so the three
+  # expression columns are the three immediately after the embedding block.
+  expr_cols <- ncol(emb) + seq_len(3)
+  if(order) tp.c <- tp.c[order(rowMeans(tp.c[, expr_cols, drop = FALSE])), ]
   p <-
     ggplot(tp.c, aes_string(
     x = colnames(tp.c)[1],
@@ -219,7 +223,7 @@ FeaturePlot3.grid <- function(
   library(dplyr)
   library(magrittr)
   library(rlist)
-  import("ggtext")
+  import_required("ggtext")
 
   # features
   add3 <- function(x) {
@@ -297,10 +301,14 @@ FeaturePlot3.grid <- function(
         return(col)
       }
     )
-    tp.c[[i]] <- cbind(Embeddings(seu, reduction = reduction), tp.c[[i]])
-    if(order) tp.c[[i]] <- tp.c[[i]][order(rowMeans(tp.c[[i]][,3:5])), ]
+    emb <- Embeddings(seu, reduction = reduction)
+    tp.c[[i]] <- cbind(emb, tp.c[[i]])
+    # Locate the expression columns after the embedding block dynamically:
+    # Embeddings() returns every dimension of the reduction, not just two.
+    expr_cols <- ncol(emb) + seq_len(3)
+    if(order) tp.c[[i]] <- tp.c[[i]][order(rowMeans(tp.c[[i]][, expr_cols, drop = FALSE])), ]
     tp.c[[i]]$index <- i
-    tp.c[[i]] <- tp.c[[i]][,-c(3:5)]
+    tp.c[[i]] <- tp.c[[i]][, -expr_cols]
   }
   tp.c <- list.rbind(tp.c)
 

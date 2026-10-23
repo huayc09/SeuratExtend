@@ -258,7 +258,7 @@ Heatmap <- function(
 
   if(!is.null(facet_col) | !is.null(facet_row)){
     if(!is.null(ncol) | !is.null(nrow)) {
-      import("lemon")
+      import_required("lemon")
       if(!is.null(facet_col)) {
         p <- p +
           facet_rep_wrap(

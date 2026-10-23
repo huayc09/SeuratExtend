@@ -69,24 +69,36 @@ test_that("WaterfallPlot generic requires features", {
 
 # --- KNOWN-ISSUE pins (2026-09-16 recheck against 问题清单0915) ------------
 
-test_that("WaterfallPlot top.n silently depends on order = TRUE", {
+test_that("WaterfallPlot top.n always selects by score, order only arranges", {
   data(pbmc)
-  # KNOWN-ISSUE (WF-1, P1) -- R/WaterfallPlot.R:407-411. With order = TRUE the
-  # rows are ranked by the statistic, so the result does not depend on the
-  # order the caller listed the features in. With order = FALSE (with top.n
-  # set) the code keeps the first/last n rows of the DATA FRAME, so the figure
-  # is decided by the caller's writing order -- and the documentation at :133
-  # never says that top.n requires order = TRUE.
-  # Measured on pbmc's first 40 genes, top.n = 3, ident.1 = "B cell":
-  #   order=TRUE  natural  -> MRPL20,NOC2L,CPSF3L,HES4,TNFRSF4,ISG15
-  #   order=TRUE  reversed -> identical
-  #   order=FALSE natural  -> NOC2L,RP11-54O7.11,C1orf159,CDK11A,SLC35E2,NADK
-  #   order=FALSE reversed -> ATAD3B,MRPL20,RP4-758J18.2,...  (a different set)
+  # FIXED (WF-1) in work order runs/2026-10-22-deps-guard-silentfix:
+  # R/WaterfallPlot.R used to take head(tail) of the CURRENT row order, so with
+  # order = FALSE the selected bars were decided by the caller's writing order.
+  # Selection is now always by value (largest top.n positives + smallest
+  # top.n negatives) and `order` only controls the final arrangement.
   feat40 <- rownames(pbmc)[1:40]
-  kept <- function(f, ord) rownames(WaterfallPlot(
-    pbmc, features = f, ident.1 = "B cell", top.n = 3, order = ord)$data)
-  expect_identical(kept(feat40, TRUE), kept(rev(feat40), TRUE))
-  expect_false(identical(kept(feat40, FALSE), kept(rev(feat40), FALSE)))
+  dat <- function(f, ord) WaterfallPlot(
+    pbmc, features = f, ident.1 = "B cell", top.n = 3, order = ord)$data
+
+  full <- WaterfallPlot(pbmc, features = feat40, ident.1 = "B cell")$data
+  pos <- full[full$length > 0, , drop = FALSE]
+  neg <- full[full$length <= 0, , drop = FALSE]
+  expected <- c(rownames(pos)[order(pos$length, decreasing = TRUE)][1:3],
+                rownames(neg)[order(neg$length)][1:3])
+
+  d_nat <- dat(feat40, FALSE)
+  d_rev <- dat(rev(feat40), FALSE)
+  d_ord <- dat(feat40, TRUE)
+
+  # same selected set regardless of order flag or caller row order
+  expect_setequal(rownames(d_nat), expected)
+  expect_setequal(rownames(d_rev), expected)
+  expect_setequal(rownames(d_ord), expected)
+
+  # order = FALSE preserves the caller's row order among the selected bars
+  expect_identical(rownames(d_nat), feat40[feat40 %in% rownames(d_nat)])
+  # order = TRUE is ranked by score (descending)
+  expect_false(is.unsorted(rev(d_ord$length)))
 })
 
 test_that("WaterfallPlot reports a bad identity with an unrelated error", {

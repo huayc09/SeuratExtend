@@ -56,37 +56,21 @@ test_that("loaded var_colors drive DimPlot2 (save_colors pipeline)", {
 # --- show_col2 helper (documented export, #8) ------------------------------
 
 test_that("show_col2 returns a ggplot grid of palettes", {
-  # show_col2 calls NoAxes() (Seurat) internally without ::; attach Seurat.
-  skip_if_not(requireNamespace("Seurat", quietly = TRUE))
-
-  # KNOWN-ISSUE (R/Functions.R:213, not yet in any checklist): show_col2()
-  # calls list.rbind() WITHOUT the rlist:: prefix, but NAMESPACE only contains
-  # import(ggplot2) + importFrom(reshape2, melt) -- rlist is never imported.
-  # The unqualified name is reachable only because another source file attaches
-  # rlist at run time (R/ClusterDistrBar.R:55 and :205 do a bare
-  # library(rlist)). On a clean session the call therefore dies with
-  #   could not find function "list.rbind"
-  # Verified both ways: test-Colors.R alone -> error; test-Colors.R executed
-  # after test-ClusterDistrBar.R -> green. That is a test-order dependency on
-  # top of the source bug, so the check below is static (order-independent).
+  # FIXED (FUN-1, P1, same defect as the test-Functions.R pin): show_col2()
+  # called list.rbind()/`%>%`/NoAxes() without the package namespace importing
+  # them, so this case used to require a manual library(rlist) shim and was
+  # order-dependent on whichever neighbour test happened to attach the
+  # namespace. The roxygen block now imports all three, so no attach is needed.
   root <- file.path("..", "..")
   skip_if_not(file.exists(file.path(root, "NAMESPACE")),
               "dev-layout source inspection only")
   ns_lines <- readLines(file.path(root, "NAMESPACE"), warn = FALSE)
-  expect_false(any(grepl("rlist", ns_lines, fixed = TRUE)))
+  expect_true(any(grepl('importFrom(magrittr,"%>%")', ns_lines, fixed = TRUE)))
+  expect_true(any(grepl("importFrom(rlist,list.rbind)", ns_lines, fixed = TRUE)))
+  expect_true(any(grepl("importFrom(Seurat,NoAxes)", ns_lines, fixed = TRUE)))
   fn_lines <- readLines(file.path(root, "R", "Functions.R"), warn = FALSE)
   expect_true(any(grepl("pal_mtx <- list.rbind(", fn_lines, fixed = TRUE)))
 
-  # Satisfy the missing prerequisite explicitly instead of relying on the
-  # neighbour test file, and put the session back exactly as it was.
-  had_rlist <- "package:rlist" %in% search()
-  if (!had_rlist) {
-    skip_if_not(requireNamespace("rlist", quietly = TRUE), "rlist absent")
-    library(rlist)
-    on.exit(detach("package:rlist", unload = FALSE), add = TRUE)
-  }
-
-  library(Seurat)
   p <- show_col2(list(A = color_pro(5), B = color_iwh(5, 1)), ncol = 5)
   expect_true(inherits(p, "ggplot"))
 })
@@ -240,24 +224,26 @@ test_that("DimPlot2_SelColCont() inherits the single-colour crash", {
   expect_no_error(DimPlot2(pbmc, features = "CD3D"))
 })
 
-test_that("scale_cont_auto() depends on viridis for every colour path", {
-  # KNOWN-ISSUE (L1 Colors.R, not yet in any checklist): viridis is listed only
-  # under Suggests, yet scale_cont_auto() builds its scale_func list
-  # unconditionally at the very top of the body (:252-266) -- including
+test_that("scale_cont_auto() guards its viridis dependency for every colour path", {
+  # FIXED (L1 Colors.R, unnumbered pin): viridis is listed only under Suggests,
+  # and scale_cont_auto() builds its scale_func list unconditionally at the very
+  # top of the body (:252-266) -- including
   #   viridis = scale_color_viridis
   # and that symbol comes from the viridis package (ggplot2 >= 3.0 only exports
-  # scale_color_viridis_c / _d). import("viridis") runs first (:250); when the
-  # package is missing, import() messages "Package installation skipped" and
-  # returns FALSE (the value is dropped), so the list() is evaluated with the
-  # symbol unresolvable. Verified: with viridis removed from the search path,
-  # evaluating exactly that list() raises
+  # scale_color_viridis_c / _d). The call site used to be a bare import() whose
+  # FALSE was dropped, so on a clean install the list() was evaluated with the
+  # symbol unresolvable and every continuous-colour call -- and therefore
+  # DimPlot2(seu, features = <gene>) -- failed with
   #   object 'scale_color_viridis' not found
-  # i.e. on a clean install every continuous-colour call -- and therefore
-  # DimPlot2(seu, features = <gene>) -- fails.
+  # It is now import_required("viridis"): import()'s interactive install prompt
+  # is preserved, and a refused/failed/skipped install fails fast with an
+  # install hint that names viridis instead of dying later at the list().
+  # Source: R/Colors.R:250 (import_required).
   body_txt <- paste(deparse(body(SeuratExtend:::scale_cont_auto)),
                     collapse = "\n")
   expect_true(grepl("scale_color_viridis", body_txt, fixed = TRUE))
-  expect_true(grepl("import(\"viridis\")", body_txt, fixed = TRUE))
+  expect_true(grepl('import_required("viridis")', body_txt, fixed = TRUE))
+  expect_false(grepl('import("viridis")', body_txt, fixed = TRUE))
 
   desc <- readLines(system.file("DESCRIPTION", package = "SeuratExtend"),
                     warn = FALSE)

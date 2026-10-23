@@ -143,7 +143,7 @@ VlnPlot2(object, ...)
 
 \item{width}{Width of the box plot. Default: 0.9.}
 
-\item{show.mean}{Logical value indicating whether to show mean and median lines. This is particularly useful for genes with low expression levels where the median and box plot quartiles might overlap at zero, making it difficult to interpret differences between groups. Default is FALSE.}
+\item{show.mean}{Logical value indicating whether to show mean and median lines. When TRUE the mean and median crossbars are drawn independently of `box` — they overlay violins, box plots, or a bare violin when `box = FALSE`. This is particularly useful for genes with low expression levels where the median and box plot quartiles might overlap at zero, making it difficult to interpret differences between groups. Default is FALSE.}
 
 \item{mean_colors}{Vector of two colors for mean and median lines respectively. Default is c("red", "blue").}
 

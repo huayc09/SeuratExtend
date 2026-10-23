@@ -198,10 +198,12 @@ feature_percent <- function(
 #'
 #' @import ggplot2
 #' @importFrom reshape2 melt
+#' @importFrom magrittr %>%
+#' @importFrom rlist list.rbind
+#' @importFrom Seurat NoAxes
 #' @export
 
 show_col2 <- function(palette_list, ncol) {
-  library(ggplot2)
   pal_mtx_list <- lapply(palette_list, function(x) {
     if (length(x) < ncol) x <- x[1:ncol]
     return(matrix(x, ncol = ncol))

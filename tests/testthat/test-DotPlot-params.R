@@ -25,9 +25,9 @@ test_that("DotPlot2 actually consumes plot.margin (A2)", {
   data(pbmc)
   p <- DotPlot2(pbmc, features = c("CD3D", "MS4A1"),
                 plot.margin = ggplot2::margin(1, 2, 3, 4))
-  # KNOWN-ISSUE(DP-A2): 问题清单2026-09-16.xlsx 行5「DotPlot.R 死参数 plot.margin」(P2)。
-  # 断言当前错误行为（plot.margin 被静默忽略），修复工单内翻转回正确断言。
-  expect_null(p$theme$plot.margin)
+  # FIXED (DP-A2) in work order runs/2026-10-22-deps-guard-silentfix:
+  # R/DotPlot.R now passes the `plot.margin` formal into the main plot theme.
+  expect_equal(p$theme$plot.margin, ggplot2::margin(1, 2, 3, 4))
 })
 
 # --- A4: legend_position is honoured with flip + annotation -----------------
@@ -43,12 +43,13 @@ test_that("DotPlot2 honours legend_position with flip + annotation (A4)", {
     ggplot2::ggsave(f, p, width = 7, height = 5, dpi = 72)
     as.character(tools::md5sum(f))
   }
-  # KNOWN-ISSUE(DP-A4): 问题清单2026-09-16.xlsx 行7「DotPlot.R 静默失败: legend_position 被覆盖」(P2)。
-  # 断言当前错误行为（flip+annotation 分支强制 legend.position="bottom"），修复工单内翻转。
-  expect_identical(render_md5("left"), render_md5("right"))
-  # and the default (no legend_position passed) must still equal the previous
-  # forced "bottom" behaviour, so existing plots do not change
-  expect_identical(render_md5(NULL), render_md5("bottom"))
+  # FIXED (DP-A4) in work order runs/2026-10-22-deps-guard-silentfix: the
+  # forced theme(legend.position = "bottom") in the flip + annotation branch is
+  # gone, so the `legend_position` formal is honoured there like everywhere
+  # else. Left and right placements now render differently, and the default
+  # (legend_position = "right") matches an explicit "right".
+  expect_false(identical(render_md5("left"), render_md5("right")))
+  expect_identical(render_md5(NULL), render_md5("right"))
 })
 
 # --- A5: no ggplot2 deprecation warning -------------------------------------

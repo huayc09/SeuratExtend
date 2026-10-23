@@ -96,16 +96,43 @@ test_that("GSEAplot()'s slot argument is dead -- the call hardcodes 'data'", {
   expect_true(grepl('slot = "data"', body_txt, fixed = TRUE))
 })
 
-test_that("GSEAplot()'s default title is the deparsed geneset call", {
-  # KNOWN-ISSUE (GSV-2, P1): title defaults to deparse(substitute(geneset))
-  # (:39), so a call written as GSEAplot(pbmc, geneset = hall50$human$X) gets
-  # the whole expression pasted into the plot title, prefixed at :67.
-  # Source: R/runGSVA.R:39 (default) / :67 (first use, where it is evaluated).
+test_that("GSEAplot()'s default title is the caller expression", {
+  # FIXED (GSV-2) in work order runs/2026-10-22-deps-guard-silentfix:
+  # title defaults to deparse(substitute(geneset)), but it used to be forced
+  # only after `geneset` had been reassigned (intersect() with the expression
+  # matrix), so substitute() returned the reassigned character vector and the
+  # plot title became deparse(<vector value>) -- measured, it rendered as
+  # 'Enrichment Plot: c("AL627309.1", "AP006222.2", ...)'. The previous comment
+  # here claimed "the whole expression pasted into the plot title", which is
+  # not what was measured. The default is now forced at function entry
+  # (`title <- force(title)`), so the caller expression is used.
   fm <- formals(SeuratExtend::GSEAplot)
   expect_identical(paste(deparse(fm$title), collapse = ""),
                    "deparse(substitute(geneset))")
   body_txt <- paste(deparse(body(SeuratExtend::GSEAplot)), collapse = "\n")
-  expect_true(grepl('paste0("Enrichment Plot: ", title)', body_txt, fixed = TRUE))
+  expect_true(grepl("title <- force(title)", body_txt, fixed = TRUE))
+
+  skip_if_not_installed("ggpubr")
+  data(pbmc)
+  my_geneset <- rownames(pbmc)[1:20]
+  p <- suppressWarnings(GSEAplot(pbmc, geneset = my_geneset, ident.1 = "B cell"))
+  # Walk the rendered gtable for text labels (the title lives inside the
+  # assembled ggarrange grob, not in p$labels).
+  walk_text <- function(x) {
+    out <- character()
+    if (inherits(x, "text")) {
+      lab <- tryCatch(as.character(x$label), error = function(e) character())
+      if (length(lab) && any(nzchar(lab))) out <- c(out, lab[nzchar(lab)])
+    }
+    for (f in c("children", "grobs")) {
+      ch <- tryCatch(x[[f]], error = function(e) NULL)
+      if (!is.null(ch)) for (gg in ch) out <- c(out, walk_text(gg))
+    }
+    out
+  }
+  labs <- walk_text(ggplot2::ggplotGrob(p))
+  expect_true(any(grepl("Enrichment Plot: my_geneset", labs, fixed = TRUE)))
+  expect_false(any(grepl("Enrichment Plot: c(", labs, fixed = TRUE)))
 })
 
 # --- KNOWN-ISSUE: pinned at the source level ------------------------------

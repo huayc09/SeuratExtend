@@ -141,29 +141,33 @@ test_that("feature_percent reports an empty selection with a misleading message"
                "not found in Seurat object")
 })
 
-test_that("show_col2 relies on symbols the package namespace cannot see", {
-  # KNOWN-ISSUE (FUN-1, P1) -- source: R/Functions.R:212 (`%>%`, magrittr),
-  # :213 (`list.rbind`, rlist), :220 (`NoAxes`, Seurat)
-  #
-  # Kept STATIC on purpose -- this case must NOT call show_col2(). In a fresh
-  # session the call dies with `could not find function "%>%"`, and WHICH
-  # symbol fails first depends on what the session happens to have attached,
-  # so a behavioural assertion would flip green/red purely on file order.
+test_that("show_col2 resolves its symbols through the package namespace", {
+  # FIXED (FUN-1, P1): show_col2 used `%>%` (magrittr), list.rbind() (rlist)
+  # and NoAxes() (Seurat) without the package namespace importing them, so a
+  # fresh session died with `could not find function "%>%"` and WHICH symbol
+  # failed first depended on what else happened to be attached. The roxygen
+  # block now declares @importFrom magrittr %>%, rlist list.rbind and
+  # Seurat NoAxes, so the names resolve inside the package namespace no matter
+  # what the session has attached -- the behavioural call below no longer needs
+  # any manual attach.
   body_txt <- paste(deparse(body(SeuratExtend::show_col2)), collapse = "\n")
   expect_true(grepl("%>%", body_txt, fixed = TRUE))
   expect_true(grepl("list.rbind", body_txt, fixed = TRUE))
+  # the in-body bare library(ggplot2) is gone; ggplot2 comes from @import
+  expect_false(grepl("library(", body_txt, fixed = TRUE))
 
-  # magrittr and rlist ARE in DESCRIPTION:Imports (so they get installed), but
-  # NAMESPACE imports neither -> the namespaces are not on the search path of
-  # the package namespace, which is why the call above cannot resolve them.
   ns_path <- file.path("..", "..", "NAMESPACE")
   skip_if_not(file.exists(ns_path), "NAMESPACE not reachable")
   ns <- readLines(ns_path, warn = FALSE)
-  expect_false(any(grepl("magrittr", ns, fixed = TRUE)))
-  expect_false(any(grepl("rlist", ns, fixed = TRUE)))
+  expect_true(any(grepl('importFrom(magrittr,"%>%")', ns, fixed = TRUE)))
+  expect_true(any(grepl("importFrom(rlist,list.rbind)", ns, fixed = TRUE)))
+  expect_true(any(grepl("importFrom(Seurat,NoAxes)", ns, fixed = TRUE)))
 
   desc_txt <- paste(readLines(system.file("DESCRIPTION", package = "SeuratExtend"),
                               warn = FALSE), collapse = " ")
   expect_true(grepl("magrittr", desc_txt, fixed = TRUE))
   expect_true(grepl("rlist", desc_txt, fixed = TRUE))
+
+  p <- show_col2(list(A = color_pro(5), B = color_iwh(5, 1)), ncol = 5)
+  expect_true(inherits(p, "ggplot"))
 })

@@ -67,18 +67,18 @@ test_that("VolcanoPlot validates y but not x", {
                "non-numeric argument")
 })
 
-test_that("VolcanoPlot reaches ggrepel through a bare library() call", {
-  # KNOWN-ISSUE (VP-1, P1) -- partially resolved 2026-10-16 (work order
-  # test-infra-landing): ggrepel is now declared in DESCRIPTION Suggests, so
-  # check/CI environments see it. REMAINING issue (清单 P1): R/VolcanoPlot.R:183
-  # still attaches ggrepel with a bare library() instead of
-  # requireNamespace()/`::` -- a minimal install stays fragile. The full fix
-  # belongs to the P1 dependency-declaration batch; this pin flips fully then.
+test_that("VolcanoPlot guards ggrepel instead of a bare library() call", {
+  # FIXED (VP-1, P1): R/VolcanoPlot.R used to attach ggrepel with a bare
+  # library() -- a hard failure in any minimal install (no Suggests). The call
+  # site now goes through import_required("ggrepel"), which keeps import()'s
+  # interactive prompt and then fails fast with an install hint. ggrepel stays
+  # declared in DESCRIPTION Suggests.
   root <- file.path("..", "..")
   skip_if_not(dir.exists(file.path(root, "R")), "source tree not reachable")
   src <- paste(readLines(file.path(root, "R", "VolcanoPlot.R"), warn = FALSE),
                collapse = "\n")
-  expect_true(grepl("library(ggrepel)", src, fixed = TRUE))
+  expect_false(grepl("library(ggrepel)", src, fixed = TRUE))
+  expect_true(grepl('import_required("ggrepel")', src, fixed = TRUE))
   expect_true(grepl("geom_text_repel", src, fixed = TRUE))
   desc <- paste(readLines(system.file("DESCRIPTION", package = "SeuratExtend"),
                           warn = FALSE), collapse = " ")

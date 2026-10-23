@@ -19,10 +19,20 @@ test_that("package_data describes every optional backend", {
   # every entry must carry at least a website and an installer
   expect_true(all(vapply(pd, function(x) "website" %in% names(x), TRUE)))
   expect_true(all(vapply(pd, function(x) "install" %in% names(x), TRUE)))
-  # KNOWN-ISSUE (L2-7 AUC10 family / L3-2, L3-4): `slingshot` is the one entry
-  # with no `install_info`, so import() prints no "Recommended installation"
-  # line for it. Source: R/import.R:74-80.
-  expect_false("install_info" %in% names(pd[["slingshot"]]))
+  # FIXED (D4, audit 03b-audit.md) in fix round of work order
+  # runs/2026-10-22-deps-guard-silentfix: `slingshot` used to be the one entry
+  # without `install_info`, so import_required() would fall back to
+  # install.packages("slingshot") for a Bioconductor-only package. It now
+  # carries the same BiocManager hint as the DelayedArray entry.
+  expect_true("install_info" %in% names(pd[["slingshot"]]))
+  expect_identical(pd[["slingshot"]]$install_info,
+                   'BiocManager::install("slingshot")')
+  # registry completeness: every Bioconductor entry must carry an
+  # install_info, otherwise the helper's CRAN fallback would be wrong.
+  bioc <- vapply(pd, function(x) grepl("bioconductor.org", x$website,
+                                       fixed = TRUE), logical(1))
+  expect_true(all(vapply(pd[bioc], function(x) "install_info" %in% names(x),
+                         logical(1))))
 })
 
 test_that("import() returns TRUE for a package that is already installed", {
@@ -82,4 +92,37 @@ test_that("import() failure is signalled by a return value, not by an error", {
     quietly(suppressMessages(
       SeuratExtend:::import("seuratextend_nonexistent_probe_pkg")))
   )
+})
+
+# --- import_required(): the call-site guard ---------------------------------
+#
+# Batch-1 of runs/2026-10-22-deps-guard-silentfix replaced the call sites that
+# dropped import()'s return value with import_required(), which keeps the
+# interactive install prompt and then fails fast with an install hint.
+
+test_that("import_required() returns TRUE for an installed package", {
+  res <- quietly(SeuratExtend:::import_required("ggpubr"))
+  expect_identical(res, TRUE)
+})
+
+test_that("import_required() fails fast with an install hint when missing", {
+  # import() answers readline() with "" in a non-interactive session, so this
+  # exercises the exact path a script / knitr / CI run takes.
+  skip_if(interactive(), "would block on readline()")
+  pkg <- "seuratextend_nonexistent_probe_pkg"
+
+  expect_error(
+    quietly(SeuratExtend:::import_required(pkg)),
+    "required but not installed"
+  )
+
+  msg <- tryCatch(
+    { quietly(SeuratExtend:::import_required(pkg)); NULL },
+    error = function(e) conditionMessage(e)
+  )
+  # non-registry packages get the truthful CRAN route, naming the package
+  expect_match(msg, sprintf('install.packages\\("%s"\\)', pkg))
+
+  # contrast: the bare helper still returns FALSE rather than throwing
+  expect_false(suppressMessages(quietly(SeuratExtend:::import(pkg))))
 })

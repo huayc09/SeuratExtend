@@ -561,3 +561,62 @@ test_that("DimPlot2() rejects a discrete variable with more than 100 values", {
   expect_error(DimPlot2(s, features = "many"), "has > 100 values")
 })
 
+
+test_that("DimPlot2 honours priority when a gene and a meta column share a name", {
+  # FIXED (problems ledger row 11): `priority` was declared but never used by
+  # DimPlot2, so a meta.data column named like a gene always won and
+  # priority = "expr" was silently ignored. Wired in work order
+  # runs/2026-10-22-deps-guard-silentfix with the same semantics as Seu2Matr:
+  # the conflicting meta.data column is temporarily removed around FetchData.
+  # FIXED (D1, audit 03b-audit.md): the removal now warns like Seu2Matr
+  # instead of silently changing a group.by plot into a continuous one.
+  data(pbmc)
+  s <- pbmc
+  s@meta.data$CD3D <- factor(rep(c("low", "high"), length.out = ncol(s)))
+  continuous <- function(g) is.numeric(g$data$var) && !is.factor(g$data$var)
+
+  g_expr <- NULL
+  expect_warning(
+    g_expr <- DimPlot2(s, features = "CD3D", priority = "expr",
+                       combine = FALSE),
+    "CD3D.*expression values"
+  )
+  g_expr <- g_expr[[1]]
+  expect_true(continuous(g_expr))
+
+  g_meta <- DimPlot2(s, features = "CD3D", priority = "none",
+                     combine = FALSE)[[1]]
+  expect_false(continuous(g_meta))
+  expect_true(is.factor(g_meta$data$var))
+
+  # default is priority = c("expr", "none") -> expression wins, with the same
+  # diagnostic as the explicit "expr" call
+  g_default <- NULL
+  expect_warning(
+    g_default <- DimPlot2(s, features = "CD3D", combine = FALSE),
+    "found in both expression matrix"
+  )
+  g_default <- g_default[[1]]
+  expect_true(continuous(g_default))
+})
+
+test_that("DimPlot2 priority keeps conflicting meta columns for shape.by", {
+  # FIXED (D2, audit 03b-audit.md): the priority="expr" meta-column removal
+  # used to persist for the rest of DimPlot2_GetData, so a variable used as
+  # both feature and shape.by/split.by/alpha.by was gone by the time
+  # DimPlot2_PlotVars() looked it up and the call died with
+  # "Cannot find '<var>' in meta.data". The columns are now restored right
+  # after FetchData.
+  data(pbmc)
+  s <- pbmc
+  s@meta.data$CD3D <- factor(rep(c("low", "high"), length.out = ncol(s)))
+  expect_warning(
+    plots <- DimPlot2(s, features = "CD3D", shape.by = "CD3D",
+                      priority = "expr", combine = FALSE),
+    "found in both expression matrix"
+  )
+  expect_s3_class(plots[[1]], "ggplot")
+  # the caller's object is untouched (the local copy was restored too)
+  expect_true("CD3D" %in% colnames(s@meta.data))
+  expect_true(is.factor(s@meta.data$CD3D))
+})

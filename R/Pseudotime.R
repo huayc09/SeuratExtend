@@ -676,7 +676,7 @@ DimPlot.Slingshot <- function(
 
   library(Seurat)
   library(ggplot2)
-  import("slingshot")
+  import_required("slingshot")
 
   # Helper function to find matching reduction (case-insensitive)
   find_matching_reduction <- function(query, available) {
@@ -811,7 +811,7 @@ DimPlot.Slingshot <- function(
 
   # Combine plots if requested
   if (combine) {
-    import("cowplot")
+    import_required("cowplot")
     p_final <- plot_grid(plotlist = p_with_curves, ncol = ncol, nrow = nrow, align = "hv")
     return(p_final)
   } else {

@@ -34,7 +34,7 @@ RunSlingshot <- function(
     assay = NULL,
     start.clus = NULL
 ){
-  import("slingshot")
+  import_required("slingshot")
   library(Seurat)
   library(dplyr)
   assay <- assay %||% DefaultAssay(Seu)

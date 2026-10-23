@@ -105,12 +105,27 @@ test_that("BarOfCluster warns deprecated and delegates (issue #11 aliases)", {
 
 test_that("ClusterDistrPlot with condition returns boxplot ggplot", {
   data(pbmc)
-  # KNOWN-ISSUE(CDB-2): 问题清单 P1「Vlnplots.R 隐藏依赖 ggbeeswarm」——geom_quasirandom 裸调在
-  # install+check 环境下不可解析（dev/load_all 下可）。依赖声明修复批次落地后移除此门并恢复直接断言。
-  p <- tryCatch(ClusterDistrPlot(origin = pbmc$sample_id, cluster = pbmc$cluster,
-                        condition = pbmc$condition), error = function(e) e)
-  if (inherits(p, "error") && grepl("geom_quasirandom", conditionMessage(p), fixed = TRUE))
-    skip("KNOWN-ISSUE(CDB-2): ggbeeswarm bare-call unresolved under R CMD check")
+  # FIXED (CDB-2, P1): 问题清单「Vlnplots.R 隐藏依赖 ggbeeswarm」. The
+  # geom_quasirandom call site now goes through import_required("ggbeeswarm"),
+  # so the bare-symbol failure is replaced by a fail-fast error carrying an
+  # install hint; ggbeeswarm is declared in DESCRIPTION Suggests. The old
+  # conditional skip (and its order-dependent green) is gone -- the path is
+  # asserted directly when the optional package is installed.
+  #
+  # The source-level assertions are gated with if(), NOT skip_if_not(): under
+  # R CMD check the source tree is unreachable, and the behavioural assertions
+  # below must still run in that layout. Only the ggbeeswarm requirement skips.
+  root <- file.path("..", "..")
+  if (dir.exists(file.path(root, "R"))) {
+    src <- paste(readLines(file.path(root, "R", "Vlnplots.R"), warn = FALSE),
+                 collapse = "\n")
+    expect_true(grepl('import_required("ggbeeswarm")', src, fixed = TRUE))
+    expect_false(grepl('import("ggbeeswarm")', src, fixed = TRUE))
+  }
+
+  skip_if_not_installed("ggbeeswarm")
+  p <- ClusterDistrPlot(origin = pbmc$sample_id, cluster = pbmc$cluster,
+                        condition = pbmc$condition)
   expect_s3_class(p, "ggplot")
   expect_true(length(p$layers) >= 1)
   save_for_review(p, "ClusterDistrPlot boxplot by condition")

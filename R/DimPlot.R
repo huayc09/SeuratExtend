@@ -237,6 +237,7 @@ DimPlot2 <- function(
     assay = assay,
     dims = dims,
     reduction = reduction,
+    priority = priority,
     shape.by = shape.by,
     alpha.by = alpha.by,
     cells.highlight = cells.highlight,
@@ -367,7 +368,7 @@ DimPlot2 <- function(
   if(!combine) {
     return(p)
   } else {
-    import("cowplot")
+    import_required("cowplot")
     p <- plot_grid(plotlist = p, ncol = ncol, nrow = nrow, align = align)
     return(p)
   }
@@ -387,6 +388,7 @@ DimPlot2_GetData <- function(
     assay = NULL,
     dims = c(1, 2),
     reduction = NULL,
+    priority = c("expr", "none"),
     shape.by = NULL,
     alpha.by = NULL,
     cells.highlight = NULL,
@@ -466,12 +468,35 @@ DimPlot2_GetData <- function(
       vars <- ord$native
     }
     if(!is.null(cells.highlight)) vars = c(vars, "Selected_cells")
+    restore_meta <- NULL
+    if (priority[1] == "expr") {
+      # Mirror Seu2Matr(): when a requested variable exists in both the
+      # expression matrix and meta.data, use the expression values. The
+      # meta.data columns are removed only around the FetchData call below and
+      # restored afterwards, so later shape.by/split.by/alpha.by lookups still
+      # find them.
+      check.rep <- intersect(rownames(seu), colnames(seu@meta.data))
+      feature.rep <- intersect(vars, check.rep)
+      if (length(feature.rep) > 0) {
+        warning("'Variables' found in both expression matrix and 'meta.data' (",
+                paste(feature.rep, collapse = ", "),
+                "). Using the expression values. If you need to fetch data from ",
+                "'meta.data' please set 'priority' to 'none'")
+        restore_meta <- seu@meta.data[, feature.rep, drop = FALSE]
+        seu@meta.data[, feature.rep] <- NULL
+      }
+    }
     if (length(vars) == 0) {
       data.var <- data.frame(row.names = cells)
     } else if (utils::packageVersion("SeuratObject") >= "5.0.0") {
       data.var <- FetchData(object = seu, vars = vars, cells = cells, layer = slot, clean = "none")
     } else {
       data.var <- FetchData(object = seu, vars = vars, cells = cells, slot = slot)
+    }
+    if (!is.null(restore_meta)) {
+      for (nm in colnames(restore_meta)) {
+        seu@meta.data[[nm]] <- restore_meta[[nm]]
+      }
     }
     if (!is.null(ord)) {
       if (length(vars) > 0) {
@@ -581,7 +606,7 @@ DimPlot2_PlotSingle <- function (
   if(istrue.cell.highlight) pt.size <- sizes.highlight
   plot <-
     if (isTRUE(x = raster)) {
-      import("scattermore")
+      import_required("scattermore")
       plot + geom_scattermore(pointsize = pt.size, pixels = raster.dpi)
     } else {
       plot + geom_point(size = pt.size)
@@ -603,7 +628,7 @@ DimPlot2_PlotSingle <- function (
   if("split.by" %in% colnames(data.plot)) {
     plot <- plot + facet_wrap(vars(split.by), nrow = nrow.each)
   }
-  import("cowplot")
+  import_required("cowplot")
   plot <- plot + theme_cowplot() + CenterTitle()
   
   # Apply theme elements
@@ -646,7 +671,7 @@ DimPlot2_LabelClusters <- function(
     position = "median",
     ...
 ) {
-  if(repel) import("ggrepel")
+  if(repel) import_required("ggrepel")
   xynames <- unlist(x = GetXYAesthetics(plot = plot, geom = geom), use.names = TRUE)
   if (!id %in% colnames(x = plot$data)) {
     stop("Cannot find variable ", id, " in plotting data")
